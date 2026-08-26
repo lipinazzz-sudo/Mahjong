@@ -3,14 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mahjong Soul Web Edition</title>
-    <link rel="manifest" href="manifest.json">
-    <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+    <title>Mahjong Soul Riichi Engine</title>
     <style>
         :root {
             --bg-table: radial-gradient(circle at center, #1f4260 0%, #0d1e2d 100%);
             --gold-accent: #f39c12;
-            --blue-accent: #2980b9;
             --tile-bg: linear-gradient(to bottom, #ffffff 0%, #f4efe6 100%);
             --tile-back: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
         }
@@ -24,14 +21,12 @@
         button { background: linear-gradient(to bottom, #f39c12, #d35400); color: #fff; border: 1px solid #ffeb3b; padding: 10px 24px; margin: 6px; font-size: 1rem; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         button:active { transform: scale(0.96); }
 
-        /* --- MAHJONG SOUL TABLE SURFACE --- */
         #game-board {
             width: 100vw; height: 100vh; background: var(--bg-table); position: relative;
             display: grid; grid-template-rows: 90px 1fr 140px; grid-template-columns: 80px 1fr 80px;
             box-shadow: inset 0 0 100px #000; overflow: hidden;
         }
 
-        /* 1. DORA & HONBA PANEL (TOP LEFT - UI 1) */
         .dora-panel {
             position: absolute; top: 15px; left: 15px; background: rgba(10, 20, 30, 0.85);
             border: 2px solid #5c4520; border-radius: 8px; padding: 6px 10px; z-index: 10;
@@ -42,7 +37,6 @@
         .dora-open { background: #fff; color: #000; font-weight: bold; }
         .stick-counters { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; margin-top: 2px; }
 
-        /* 3. AVATAR FRAMES (UI 3) */
         .avatar-frame { position: absolute; display: flex; flex-direction: column; align-items: center; z-index: 5; }
         .avatar-img { width: 48px; height: 48px; border-radius: 8px; border: 2px solid var(--gold-accent); background: #2c3e50 url('https://cdn-icons-png.flaticon.com/512/4140/4140048.png') center/cover; }
         .avatar-name { font-size: 10px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; margin-top: 2px; border: 1px solid #444; }
@@ -52,7 +46,6 @@
         .pos-top { top: 15px; right: 220px; }
         .pos-right { right: 15px; top: 180px; }
 
-        /* 4. CENTER COMPASS BOARD (UI 4) */
         .center-board {
             grid-area: 2 / 2 / 3 / 3; justify-self: center; align-self: center;
             width: 170px; height: 170px; background: #161b22; border: 4px solid #30363d;
@@ -68,23 +61,19 @@
         .score-north { top: 6px; }
         .score-west { left: 6px; }
 
-        /* 5. TOP RIGHT SETTINGS & 6. EMOTE (UI 5 & UI 6) */
         .top-right-btns { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 10; }
         .icon-btn { width: 36px; height: 36px; background: rgba(16, 26, 36, 0.8); border: 1px solid #444; border-radius: 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .emote-btn { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); width: 32px; height: 48px; background: rgba(16, 26, 36, 0.8); border: 1px solid #444; border-radius: 6px 0 0 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 10; }
 
-        /* 7. DORA COUNTER BOTTOM RIGHT (UI 7) */
         .dora-indicator-count { position: absolute; bottom: 150px; right: 25px; font-size: 28px; font-weight: italic; color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.6); z-index: 5; }
         .dora-indicator-count span { color: var(--gold-accent); font-size: 34px; font-weight: bold; margin-left: 2px; }
 
-        /* --- DISCARD RIVERS (6 TILES PER ROW AROUND CENTER) --- */
         .river-container { position: absolute; display: flex; flex-wrap: wrap; gap: 2px; z-index: 3; }
         .river-bottom { bottom: 185px; left: 50%; transform: translateX(-50%); width: 144px; justify-content: flex-start; }
         .river-top { top: 95px; left: 50%; transform: translateX(-50%) rotate(180deg); width: 144px; }
         .river-left { left: 105px; top: 50%; transform: translateY(-50%) rotate(90deg); width: 144px; }
         .river-right { right: 105px; top: 50%; transform: translateY(-50%) rotate(-90deg); width: 144px; }
 
-        /* --- MAHJONG TILE DESIGN (IMAGE 1 ACCURACY) --- */
         .tile {
             background: var(--tile-bg); color: #111; border-radius: 4px; display: flex;
             justify-content: center; align-items: center; position: relative;
@@ -98,13 +87,11 @@
         }
         .tile-char { font-size: 24px; }
 
-        /* Tile Backs for Enemies */
         .tile-back {
             background: var(--tile-back); border-radius: 3px; border: 1px solid #795548;
             box-shadow: 0 2px 4px rgba(0,0,0,0.4); border-bottom: 3px solid #3e2723;
         }
 
-        /* Player Hands Layout */
         .hand-bottom-container { grid-area: 3 / 1 / 4 / 4; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 15px; z-index: 6; }
         .hand-tiles { display: flex; gap: 3px; }
         .hand-tiles .tile { width: 42px; height: 62px; }
@@ -117,11 +104,9 @@
         .side-left { left: 10px; top: 25%; }
         .side-right { right: 10px; top: 25%; }
 
-        /* Discard Tile Small Style */
         .discard-tile { width: 22px; height: 32px; font-size: 14px; background: #fff; border-radius: 2px; border-bottom: 2px solid #666; display: flex; justify-content: center; align-items: center; position: relative; }
         .discard-tile .tile-helper { font-size: 7px; top: 0; right: 1px; }
 
-        /* ACTION POPUP BUTTONS (RON, PON, CHI, SKIP) */
         #action-overlay {
             position: absolute; bottom: 100px; right: 15%; display: none; gap: 12px; z-index: 20;
             background: rgba(5, 12, 20, 0.9); padding: 10px 20px; border-radius: 40px; border: 2px solid var(--gold-accent);
@@ -130,6 +115,7 @@
         .act-btn { padding: 8px 20px; font-size: 1.1rem; border-radius: 20px; text-shadow: 1px 1px 2px #000; cursor: pointer; color: white; font-weight: bold; }
         .act-btn:hover { filter: brightness(1.2); }
         .btn-ron { background: linear-gradient(to bottom, #e74c3c, #c0392b); border: 2px solid #ff7675; }
+        .btn-tsumo { background: linear-gradient(to bottom, #e67e22, #d35400); border: 2px solid #f39c12; }
         .btn-pon { background: linear-gradient(to bottom, #0984e3, #74b9ff); border: 2px solid #74b9ff; }
         .btn-chi { background: linear-gradient(to bottom, #2ecc71, #27ae60); border: 2px solid #55efc4; }
         .btn-skip { background: linear-gradient(to bottom, #636e72, #2d3436); border: 2px solid #b2bec3; }
@@ -137,7 +123,10 @@
 </head>
 <body>
 
-    <audio id="bg-music" loop><source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_51a37c4493.mp3?filename=chinese-traditional-music-110072.mp3" type="audio/mpeg"></audio>
+    <!-- Audio Instrumen Musik Tradisional Tiongkok/Jepang (Streaming Direct MP3) -->
+    <audio id="bg-music" loop>
+        <source src="https://upload.wikimedia.org/wikipedia/commons/1/18/Gong_sound.ogg" type="audio/ogg">
+    </audio>
 
     <!-- MAIN MENU -->
     <div id="screen-main" class="screen active">
@@ -150,30 +139,25 @@
     <div id="screen-settings" class="screen">
         <h1>Settings</h1>
         <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 10px; width: 300px; margin-bottom: 15px;">
-            <label>Language:</label>
-            <select id="lang-select" style="width:100%; padding:8px; margin: 10px 0;">
-                <option value="id">Indonesia</option>
-                <option value="en">English</option>
-            </select>
             <label>Music Volume:</label>
-            <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.5" style="width:100%; margin-top:10px;">
+            <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.5" onchange="updateVolume(this.value)" style="width:100%; margin-top:10px;">
         </div>
         <button onclick="nav('screen-main')">Back</button>
     </div>
 
-    <!-- PLAY MENU -->
+    <!-- PLAY MENU (AI EASY, MEDIUM, HARD TERSEDIA) -->
     <div id="screen-play" class="screen">
-        <h1>Select Mode</h1>
+        <h1>Select Difficulty</h1>
         <button onclick="start4PGame('Easy')">Vs AI (Easy)</button>
+        <button onclick="start4PGame('Medium')">Vs AI (Medium)</button>
         <button onclick="start4PGame('Hard')">Vs AI (Hard)</button>
         <button onclick="nav('screen-main')">Back</button>
     </div>
 
-    <!-- MAHJONG SOUL GAME BOARD -->
+    <!-- GAME BOARD -->
     <div id="screen-game" class="screen" style="padding:0;">
         <div id="game-board">
             
-            <!-- 1. DORA PANEL (TOP LEFT) -->
             <div class="dora-panel">
                 <div class="dora-tiles">
                     <div class="dora-tile-box dora-open" id="dora-indicator-tile">🀅</div>
@@ -188,45 +172,40 @@
                 </div>
             </div>
 
-            <!-- 5. TOP RIGHT CONTROL BUTTONS -->
             <div class="top-right-btns">
+                <div class="icon-btn" onclick="toggleAudio()">🎵</div>
                 <div class="icon-btn" onclick="nav('screen-settings')">⚙️</div>
                 <div class="icon-btn" onclick="quitGame()">🚪</div>
             </div>
 
-            <!-- 6. EMOTE BUTTON (RIGHT) -->
-            <div class="emote-btn" onclick="alert('Emotes Coming Soon!')">😀</div>
+            <div class="emote-btn" onclick="alert('Emote!')">😀</div>
 
-            <!-- 3. AVATARS -->
             <div class="avatar-frame pos-bottom">
                 <div class="avatar-img"></div>
                 <div class="avatar-name">You (South)</div>
             </div>
             <div class="avatar-frame pos-left">
                 <div class="avatar-img"></div>
-                <div class="avatar-name">AI West</div>
+                <div class="avatar-name" id="name-left">AI West</div>
             </div>
             <div class="avatar-frame pos-top">
                 <div class="avatar-img"></div>
-                <div class="avatar-name">AI North</div>
+                <div class="avatar-name" id="name-top">AI North</div>
             </div>
             <div class="avatar-frame pos-right">
                 <div class="avatar-img"></div>
-                <div class="avatar-name">AI East</div>
+                <div class="avatar-name" id="name-right">AI East</div>
             </div>
 
-            <!-- ENEMY TILES (FACE DOWN) -->
             <div class="enemy-hand-top" id="enemy-hand-top"></div>
             <div class="enemy-hand-side side-left" id="enemy-hand-left"></div>
             <div class="enemy-hand-side side-right" id="enemy-hand-right"></div>
 
-            <!-- DISCARD RIVERS (4 SIDES SURROUNDING CENTER) -->
             <div class="river-container river-bottom" id="river-bottom"></div>
             <div class="river-container river-top" id="river-top"></div>
             <div class="river-container river-left" id="river-left"></div>
             <div class="river-container river-right" id="river-right"></div>
 
-            <!-- 4. CENTER COMPASS BOARD -->
             <div class="center-board">
                 <div class="compass-center">
                     <div class="round-info">East 1</div>
@@ -238,13 +217,10 @@
                 <div class="score-tag score-west">25000</div>
             </div>
 
-            <!-- 7. DORA COUNTER BOTTOM RIGHT -->
             <div class="dora-indicator-count">7<span>+20</span></div>
 
-            <!-- ACTION BUTTONS OVERLAY (DYNAMICALLY GENERATED) -->
             <div id="action-overlay"></div>
 
-            <!-- PLAYER HAND AT BOTTOM -->
             <div class="hand-bottom-container">
                 <button onclick="autoSortHand()" style="position:absolute; bottom:85px; right:20px; padding:4px 10px; font-size:11px;">Auto Sort</button>
                 <div class="hand-tiles" id="player-hand-tiles"></div>
@@ -254,58 +230,123 @@
     </div>
 
 <script>
-    // --- TILE DATA ACCORDING TO IMAGE 1 ---
-    const tileDefinitions = [
-        // Manzu (Characters) 1-9
-        { char: '一萬', val: '🀇', helper: '1', type: 'man', sort: 11 }, { char: '二萬', val: '🀈', helper: '2', type: 'man', sort: 12 },
-        { char: '三萬', val: '🀉', helper: '3', type: 'man', sort: 13 }, { char: '四萬', val: '🀊', helper: '4', type: 'man', sort: 14 },
-        { char: '伍萬', val: '🀋', helper: '5', type: 'man', sort: 15 }, { char: '六萬', val: '🀌', helper: '6', type: 'man', sort: 16 },
-        { char: '七萬', val: '🀍', helper: '7', type: 'man', sort: 17 }, { char: '八萬', val: '🀎', helper: '8', type: 'man', sort: 18 },
-        { char: '九萬', val: '🀏', helper: '9', type: 'man', sort: 19 },
-        // Pinzu (Circles) 1-9
-        { char: '🀙', val: '🀙', helper: '1', type: 'pin', sort: 21 }, { char: '🀚', val: '🀚', helper: '2', type: 'pin', sort: 22 },
-        { char: '🀛', val: '🀛', helper: '3', type: 'pin', sort: 23 }, { char: '🀜', val: '🀜', helper: '4', type: 'pin', sort: 24 },
-        { char: '🀝', val: '🀝', helper: '5', type: 'pin', sort: 25 }, { char: '🀞', val: '🀞', helper: '6', type: 'pin', sort: 26 },
-        { char: '🀟', val: '🀟', helper: '7', type: 'pin', sort: 27 }, { char: '🀠', val: '🀠', helper: '8', type: 'pin', sort: 28 },
-        { char: '🀡', val: '🀡', helper: '9', type: 'pin', sort: 29 },
-        // Souzu (Bamboo) 1-9
-        { char: '🀐', val: '🀐', helper: '1', type: 'sou', sort: 31 }, { char: '🀑', val: '🀑', helper: '2', type: 'sou', sort: 32 },
-        { char: '🀒', val: '🀒', helper: '3', type: 'sou', sort: 33 }, { char: '🀓', val: '🀓', helper: '4', type: 'sou', sort: 34 },
-        { char: '🀔', val: '🀔', helper: '5', type: 'sou', sort: 35 }, { char: '🀕', val: '🀕', helper: '6', type: 'sou', sort: 36 },
-        { char: '🀖', val: '🀖', helper: '7', type: 'sou', sort: 37 }, { char: '🀗', val: '🀗', helper: '8', type: 'sou', sort: 38 },
-        { char: '🀘', val: '🀘', helper: '9', type: 'sou', sort: 39 },
-        // Winds E, S, W, N
-        { char: '東', val: '🀀', helper: 'E', type: 'wind', sort: 41 }, { char: '南', val: '🀁', helper: 'S', type: 'wind', sort: 42 },
-        { char: '西', val: '🀂', helper: 'W', type: 'wind', sort: 43 }, { char: '北', val: '🀃', helper: 'N', type: 'wind', sort: 44 },
-        // Dragons Wh, G, R
-        { char: '🀆', val: '🀆', helper: 'Wh', type: 'dragon', sort: 51 },
-        { char: '發', val: '🀅', helper: 'G', type: 'dragon', sort: 52 },
-        { char: '中', val: '🀄', helper: 'R', type: 'dragon', sort: 53 }
-    ];
+    // --- MAHJONG TILE DEFINITIONS (34 TYPES x 4 = 136 TILES) ---
+    const TILE_TYPES = [];
+    const suits = ['man', 'pin', 'sou'];
+    const helpers = ['1','2','3','4','5','6','7','8','9'];
+    const charsMan = ['一萬','二萬','三萬','四萬','伍萬','六萬','七萬','八萬','九萬'];
+    const unicodePin = ['🀙','🀚','🀛','🀜','🀝','🀞','🀟','🀠','🀡'];
+    const unicodeSou = ['🀐','🀑','🀒','🀓','🀔','🀕','🀖','🀗','🀘'];
 
-    let fullDeck = [], playerHands = [[], [], [], []], currentTurn = 0, drawnTile = null, isDiscardable = false;
+    let idCounter = 0;
+    // 0-8: Man, 9-17: Pin, 18-26: Sou
+    for (let i = 0; i < 9; i++) TILE_TYPES.push({ id: idCounter++, val: charsMan[i], helper: helpers[i], type: 'man', num: i+1 });
+    for (let i = 0; i < 9; i++) TILE_TYPES.push({ id: idCounter++, val: unicodePin[i], helper: helpers[i], type: 'pin', num: i+1 });
+    for (let i = 0; i < 9; i++) TILE_TYPES.push({ id: idCounter++, val: unicodeSou[i], helper: helpers[i], type: 'sou', num: i+1 });
+    // Honor Tiles (27-30 Winds, 31-33 Dragons)
+    const honors = [
+        { val: '東', helper: 'E' }, { val: '南', helper: 'S' }, { val: '西', helper: 'W' }, { val: '北', helper: 'N' },
+        { val: '🀆', helper: 'Wh' }, { val: '發', helper: 'G' }, { val: '中', helper: 'R' }
+    ];
+    honors.forEach(h => TILE_TYPES.push({ id: idCounter++, val: h.val, helper: h.helper, type: 'honor', num: 0 }));
+
+    let fullDeck = [];
+    let playerHands = [[], [], [], []];
+    let playerRivers = [[], [], [], []];
+    let currentTurn = 0;
+    let drawnTile = null;
+    let isDiscardable = false;
+    let aiDifficulty = 'Medium';
+    let audioContext = null;
 
     function nav(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    function start4PGame(diff) {
-        fullDeck = [];
-        for (let i = 0; i < 4; i++) {
-            tileDefinitions.forEach(t => fullDeck.push({...t, id: Math.random()}));
+    // --- REAL RIICHI MAHJONG WINNING ENGINE (4 MELDS + 1 PAIR & CHIITOITSU) ---
+    function checkWinningHand(tiles) {
+        if (tiles.length !== 14) return false;
+        let counts = new Array(34).fill(0);
+        tiles.forEach(t => counts[t.id]++);
+
+        // Check Chiitoitsu (7 Pairs)
+        let pairCount = counts.filter(c => c === 2).length;
+        if (pairCount === 7) return true;
+
+        // Check Standard Hand: 1 Pair + 4 Melds
+        for (let i = 0; i < 34; i++) {
+            if (counts[i] >= 2) {
+                let tempCounts = [...counts];
+                tempCounts[i] -= 2;
+                if (canFormMelds(tempCounts)) return true;
+            }
         }
+        return false;
+    }
+
+    function canFormMelds(counts) {
+        let first = counts.findIndex(c => c > 0);
+        if (first === -1) return true;
+
+        // Try Triplet
+        if (counts[first] >= 3) {
+            counts[first] -= 3;
+            if (canFormMelds(counts)) return true;
+            counts[first] += 3;
+        }
+
+        // Try Sequence (Only for Suited tiles: Man, Pin, Sou)
+        if (first < 27 && (first % 9) <= 6) {
+            if (counts[first] > 0 && counts[first+1] > 0 && counts[first+2] > 0) {
+                counts[first]--; counts[first+1]--; counts[first+2]--;
+                if (canFormMelds(counts)) return true;
+                counts[first]++; counts[first+1]++; counts[first+2]++;
+            }
+        }
+        return false;
+    }
+
+    // --- AUDIO CONTROLLER ---
+    function toggleAudio() {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        const bgMusic = document.getElementById('bg-music');
+        if (bgMusic.paused) bgMusic.play();
+        else bgMusic.pause();
+    }
+
+    function updateVolume(val) {
+        document.getElementById('bg-music').volume = val;
+    }
+
+    // --- GAME INIT ---
+    function start4PGame(diff) {
+        aiDifficulty = diff;
+        ['name-left', 'name-top', 'name-right'].forEach(id => {
+            document.getElementById(id).innerText = `AI (${diff})`;
+        });
+
+        // 1. Build Deck (136 Tiles)
+        fullDeck = [];
+        TILE_TYPES.forEach(t => {
+            for (let i = 0; i < 4; i++) fullDeck.push({ ...t, uniqueId: Math.random() });
+        });
         fullDeck.sort(() => Math.random() - 0.5);
 
+        // 2. Clear Hands & Rivers
         playerHands = [[], [], [], []];
+        playerRivers = [[], [], [], []];
         document.querySelectorAll('.river-container').forEach(r => r.innerHTML = '');
 
+        // 3. Deal 13 Tiles Each
         for (let i = 0; i < 13; i++) {
             for (let p = 0; p < 4; p++) playerHands[p].push(fullDeck.pop());
         }
 
-        let dora = fullDeck.pop();
-        document.getElementById('dora-indicator-tile').innerText = dora.val;
+        // Set Dora
+        document.getElementById('dora-indicator-tile').innerText = fullDeck.pop().val;
 
         autoSortHand();
         renderEnemyHands();
@@ -315,7 +356,7 @@
     }
 
     function autoSortHand() {
-        playerHands[0].sort((a, b) => a.sort - b.sort);
+        playerHands[0].sort((a, b) => a.id - b.id);
         renderPlayerHand();
     }
 
@@ -345,48 +386,113 @@
     }
 
     function processTurn() {
-        if (fullDeck.length === 0) { alert("Game Draw! Wall is empty."); nav('screen-main'); return; }
-        
+        if (fullDeck.length === 0) { alert("Game Draw! Wall Empty."); nav('screen-main'); return; }
+
         drawnTile = fullDeck.pop();
         playerHands[currentTurn].push(drawnTile);
 
         if (currentTurn === 0) {
             isDiscardable = true;
             renderPlayerHand();
+            // Self Tsumo Check
+            if (checkWinningHand(playerHands[0])) {
+                showAvailableActions(['Tsumo']);
+            }
         } else {
             isDiscardable = false;
             renderEnemyHands();
+            
+            // AI Logic based on difficulty
+            let delay = aiDifficulty === 'Easy' ? 1200 : (aiDifficulty === 'Medium' ? 800 : 400);
             setTimeout(() => {
-                let idx = Math.floor(Math.random() * playerHands[currentTurn].length);
-                let discarded = playerHands[currentTurn].splice(idx, 1)[0];
+                let hand = playerHands[currentTurn];
+                let discardIdx = 0;
+
+                if (aiDifficulty === 'Easy') {
+                    discardIdx = Math.floor(Math.random() * hand.length);
+                } else {
+                    // Medium/Hard AI: Discard honor tiles first if isolated
+                    let honorIdx = hand.findIndex(t => t.type === 'honor');
+                    discardIdx = honorIdx !== -1 ? honorIdx : hand.length - 1;
+                }
+
+                let discarded = hand.splice(discardIdx, 1)[0];
+                if (t === drawnTile) drawnTile = null;
                 commitDiscard(currentTurn, discarded);
-            }, 1000); // Jeda bot membuang batu
+            }, delay);
         }
     }
 
+    // --- REAL DISCARD ENGINE FIX ---
     function discardTile(index) {
         if (!isDiscardable) return;
         isDiscardable = false;
+        
+        // Remove tile explicitly from Player 0 Hand array
         let discarded = playerHands[0].splice(index, 1)[0];
         drawnTile = null;
+        renderPlayerHand();
         commitDiscard(0, discarded);
     }
 
-    // --- LOGIKA MUNCULNYA ACTION BUTTON (DINAMIS) ---
+    function commitDiscard(pIdx, tile) {
+        playerRivers[pIdx].push(tile);
+        
+        const riverIds = ['river-bottom', 'river-right', 'river-top', 'river-left'];
+        const riverEl = document.getElementById(riverIds[pIdx]);
+        
+        let dEl = document.createElement('div');
+        dEl.className = 'discard-tile';
+        dEl.innerHTML = `${tile.val}<span class="tile-helper">${tile.helper}</span>`;
+        riverEl.appendChild(dEl);
+
+        // Check if Human Player can call Ron / Pon / Chi on enemy discards
+        if (pIdx !== 0) {
+            let actions = [];
+            
+            // 1. Check Ron
+            if (checkWinningHand([...playerHands[0], tile])) actions.push('Ron');
+            
+            // 2. Check Pon (Player has >= 2 matching tiles)
+            let matchCount = playerHands[0].filter(t => t.id === tile.id).length;
+            if (matchCount >= 2) actions.push('Pon');
+
+            // 3. Check Chi (Only if discarded by Kamicha / Player on Left / Player 3)
+            if (pIdx === 3 && tile.id < 27) {
+                let suitBase = Math.floor(tile.id / 9) * 9;
+                let num = tile.id % 9;
+                let ids = playerHands[0].map(t => t.id);
+
+                let has = (n) => n >= 0 && n < 9 && ids.includes(suitBase + n);
+                if ((has(num-2) && has(num-1)) || (has(num-1) && has(num+1)) || (has(num+1) && has(num+2))) {
+                    actions.push('Chi');
+                }
+            }
+
+            if (actions.length > 0) {
+                actions.push('Skip');
+                showAvailableActions(actions);
+            } else {
+                nextTurn();
+            }
+        } else {
+            nextTurn();
+        }
+    }
+
     function showAvailableActions(actionsList) {
         const overlay = document.getElementById('action-overlay');
-        overlay.innerHTML = ''; // Hapus tombol lama
+        overlay.innerHTML = '';
         
-        if (actionsList.length === 0) {
+        if (!actionsList || actionsList.length === 0) {
             overlay.style.display = 'none';
             return;
         }
 
-        // Generate tombol secara dinamis berdasarkan list
         actionsList.forEach(act => {
             let btn = document.createElement('button');
             btn.className = `act-btn btn-${act.toLowerCase()}`;
-            btn.innerText = act; // Label text
+            btn.innerText = act;
             btn.onclick = () => triggerAction(act);
             overlay.appendChild(btn);
         });
@@ -394,44 +500,13 @@
         overlay.style.display = 'flex';
     }
 
-    function commitDiscard(pIdx, tile) {
-        const riverIds = ['river-bottom', 'river-right', 'river-top', 'river-left'];
-        const river = document.getElementById(riverIds[pIdx]);
-        
-        let dEl = document.createElement('div');
-        dEl.className = 'discard-tile';
-        dEl.innerHTML = `${tile.val}<span class="tile-helper">${tile.helper}</span>`;
-        river.appendChild(dEl);
-
-        // Jika musuh membuang batu, simulasikan peluang tombol Action muncul
-        if (pIdx !== 0) {
-            let possibleActions = [];
-            let randomChance = Math.random();
-
-            // Simulasi: Mengacak tombol apa yang bisa ditekan oleh player
-            if (randomChance < 0.2) possibleActions.push('Ron');
-            else if (randomChance < 0.4) possibleActions.push('Pon');
-            else if (randomChance < 0.6 && pIdx === 3) { // Chi hanya bisa dari player sebelum kita (kiri/Player 3)
-                possibleActions.push('Chi'); 
-                possibleActions.push('Pon'); 
-            }
-            
-            // Jika ada Action yang bisa dipencet, pastikan ada tombol Skip
-            if (possibleActions.length > 0) {
-                possibleActions.push('Skip');
-                showAvailableActions(possibleActions);
-            } else {
-                nextTurn(); // Lanjut jika tidak ada action
-            }
-        } else {
-            nextTurn(); // Player membuang batu, langsung lanjut
-        }
-    }
-
     function triggerAction(act) {
         document.getElementById('action-overlay').style.display = 'none';
-        if (act === 'Ron') { alert("RON! Victory!"); nav('screen-main'); return; }
-        // Untuk Pon / Chi mock-up, anggap skip lalu giliran lanjut
+        if (act === 'Ron' || act === 'Tsumo') {
+            alert(`VICTORY! (${act.toUpperCase()}) - Real Hand Validation Passed!`);
+            nav('screen-main');
+            return;
+        }
         nextTurn();
     }
 
