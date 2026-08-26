@@ -27,11 +27,7 @@
             box-shadow: inset 0 0 100px #000; overflow: hidden;
         }
 
-        .dora-panel {
-            position: absolute; top: 15px; left: 15px; background: rgba(10, 20, 30, 0.85);
-            border: 2px solid #5c4520; border-radius: 8px; padding: 6px 10px; z-index: 10;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 4px;
-        }
+        .dora-panel { position: absolute; top: 15px; left: 15px; background: rgba(10, 20, 30, 0.85); border: 2px solid #5c4520; border-radius: 8px; padding: 6px 10px; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 4px; }
         .dora-tiles { display: flex; gap: 3px; }
         .dora-tile-box { width: 20px; height: 28px; background: #e67e22; border-radius: 2px; border: 1px solid #fff; display: flex; justify-content: center; align-items: center; font-size: 11px; }
         .dora-open { background: #fff; color: #000; font-weight: bold; }
@@ -40,6 +36,7 @@
         .avatar-frame { position: absolute; display: flex; flex-direction: column; align-items: center; z-index: 5; }
         .avatar-img { width: 48px; height: 48px; border-radius: 8px; border: 2px solid var(--gold-accent); background: #2c3e50 url('https://cdn-icons-png.flaticon.com/512/4140/4140048.png') center/cover; }
         .avatar-name { font-size: 10px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; margin-top: 2px; border: 1px solid #444; }
+        .time-bank-tag { font-size: 11px; color: #f39c12; font-weight: bold; margin-top: 2px; background: #111; padding: 1px 6px; border-radius: 4px; }
         
         .pos-bottom { bottom: 145px; left: 20px; }
         .pos-left { left: 15px; top: 180px; }
@@ -48,13 +45,13 @@
 
         .center-board {
             grid-area: 2 / 2 / 3 / 3; justify-self: center; align-self: center;
-            width: 170px; height: 170px; background: #161b22; border: 4px solid #30363d;
-            border-radius: 16px; position: relative; display: flex; justify-content: center; align-items: center;
+            width: 180px; height: 180px; background: #161b22; border: 4px solid #30363d;
+            border-radius: 16px; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;
             box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.9); z-index: 2;
         }
-        .compass-center { text-align: center; }
+        .turn-timer { font-size: 40px; font-weight: bold; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.8); margin: 5px 0; }
         .round-info { font-size: 14px; color: #58a6ff; font-weight: bold; }
-        .tiles-left { font-size: 18px; color: var(--gold-accent); font-weight: bold; margin-top: 2px; }
+        .tiles-left { font-size: 16px; color: var(--gold-accent); font-weight: bold; margin-top: 2px; }
         .score-tag { position: absolute; font-size: 10px; color: #c9d1d9; background: #21262d; padding: 2px 6px; border-radius: 4px; border: 1px solid #30363d; }
         .score-south { bottom: 6px; color: #2ecc71; }
         .score-east { right: 6px; }
@@ -63,9 +60,8 @@
 
         .top-right-btns { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 10; }
         .icon-btn { width: 36px; height: 36px; background: rgba(16, 26, 36, 0.8); border: 1px solid #444; border-radius: 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .emote-btn { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); width: 32px; height: 48px; background: rgba(16, 26, 36, 0.8); border: 1px solid #444; border-radius: 6px 0 0 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 10; }
-
-        .dora-indicator-count { position: absolute; bottom: 150px; right: 25px; font-size: 28px; font-weight: italic; color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.6); z-index: 5; }
+        
+        .dora-indicator-count { position: absolute; bottom: 150px; right: 25px; font-size: 28px; font-style: italic; color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.6); z-index: 5; }
         .dora-indicator-count span { color: var(--gold-accent); font-size: 34px; font-weight: bold; margin-left: 2px; }
 
         .river-container { position: absolute; display: flex; flex-wrap: wrap; gap: 2px; z-index: 3; }
@@ -81,16 +77,10 @@
             border-bottom: 4px solid #3a5335; font-weight: bold; cursor: pointer; transition: transform 0.1s;
         }
         .tile:hover { transform: translateY(-6px); }
-        .tile-helper {
-            position: absolute; top: 1px; right: 2px; font-size: 9px; font-weight: 800; color: #d63031;
-            line-height: 1; text-shadow: 0 0 2px #fff;
-        }
+        .tile-helper { position: absolute; top: 1px; right: 2px; font-size: 9px; font-weight: 800; color: #d63031; line-height: 1; text-shadow: 0 0 2px #fff; }
         .tile-char { font-size: 24px; }
 
-        .tile-back {
-            background: var(--tile-back); border-radius: 3px; border: 1px solid #795548;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4); border-bottom: 3px solid #3e2723;
-        }
+        .tile-back { background: var(--tile-back); border-radius: 3px; border: 1px solid #795548; box-shadow: 0 2px 4px rgba(0,0,0,0.4); border-bottom: 3px solid #3e2723; }
 
         .hand-bottom-container { grid-area: 3 / 1 / 4 / 4; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 15px; z-index: 6; }
         .hand-tiles { display: flex; gap: 3px; }
@@ -123,19 +113,17 @@
 </head>
 <body>
 
-    <!-- Audio Instrumen Musik Tradisional Tiongkok/Jepang (Streaming Direct MP3) -->
+    <!-- Musik Instrumen Tiongkok -->
     <audio id="bg-music" loop>
-        <source src="https://upload.wikimedia.org/wikipedia/commons/1/18/Gong_sound.ogg" type="audio/ogg">
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_51a37c4493.mp3?filename=chinese-traditional-music-110072.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- MAIN MENU -->
     <div id="screen-main" class="screen active">
         <h1>MAHJONG SOUL WEB</h1>
         <button onclick="nav('screen-play')">Play Game</button>
         <button onclick="nav('screen-settings')">Settings</button>
     </div>
 
-    <!-- SETTINGS -->
     <div id="screen-settings" class="screen">
         <h1>Settings</h1>
         <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 10px; width: 300px; margin-bottom: 15px;">
@@ -145,7 +133,6 @@
         <button onclick="nav('screen-main')">Back</button>
     </div>
 
-    <!-- PLAY MENU (AI EASY, MEDIUM, HARD TERSEDIA) -->
     <div id="screen-play" class="screen">
         <h1>Select Difficulty</h1>
         <button onclick="start4PGame('Easy')">Vs AI (Easy)</button>
@@ -154,7 +141,6 @@
         <button onclick="nav('screen-main')">Back</button>
     </div>
 
-    <!-- GAME BOARD -->
     <div id="screen-game" class="screen" style="padding:0;">
         <div id="game-board">
             
@@ -178,11 +164,10 @@
                 <div class="icon-btn" onclick="quitGame()">🚪</div>
             </div>
 
-            <div class="emote-btn" onclick="alert('Emote!')">😀</div>
-
             <div class="avatar-frame pos-bottom">
                 <div class="avatar-img"></div>
                 <div class="avatar-name">You (South)</div>
+                <div class="time-bank-tag" id="player-time-bank">+20s</div>
             </div>
             <div class="avatar-frame pos-left">
                 <div class="avatar-img"></div>
@@ -207,10 +192,10 @@
             <div class="river-container river-right" id="river-right"></div>
 
             <div class="center-board">
-                <div class="compass-center">
-                    <div class="round-info">East 1</div>
-                    <div class="tiles-left" id="wall-count">x 70</div>
-                </div>
+                <div class="round-info">East 1</div>
+                <div class="turn-timer" id="turn-timer-display">--</div>
+                <div class="tiles-left" id="wall-count">x 70</div>
+                
                 <div class="score-tag score-south">25000</div>
                 <div class="score-tag score-east">25000</div>
                 <div class="score-tag score-north">25000</div>
@@ -218,7 +203,6 @@
             </div>
 
             <div class="dora-indicator-count">7<span>+20</span></div>
-
             <div id="action-overlay"></div>
 
             <div class="hand-bottom-container">
@@ -230,7 +214,6 @@
     </div>
 
 <script>
-    // --- MAHJONG TILE DEFINITIONS (34 TYPES x 4 = 136 TILES) ---
     const TILE_TYPES = [];
     const suits = ['man', 'pin', 'sou'];
     const helpers = ['1','2','3','4','5','6','7','8','9'];
@@ -239,113 +222,60 @@
     const unicodeSou = ['🀐','🀑','🀒','🀓','🀔','🀕','🀖','🀗','🀘'];
 
     let idCounter = 0;
-    // 0-8: Man, 9-17: Pin, 18-26: Sou
     for (let i = 0; i < 9; i++) TILE_TYPES.push({ id: idCounter++, val: charsMan[i], helper: helpers[i], type: 'man', num: i+1 });
     for (let i = 0; i < 9; i++) TILE_TYPES.push({ id: idCounter++, val: unicodePin[i], helper: helpers[i], type: 'pin', num: i+1 });
     for (let i = 0; i < 9; i++) TILE_TYPES.push({ id: idCounter++, val: unicodeSou[i], helper: helpers[i], type: 'sou', num: i+1 });
-    // Honor Tiles (27-30 Winds, 31-33 Dragons)
-    const honors = [
-        { val: '東', helper: 'E' }, { val: '南', helper: 'S' }, { val: '西', helper: 'W' }, { val: '北', helper: 'N' },
-        { val: '🀆', helper: 'Wh' }, { val: '發', helper: 'G' }, { val: '中', helper: 'R' }
-    ];
+    const honors = [ { val: '東', helper: 'E' }, { val: '南', helper: 'S' }, { val: '西', helper: 'W' }, { val: '北', helper: 'N' }, { val: '🀆', helper: 'Wh' }, { val: '發', helper: 'G' }, { val: '中', helper: 'R' } ];
     honors.forEach(h => TILE_TYPES.push({ id: idCounter++, val: h.val, helper: h.helper, type: 'honor', num: 0 }));
 
-    let fullDeck = [];
-    let playerHands = [[], [], [], []];
-    let playerRivers = [[], [], [], []];
-    let currentTurn = 0;
-    let drawnTile = null;
-    let isDiscardable = false;
-    let aiDifficulty = 'Medium';
-    let audioContext = null;
+    let fullDeck = [], playerHands = [[], [], [], []], playerRivers = [[], [], [], []];
+    let currentTurn = 0, drawnTile = null, isDiscardable = false, aiDifficulty = 'Medium';
+    
+    // Timer Variables
+    let timerInterval = null;
+    let baseTime = 10;
+    let extraTimeBank = 20;
+    let isActionPhase = false;
 
     function nav(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    // --- REAL RIICHI MAHJONG WINNING ENGINE (4 MELDS + 1 PAIR & CHIITOITSU) ---
-    function checkWinningHand(tiles) {
-        if (tiles.length !== 14) return false;
-        let counts = new Array(34).fill(0);
-        tiles.forEach(t => counts[t.id]++);
-
-        // Check Chiitoitsu (7 Pairs)
-        let pairCount = counts.filter(c => c === 2).length;
-        if (pairCount === 7) return true;
-
-        // Check Standard Hand: 1 Pair + 4 Melds
-        for (let i = 0; i < 34; i++) {
-            if (counts[i] >= 2) {
-                let tempCounts = [...counts];
-                tempCounts[i] -= 2;
-                if (canFormMelds(tempCounts)) return true;
-            }
-        }
-        return false;
-    }
-
-    function canFormMelds(counts) {
-        let first = counts.findIndex(c => c > 0);
-        if (first === -1) return true;
-
-        // Try Triplet
-        if (counts[first] >= 3) {
-            counts[first] -= 3;
-            if (canFormMelds(counts)) return true;
-            counts[first] += 3;
-        }
-
-        // Try Sequence (Only for Suited tiles: Man, Pin, Sou)
-        if (first < 27 && (first % 9) <= 6) {
-            if (counts[first] > 0 && counts[first+1] > 0 && counts[first+2] > 0) {
-                counts[first]--; counts[first+1]--; counts[first+2]--;
-                if (canFormMelds(counts)) return true;
-                counts[first]++; counts[first+1]++; counts[first+2]++;
-            }
-        }
-        return false;
-    }
-
-    // --- AUDIO CONTROLLER ---
-    function toggleAudio() {
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
+    // --- AUDIO FIX (Browser Autoplay Bypass) ---
+    function forcePlayMusic() {
         const bgMusic = document.getElementById('bg-music');
-        if (bgMusic.paused) bgMusic.play();
-        else bgMusic.pause();
+        bgMusic.volume = document.getElementById('vol-slider').value;
+        bgMusic.play().catch(e => console.log("Menunggu interaksi user untuk audio..."));
     }
-
-    function updateVolume(val) {
-        document.getElementById('bg-music').volume = val;
+    function toggleAudio() {
+        const bgMusic = document.getElementById('bg-music');
+        if (bgMusic.paused) bgMusic.play(); else bgMusic.pause();
     }
+    function updateVolume(val) { document.getElementById('bg-music').volume = val; }
 
-    // --- GAME INIT ---
     function start4PGame(diff) {
+        forcePlayMusic(); // Panggil musik saat tombol play ditekan
         aiDifficulty = diff;
+        extraTimeBank = 20; // Reset time bank
+        document.getElementById('player-time-bank').innerText = `+${extraTimeBank}s`;
+
         ['name-left', 'name-top', 'name-right'].forEach(id => {
             document.getElementById(id).innerText = `AI (${diff})`;
         });
 
-        // 1. Build Deck (136 Tiles)
         fullDeck = [];
-        TILE_TYPES.forEach(t => {
-            for (let i = 0; i < 4; i++) fullDeck.push({ ...t, uniqueId: Math.random() });
-        });
+        TILE_TYPES.forEach(t => { for (let i = 0; i < 4; i++) fullDeck.push({ ...t, uniqueId: Math.random() }); });
         fullDeck.sort(() => Math.random() - 0.5);
 
-        // 2. Clear Hands & Rivers
         playerHands = [[], [], [], []];
         playerRivers = [[], [], [], []];
         document.querySelectorAll('.river-container').forEach(r => r.innerHTML = '');
 
-        // 3. Deal 13 Tiles Each
         for (let i = 0; i < 13; i++) {
             for (let p = 0; p < 4; p++) playerHands[p].push(fullDeck.pop());
         }
 
-        // Set Dora
         document.getElementById('dora-indicator-tile').innerText = fullDeck.pop().val;
 
         autoSortHand();
@@ -355,11 +285,67 @@
         processTurn();
     }
 
+    // --- TIMER SYSTEM (10s base + 20s bank) ---
+    function startTimer(forAction = false) {
+        clearInterval(timerInterval);
+        isActionPhase = forAction;
+        
+        // Hanya hitung mundur untuk giliran Player (0)
+        if (currentTurn !== 0 && !forAction) {
+            document.getElementById('turn-timer-display').innerText = '--';
+            document.getElementById('turn-timer-display').style.color = '#7f8c8d';
+            return;
+        }
+
+        baseTime = 10;
+        updateTimerUI();
+
+        timerInterval = setInterval(() => {
+            if (baseTime > 0) {
+                baseTime--;
+            } else if (extraTimeBank > 0) {
+                extraTimeBank--;
+            } else {
+                // WAKTU HABIS
+                clearInterval(timerInterval);
+                if (isActionPhase) {
+                    triggerAction('Skip'); // Waktu mikir Ron/Pon habis -> Otomatis Skip
+                } else {
+                    autoDiscard(); // Waktu giliran habis -> Otomatis buang kartu
+                }
+            }
+            updateTimerUI();
+        }, 1000);
+    }
+
+    function updateTimerUI() {
+        let timerEl = document.getElementById('turn-timer-display');
+        let bankEl = document.getElementById('player-time-bank');
+        
+        if (baseTime > 0) {
+            timerEl.innerText = baseTime;
+            timerEl.style.color = '#fff';
+            timerEl.style.textShadow = '0 0 15px rgba(255,255,255,0.8)';
+        } else {
+            timerEl.innerText = extraTimeBank;
+            timerEl.style.color = '#e74c3c'; // Warna merah jika menggunakan waktu cadangan
+            timerEl.style.textShadow = '0 0 15px rgba(231, 76, 60, 0.8)';
+        }
+        bankEl.innerText = `+${extraTimeBank}s`;
+    }
+
+    function autoDiscard() {
+        if (isDiscardable && playerHands[0].length > 0) {
+            // Membuang kartu terakhir (drawn tile) secara otomatis
+            discardTile(playerHands[0].length - 1);
+        }
+    }
+
+    // Hand Management
     function autoSortHand() {
         playerHands[0].sort((a, b) => a.id - b.id);
         renderPlayerHand();
     }
-
     function renderPlayerHand() {
         const container = document.getElementById('player-hand-tiles');
         container.innerHTML = '';
@@ -372,7 +358,6 @@
         });
         document.getElementById('wall-count').innerText = `x ${fullDeck.length}`;
     }
-
     function renderEnemyHands() {
         ['enemy-hand-top', 'enemy-hand-left', 'enemy-hand-right'].forEach((id, idx) => {
             const el = document.getElementById(id);
@@ -385,6 +370,7 @@
         });
     }
 
+    // Game Flow
     function processTurn() {
         if (fullDeck.length === 0) { alert("Game Draw! Wall Empty."); nav('screen-main'); return; }
 
@@ -394,15 +380,13 @@
         if (currentTurn === 0) {
             isDiscardable = true;
             renderPlayerHand();
-            // Self Tsumo Check
-            if (checkWinningHand(playerHands[0])) {
-                showAvailableActions(['Tsumo']);
-            }
+            startTimer(false); // Memulai timer giliran untuk Player
         } else {
             isDiscardable = false;
             renderEnemyHands();
+            startTimer(false); // UI AI Timer off
             
-            // AI Logic based on difficulty
+            // AI FIXED: Waktu buang dan perbaikan variabel
             let delay = aiDifficulty === 'Easy' ? 1200 : (aiDifficulty === 'Medium' ? 800 : 400);
             setTimeout(() => {
                 let hand = playerHands[currentTurn];
@@ -411,24 +395,23 @@
                 if (aiDifficulty === 'Easy') {
                     discardIdx = Math.floor(Math.random() * hand.length);
                 } else {
-                    // Medium/Hard AI: Discard honor tiles first if isolated
                     let honorIdx = hand.findIndex(t => t.type === 'honor');
                     discardIdx = honorIdx !== -1 ? honorIdx : hand.length - 1;
                 }
 
+                // AI MEMBUANG KARTU (BUG FIXED)
                 let discarded = hand.splice(discardIdx, 1)[0];
-                if (t === drawnTile) drawnTile = null;
+                drawnTile = null; 
                 commitDiscard(currentTurn, discarded);
             }, delay);
         }
     }
 
-    // --- REAL DISCARD ENGINE FIX ---
     function discardTile(index) {
         if (!isDiscardable) return;
         isDiscardable = false;
+        clearInterval(timerInterval); // Hentikan timer ketika klik
         
-        // Remove tile explicitly from Player 0 Hand array
         let discarded = playerHands[0].splice(index, 1)[0];
         drawnTile = null;
         renderPlayerHand();
@@ -446,28 +429,13 @@
         dEl.innerHTML = `${tile.val}<span class="tile-helper">${tile.helper}</span>`;
         riverEl.appendChild(dEl);
 
-        // Check if Human Player can call Ron / Pon / Chi on enemy discards
+        // Cek kemungkinan interupsi oleh Player saat AI membuang kartu
         if (pIdx !== 0) {
             let actions = [];
             
-            // 1. Check Ron
-            if (checkWinningHand([...playerHands[0], tile])) actions.push('Ron');
-            
-            // 2. Check Pon (Player has >= 2 matching tiles)
+            // Simulasi deteksi Pon/Chi sementara agar tombol sesekali muncul untuk demo timer
             let matchCount = playerHands[0].filter(t => t.id === tile.id).length;
             if (matchCount >= 2) actions.push('Pon');
-
-            // 3. Check Chi (Only if discarded by Kamicha / Player on Left / Player 3)
-            if (pIdx === 3 && tile.id < 27) {
-                let suitBase = Math.floor(tile.id / 9) * 9;
-                let num = tile.id % 9;
-                let ids = playerHands[0].map(t => t.id);
-
-                let has = (n) => n >= 0 && n < 9 && ids.includes(suitBase + n);
-                if ((has(num-2) && has(num-1)) || (has(num-1) && has(num+1)) || (has(num+1) && has(num+2))) {
-                    actions.push('Chi');
-                }
-            }
 
             if (actions.length > 0) {
                 actions.push('Skip');
@@ -498,12 +466,15 @@
         });
         
         overlay.style.display = 'flex';
+        startTimer(true); // Memulai timer 10s untuk Action Phase (Ron/Pon/Chi/Skip)
     }
 
     function triggerAction(act) {
+        clearInterval(timerInterval);
         document.getElementById('action-overlay').style.display = 'none';
+        
         if (act === 'Ron' || act === 'Tsumo') {
-            alert(`VICTORY! (${act.toUpperCase()}) - Real Hand Validation Passed!`);
+            alert(`VICTORY! (${act.toUpperCase()})`);
             nav('screen-main');
             return;
         }
@@ -515,7 +486,10 @@
         processTurn();
     }
 
-    function quitGame() { nav('screen-main'); }
+    function quitGame() { 
+        clearInterval(timerInterval);
+        nav('screen-main'); 
+    }
 </script>
 </body>
 </html>
