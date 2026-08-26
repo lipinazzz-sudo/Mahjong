@@ -3,90 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Riichi Mahjong Soul 4P</title>
+    <title>Mahjong Soul Web Edition</title>
     <link rel="manifest" href="manifest.json">
     <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
     <style>
         :root {
-            --table-bg: #1b4d2e;
-            --table-dark: #0f331d;
-            --gold: #f39c12;
-            --tile-bg: #fffdf5;
-            --tile-back: #2c3e50;
+            --bg-table: radial-gradient(circle at center, #1f4260 0%, #0d1e2d 100%);
+            --gold-accent: #f39c12;
+            --blue-accent: #2980b9;
+            --tile-bg: linear-gradient(to bottom, #ffffff 0%, #f4efe6 100%);
+            --tile-back: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #111; color: #fff; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
+        body { background: #050b11; color: #fff; overflow: hidden; height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center; }
 
-        .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; padding: 15px; text-align: center; }
+        .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; padding: 15px; text-align: center; position: absolute; }
         .active { display: flex; }
 
-        h1 { font-size: 2rem; margin-bottom: 20px; color: var(--gold); text-shadow: 2px 2px 4px #000; }
-        button { background-color: var(--gold); color: #000; border: none; padding: 10px 20px; margin: 6px; font-size: 1rem; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
-        button:active { transform: scale(0.95); }
+        h1 { font-size: 2.2rem; color: var(--gold-accent); text-shadow: 0 0 10px rgba(243, 156, 18, 0.5); margin-bottom: 20px; }
+        button { background: linear-gradient(to bottom, #f39c12, #d35400); color: #fff; border: 1px solid #ffeb3b; padding: 10px 24px; margin: 6px; font-size: 1rem; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        button:active { transform: scale(0.96); }
 
-        .panel { background: rgba(0,0,0,0.7); padding: 15px; border-radius: 10px; width: 90%; max-width: 380px; margin-bottom: 15px; border: 1px solid #444; }
-        select, input[type="range"] { width: 100%; padding: 8px; margin: 8px 0; border-radius: 4px; }
-
-        /* --- MEJA MAHJONG SOUL (4 PLAYERS) --- */
+        /* --- MAHJONG SOUL TABLE SURFACE --- */
         #game-board {
-            width: 100vw; height: 100vh; background: radial-gradient(circle, var(--table-bg) 60%, var(--table-dark) 100%);
-            display: grid; grid-template-rows: 70px 1fr 140px; grid-template-columns: 70px 1fr 70px;
-            position: relative; box-shadow: inset 0 0 50px #000;
+            width: 100vw; height: 100vh; background: var(--bg-table); position: relative;
+            display: grid; grid-template-rows: 90px 1fr 140px; grid-template-columns: 80px 1fr 80px;
+            box-shadow: inset 0 0 100px #000; overflow: hidden;
         }
 
-        /* Opponents (Top, Left, Right) */
-        .player-zone { display: flex; justify-content: center; align-items: center; position: relative; }
-        .zone-top { grid-area: 1 / 2 / 2 / 3; flex-direction: row; }
-        .zone-left { grid-area: 2 / 1 / 3 / 2; flex-direction: column; }
-        .zone-right { grid-area: 2 / 3 / 3 / 4; flex-direction: column; }
-        .zone-bottom { grid-area: 3 / 1 / 4 / 4; flex-direction: column; justify-content: flex-end; padding-bottom: 10px; }
-
-        /* Tile Styling */
-        .tile {
-            background: var(--tile-bg); color: #111; border-radius: 4px;
-            display: flex; justify-content: center; align-items: center;
-            position: relative; box-shadow: 1px 2px 4px rgba(0,0,0,0.5);
-            border-bottom: 4px solid #4a7c59; font-weight: bold; cursor: pointer; user-select: none;
+        /* 1. DORA & HONBA PANEL (TOP LEFT - UI 1) */
+        .dora-panel {
+            position: absolute; top: 15px; left: 15px; background: rgba(10, 20, 30, 0.85);
+            border: 2px solid #5c4520; border-radius: 8px; padding: 6px 10px; z-index: 10;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 4px;
         }
-        .tile-back {
-            background: linear-gradient(135deg, #2980b9 25%, var(--tile-back) 25%, var(--tile-back) 50%, #2980b9 50%, #2980b9 75%, var(--tile-back) 75%);
-            background-size: 10px 10px; border: 1px solid #1a252f; border-bottom: 3px solid #111; border-radius: 3px;
-        }
+        .dora-tiles { display: flex; gap: 3px; }
+        .dora-tile-box { width: 20px; height: 28px; background: #e67e22; border-radius: 2px; border: 1px solid #fff; display: flex; justify-content: center; align-items: center; font-size: 11px; }
+        .dora-open { background: #fff; color: #000; font-weight: bold; }
+        .stick-counters { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; margin-top: 2px; }
 
-        /* Player Bottom Hand */
-        .hand-bottom { display: flex; gap: 3px; justify-content: center; flex-wrap: nowrap; }
-        .hand-bottom .tile { width: 36px; height: 52px; font-size: 22px; }
-        .tile-drawn { margin-left: 10px; border: 2px solid var(--gold); } /* Batu yang baru diambil */
+        /* 3. AVATAR FRAMES (UI 3) */
+        .avatar-frame { position: absolute; display: flex; flex-direction: column; align-items: center; z-index: 5; }
+        .avatar-img { width: 48px; height: 48px; border-radius: 8px; border: 2px solid var(--gold-accent); background: #2c3e50 url('https://cdn-icons-png.flaticon.com/512/4140/4140048.png') center/cover; }
+        .avatar-name { font-size: 10px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; margin-top: 2px; border: 1px solid #444; }
         
+        .pos-bottom { bottom: 145px; left: 20px; }
+        .pos-left { left: 15px; top: 180px; }
+        .pos-top { top: 15px; right: 220px; }
+        .pos-right { right: 15px; top: 180px; }
+
+        /* 4. CENTER COMPASS BOARD (UI 4) */
+        .center-board {
+            grid-area: 2 / 2 / 3 / 3; justify-self: center; align-self: center;
+            width: 170px; height: 170px; background: #161b22; border: 4px solid #30363d;
+            border-radius: 16px; position: relative; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.9); z-index: 2;
+        }
+        .compass-center { text-align: center; }
+        .round-info { font-size: 14px; color: #58a6ff; font-weight: bold; }
+        .tiles-left { font-size: 18px; color: var(--gold-accent); font-weight: bold; margin-top: 2px; }
+        .score-tag { position: absolute; font-size: 10px; color: #c9d1d9; background: #21262d; padding: 2px 6px; border-radius: 4px; border: 1px solid #30363d; }
+        .score-south { bottom: 6px; color: #2ecc71; }
+        .score-east { right: 6px; }
+        .score-north { top: 6px; }
+        .score-west { left: 6px; }
+
+        /* 5. TOP RIGHT SETTINGS & 6. EMOTE (UI 5 & UI 6) */
+        .top-right-btns { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 10; }
+        .icon-btn { width: 36px; height: 36px; background: rgba(16, 26, 36, 0.8); border: 1px solid #444; border-radius: 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .emote-btn { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); width: 32px; height: 48px; background: rgba(16, 26, 36, 0.8); border: 1px solid #444; border-radius: 6px 0 0 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 10; }
+
+        /* 7. DORA COUNTER BOTTOM RIGHT (UI 7) */
+        .dora-indicator-count { position: absolute; bottom: 150px; right: 25px; font-size: 28px; font-weight: italic; color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.6); z-index: 5; }
+        .dora-indicator-count span { color: var(--gold-accent); font-size: 34px; font-weight: bold; margin-left: 2px; }
+
+        /* --- DISCARD RIVERS (6 TILES PER ROW AROUND CENTER) --- */
+        .river-container { position: absolute; display: flex; flex-wrap: wrap; gap: 2px; z-index: 3; }
+        .river-bottom { bottom: 185px; left: 50%; transform: translateX(-50%); width: 144px; justify-content: flex-start; }
+        .river-top { top: 95px; left: 50%; transform: translateX(-50%) rotate(180deg); width: 144px; }
+        .river-left { left: 105px; top: 50%; transform: translateY(-50%) rotate(90deg); width: 144px; }
+        .river-right { right: 105px; top: 50%; transform: translateY(-50%) rotate(-90deg); width: 144px; }
+
+        /* --- MAHJONG TILE DESIGN (IMAGE 1 ACCURACY) --- */
+        .tile {
+            background: var(--tile-bg); color: #111; border-radius: 4px; display: flex;
+            justify-content: center; align-items: center; position: relative;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.5), inset 0 -2px 0 rgba(0,0,0,0.15);
+            border-bottom: 4px solid #3a5335; font-weight: bold; cursor: pointer; transition: transform 0.1s;
+        }
+        .tile:hover { transform: translateY(-6px); }
         .tile-helper {
-            position: absolute; top: 1px; right: 2px; font-size: 9px; font-weight: bold; color: #c0392b;
-            background: rgba(255,255,255,0.9); padding: 0 2px; border-radius: 2px; line-height: 1;
+            position: absolute; top: 1px; right: 2px; font-size: 9px; font-weight: 800; color: #d63031;
+            line-height: 1; text-shadow: 0 0 2px #fff;
+        }
+        .tile-char { font-size: 24px; }
+
+        /* Tile Backs for Enemies */
+        .tile-back {
+            background: var(--tile-back); border-radius: 3px; border: 1px solid #795548;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4); border-bottom: 3px solid #3e2723;
         }
 
-        /* Enemy Face-down hands */
-        .hand-top { display: flex; gap: 2px; }
-        .hand-top .tile-back { width: 22px; height: 32px; }
-        .hand-side { display: flex; flex-direction: column; gap: 2px; }
-        .hand-side .tile-back { width: 32px; height: 18px; }
+        /* Player Hands Layout */
+        .hand-bottom-container { grid-area: 3 / 1 / 4 / 4; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 15px; z-index: 6; }
+        .hand-tiles { display: flex; gap: 3px; }
+        .hand-tiles .tile { width: 42px; height: 62px; }
+        .drawn-tile-gap { margin-left: 14px; border: 2px solid var(--gold-accent); }
 
-        /* Center Table / River */
-        .center-realm {
-            grid-area: 2 / 2 / 3 / 3; display: flex; flex-direction: column; justify-content: space-between;
-            align-items: center; padding: 10px; position: relative;
-        }
-        .river-grid { display: flex; flex-wrap: wrap; gap: 2px; max-width: 200px; max-height: 70px; justify-content: center; align-content: flex-start; }
-        .discard-tile { width: 22px; height: 30px; font-size: 14px; background: #eee; border-radius: 2px; display: flex; justify-content: center; align-items: center; position: relative; }
+        .enemy-hand-top { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 2px; }
+        .enemy-hand-top .tile-back { width: 22px; height: 32px; }
+        .enemy-hand-side { position: absolute; display: flex; flex-direction: column; gap: 2px; }
+        .enemy-hand-side .tile-back { width: 32px; height: 20px; }
+        .side-left { left: 10px; top: 25%; }
+        .side-right { right: 10px; top: 25%; }
 
-        /* Action Bar overlay (Pon, Chi, Kan, Ron, Skip) */
-        #action-bar {
-            position: absolute; bottom: 150px; display: none; gap: 8px; background: rgba(0,0,0,0.85);
-            padding: 8px 15px; border-radius: 30px; border: 2px solid var(--gold); z-index: 99;
+        /* Discard Tile Small Style */
+        .discard-tile { width: 22px; height: 32px; font-size: 14px; background: #fff; border-radius: 2px; border-bottom: 2px solid #666; display: flex; justify-content: center; align-items: center; position: relative; }
+        .discard-tile .tile-helper { font-size: 7px; top: 0; right: 1px; }
+
+        /* ACTION POPUP BUTTONS (RON, PON, CHI, SKIP) */
+        #action-overlay {
+            position: absolute; bottom: 100px; right: 15%; display: none; gap: 12px; z-index: 20;
+            background: rgba(5, 12, 20, 0.9); padding: 10px 20px; border-radius: 40px; border: 2px solid var(--gold-accent);
+            box-shadow: 0 0 20px rgba(243, 156, 18, 0.4);
         }
-        .act-btn { padding: 6px 14px; font-size: 0.9rem; border-radius: 20px; }
-        .act-ron { background: #e74c3c; color: #fff; }
-        .act-pon { background: #3498db; color: #fff; }
-        .act-chi { background: #2ecc71; color: #fff; }
-        .act-skip { background: #7f8c8d; color: #fff; }
+        .act-btn { padding: 8px 20px; font-size: 1.1rem; border-radius: 20px; text-shadow: 1px 1px 2px #000; cursor: pointer; color: white; font-weight: bold; }
+        .act-btn:hover { filter: brightness(1.2); }
+        .btn-ron { background: linear-gradient(to bottom, #e74c3c, #c0392b); border: 2px solid #ff7675; }
+        .btn-pon { background: linear-gradient(to bottom, #0984e3, #74b9ff); border: 2px solid #74b9ff; }
+        .btn-chi { background: linear-gradient(to bottom, #2ecc71, #27ae60); border: 2px solid #55efc4; }
+        .btn-skip { background: linear-gradient(to bottom, #636e72, #2d3436); border: 2px solid #b2bec3; }
     </style>
 </head>
 <body>
@@ -95,344 +141,306 @@
 
     <!-- MAIN MENU -->
     <div id="screen-main" class="screen active">
-        <h1>Mahjong Soul 4P</h1>
-        <button onclick="nav('screen-play')" id="btn-play">Play</button>
-        <button onclick="nav('screen-settings')" id="btn-settings">Settings</button>
+        <h1>MAHJONG SOUL WEB</h1>
+        <button onclick="nav('screen-play')">Play Game</button>
+        <button onclick="nav('screen-settings')">Settings</button>
     </div>
 
     <!-- SETTINGS -->
     <div id="screen-settings" class="screen">
-        <h1 id="txt-settings">Settings</h1>
-        <div class="panel">
-            <label id="txt-lang">Bahasa / Language:</label>
-            <select id="lang-select" onchange="changeLanguage()">
+        <h1>Settings</h1>
+        <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 10px; width: 300px; margin-bottom: 15px;">
+            <label>Language:</label>
+            <select id="lang-select" style="width:100%; padding:8px; margin: 10px 0;">
                 <option value="id">Indonesia</option>
                 <option value="en">English</option>
             </select>
-            <label id="txt-volume">Volume Musik:</label>
-            <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.5" onchange="updateVolume()">
+            <label>Music Volume:</label>
+            <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.5" style="width:100%; margin-top:10px;">
         </div>
-        <button onclick="nav('screen-main')" id="btn-back-settings">Back</button>
+        <button onclick="nav('screen-main')">Back</button>
     </div>
 
     <!-- PLAY MENU -->
     <div id="screen-play" class="screen">
-        <h1 id="txt-play-menu">Play Menu</h1>
-        <div class="panel">
-            <h3 id="txt-how" style="color: var(--gold);">Aturan 4 Pemain</h3>
-            <p id="txt-how-desc" style="font-size: 0.8rem; text-align: left; margin-top: 5px;">
-                4 Pemain bertanding. Setiap giliran: Ambil 1 batu, lalu buang 1 batu. Gunakan Pon/Chi/Kan/Ron saat musuh membuang batu.
-            </p>
-        </div>
-        <button onclick="nav('screen-ai-diff')" id="btn-vs-ai">Vs AI (4 Players)</button>
-        <button onclick="nav('screen-online-room')" id="btn-vs-player">Vs Player Online (P2P)</button>
-        <button onclick="nav('screen-main')" id="btn-back-play">Back</button>
+        <h1>Select Mode</h1>
+        <button onclick="start4PGame('Easy')">Vs AI (Easy)</button>
+        <button onclick="start4PGame('Hard')">Vs AI (Hard)</button>
+        <button onclick="nav('screen-main')">Back</button>
     </div>
 
-    <!-- AI DIFFICULTY -->
-    <div id="screen-ai-diff" class="screen">
-        <h1 id="txt-ai-level">Select AI Level</h1>
-        <button onclick="start4PGame('Easy')">Easy</button>
-        <button onclick="start4PGame('Medium')">Medium</button>
-        <button onclick="start4PGame('Hard')">Hard</button>
-        <button onclick="nav('screen-play')" id="btn-back-ai">Back</button>
-    </div>
-
-    <!-- ONLINE ROOM -->
-    <div id="screen-online-room" class="screen">
-        <h1>Online Room (4P)</h1>
-        <div class="panel">
-            <div id="room-status" style="color: var(--gold); font-size: 0.85rem; word-break: break-all;"></div>
-        </div>
-        <button onclick="createRoom()">Buat Room (Host)</button>
-        <button onclick="joinRoom()">Masuk Room (Join)</button>
-        <button onclick="nav('screen-play')">Back</button>
-    </div>
-
-    <!-- MAIN GAME SCREEN (4 PLAYERS BOARD) -->
+    <!-- MAHJONG SOUL GAME BOARD -->
     <div id="screen-game" class="screen" style="padding:0;">
         <div id="game-board">
             
-            <!-- TOP OPPONENT (P2) -->
-            <div class="player-zone zone-top">
-                <div style="position:absolute; top:5px; font-size:11px; color:#aaa;">P2 (North)</div>
-                <div class="hand-top" id="hand-p2"></div>
-            </div>
-
-            <!-- LEFT OPPONENT (P3) -->
-            <div class="player-zone zone-left">
-                <div style="position:absolute; left:2px; font-size:11px; color:#aaa; writing-mode: vertical-rl;">P3 (West)</div>
-                <div class="hand-side" id="hand-p3"></div>
-            </div>
-
-            <!-- RIGHT OPPONENT (P1) -->
-            <div class="player-zone zone-right">
-                <div style="position:absolute; right:2px; font-size:11px; color:#aaa; writing-mode: vertical-rl;">P1 (East)</div>
-                <div class="hand-side" id="hand-p1"></div>
-            </div>
-
-            <!-- CENTER REALM (DISCARD RIVER & WALL INFO) -->
-            <div class="center-realm">
-                <div style="font-size:12px; color:var(--gold);" id="wall-counter">Batu Sisa: 84</div>
-                <div id="info-status" style="font-size:13px; color:#fff; text-align:center;">Giliran Anda</div>
-                <div class="river-grid" id="river-discards"></div>
-            </div>
-
-            <!-- ACTION OVERLAY (PON/CHI/KAN/RON) -->
-            <div id="action-bar">
-                <button class="act-btn act-ron" onclick="triggerAction('RON')">RON</button>
-                <button class="act-btn act-pon" onclick="triggerAction('PON')">PON</button>
-                <button class="act-btn act-chi" onclick="triggerAction('CHI')">CHI</button>
-                <button class="act-btn act-skip" onclick="triggerAction('SKIP')">SKIP</button>
-            </div>
-
-            <!-- BOTTOM PLAYER (YOU - P0) -->
-            <div class="player-zone zone-bottom">
-                <div style="margin-bottom: 5px; display:flex; gap:10px; align-items:center;">
-                    <span style="font-size:12px; color:var(--gold);">Anda (South)</span>
-                    <button onclick="autoSortHand()" style="padding:3px 10px; font-size:11px; margin:0;">Auto Susun</button>
+            <!-- 1. DORA PANEL (TOP LEFT) -->
+            <div class="dora-panel">
+                <div class="dora-tiles">
+                    <div class="dora-tile-box dora-open" id="dora-indicator-tile">🀅</div>
+                    <div class="dora-tile-box"></div>
+                    <div class="dora-tile-box"></div>
+                    <div class="dora-tile-box"></div>
+                    <div class="dora-tile-box"></div>
                 </div>
-                <div class="hand-bottom" id="hand-p0"></div>
+                <div class="stick-counters">
+                    <span>🀆 x 0</span>
+                    <span>1000 x 0</span>
+                </div>
+            </div>
+
+            <!-- 5. TOP RIGHT CONTROL BUTTONS -->
+            <div class="top-right-btns">
+                <div class="icon-btn" onclick="nav('screen-settings')">⚙️</div>
+                <div class="icon-btn" onclick="quitGame()">🚪</div>
+            </div>
+
+            <!-- 6. EMOTE BUTTON (RIGHT) -->
+            <div class="emote-btn" onclick="alert('Emotes Coming Soon!')">😀</div>
+
+            <!-- 3. AVATARS -->
+            <div class="avatar-frame pos-bottom">
+                <div class="avatar-img"></div>
+                <div class="avatar-name">You (South)</div>
+            </div>
+            <div class="avatar-frame pos-left">
+                <div class="avatar-img"></div>
+                <div class="avatar-name">AI West</div>
+            </div>
+            <div class="avatar-frame pos-top">
+                <div class="avatar-img"></div>
+                <div class="avatar-name">AI North</div>
+            </div>
+            <div class="avatar-frame pos-right">
+                <div class="avatar-img"></div>
+                <div class="avatar-name">AI East</div>
+            </div>
+
+            <!-- ENEMY TILES (FACE DOWN) -->
+            <div class="enemy-hand-top" id="enemy-hand-top"></div>
+            <div class="enemy-hand-side side-left" id="enemy-hand-left"></div>
+            <div class="enemy-hand-side side-right" id="enemy-hand-right"></div>
+
+            <!-- DISCARD RIVERS (4 SIDES SURROUNDING CENTER) -->
+            <div class="river-container river-bottom" id="river-bottom"></div>
+            <div class="river-container river-top" id="river-top"></div>
+            <div class="river-container river-left" id="river-left"></div>
+            <div class="river-container river-right" id="river-right"></div>
+
+            <!-- 4. CENTER COMPASS BOARD -->
+            <div class="center-board">
+                <div class="compass-center">
+                    <div class="round-info">East 1</div>
+                    <div class="tiles-left" id="wall-count">x 70</div>
+                </div>
+                <div class="score-tag score-south">25000</div>
+                <div class="score-tag score-east">25000</div>
+                <div class="score-tag score-north">25000</div>
+                <div class="score-tag score-west">25000</div>
+            </div>
+
+            <!-- 7. DORA COUNTER BOTTOM RIGHT -->
+            <div class="dora-indicator-count">7<span>+20</span></div>
+
+            <!-- ACTION BUTTONS OVERLAY (DYNAMICALLY GENERATED) -->
+            <div id="action-overlay"></div>
+
+            <!-- PLAYER HAND AT BOTTOM -->
+            <div class="hand-bottom-container">
+                <button onclick="autoSortHand()" style="position:absolute; bottom:85px; right:20px; padding:4px 10px; font-size:11px;">Auto Sort</button>
+                <div class="hand-tiles" id="player-hand-tiles"></div>
             </div>
 
         </div>
-        <button onclick="quitGame()" style="position:absolute; top:5px; left:5px; padding:4px 10px; font-size:11px; z-index:100;">Quit</button>
     </div>
 
 <script>
-    // --- DICTIONARY & LANG ---
-    const dict = {
-        'id': { 'title': 'Mahjong Soul 4P', 'play': 'Main', 'settings': 'Pengaturan', 'lang': 'Bahasa:', 'vol': 'Volume:', 'back': 'Kembali', 'playMenu': 'Pilih Mode', 'how': 'Aturan 4 Pemain', 'howDesc': 'Ambil 1 batu saat giliran, buang 1 batu. Respon Pon/Chi/Ron saat lawan membuang batu.', 'vsAI': 'Vs AI (4 Players)', 'vsPlayer': 'Vs Player Online', 'aiLevel': 'Tingkat AI' },
-        'en': { 'title': 'Mahjong Soul 4P', 'play': 'Play', 'settings': 'Settings', 'lang': 'Language:', 'vol': 'Volume:', 'back': 'Back', 'playMenu': 'Select Mode', 'how': '4-Player Rules', 'howDesc': 'Draw 1 tile on turn, discard 1 tile. Call Pon/Chi/Ron on enemy discards.', 'vsAI': 'Vs AI (4 Players)', 'vsPlayer': 'Vs Player Online', 'aiLevel': 'AI Level' }
-    };
-    let currentLang = 'id';
-    function changeLanguage() {
-        currentLang = document.getElementById('lang-select').value;
-        document.getElementById('txt-title').innerText = dict[currentLang]['title'];
-        document.getElementById('btn-play').innerText = dict[currentLang]['play'];
-        document.getElementById('btn-settings').innerText = dict[currentLang]['settings'];
-        document.getElementById('txt-settings').innerText = dict[currentLang]['settings'];
-        document.getElementById('txt-lang').innerText = dict[currentLang]['lang'];
-        document.getElementById('txt-volume').innerText = dict[currentLang]['vol'];
-        document.getElementById('btn-back-settings').innerText = dict[currentLang]['back'];
-        document.getElementById('btn-back-play').innerText = dict[currentLang]['back'];
-        document.getElementById('btn-back-ai').innerText = dict[currentLang]['back'];
-        document.getElementById('txt-play-menu').innerText = dict[currentLang]['playMenu'];
-        document.getElementById('txt-how').innerText = dict[currentLang]['how'];
-        document.getElementById('txt-how-desc').innerText = dict[currentLang]['howDesc'];
-        document.getElementById('btn-vs-ai').innerText = dict[currentLang]['vsAI'];
-        document.getElementById('btn-vs-player').innerText = dict[currentLang]['vsPlayer'];
-        document.getElementById('txt-ai-level').innerText = dict[currentLang]['aiLevel'];
-    }
-
-    const bgMusic = document.getElementById('bg-music');
-    let musicStarted = false;
-    function nav(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-        if (!musicStarted && screenId !== 'screen-main') { bgMusic.play().catch(()=>{}); musicStarted = true; }
-    }
-    function updateVolume() { bgMusic.volume = document.getElementById('vol-slider').value; }
-
-    // --- MAHJONG TILE SYSTEM ---
-    const rawTiles = [
-        // Manzu (1M-9M)
-        { suit: 'man', val: 1, char: '🀇', helper: '1M', sort: 11 }, { suit: 'man', val: 2, char: '🀈', helper: '2M', sort: 12 }, { suit: 'man', val: 3, char: '🀉', helper: '3M', sort: 13 },
-        { suit: 'man', val: 4, char: '🀊', helper: '4M', sort: 14 }, { suit: 'man', val: 5, char: '🀋', helper: '5M', sort: 15 }, { suit: 'man', val: 6, char: '🀌', helper: '6M', sort: 16 },
-        { suit: 'man', val: 7, char: '🀍', helper: '7M', sort: 17 }, { suit: 'man', val: 8, char: '🀎', helper: '8M', sort: 18 }, { suit: 'man', val: 9, char: '🀏', helper: '9M', sort: 19 },
-        // Souzu (1S-9S)
-        { suit: 'sou', val: 1, char: '🀐', helper: '1S', sort: 21 }, { suit: 'sou', val: 2, char: '🀑', helper: '2S', sort: 22 }, { suit: 'sou', val: 3, char: '🀒', helper: '3S', sort: 23 },
-        { suit: 'sou', val: 4, char: '🀓', helper: '4S', sort: 24 }, { suit: 'sou', val: 5, char: '🀔', helper: '5S', sort: 25 }, { suit: 'sou', val: 6, char: '🀕', helper: '6S', sort: 26 },
-        { suit: 'sou', val: 7, char: '🀖', helper: '7S', sort: 27 }, { suit: 'sou', val: 8, char: '🀗', helper: '8S', sort: 28 }, { suit: 'sou', val: 9, char: '🀘', helper: '9S', sort: 29 },
-        // Pinzu (1P-9P)
-        { suit: 'pin', val: 1, char: '🀙', helper: '1P', sort: 31 }, { suit: 'pin', val: 2, char: '🀚', helper: '2P', sort: 32 }, { suit: 'pin', val: 3, char: '🀛', helper: '3P', sort: 33 },
-        { suit: 'pin', val: 4, char: '🀜', helper: '4P', sort: 34 }, { suit: 'pin', val: 5, char: '🀝', helper: '5P', sort: 35 }, { suit: 'pin', val: 6, char: '🀞', helper: '6P', sort: 36 },
-        { suit: 'pin', val: 7, char: '🀟', helper: '7P', sort: 37 }, { suit: 'pin', val: 8, char: '🀠', helper: '8P', sort: 38 }, { suit: 'pin', val: 9, char: '🀡', helper: '9P', sort: 39 },
-        // Winds & Dragons
-        { suit: 'wind', val: 'E', char: '🀀', helper: 'E', sort: 41 }, { suit: 'wind', val: 'S', char: '🀁', helper: 'S', sort: 42 },
-        { suit: 'wind', val: 'W', char: '🀂', helper: 'W', sort: 43 }, { suit: 'wind', val: 'N', char: '🀃', helper: 'N', sort: 44 },
-        { suit: 'dragon', val: 'R', char: '🀄', helper: 'R', sort: 51 }, { suit: 'dragon', val: 'G', char: '🀅', helper: 'G', sort: 52 }, { suit: 'dragon', val: 'W', char: '🀆', helper: 'W', sort: 53 }
+    // --- TILE DATA ACCORDING TO IMAGE 1 ---
+    const tileDefinitions = [
+        // Manzu (Characters) 1-9
+        { char: '一萬', val: '🀇', helper: '1', type: 'man', sort: 11 }, { char: '二萬', val: '🀈', helper: '2', type: 'man', sort: 12 },
+        { char: '三萬', val: '🀉', helper: '3', type: 'man', sort: 13 }, { char: '四萬', val: '🀊', helper: '4', type: 'man', sort: 14 },
+        { char: '伍萬', val: '🀋', helper: '5', type: 'man', sort: 15 }, { char: '六萬', val: '🀌', helper: '6', type: 'man', sort: 16 },
+        { char: '七萬', val: '🀍', helper: '7', type: 'man', sort: 17 }, { char: '八萬', val: '🀎', helper: '8', type: 'man', sort: 18 },
+        { char: '九萬', val: '🀏', helper: '9', type: 'man', sort: 19 },
+        // Pinzu (Circles) 1-9
+        { char: '🀙', val: '🀙', helper: '1', type: 'pin', sort: 21 }, { char: '🀚', val: '🀚', helper: '2', type: 'pin', sort: 22 },
+        { char: '🀛', val: '🀛', helper: '3', type: 'pin', sort: 23 }, { char: '🀜', val: '🀜', helper: '4', type: 'pin', sort: 24 },
+        { char: '🀝', val: '🀝', helper: '5', type: 'pin', sort: 25 }, { char: '🀞', val: '🀞', helper: '6', type: 'pin', sort: 26 },
+        { char: '🀟', val: '🀟', helper: '7', type: 'pin', sort: 27 }, { char: '🀠', val: '🀠', helper: '8', type: 'pin', sort: 28 },
+        { char: '🀡', val: '🀡', helper: '9', type: 'pin', sort: 29 },
+        // Souzu (Bamboo) 1-9
+        { char: '🀐', val: '🀐', helper: '1', type: 'sou', sort: 31 }, { char: '🀑', val: '🀑', helper: '2', type: 'sou', sort: 32 },
+        { char: '🀒', val: '🀒', helper: '3', type: 'sou', sort: 33 }, { char: '🀓', val: '🀓', helper: '4', type: 'sou', sort: 34 },
+        { char: '🀔', val: '🀔', helper: '5', type: 'sou', sort: 35 }, { char: '🀕', val: '🀕', helper: '6', type: 'sou', sort: 36 },
+        { char: '🀖', val: '🀖', helper: '7', type: 'sou', sort: 37 }, { char: '🀗', val: '🀗', helper: '8', type: 'sou', sort: 38 },
+        { char: '🀘', val: '🀘', helper: '9', type: 'sou', sort: 39 },
+        // Winds E, S, W, N
+        { char: '東', val: '🀀', helper: 'E', type: 'wind', sort: 41 }, { char: '南', val: '🀁', helper: 'S', type: 'wind', sort: 42 },
+        { char: '西', val: '🀂', helper: 'W', type: 'wind', sort: 43 }, { char: '北', val: '🀃', helper: 'N', type: 'wind', sort: 44 },
+        // Dragons Wh, G, R
+        { char: '🀆', val: '🀆', helper: 'Wh', type: 'dragon', sort: 51 },
+        { char: '發', val: '🀅', helper: 'G', type: 'dragon', sort: 52 },
+        { char: '中', val: '🀄', helper: 'R', type: 'dragon', sort: 53 }
     ];
 
-    let fullWall = [];
-    let players = [{ hand: [] }, { hand: [] }, { hand: [] }, { hand: [] }];
-    let currentTurn = 0; // 0: You, 1: Right, 2: Top, 3: Left
-    let drawnTile = null;
-    let isCanDiscard = false;
-    let lastDiscardedTile = null;
+    let fullDeck = [], playerHands = [[], [], [], []], currentTurn = 0, drawnTile = null, isDiscardable = false;
 
-    function buildWall() {
-        fullWall = [];
-        // Complete 136 Mahjong Tiles (4 of each)
-        for(let i=0; i<4; i++) {
-            rawTiles.forEach(t => fullWall.push({...t, uid: Math.random()}));
-        }
-        // Shuffle Wall
-        fullWall.sort(() => Math.random() - 0.5);
+    function nav(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
     }
 
     function start4PGame(diff) {
-        buildWall();
-        players = [{ hand: [] }, { hand: [] }, { hand: [] }, { hand: [] }];
-        document.getElementById('river-discards').innerHTML = '';
-        
-        // Deal 13 initial tiles to all 4 players
-        for(let i=0; i<13; i++) {
-            for(let p=0; p<4; p++) {
-                players[p].hand.push(fullWall.pop());
-            }
+        fullDeck = [];
+        for (let i = 0; i < 4; i++) {
+            tileDefinitions.forEach(t => fullDeck.push({...t, id: Math.random()}));
+        }
+        fullDeck.sort(() => Math.random() - 0.5);
+
+        playerHands = [[], [], [], []];
+        document.querySelectorAll('.river-container').forEach(r => r.innerHTML = '');
+
+        for (let i = 0; i < 13; i++) {
+            for (let p = 0; p < 4; p++) playerHands[p].push(fullDeck.pop());
         }
 
+        let dora = fullDeck.pop();
+        document.getElementById('dora-indicator-tile').innerText = dora.val;
+
         autoSortHand();
+        renderEnemyHands();
         nav('screen-game');
         currentTurn = 0;
         processTurn();
     }
 
-    // AUTO SUSUN BLOCK (PLAYER 0)
     function autoSortHand() {
-        players[0].hand.sort((a, b) => a.sort - b.sort);
-        renderHands();
+        playerHands[0].sort((a, b) => a.sort - b.sort);
+        renderPlayerHand();
     }
 
-    function renderHands() {
-        // Render Player 0 (Bottom - Face Up)
-        const p0Hand = document.getElementById('hand-p0');
-        p0Hand.innerHTML = '';
-        players[0].hand.forEach((t, idx) => {
+    function renderPlayerHand() {
+        const container = document.getElementById('player-hand-tiles');
+        container.innerHTML = '';
+        playerHands[0].forEach((t, i) => {
             let el = document.createElement('div');
-            el.className = 'tile' + (t === drawnTile ? ' tile-drawn' : '');
-            el.innerHTML = `${t.char}<span class="tile-helper">${t.helper}</span>`;
-            el.onclick = () => { if(isCanDiscard) playerDiscard(idx); };
-            p0Hand.appendChild(el);
+            el.className = 'tile' + (t === drawnTile ? ' drawn-tile-gap' : '');
+            el.innerHTML = `<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span>`;
+            el.onclick = () => { if (isDiscardable) discardTile(i); };
+            container.appendChild(el);
         });
-
-        // Render Opponents (Face Down Tiles)
-        renderOpponent('hand-p1', players[1].hand.length, 'side');
-        renderOpponent('hand-p2', players[2].hand.length, 'top');
-        renderOpponent('hand-p3', players[3].hand.length, 'side');
-
-        document.getElementById('wall-counter').innerText = `Batu Sisa: ${fullWall.length}`;
+        document.getElementById('wall-count').innerText = `x ${fullDeck.length}`;
     }
 
-    function renderOpponent(elementId, count, type) {
-        const parent = document.getElementById(elementId);
-        parent.innerHTML = '';
-        for(let i=0; i<count; i++) {
-            let b = document.createElement('div');
-            b.className = 'tile-back';
-            parent.appendChild(b);
-        }
+    function renderEnemyHands() {
+        ['enemy-hand-top', 'enemy-hand-left', 'enemy-hand-right'].forEach((id, idx) => {
+            const el = document.getElementById(id);
+            el.innerHTML = '';
+            for (let i = 0; i < playerHands[idx+1].length; i++) {
+                let b = document.createElement('div');
+                b.className = 'tile-back';
+                el.appendChild(b);
+            }
+        });
     }
 
-    // TURN CYCLE MANAGEMENT (DRAW -> DISCARD)
     function processTurn() {
-        if(fullWall.length === 0) {
-            alert("Permainan Seri! Batu di tembok habis.");
-            nav('screen-main');
-            return;
-        }
-
-        renderHands();
-        const turnNames = ["Anda", "P1 (Right)", "P2 (Top)", "P3 (Left)"];
-        document.getElementById('info-status').innerText = `Giliran: ${turnNames[currentTurn]}`;
-
-        // Step 1: Ambil 1 batu baru (Draw Phase)
-        drawnTile = fullWall.pop();
-        players[currentTurn].hand.push(drawnTile);
-        renderHands();
+        if (fullDeck.length === 0) { alert("Game Draw! Wall is empty."); nav('screen-main'); return; }
+        
+        drawnTile = fullDeck.pop();
+        playerHands[currentTurn].push(drawnTile);
 
         if (currentTurn === 0) {
-            // Player's Turn
-            isCanDiscard = true;
+            isDiscardable = true;
+            renderPlayerHand();
         } else {
-            // AI Turn
-            isCanDiscard = false;
+            isDiscardable = false;
+            renderEnemyHands();
             setTimeout(() => {
-                // AI membuang 1 batu acak
-                let discardIdx = Math.floor(Math.random() * players[currentTurn].hand.length);
-                let discarded = players[currentTurn].hand.splice(discardIdx, 1)[0];
-                executeDiscard(currentTurn, discarded);
-            }, 1200);
+                let idx = Math.floor(Math.random() * playerHands[currentTurn].length);
+                let discarded = playerHands[currentTurn].splice(idx, 1)[0];
+                commitDiscard(currentTurn, discarded);
+            }, 1000); // Jeda bot membuang batu
         }
     }
 
-    function playerDiscard(index) {
-        if(!isCanDiscard) return;
-        isCanDiscard = false;
-        let discarded = players[0].hand.splice(index, 1)[0];
+    function discardTile(index) {
+        if (!isDiscardable) return;
+        isDiscardable = false;
+        let discarded = playerHands[0].splice(index, 1)[0];
         drawnTile = null;
-        executeDiscard(0, discarded);
+        commitDiscard(0, discarded);
     }
 
-    function executeDiscard(playerIdx, tile) {
-        lastDiscardedTile = tile;
+    // --- LOGIKA MUNCULNYA ACTION BUTTON (DINAMIS) ---
+    function showAvailableActions(actionsList) {
+        const overlay = document.getElementById('action-overlay');
+        overlay.innerHTML = ''; // Hapus tombol lama
+        
+        if (actionsList.length === 0) {
+            overlay.style.display = 'none';
+            return;
+        }
 
-        // Render to Discard River
-        const river = document.getElementById('river-discards');
+        // Generate tombol secara dinamis berdasarkan list
+        actionsList.forEach(act => {
+            let btn = document.createElement('button');
+            btn.className = `act-btn btn-${act.toLowerCase()}`;
+            btn.innerText = act; // Label text
+            btn.onclick = () => triggerAction(act);
+            overlay.appendChild(btn);
+        });
+        
+        overlay.style.display = 'flex';
+    }
+
+    function commitDiscard(pIdx, tile) {
+        const riverIds = ['river-bottom', 'river-right', 'river-top', 'river-left'];
+        const river = document.getElementById(riverIds[pIdx]);
+        
         let dEl = document.createElement('div');
         dEl.className = 'discard-tile';
-        dEl.innerHTML = `${tile.char}<span style="position:absolute;top:0;right:1px;font-size:7px;color:#cc0000">${tile.helper}</span>`;
+        dEl.innerHTML = `${tile.val}<span class="tile-helper">${tile.helper}</span>`;
         river.appendChild(dEl);
 
-        // Jika musuh yang buang, cek apakah Player 0 bisa PON/CHI/RON
-        if (playerIdx !== 0 && checkPlayerCallOpportunity(tile)) {
-            document.getElementById('action-bar').style.display = 'flex';
+        // Jika musuh membuang batu, simulasikan peluang tombol Action muncul
+        if (pIdx !== 0) {
+            let possibleActions = [];
+            let randomChance = Math.random();
+
+            // Simulasi: Mengacak tombol apa yang bisa ditekan oleh player
+            if (randomChance < 0.2) possibleActions.push('Ron');
+            else if (randomChance < 0.4) possibleActions.push('Pon');
+            else if (randomChance < 0.6 && pIdx === 3) { // Chi hanya bisa dari player sebelum kita (kiri/Player 3)
+                possibleActions.push('Chi'); 
+                possibleActions.push('Pon'); 
+            }
+            
+            // Jika ada Action yang bisa dipencet, pastikan ada tombol Skip
+            if (possibleActions.length > 0) {
+                possibleActions.push('Skip');
+                showAvailableActions(possibleActions);
+            } else {
+                nextTurn(); // Lanjut jika tidak ada action
+            }
         } else {
-            nextTurn();
+            nextTurn(); // Player membuang batu, langsung lanjut
         }
     }
 
-    function checkPlayerCallOpportunity(tile) {
-        // Logika Sederhana: Cek Pon (apakah pemain punya 2 batu kembar di tangan)
-        let matches = players[0].hand.filter(t => t.char === tile.char);
-        return matches.length >= 2;
-    }
-
-    function triggerAction(type) {
-        document.getElementById('action-bar').style.display = 'none';
-        if (type === 'RON') {
-            alert("RON! Anda Memenangkan Pertandingan!");
-            nav('screen-main');
-            return;
-        } else if (type === 'PON') {
-            // Pindahkan batu dari river ke tangan (Simulasi Pon)
-            alert(`Anda Melakukan PON pada batu ${lastDiscardedTile.char}!`);
-        }
+    function triggerAction(act) {
+        document.getElementById('action-overlay').style.display = 'none';
+        if (act === 'Ron') { alert("RON! Victory!"); nav('screen-main'); return; }
+        // Untuk Pon / Chi mock-up, anggap skip lalu giliran lanjut
         nextTurn();
     }
 
     function nextTurn() {
-        document.getElementById('action-bar').style.display = 'none';
         currentTurn = (currentTurn + 1) % 4;
         processTurn();
     }
 
-    function quitGame() {
-        if (peer) peer.destroy();
-        nav('screen-main');
-    }
-
-    // PEERJS ONLINE MULTIPLAYER
-    let peer = null, conn = null;
-    function createRoom() {
-        document.getElementById('room-status').innerText = "Menghubungkan P2P...";
-        peer = new Peer();
-        peer.on('open', id => { document.getElementById('room-status').innerText = `KODE ROOM (HOST):\n${id}`; });
-        peer.on('connection', c => { conn = c; alert("Pemain terhubung!"); start4PGame('Medium'); });
-    }
-    function joinRoom() {
-        let code = prompt("Masukkan Kode Room Host:");
-        if(!code) return;
-        peer = new Peer();
-        peer.on('open', () => {
-            conn = peer.connect(code);
-            conn.on('open', () => { alert("Berhasil Masuk Room!"); start4PGame('Medium'); });
-        });
-    }
-
-    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
-    changeLanguage();
+    function quitGame() { nav('screen-main'); }
 </script>
 </body>
 </html>
