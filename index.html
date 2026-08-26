@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Riichi Mahjong Web</title>
+    <link rel="manifest" href="manifest.json">
+    <!-- Library PeerJS untuk Online Multiplayer P2P Gratis -->
+    <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #2b5c3a;
+            --text-color: #f1f1f1;
+            --btn-bg: #d4af37;
+            --btn-text: #1a1a1a;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        
+        .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; padding: 15px; text-align: center; }
+        .active { display: flex; }
+        
+        h1 { font-size: 2.2rem; margin-bottom: 25px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        button { background-color: var(--btn-bg); color: var(--btn-text); border: none; padding: 12px 25px; margin: 8px; font-size: 1.1rem; border-radius: 8px; cursor: pointer; font-weight: bold; width: 85%; max-width: 320px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        button:active { transform: scale(0.96); }
+        
+        .panel { background: rgba(0,0,0,0.6); padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; margin-bottom: 15px; }
+        select, input[type="range"] { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; }
+        
+        /* Mahjong Tile Styling */
+        .hand { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 15px; }
+        .tile { 
+            background: #fdf5e6; color: #000; width: 42px; height: 58px; border-radius: 5px; 
+            display: flex; justify-content: center; align-items: center; font-size: 26px;
+            position: relative; box-shadow: 2px 3px 6px rgba(0,0,0,0.4), inset -1px -2px 2px rgba(0,0,0,0.2);
+            border-bottom: 5px solid #6b8e23;
+            cursor: pointer; user-select: none;
+        }
+        .tile:hover { transform: translateY(-4px); }
+        .tile-helper {
+            position: absolute; top: 2px; right: 3px; font-size: 10px; font-weight: bold; color: #cc0000;
+            background: rgba(255,255,255,0.8); padding: 0 2px; border-radius: 2px; line-height: 1;
+        }
+        
+        #game-board { flex: 1; display: flex; flex-direction: column; justify-content: space-between; width: 100%; max-width: 600px; }
+        .center-table { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 1.1rem; color: #fff; background: rgba(0,0,0,0.2); border-radius: 10px; margin: 10px 0; padding: 10px; }
+        .discard-zone { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; margin-top: 10px; max-height: 120px; overflow-y: auto; }
+        .discard-tile { width: 28px; height: 38px; font-size: 16px; background: #eee; color: #000; display: flex; align-items: center; justify-content: center; border-radius: 3px; border-bottom: 2px solid #555; position: relative; }
+    </style>
+</head>
+<body>
+
+    <!-- Audio Background Musik Tradisional Tiongkok -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_51a37c4493.mp3?filename=chinese-traditional-music-110072.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- TAMPILAN UTAMA (MAIN MENU) -->
+    <div id="screen-main" class="screen active">
+        <h1 id="txt-title">Riichi Mahjong</h1>
+        <button onclick="nav('screen-play')" id="btn-play">Play</button>
+        <button onclick="nav('screen-settings')" id="btn-settings">Settings</button>
+    </div>
+
+    <!-- TAMPILAN PENGATURAN (SETTINGS) -->
+    <div id="screen-settings" class="screen">
+        <h1 id="txt-settings">Settings</h1>
+        <div class="panel">
+            <label id="txt-lang">Bahasa / Language:</label>
+            <select id="lang-select" onchange="changeLanguage()">
+                <option value="id">Indonesia</option>
+                <option value="en">English</option>
+            </select>
+            
+            <label id="txt-volume">Volume Musik:</label>
+            <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.5" onchange="updateVolume()">
+        </div>
+        <button onclick="nav('screen-main')" id="btn-back-settings">Back</button>
+    </div>
+
+    <!-- TAMPILAN MENU PLAY -->
+    <div id="screen-play" class="screen">
+        <h1 id="txt-play-menu">Play Menu</h1>
+        
+        <div class="panel">
+            <h3 id="txt-how" style="color: #d4af37;">Cara Bermain</h3>
+            <p id="txt-how-desc" style="font-size: 0.85rem; margin-top: 8px; text-align: left;">
+                Kumpulkan 14 batu untuk membentuk 4 Set (3 batu seri/kembar) dan 1 Pair (pasangan 2 batu sama). Klik batu di tangan Anda untuk membuangnya.
+            </p>
+        </div>
+
+        <button onclick="nav('screen-ai-diff')" id="btn-vs-ai">Vs AI (Bot)</button>
+        <button onclick="nav('screen-online-room')" id="btn-vs-player">Vs Player (Online P2P)</button>
+        <button onclick="nav('screen-main')" id="btn-back-play">Back</button>
+    </div>
+
+    <!-- TAMPILAN TINGKAT KESULITAN AI -->
+    <div id="screen-ai-diff" class="screen">
+        <h1 id="txt-ai-level">Select AI Level</h1>
+        <button onclick="startAIGame('Easy')">Easy</button>
+        <button onclick="startAIGame('Medium')">Medium</button>
+        <button onclick="startAIGame('Hard')">Hard</button>
+        <button onclick="nav('screen-play')" id="btn-back-ai">Back</button>
+    </div>
+
+    <!-- TAMPILAN ROOM ONLINE (PEERJS) -->
+    <div id="screen-online-room" class="screen">
+        <h1>Online P2P Room</h1>
+        <div class="panel">
+            <p style="font-size: 0.85rem; margin-bottom: 10px;">Main langsung dengan pemain lain tanpa server!</p>
+            <div id="room-status" style="color: #d4af37; font-weight: bold; word-break: break-all; margin-bottom: 10px;"></div>
+        </div>
+        <button onclick="createRoom()">Buat Room (Host)</button>
+        <button onclick="joinRoom()">Masuk Room (Join)</button>
+        <button onclick="nav('screen-play')">Back</button>
+    </div>
+
+    <!-- TAMPILAN PERMAINAN (GAME SCREEN) -->
+    <div id="screen-game" class="screen">
+        <div id="game-board">
+            <div style="text-align: center; color: #aaa; font-size: 0.9rem;" id="txt-opponent-status">Lawan: Menunggu...</div>
+            
+            <div class="center-table">
+                <div id="table-info" style="font-size: 0.9rem; margin-bottom: 5px;">Meja Tengah</div>
+                <div class="discard-zone" id="discard-pile"></div>
+            </div>
+            
+            <div>
+                <div style="text-align: center; margin-bottom: 5px; font-size: 0.9rem;" id="txt-your-hand">Tangan Anda</div>
+                <div class="hand" id="player-hand"></div>
+            </div>
+        </div>
+        <button onclick="quitGame()" style="width: auto; padding: 6px 20px; margin-top: 10px; font-size: 0.9rem;">Keluar / Quit</button>
+    </div>
+
+<script>
+    // --- LOKALISASI (BAHASA) ---
+    const dict = {
+        'id': {
+            'title': 'Riichi Mahjong', 'play': 'Main', 'settings': 'Pengaturan',
+            'lang': 'Bahasa:', 'vol': 'Volume Musik:', 'back': 'Kembali',
+            'playMenu': 'Pilih Mode', 'how': 'Cara Bermain',
+            'howDesc': 'Kumpulkan 14 batu untuk membentuk 4 Set (3 batu seri/kembar) dan 1 Pair (pasangan). Klik batu untuk membuang.',
+            'vsAI': 'Lawan AI (Bot)', 'vsPlayer': 'Lawan Pemain (Online P2P)',
+            'aiLevel': 'Pilih Kesulitan AI', 'yourHand': 'Tangan Anda'
+        },
+        'en': {
+            'title': 'Riichi Mahjong', 'play': 'Play', 'settings': 'Settings',
+            'lang': 'Language:', 'vol': 'Music Volume:', 'back': 'Back',
+            'playMenu': 'Select Mode', 'how': 'How to Play',
+            'howDesc': 'Draw and discard tiles to complete a legal hand (4 sets & 1 pair). Click a tile to discard.',
+            'vsAI': 'Vs AI (Bot)', 'vsPlayer': 'Vs Player (Online P2P)',
+            'aiLevel': 'Select AI Difficulty', 'yourHand': 'Your Hand'
+        }
+    };
+
+    let currentLang = 'id';
+    let currentGameMode = 'AI'; // 'AI' atau 'ONLINE'
+    let aiDifficulty = 'Easy';
+
+    function changeLanguage() {
+        currentLang = document.getElementById('lang-select').value;
+        document.getElementById('txt-title').innerText = dict[currentLang]['title'];
+        document.getElementById('btn-play').innerText = dict[currentLang]['play'];
+        document.getElementById('btn-settings').innerText = dict[currentLang]['settings'];
+        document.getElementById('txt-settings').innerText = dict[currentLang]['settings'];
+        document.getElementById('txt-lang').innerText = dict[currentLang]['lang'];
+        document.getElementById('txt-volume').innerText = dict[currentLang]['vol'];
+        document.getElementById('btn-back-settings').innerText = dict[currentLang]['back'];
+        document.getElementById('btn-back-play').innerText = dict[currentLang]['back'];
+        document.getElementById('btn-back-ai').innerText = dict[currentLang]['back'];
+        document.getElementById('txt-play-menu').innerText = dict[currentLang]['playMenu'];
+        document.getElementById('txt-how').innerText = dict[currentLang]['how'];
+        document.getElementById('txt-how-desc').innerText = dict[currentLang]['howDesc'];
+        document.getElementById('btn-vs-ai').innerText = dict[currentLang]['vsAI'];
+        document.getElementById('btn-vs-player').innerText = dict[currentLang]['vsPlayer'];
+        document.getElementById('txt-ai-level').innerText = dict[currentLang]['aiLevel'];
+        document.getElementById('txt-your-hand').innerText = dict[currentLang]['yourHand'];
+    }
+
+    // --- NAVIGASI LAYAR & AUDIO ---
+    const bgMusic = document.getElementById('bg-music');
+    let musicStarted = false;
+
+    function nav(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        
+        if (!musicStarted && screenId !== 'screen-main') {
+            bgMusic.play().catch(e => console.log("Audio play blocked"));
+            musicStarted = true;
+        }
+    }
+
+    function updateVolume() {
+        bgMusic.volume = document.getElementById('vol-slider').value;
+    }
+
+    // --- DATA BATU MAHJONG DENGAN HELPER/PETUNJUK ---
+    const tilesData = [
+        // Manzu (Karakter) - Helper: 1M - 9M
+        { char: '🀇', helper: '1' }, { char: '🀈', helper: '2' }, { char: '🀉', helper: '3' },
+        { char: '🀊', helper: '4' }, { char: '🀋', helper: '5' }, { char: '🀌', helper: '6' },
+        { char: '🀍', helper: '7' }, { char: '🀎', helper: '8' }, { char: '🀏', helper: '9' },
+        // Souzu (Bambu) - Helper: 1S - 9S
+        { char: '🀐', helper: '1' }, { char: '🀑', helper: '2' }, { char: '🀒', helper: '3' },
+        { char: '🀓', helper: '4' }, { char: '🀔', helper: '5' }, { char: '🀕', helper: '6' },
+        { char: '🀖', helper: '7' }, { char: '🀗', helper: '8' }, { char: '🀘', helper: '9' },
+        // Pinzu (Lingkaran) - Helper: 1P - 9P
+        { char: '🀙', helper: '1' }, { char: '🀚', helper: '2' }, { char: '🀛', helper: '3' },
+        { char: '🀜', helper: '4' }, { char: '🀝', helper: '5' }, { char: '🀞', helper: '6' },
+        { char: '🀟', helper: '7' }, { char: '🀠', helper: '8' }, { char: '🀡', helper: '9' },
+        // Angin (Winds) - Petunjuk W, N, E, S
+        { char: '🀀', helper: 'E' }, { char: '🀁', helper: 'S' }, { char: '🀂', helper: 'W' }, { char: '🀃', helper: 'N' },
+        // Dragon - Petunjuk R (Red), G (Green), W (White)
+        { char: '🀄', helper: 'R' }, { char: '🀅', helper: 'G' }, { char: '🀆', helper: 'W' }
+    ];
+
+    // --- KELOLA GAME LOGIC ---
+    function startAIGame(diff) {
+        currentGameMode = 'AI';
+        aiDifficulty = diff;
+        document.getElementById('txt-opponent-status').innerText = `Lawan: AI (${diff})`;
+        document.getElementById('table-info').innerText = "Pertandingan Dimulai!";
+        document.getElementById('discard-pile').innerHTML = '';
+        nav('screen-game');
+        renderHand();
+    }
+
+    function renderHand() {
+        const handDiv = document.getElementById('player-hand');
+        handDiv.innerHTML = '';
+        
+        // Buat 13 batu acak di tangan pemain
+        for(let i=0; i<13; i++) {
+            let randomTile = tilesData[Math.floor(Math.random() * tilesData.length)];
+            let tileEl = document.createElement('div');
+            tileEl.className = 'tile';
+            tileEl.innerHTML = `${randomTile.char}<span class="tile-helper">${randomTile.helper}</span>`;
+            
+            // Aksi Klik untuk Buang Batu
+            tileEl.onclick = function() {
+                discardTile(randomTile);
+                this.remove();
+            };
+            handDiv.appendChild(tileEl);
+        }
+    }
+
+    function discardTile(tile) {
+        // Tambahkan ke meja buangan
+        const discardPile = document.getElementById('discard-pile');
+        let dTile = document.createElement('div');
+        dTile.className = 'discard-tile';
+        dTile.innerHTML = `${tile.char}<span class="tile-helper">${tile.helper}</span>`;
+        discardPile.appendChild(dTile);
+        
+        document.getElementById('table-info').innerText = `Anda membuang: ${tile.char} (${tile.helper})`;
+
+        // Kirim data jika bermain Online
+        if (currentGameMode === 'ONLINE' && conn && conn.open) {
+            conn.send({ type: 'discard', tile: tile });
+        } 
+        // Logika Respons AI jika bermain Vs AI
+        else if (currentGameMode === 'AI') {
+            setTimeout(() => {
+                let aiTile = tilesData[Math.floor(Math.random() * tilesData.length)];
+                let aiDTile = document.createElement('div');
+                aiDTile.className = 'discard-tile';
+                aiDTile.style.background = '#ffd1d1';
+                aiDTile.innerHTML = `${aiTile.char}<span class="tile-helper">${aiTile.helper}</span>`;
+                discardPile.appendChild(aiDTile);
+                document.getElementById('table-info').innerText = `AI (${aiDifficulty}) membuang: ${aiTile.char} (${aiTile.helper})`;
+            }, 1000);
+        }
+    }
+
+    function quitGame() {
+        if (peer) peer.destroy();
+        nav('screen-main');
+    }
+
+    // --- PEERJS (ONLINE MULTIPLAYER P2P) ---
+    let peer = null;
+    let conn = null;
+
+    function createRoom() {
+        document.getElementById('room-status').innerText = "Menghubungkan ke jaringan P2P...";
+        peer = new Peer();
+
+        peer.on('open', function(id) {
+            document.getElementById('room-status').innerText = `KODE ROOM ANDA:\n${id}\n\nBerikan kode ini ke lawan!`;
+        });
+
+        peer.on('connection', function(connection) {
+            conn = connection;
+            setupPeerEvents();
+            alert("Pemain lain terhubung! Memulai permainan...");
+            startOnlineGame("Host");
+        });
+
+        peer.on('error', function(err) {
+            alert("Gagal membuat room: " + err);
+        });
+    }
+
+    function joinRoom() {
+        let roomCode = prompt("Masukkan KODE ROOM dari Host:");
+        if (!roomCode) return;
+
+        document.getElementById('room-status').innerText = "Menghubungkan ke Host...";
+        peer = new Peer();
+
+        peer.on('open', function() {
+            conn = peer.connect(roomCode);
+            conn.on('open', function() {
+                setupPeerEvents();
+                startOnlineGame("Client");
+            });
+        });
+
+        peer.on('error', function(err) {
+            alert("Gagal terhubung ke Room. Cek kembali kode!");
+        });
+    }
+
+    function setupPeerEvents() {
+        conn.on('data', function(data) {
+            if (data.type === 'discard') {
+                const discardPile = document.getElementById('discard-pile');
+                let dTile = document.createElement('div');
+                dTile.className = 'discard-tile';
+                dTile.style.background = '#d1e7dd';
+                dTile.innerHTML = `${data.tile.char}<span class="tile-helper">${data.tile.helper}</span>`;
+                discardPile.appendChild(dTile);
+                document.getElementById('table-info').innerText = `Lawan membuang: ${data.tile.char} (${data.tile.helper})`;
+            }
+        });
+
+        conn.on('close', function() {
+            alert("Koneksi dengan lawan terputus.");
+            quitGame();
+        });
+    }
+
+    function startOnlineGame(role) {
+        currentGameMode = 'ONLINE';
+        document.getElementById('txt-opponent-status').innerText = `Lawan: Pemain Lain (${role})`;
+        document.getElementById('table-info').innerText = "Pertandingan Online Dimulai!";
+        document.getElementById('discard-pile').innerHTML = '';
+        nav('screen-game');
+        renderHand();
+    }
+
+    // Register Service Worker untuk fitur Offline PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+        .then(() => console.log("Service Worker Active"))
+        .catch(err => console.log("SW Error", err));
+    }
+
+    // Set Bahasa Default
+    changeLanguage();
+</script>
+</body>
+</html>
