@@ -49,9 +49,9 @@
             border-radius: 16px; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;
             box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.9); z-index: 2;
         }
-        .turn-timer { font-size: 40px; font-weight: bold; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.8); margin: 5px 0; }
+        .turn-timer { font-size: 42px; font-weight: bold; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.8); margin: 2px 0; }
         .round-info { font-size: 14px; color: #58a6ff; font-weight: bold; }
-        .tiles-left { font-size: 16px; color: var(--gold-accent); font-weight: bold; margin-top: 2px; }
+        .tiles-left { font-size: 15px; color: var(--gold-accent); font-weight: bold; }
         .score-tag { position: absolute; font-size: 10px; color: #c9d1d9; background: #21262d; padding: 2px 6px; border-radius: 4px; border: 1px solid #30363d; }
         .score-south { bottom: 6px; color: #2ecc71; }
         .score-east { right: 6px; }
@@ -60,15 +60,12 @@
 
         .top-right-btns { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 10; }
         .icon-btn { width: 36px; height: 36px; background: rgba(16, 26, 36, 0.8); border: 1px solid #444; border-radius: 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        
-        .dora-indicator-count { position: absolute; bottom: 150px; right: 25px; font-size: 28px; font-style: italic; color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.6); z-index: 5; }
-        .dora-indicator-count span { color: var(--gold-accent); font-size: 34px; font-weight: bold; margin-left: 2px; }
 
-        .river-container { position: absolute; display: flex; flex-wrap: wrap; gap: 2px; z-index: 3; }
-        .river-bottom { bottom: 185px; left: 50%; transform: translateX(-50%); width: 144px; justify-content: flex-start; }
-        .river-top { top: 95px; left: 50%; transform: translateX(-50%) rotate(180deg); width: 144px; }
-        .river-left { left: 105px; top: 50%; transform: translateY(-50%) rotate(90deg); width: 144px; }
-        .river-right { right: 105px; top: 50%; transform: translateY(-50%) rotate(-90deg); width: 144px; }
+        .river-container { position: absolute; display: flex; flex-wrap: wrap; gap: 3px; z-index: 3; }
+        .river-bottom { bottom: 185px; left: 50%; transform: translateX(-50%); width: 160px; justify-content: flex-start; }
+        .river-top { top: 95px; left: 50%; transform: translateX(-50%) rotate(180deg); width: 160px; }
+        .river-left { left: 105px; top: 50%; transform: translateY(-50%) rotate(90deg); width: 160px; }
+        .river-right { right: 105px; top: 50%; transform: translateY(-50%) rotate(-90deg); width: 160px; }
 
         .tile {
             background: var(--tile-bg); color: #111; border-radius: 4px; display: flex;
@@ -94,8 +91,15 @@
         .side-left { left: 10px; top: 25%; }
         .side-right { right: 10px; top: 25%; }
 
-        .discard-tile { width: 22px; height: 32px; font-size: 14px; background: #fff; border-radius: 2px; border-bottom: 2px solid #666; display: flex; justify-content: center; align-items: center; position: relative; }
-        .discard-tile .tile-helper { font-size: 7px; top: 0; right: 1px; }
+        /* KARTU BUANGAN (RIVER) DENGAN SIMBOL JELAS */
+        .discard-tile { 
+            width: 24px; height: 34px; background: var(--tile-bg); border-radius: 3px; 
+            border-bottom: 2px solid #3a5335; display: flex; justify-content: center; 
+            align-items: center; position: relative; color: #111; font-weight: bold; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+        }
+        .discard-tile .tile-char { font-size: 14px; }
+        .discard-tile .tile-helper { font-size: 7px; top: 1px; right: 1px; position: absolute; color: #d63031; }
 
         #action-overlay {
             position: absolute; bottom: 100px; right: 15%; display: none; gap: 12px; z-index: 20;
@@ -113,7 +117,6 @@
 </head>
 <body>
 
-    <!-- Musik Instrumen Tiongkok -->
     <audio id="bg-music" loop>
         <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_51a37c4493.mp3?filename=chinese-traditional-music-110072.mp3" type="audio/mpeg">
     </audio>
@@ -191,6 +194,7 @@
             <div class="river-container river-left" id="river-left"></div>
             <div class="river-container river-right" id="river-right"></div>
 
+            <!-- COMPASS & TIMER TERPUSAT ATAS DESAIN MEJA -->
             <div class="center-board">
                 <div class="round-info">East 1</div>
                 <div class="turn-timer" id="turn-timer-display">--</div>
@@ -202,7 +206,6 @@
                 <div class="score-tag score-west">25000</div>
             </div>
 
-            <div class="dora-indicator-count">7<span>+20</span></div>
             <div id="action-overlay"></div>
 
             <div class="hand-bottom-container">
@@ -215,7 +218,6 @@
 
 <script>
     const TILE_TYPES = [];
-    const suits = ['man', 'pin', 'sou'];
     const helpers = ['1','2','3','4','5','6','7','8','9'];
     const charsMan = ['一萬','二萬','三萬','四萬','伍萬','六萬','七萬','八萬','九萬'];
     const unicodePin = ['🀙','🀚','🀛','🀜','🀝','🀞','🀟','🀠','🀡'];
@@ -230,23 +232,17 @@
 
     let fullDeck = [], playerHands = [[], [], [], []], playerRivers = [[], [], [], []];
     let currentTurn = 0, drawnTile = null, isDiscardable = false, aiDifficulty = 'Medium';
-    
-    // Timer Variables
-    let timerInterval = null;
-    let baseTime = 10;
-    let extraTimeBank = 20;
-    let isActionPhase = false;
+    let timerInterval = null, baseTime = 10, extraTimeBank = 20, isActionPhase = false;
 
     function nav(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    // --- AUDIO FIX (Browser Autoplay Bypass) ---
     function forcePlayMusic() {
         const bgMusic = document.getElementById('bg-music');
         bgMusic.volume = document.getElementById('vol-slider').value;
-        bgMusic.play().catch(e => console.log("Menunggu interaksi user untuk audio..."));
+        bgMusic.play().catch(e => console.log("Audio waiting for user click..."));
     }
     function toggleAudio() {
         const bgMusic = document.getElementById('bg-music');
@@ -254,10 +250,53 @@
     }
     function updateVolume(val) { document.getElementById('bg-music').volume = val; }
 
+    // --- RIICHI MAHJONG VALIDATOR ENGINE ---
+    function checkWinningHand(tiles) {
+        if (tiles.length !== 14) return false;
+        let counts = new Array(34).fill(0);
+        tiles.forEach(t => { if (t && typeof t.id === 'number') counts[t.id]++; });
+
+        // 1. Chiitoitsu (7 Pairs)
+        let pairs = counts.filter(c => c === 2).length;
+        if (pairs === 7) return true;
+
+        // 2. Standard (4 Melds + 1 Pair)
+        for (let i = 0; i < 34; i++) {
+            if (counts[i] >= 2) {
+                let temp = [...counts];
+                temp[i] -= 2;
+                if (canFormMelds(temp)) return true;
+            }
+        }
+        return false;
+    }
+
+    function canFormMelds(counts) {
+        let first = counts.findIndex(c => c > 0);
+        if (first === -1) return true;
+
+        // Try Triplet (Koutsu)
+        if (counts[first] >= 3) {
+            counts[first] -= 3;
+            if (canFormMelds(counts)) return true;
+            counts[first] += 3;
+        }
+
+        // Try Sequence (Shuntsu)
+        if (first < 27 && (first % 9) <= 6) {
+            if (counts[first] > 0 && counts[first+1] > 0 && counts[first+2] > 0) {
+                counts[first]--; counts[first+1]--; counts[first+2]--;
+                if (canFormMelds(counts)) return true;
+                counts[first]++; counts[first+1]++; counts[first+2]++;
+            }
+        }
+        return false;
+    }
+
     function start4PGame(diff) {
-        forcePlayMusic(); // Panggil musik saat tombol play ditekan
+        forcePlayMusic();
         aiDifficulty = diff;
-        extraTimeBank = 20; // Reset time bank
+        extraTimeBank = 20;
         document.getElementById('player-time-bank').innerText = `+${extraTimeBank}s`;
 
         ['name-left', 'name-top', 'name-right'].forEach(id => {
@@ -285,12 +324,10 @@
         processTurn();
     }
 
-    // --- TIMER SYSTEM (10s base + 20s bank) ---
     function startTimer(forAction = false) {
         clearInterval(timerInterval);
         isActionPhase = forAction;
         
-        // Hanya hitung mundur untuk giliran Player (0)
         if (currentTurn !== 0 && !forAction) {
             document.getElementById('turn-timer-display').innerText = '--';
             document.getElementById('turn-timer-display').style.color = '#7f8c8d';
@@ -306,13 +343,9 @@
             } else if (extraTimeBank > 0) {
                 extraTimeBank--;
             } else {
-                // WAKTU HABIS
                 clearInterval(timerInterval);
-                if (isActionPhase) {
-                    triggerAction('Skip'); // Waktu mikir Ron/Pon habis -> Otomatis Skip
-                } else {
-                    autoDiscard(); // Waktu giliran habis -> Otomatis buang kartu
-                }
+                if (isActionPhase) triggerAction('Skip');
+                else autoDiscard();
             }
             updateTimerUI();
         }, 1000);
@@ -325,27 +358,24 @@
         if (baseTime > 0) {
             timerEl.innerText = baseTime;
             timerEl.style.color = '#fff';
-            timerEl.style.textShadow = '0 0 15px rgba(255,255,255,0.8)';
         } else {
             timerEl.innerText = extraTimeBank;
-            timerEl.style.color = '#e74c3c'; // Warna merah jika menggunakan waktu cadangan
-            timerEl.style.textShadow = '0 0 15px rgba(231, 76, 60, 0.8)';
+            timerEl.style.color = '#e74c3c';
         }
         bankEl.innerText = `+${extraTimeBank}s`;
     }
 
     function autoDiscard() {
         if (isDiscardable && playerHands[0].length > 0) {
-            // Membuang kartu terakhir (drawn tile) secara otomatis
             discardTile(playerHands[0].length - 1);
         }
     }
 
-    // Hand Management
     function autoSortHand() {
         playerHands[0].sort((a, b) => a.id - b.id);
         renderPlayerHand();
     }
+
     function renderPlayerHand() {
         const container = document.getElementById('player-hand-tiles');
         container.innerHTML = '';
@@ -358,6 +388,7 @@
         });
         document.getElementById('wall-count').innerText = `x ${fullDeck.length}`;
     }
+
     function renderEnemyHands() {
         ['enemy-hand-top', 'enemy-hand-left', 'enemy-hand-right'].forEach((id, idx) => {
             const el = document.getElementById(id);
@@ -370,7 +401,6 @@
         });
     }
 
-    // Game Flow
     function processTurn() {
         if (fullDeck.length === 0) { alert("Game Draw! Wall Empty."); nav('screen-main'); return; }
 
@@ -380,13 +410,18 @@
         if (currentTurn === 0) {
             isDiscardable = true;
             renderPlayerHand();
-            startTimer(false); // Memulai timer giliran untuk Player
+            
+            // VALIDASI TSUMO OTOMATIS SAAT AMBIL KARTU
+            if (checkWinningHand(playerHands[0])) {
+                showAvailableActions(['Tsumo']);
+            } else {
+                startTimer(false);
+            }
         } else {
             isDiscardable = false;
             renderEnemyHands();
-            startTimer(false); // UI AI Timer off
+            startTimer(false);
             
-            // AI FIXED: Waktu buang dan perbaikan variabel
             let delay = aiDifficulty === 'Easy' ? 1200 : (aiDifficulty === 'Medium' ? 800 : 400);
             setTimeout(() => {
                 let hand = playerHands[currentTurn];
@@ -399,9 +434,8 @@
                     discardIdx = honorIdx !== -1 ? honorIdx : hand.length - 1;
                 }
 
-                // AI MEMBUANG KARTU (BUG FIXED)
                 let discarded = hand.splice(discardIdx, 1)[0];
-                drawnTile = null; 
+                drawnTile = null;
                 commitDiscard(currentTurn, discarded);
             }, delay);
         }
@@ -410,7 +444,7 @@
     function discardTile(index) {
         if (!isDiscardable) return;
         isDiscardable = false;
-        clearInterval(timerInterval); // Hentikan timer ketika klik
+        clearInterval(timerInterval);
         
         let discarded = playerHands[0].splice(index, 1)[0];
         drawnTile = null;
@@ -424,16 +458,20 @@
         const riverIds = ['river-bottom', 'river-right', 'river-top', 'river-left'];
         const riverEl = document.getElementById(riverIds[pIdx]);
         
+        // RENDER KARTU BUANGAN LENGKAP DENGAN KARAKTER & SYMBOL
         let dEl = document.createElement('div');
         dEl.className = 'discard-tile';
-        dEl.innerHTML = `${tile.val}<span class="tile-helper">${tile.helper}</span>`;
+        dEl.innerHTML = `<span class="tile-char">${tile.val}</span><span class="tile-helper">${tile.helper}</span>`;
         riverEl.appendChild(dEl);
 
-        // Cek kemungkinan interupsi oleh Player saat AI membuang kartu
         if (pIdx !== 0) {
             let actions = [];
             
-            // Simulasi deteksi Pon/Chi sementara agar tombol sesekali muncul untuk demo timer
+            // VALIDASI RON OTOMATIS KETIKA ENEMY MEMBUANG KARTU
+            if (checkWinningHand([...playerHands[0], tile])) {
+                actions.push('Ron');
+            }
+
             let matchCount = playerHands[0].filter(t => t.id === tile.id).length;
             if (matchCount >= 2) actions.push('Pon');
 
@@ -466,7 +504,7 @@
         });
         
         overlay.style.display = 'flex';
-        startTimer(true); // Memulai timer 10s untuk Action Phase (Ron/Pon/Chi/Skip)
+        startTimer(true);
     }
 
     function triggerAction(act) {
@@ -474,7 +512,7 @@
         document.getElementById('action-overlay').style.display = 'none';
         
         if (act === 'Ron' || act === 'Tsumo') {
-            alert(`VICTORY! (${act.toUpperCase()})`);
+            alert(`VICTORY! (${act.toUpperCase()}) - Real Mahjong Hand Validated!`);
             nav('screen-main');
             return;
         }
