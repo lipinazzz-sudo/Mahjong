@@ -16,6 +16,10 @@
             --tile-h: clamp(36px, 8.5vw, 62px);
             --tile-font: clamp(14px, 3.2vw, 24px);
             --tile-helper-font: clamp(7px, 1.5vw, 10px);
+
+            /* Discard Tile Dimensions */
+            --discard-w: clamp(16px, 3.8vw, 26px);
+            --discard-h: clamp(24px, 5.5vw, 36px);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
@@ -39,7 +43,7 @@
         .dora-tiles { display: flex; gap: 2px; }
         .dora-tile-box { width: clamp(14px, 3.5vw, 22px); height: clamp(20px, 5vw, 30px); background: #e67e22; border-radius: 2px; border: 1px solid #fff; display: flex; justify-content: center; align-items: center; font-size: clamp(9px, 2vw, 12px); }
         .dora-open { background: #fff; color: #000; font-weight: bold; }
-        .stick-counters { display: flex; justify-content: space-between; font-size: 10px; color: #aaa; margin-top: 1px; }
+        .stick-counters { display: flex; justify-space-between: space-between; font-size: 10px; color: #aaa; margin-top: 1px; }
 
         .avatar-frame { position: absolute; display: flex; flex-direction: column; align-items: center; z-index: 5; }
         .avatar-img { width: clamp(32px, 8vw, 48px); height: clamp(32px, 8vw, 48px); border-radius: 6px; border: 2px solid var(--gold-accent); background: #2c3e50 url('https://cdn-icons-png.flaticon.com/512/4140/4140048.png') center/cover; }
@@ -55,7 +59,7 @@
             grid-area: 2 / 2 / 3 / 3; justify-self: center; align-self: center;
             width: clamp(120px, 30vw, 180px); height: clamp(120px, 30vw, 180px); background: #161b22; border: 3px solid #30363d;
             border-radius: 12px; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8); z-index: 2;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8); z-index: 2; transition: border-color 0.3s;
         }
         .turn-timer { font-size: clamp(24px, 6vw, 42px); font-weight: bold; color: #fff; margin: 1px 0; }
         .round-info { font-size: clamp(10px, 2.5vw, 14px); color: #58a6ff; font-weight: bold; }
@@ -69,12 +73,15 @@
         .top-right-btns { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; z-index: 10; }
         .icon-btn { width: clamp(28px, 6vw, 36px); height: clamp(28px, 6vw, 36px); background: rgba(16, 26, 36, 0.8); border: 1px solid #444; border-radius: 5px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 14px; }
 
-        /* River Styling */
-        .river-container { position: absolute; display: flex; flex-wrap: wrap; gap: 1px; z-index: 3; max-width: 180px; }
-        .river-bottom { bottom: calc(var(--tile-h) + 75px); left: 50%; transform: translateX(-50%); }
-        .river-top { top: 75px; left: 50%; transform: translateX(-50%) rotate(180deg); }
-        .river-left { left: 90px; top: 50%; transform: translateY(-50%) rotate(90deg); }
-        .river-right { right: 90px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
+        /* Authentic 6-Tile Per Row River Styling */
+        .river-container {
+            position: absolute; display: grid; grid-template-columns: repeat(6, var(--discard-w)); gap: 1px; z-index: 3;
+            width: calc(var(--discard-w) * 6 + 6px); height: calc(var(--discard-h) * 3 + 3px); align-content: start;
+        }
+        .river-bottom { bottom: calc(var(--tile-h) + 65px); left: 50%; transform: translateX(-50%); }
+        .river-top { top: 65px; left: 50%; transform: translateX(-50%) rotate(180deg); }
+        .river-left { left: 110px; top: 50%; transform: translateY(-50%) rotate(90deg); }
+        .river-right { right: 110px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
 
         /* Tile Styling & Formatting Fix */
         .tile {
@@ -104,15 +111,20 @@
         .side-right { right: 5px; top: 25%; }
 
         .discard-tile { 
-            width: clamp(18px, 4.2vw, 28px); height: clamp(26px, 6vw, 38px); background: var(--tile-bg); border-radius: 2px; 
+            width: var(--discard-w); height: var(--discard-h); background: var(--tile-bg); border-radius: 2px; 
             border-bottom: 2px solid #3a5335; display: flex; justify-content: center; align-items: center; position: relative; color: #111; font-weight: bold; overflow: hidden;
         }
-        .discard-tile .tile-char { font-size: clamp(11px, 2.8vw, 18px); }
-        .discard-tile .tile-helper { font-size: clamp(6px, 1.2vw, 8px); top: 1px; right: 1px; position: absolute; color: #d63031; font-weight: 800;}
+        .discard-tile .tile-char { font-size: clamp(11px, 2.5vw, 16px); }
+        .discard-tile .tile-helper { font-size: clamp(5px, 1vw, 7px); top: 1px; right: 1px; position: absolute; color: #d63031; font-weight: 800;}
         
         .riichi-tile { transform: rotate(-90deg) scale(0.9); margin: 0 2px; }
 
         .melds-container { position: absolute; bottom: calc(var(--tile-h) + 15px); right: 10px; display: flex; gap: 5px; z-index: 6; }
+        .enemy-melds { position: absolute; display: flex; gap: 4px; z-index: 5; }
+        .enemy-melds-top { top: 40px; left: 20%; }
+        .enemy-melds-left { left: 40px; top: 60%; flex-direction: column; }
+        .enemy-melds-right { right: 40px; top: 15%; flex-direction: column; }
+        
         .meld-group { display: flex; gap: 1px; background: rgba(0,0,0,0.3); padding: 2px; border-radius: 4px; }
         .meld-group .tile { width: clamp(18px, 4vw, 30px); height: clamp(26px, 6vw, 44px); font-size: 14px; cursor: default; }
 
@@ -242,12 +254,17 @@
             <div class="enemy-hand-side side-left" id="enemy-hand-left"></div>
             <div class="enemy-hand-side side-right" id="enemy-hand-right"></div>
 
+            <!-- Enemy Melds Display -->
+            <div class="enemy-melds enemy-melds-top" id="enemy-melds-2"></div>
+            <div class="enemy-melds enemy-melds-left" id="enemy-melds-3"></div>
+            <div class="enemy-melds enemy-melds-right" id="enemy-melds-1"></div>
+
             <div class="river-container river-bottom" id="river-bottom"></div>
             <div class="river-container river-top" id="river-top"></div>
             <div class="river-container river-left" id="river-left"></div>
             <div class="river-container river-right" id="river-right"></div>
 
-            <div class="center-board">
+            <div class="center-board" id="center-board-box">
                 <div class="round-info" id="round-title-display">East 1</div>
                 <div class="turn-timer" id="turn-timer-display">--</div>
                 <div class="tiles-left" id="wall-count">x 70</div>
@@ -288,6 +305,7 @@
     let fullDeck = [], deadWall = [], playerHands = [[], [], [], []], playerRivers = [[], [], [], []];
     let playerMelds = [[], [], [], []]; 
     let playerScores = [25000, 25000, 25000, 25000];
+    let aiRiichi = [false, false, false, false];
     
     let activeScreenId = 'screen-main';
     let previousScreenId = 'screen-main';
@@ -415,6 +433,68 @@
         }
     }
 
+    // ADVANCED YAKU & HAN EVALUATOR
+    function evaluateYakuAndScore(pIdx, winningTile, isTsumo) {
+        let hand = [...playerHands[pIdx]];
+        if (winningTile && !isTsumo) hand.push(winningTile);
+        let melds = playerMelds[pIdx];
+
+        let han = 0;
+        let yakuList = [];
+
+        // 1. Check Riichi
+        if (pIdx === 0 ? isRiichi : aiRiichi[pIdx]) {
+            han += 1;
+            yakuList.push("Riichi (1 Han)");
+        }
+
+        // 2. Check Fully Concealed Hand (Menzen Tsumo)
+        if (isTsumo && melds.length === 0) {
+            han += 1;
+            yakuList.push("Menzen Tsumo (1 Han)");
+        }
+
+        // 3. Check All Simples (Tanyao)
+        let allTiles = [...hand, ...melds.flat()];
+        let isTanyao = allTiles.every(t => t.type !== 'honor' && t.num > 1 && t.num < 9);
+        if (isTanyao) {
+            han += 1;
+            yakuList.push("Tanyao / All Simples (1 Han)");
+        }
+
+        // 4. Check Dora
+        let doraIndicator = deadWall[0];
+        let doraCount = 0;
+        if (doraIndicator) {
+            allTiles.forEach(t => {
+                if (t.type === doraIndicator.type && t.num === (doraIndicator.num % 9 + 1)) doraCount++;
+                else if (doraIndicator.type === 'honor' && t.type === 'honor' && t.id === (doraIndicator.id % 7 + 1)) doraCount++;
+            });
+        }
+        if (doraCount > 0) {
+            han += doraCount;
+            yakuList.push(`Dora x${doraCount} (${doraCount} Han)`);
+        }
+
+        // Base fallback Yaku to guarantee valid win
+        if (han === 0) {
+            han = 1;
+            yakuList.push("Standard Hand (1 Han)");
+        }
+
+        let fu = isTsumo ? 20 : 30;
+        let isDealer = (pIdx === currentDealerIdx);
+        let pointsObj = calculateRiichiPoints(han, fu, isDealer, isTsumo);
+
+        return {
+            han: han,
+            fu: fu,
+            yakuStr: yakuList.join(", "),
+            points: pointsObj.total,
+            detail: pointsObj.detail
+        };
+    }
+
     function checkWinningHand(tiles) {
         if (tiles.length < 14) return false;
         let counts = new Array(34).fill(0);
@@ -510,11 +590,17 @@
         playerHands = [[], [], [], []];
         playerRivers = [[], [], [], []];
         playerMelds = [[], [], [], []]; 
+        aiRiichi = [false, false, false, false];
         isRiichi = false; pendingRiichi = false; riichiSticks = 0;
         document.getElementById('riichi-effect').style.display = 'none';
         
         document.querySelectorAll('.river-container').forEach(r => r.innerHTML = '');
         document.getElementById('player-melds-container').innerHTML = '';
+        for(let i=1; i<=3; i++) {
+            let enemyMeldEl = document.getElementById(`enemy-melds-${i}`);
+            if (enemyMeldEl) enemyMeldEl.innerHTML = '';
+        }
+
         updateScoresUI();
 
         for (let i = 0; i < 13; i++) {
@@ -612,6 +698,23 @@
         });
     }
 
+    function renderEnemyMelds(pIdx) {
+        const container = document.getElementById(`enemy-melds-${pIdx}`);
+        if (!container) return;
+        container.innerHTML = '';
+        playerMelds[pIdx].forEach(group => {
+            let groupEl = document.createElement('div');
+            groupEl.className = 'meld-group';
+            group.forEach(t => {
+                let tileEl = document.createElement('div');
+                tileEl.className = 'tile';
+                tileEl.innerHTML = `<span class="tile-char">${t.val}</span>`;
+                groupEl.appendChild(tileEl);
+            });
+            container.appendChild(groupEl);
+        });
+    }
+
     function renderEnemyHands() {
         ['enemy-hand-top', 'enemy-hand-left', 'enemy-hand-right'].forEach((id, idx) => {
             const el = document.getElementById(id);
@@ -624,7 +727,14 @@
         });
     }
 
+    function updateTurnHighlight() {
+        const centerBox = document.getElementById('center-board-box');
+        const colors = ['#2ecc71', '#f39c12', '#e74c3c', '#9b59b6'];
+        centerBox.style.borderColor = colors[currentTurn];
+    }
+
     function processTurn() {
+        updateTurnHighlight();
         if (fullDeck.length === 0) { 
             endRound("Draw (Ryuukyoku)", "Dinding kartu telah habis!");
             return; 
@@ -659,17 +769,46 @@
                 }
             }
         } else {
+            // AI TURN BOT LOGIC
             isDiscardable = false;
             renderEnemyHands();
             startTimer(false);
+
+            // Check AI TSUMO Win
+            if (checkWinningHand(playerHands[currentTurn])) {
+                let evalScore = evaluateYakuAndScore(currentTurn, null, true);
+                playerScores[currentTurn] += evalScore.points;
+                let pNames = ["You", "P1 (East)", "P2 (North)", "P3 (West)"];
+                endRound(`TSUMO by ${pNames[currentTurn]}!`, `${evalScore.yakuStr} - ${evalScore.points} Pts`);
+                return;
+            }
+
+            // Check AI Riichi Declaration
+            if (!aiRiichi[currentTurn] && playerMelds[currentTurn].length === 0 && isTenpai(playerHands[currentTurn].slice(0, -1))) {
+                aiRiichi[currentTurn] = true;
+                playerScores[currentTurn] -= 1000;
+                riichiSticks++;
+                updateScoresUI();
+            }
             
             let delay = aiDifficulty === 'Easy' ? 1000 : 500;
             setTimeout(() => {
                 let hand = playerHands[currentTurn];
                 let discardIdx = 0;
 
-                let honorIdx = hand.findIndex(t => t.type === 'honor');
-                discardIdx = honorIdx !== -1 ? honorIdx : hand.length - 1;
+                if (aiRiichi[currentTurn]) {
+                    // Discard drawn tile if in Riichi
+                    discardIdx = hand.indexOf(drawnTile);
+                    if (discardIdx === -1) discardIdx = hand.length - 1;
+                } else {
+                    // Smart Discard: Prioritize isolated Honor tiles -> Terminals (1/9)
+                    let honorIdx = hand.findIndex(t => t.type === 'honor');
+                    let terminalIdx = hand.findIndex(t => t.num === 1 || t.num === 9);
+                    
+                    if (honorIdx !== -1) discardIdx = honorIdx;
+                    else if (terminalIdx !== -1) discardIdx = terminalIdx;
+                    else discardIdx = Math.floor(Math.random() * hand.length);
+                }
 
                 let discarded = hand.splice(discardIdx, 1)[0];
                 drawnTile = null;
@@ -708,11 +847,29 @@
             updateScoresUI();
             dEl.classList.add('riichi-tile'); 
             document.getElementById('riichi-effect').style.display = 'block'; 
+        } else if (pIdx !== 0 && aiRiichi[pIdx] && playerRivers[pIdx].length === 1) {
+            dEl.classList.add('riichi-tile');
         }
 
         dEl.innerHTML = `<span class="tile-char">${tile.val}</span><span class="tile-helper">${tile.helper}</span>`;
         riverEl.appendChild(dEl);
 
+        // Check if ANY AI Bot calls RON from discarded tile
+        for (let p = 1; p < 4; p++) {
+            if (p !== pIdx) {
+                let isWin = checkWinningHand([...playerHands[p], tile]);
+                if (isWin) {
+                    let evalScore = evaluateYakuAndScore(p, tile, false);
+                    playerScores[p] += evalScore.points;
+                    playerScores[pIdx] -= evalScore.points;
+                    let pNames = ["You", "Player 1 (East)", "Player 2 (North)", "Player 3 (West)"];
+                    endRound(`RON by ${pNames[p]}!`, `${evalScore.yakuStr} (+${evalScore.points} Pts paid by ${pNames[pIdx]})`);
+                    return;
+                }
+            }
+        }
+
+        // Check Player actions on AI Discard
         if (pIdx !== 0 && !isRiichi) {
             let actions = [];
             let isWinning = checkWinningHand([...playerHands[0], tile]);
@@ -769,10 +926,12 @@
         document.getElementById('action-overlay').style.display = 'none';
         
         if (act === 'Ron' || act === 'Tsumo') {
-            let isOya = (currentTurn === 0);
-            let calc = calculateRiichiPoints(3, 30, isOya, act === 'Tsumo'); // Base calculation
-            playerScores[0] += calc.total;
-            endRound(`${act.toUpperCase()} WIN!`, `Kemenangan 3 Han 30 Fu! (+${calc.total} Poin)\n${calc.detail}`);
+            let evalScore = evaluateYakuAndScore(0, act === 'Ron' ? lastDiscardedTile : null, act === 'Tsumo');
+            playerScores[0] += evalScore.points;
+            if (act === 'Ron' && lastDiscarderIdx !== -1) {
+                playerScores[lastDiscarderIdx] -= evalScore.points;
+            }
+            endRound(`${act.toUpperCase()} WIN!`, `${evalScore.yakuStr} (+${evalScore.points} Poin)\n${evalScore.detail}`);
             return;
         }
         
@@ -815,11 +974,15 @@
         playerMelds[playerIdx].push(ponTiles);
 
         removeLastDiscard();
-        if (autoSortSetting) autoSortHand();
-        renderPlayerMelds();
+        if (playerIdx === 0) {
+            if (autoSortSetting) autoSortHand();
+            renderPlayerMelds();
+        } else {
+            renderEnemyMelds(playerIdx);
+        }
 
-        currentTurn = playerIdx; isDiscardable = true; drawnTile = null; 
-        startTimer(false);
+        currentTurn = playerIdx; isDiscardable = (playerIdx === 0); drawnTile = null; 
+        if (playerIdx === 0) startTimer(false); else processTurn();
     }
 
     function executeKan(playerIdx) {
@@ -833,15 +996,18 @@
         playerMelds[playerIdx].push(kanTiles);
 
         removeLastDiscard();
-        if (autoSortSetting) autoSortHand();
-        renderPlayerMelds();
+        if (playerIdx === 0) {
+            if (autoSortSetting) autoSortHand();
+            renderPlayerMelds();
+        } else {
+            renderEnemyMelds(playerIdx);
+        }
 
         currentTurn = playerIdx;
         drawnTile = fullDeck.pop();
         playerHands[playerIdx].push(drawnTile);
-        isDiscardable = true;
-        renderPlayerHand();
-        startTimer(false);
+        isDiscardable = (playerIdx === 0);
+        if (playerIdx === 0) { renderPlayerHand(); startTimer(false); } else processTurn();
     }
 
     function executeChi(playerIdx) {
@@ -858,11 +1024,15 @@
         playerMelds[playerIdx].push(chiTiles);
 
         removeLastDiscard();
-        if (autoSortSetting) autoSortHand();
-        renderPlayerMelds();
+        if (playerIdx === 0) {
+            if (autoSortSetting) autoSortHand();
+            renderPlayerMelds();
+        } else {
+            renderEnemyMelds(playerIdx);
+        }
 
-        currentTurn = playerIdx; isDiscardable = true; drawnTile = null; 
-        startTimer(false);
+        currentTurn = playerIdx; isDiscardable = (playerIdx === 0); drawnTile = null; 
+        if (playerIdx === 0) startTimer(false); else processTurn();
     }
 
     function nextTurn() {
