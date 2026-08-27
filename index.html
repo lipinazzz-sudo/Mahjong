@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mahjong Soul Riichi Engine - Advanced</title>
+    <title>Mahjong Soul Riichi Engine - Dead Wall & Furiten</title>
     <style>
         :root {
             --bg-table: radial-gradient(circle at center, #1f4260 0%, #0d1e2d 100%);
@@ -52,7 +52,7 @@
         .turn-timer { font-size: 42px; font-weight: bold; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.8); margin: 2px 0; }
         .round-info { font-size: 14px; color: #58a6ff; font-weight: bold; }
         .tiles-left { font-size: 15px; color: var(--gold-accent); font-weight: bold; }
-        .score-tag { position: absolute; font-size: 10px; color: #c9d1d9; background: #21262d; padding: 2px 6px; border-radius: 4px; border: 1px solid #30363d; transition: color 0.3s; }
+        .score-tag { position: absolute; font-size: 10px; color: #c9d1d9; background: #21262d; padding: 2px 6px; border-radius: 4px; border: 1px solid #30363d; }
         .score-south { bottom: 6px; color: #2ecc71; font-weight: bold;}
         .score-east { right: 6px; }
         .score-north { top: 6px; }
@@ -100,12 +100,11 @@
             width: 32px; height: 44px; background: var(--tile-bg); border-radius: 3px; 
             border-bottom: 3px solid #3a5335; display: flex; justify-content: center; 
             align-items: center; position: relative; color: #111; font-weight: bold; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5); transition: 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5); 
         }
         .discard-tile .tile-char { font-size: 20px; }
         .discard-tile .tile-helper { font-size: 9px; top: 1px; right: 2px; position: absolute; color: #d63031; font-weight: 800;}
         
-        /* Modifikasi bentuk kartu saat Riichi */
         .riichi-tile {
             transform: rotate(-90deg) scale(0.9);
             margin: 0 5px;
@@ -255,7 +254,7 @@
     const honors = [ { val: '東', helper: 'E' }, { val: '南', helper: 'S' }, { val: '西', helper: 'W' }, { val: '北', helper: 'N' }, { val: '🀆', helper: 'Wh' }, { val: '發', helper: 'G' }, { val: '中', helper: 'R' } ];
     honors.forEach(h => TILE_TYPES.push({ id: idCounter++, val: h.val, helper: h.helper, type: 'honor', num: 0 }));
 
-    let fullDeck = [], playerHands = [[], [], [], []], playerRivers = [[], [], [], []];
+    let fullDeck = [], deadWall = [], playerHands = [[], [], [], []], playerRivers = [[], [], [], []];
     let playerMelds = [[], [], [], []]; 
     let playerScores = [25000, 25000, 25000, 25000];
     
@@ -289,7 +288,7 @@
         tiles.forEach(t => { if (t && typeof t.id === 'number') counts[t.id]++; });
 
         let pairs = counts.filter(c => c === 2).length;
-        if (pairs === 7) return true; // Chiitoitsu
+        if (pairs === 7) return true;
 
         for (let i = 0; i < 34; i++) {
             if (counts[i] >= 2) {
@@ -319,9 +318,7 @@
         return false;
     }
 
-    // Fungsi Cek Tenpai
     function isTenpai(hand) {
-        // Tangan harus berjumlah sesuai (13, 10, 7)
         if (hand.length % 3 !== 1) return false;
         for (let i = 0; i < 34; i++) {
             let mockTile = TILE_TYPES.find(t => t.id === i);
@@ -330,7 +327,14 @@
         return false;
     }
 
-    // Fungsi Deteksi Kombinasi Chi
+    // FUNGSI PEMERIKSA FURITEN
+    // Mengecek apakah kartu yang bisa membuat pemain menang pernah dibuang sendiri ke sungai
+    function checkFuriten(winningTileId) {
+        let myRiver = playerRivers[0];
+        // Jika kartu kemenangan ada di sungai kita sendiri, berarti Furiten
+        return myRiver.some(t => t.id === winningTileId);
+    }
+
     function getChiCombinations(hand, tile) {
         if (tile.type === 'honor') return [];
         let nums = Array.from(new Set(hand.filter(t => t.type === tile.type).map(t => t.num)));
@@ -359,6 +363,9 @@
         TILE_TYPES.forEach(t => { for (let i = 0; i < 4; i++) fullDeck.push({ ...t, uniqueId: Math.random() }); });
         fullDeck.sort(() => Math.random() - 0.5);
 
+        // MEMBUAT DEAD WALL (14 Kartu Disisihkan)
+        deadWall = fullDeck.splice(0, 14);
+
         playerHands = [[], [], [], []];
         playerRivers = [[], [], [], []];
         playerMelds = [[], [], [], []]; 
@@ -374,7 +381,8 @@
             for (let p = 0; p < 4; p++) playerHands[p].push(fullDeck.pop());
         }
 
-        document.getElementById('dora-indicator-tile').innerText = fullDeck.pop().val;
+        // Ambil 1 dari Dead Wall untuk indikator Dora awal
+        document.getElementById('dora-indicator-tile').innerText = deadWall[0].val;
 
         autoSortHand();
         renderEnemyHands();
@@ -445,6 +453,7 @@
             el.onclick = () => { if (isDiscardable) discardTile(i); };
             container.appendChild(el);
         });
+        // Sisa wall dikurangi dead wall
         document.getElementById('wall-count').innerText = `x ${fullDeck.length}`;
     }
     
@@ -477,7 +486,8 @@
     }
 
     function processTurn() {
-        if (fullDeck.length === 0) { alert("Game Draw! (Ryuukyoku)"); nav('screen-main'); return; }
+        // Cek sisa dek (mengabaikan dead wall)
+        if (fullDeck.length === 0) { alert("Game Draw! (Ryuukyoku - Wall Empty)"); nav('screen-main'); return; }
 
         drawnTile = fullDeck.pop();
         playerHands[currentTurn].push(drawnTile);
@@ -489,12 +499,11 @@
             let actions = [];
             let currentTotalTiles = playerHands[0].length + (playerMelds[0].length * 3);
             
-            // Cek Tsumo
+            // Cek Tsumo (Menang dari tarikan sendiri tidak terhalang furiten biasa)
             if (checkWinningHand(playerHands[0]) && currentTotalTiles === 14) {
                 actions.push('Tsumo');
             }
             
-            // Cek Riichi (Hanya jika belum Riichi, belum ada kartu terbuka/Meld, dan status Tenpai)
             if (!isRiichi && playerMelds[0].length === 0 && isTenpai(playerHands[0].slice(0, -1))) {
                 actions.push('Riichi');
             }
@@ -503,7 +512,7 @@
                 showAvailableActions(actions);
             } else {
                 if (isRiichi) {
-                    setTimeout(() => autoDiscard(), 800); // Auto buang jika Riichi
+                    setTimeout(() => autoDiscard(), 800); 
                 } else {
                     startTimer(false);
                 }
@@ -554,15 +563,14 @@
         let dEl = document.createElement('div');
         dEl.className = 'discard-tile';
         
-        // Logika Eksekusi Riichi
         if (pIdx === 0 && pendingRiichi) {
             isRiichi = true;
             pendingRiichi = false;
             playerScores[0] -= 1000;
             riichiSticks++;
             updateScoresUI();
-            dEl.classList.add('riichi-tile'); // Putar kartu
-            document.getElementById('riichi-effect').style.display = 'block'; // Efek visual riichi
+            dEl.classList.add('riichi-tile'); 
+            document.getElementById('riichi-effect').style.display = 'block'; 
         }
 
         dEl.innerHTML = `<span class="tile-char">${tile.val}</span><span class="tile-helper">${tile.helper}</span>`;
@@ -571,17 +579,19 @@
         if (pIdx !== 0 && !isRiichi) {
             let actions = [];
             
-            // Cek Ron (Menang dari buangan lawan)
-            if (checkWinningHand([...playerHands[0], tile])) {
+            // VALIDASI RON & FURITEN
+            let isWinning = checkWinningHand([...playerHands[0], tile]);
+            let isInFuriten = checkFuriten(tile.id);
+
+            // Tombol Ron hanya muncul jika menang DAN TIDAK DALAM KONDISI FURITEN
+            if (isWinning && !isInFuriten) {
                 actions.push('Ron');
             }
 
-            // Cek Pon & Kan
             let matchCount = playerHands[0].filter(t => t.id === tile.id).length;
             if (matchCount >= 2) actions.push('Pon');
             if (matchCount >= 3) actions.push('Kan');
 
-            // Cek Chi (Hanya aktif jika pemain index 3 / sebelah kiri yang membuang)
             if (pIdx === 3 && getChiCombinations(playerHands[0], tile).length > 0) {
                 actions.push('Chi');
             }
@@ -593,9 +603,10 @@
                 nextTurn();
             }
         } 
-        // Jika sudah Riichi, hanya bisa cek Ron
         else if (pIdx !== 0 && isRiichi) {
-            if (checkWinningHand([...playerHands[0], tile])) {
+            let isWinning = checkWinningHand([...playerHands[0], tile]);
+            let isInFuriten = checkFuriten(tile.id);
+            if (isWinning && !isInFuriten) {
                 showAvailableActions(['Ron', 'Skip']);
             } else {
                 nextTurn();
@@ -631,7 +642,7 @@
         document.getElementById('action-overlay').style.display = 'none';
         
         if (act === 'Ron' || act === 'Tsumo') {
-            let totalWin = act === 'Ron' ? 8000 : 12000; // Mock score
+            let totalWin = act === 'Ron' ? 8000 : 12000;
             alert(`YAKUMAN! (${act.toUpperCase()}) - Kamu Menang!\n+${totalWin} Poin`);
             nav('screen-main');
             return;
@@ -639,7 +650,6 @@
         
         if (act === 'Riichi') {
             pendingRiichi = true;
-            // Jika status Skip dicentang, pemain diberi waktu buang kartu lagi.
             startTimer(false); 
             return;
         }
@@ -706,7 +716,6 @@
         autoSortHand();
         renderPlayerMelds();
 
-        // Extra Draw (Rinshan)
         currentTurn = playerIdx;
         drawnTile = fullDeck.pop();
         playerHands[playerIdx].push(drawnTile);
@@ -717,7 +726,7 @@
 
     function executeChi(playerIdx) {
         let combos = getChiCombinations(playerHands[playerIdx], lastDiscardedTile);
-        let chosenCombo = combos[0]; // Auto pick sequence pertama untuk simplifikasi
+        let chosenCombo = combos[0]; 
         
         let chiTiles = [];
         for (let num of chosenCombo) {
