@@ -2,139 +2,135 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mahjong Soul Riichi Engine - Dead Wall & Furiten</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mahjong Soul Riichi Engine - Responsive & Advanced</title>
     <style>
         :root {
             --bg-table: radial-gradient(circle at center, #1f4260 0%, #0d1e2d 100%);
             --gold-accent: #f39c12;
             --tile-bg: linear-gradient(to bottom, #ffffff 0%, #f4efe6 100%);
             --tile-back: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            
+            /* Dynamic Tile Sizing for Universal Screens */
+            --tile-w: clamp(24px, 5.8vw, 42px);
+            --tile-h: clamp(36px, 8.5vw, 62px);
+            --tile-font: clamp(14px, 3.2vw, 24px);
+            --tile-helper-font: clamp(7px, 1.5vw, 10px);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
-        body { background: #050b11; color: #fff; overflow: hidden; height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center; }
 
-        .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; padding: 15px; text-align: center; position: absolute; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
+        body { background: #050b11; color: #fff; overflow: hidden; height: 100dvh; width: 100vw; display: flex; justify-content: center; align-items: center; }
+
+        .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; padding: 15px; text-align: center; position: absolute; top:0; left:0; }
         .active { display: flex; }
 
-        h1 { font-size: 2.2rem; color: var(--gold-accent); text-shadow: 0 0 10px rgba(243, 156, 18, 0.5); margin-bottom: 20px; }
-        button { background: linear-gradient(to bottom, #f39c12, #d35400); color: #fff; border: 1px solid #ffeb3b; padding: 10px 24px; margin: 6px; font-size: 1rem; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); color: var(--gold-accent); text-shadow: 0 0 10px rgba(243, 156, 18, 0.5); margin-bottom: 15px; }
+        button { background: linear-gradient(to bottom, #f39c12, #d35400); color: #fff; border: 1px solid #ffeb3b; padding: 8px 18px; margin: 5px; font-size: clamp(0.8rem, 2vw, 1rem); border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         button:active { transform: scale(0.96); }
 
+        /* Flexible Board Layout */
         #game-board {
-            width: 100vw; height: 100vh; background: var(--bg-table); position: relative;
-            display: grid; grid-template-rows: 90px 1fr 140px; grid-template-columns: 80px 1fr 80px;
+            width: 100vw; height: 100dvh; background: var(--bg-table); position: relative;
+            display: grid; grid-template-rows: max-content 1fr max-content; grid-template-columns: min-content 1fr min-content;
             box-shadow: inset 0 0 100px #000; overflow: hidden;
         }
 
-        .dora-panel { position: absolute; top: 15px; left: 15px; background: rgba(10, 20, 30, 0.85); border: 2px solid #5c4520; border-radius: 8px; padding: 6px 10px; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 4px; }
-        .dora-tiles { display: flex; gap: 3px; }
-        .dora-tile-box { width: 20px; height: 28px; background: #e67e22; border-radius: 2px; border: 1px solid #fff; display: flex; justify-content: center; align-items: center; font-size: 11px; }
+        .dora-panel { position: absolute; top: 10px; left: 10px; background: rgba(10, 20, 30, 0.85); border: 1.5px solid #5c4520; border-radius: 6px; padding: 4px 8px; z-index: 10; display: flex; flex-direction: column; gap: 2px; }
+        .dora-tiles { display: flex; gap: 2px; }
+        .dora-tile-box { width: clamp(14px, 3.5vw, 22px); height: clamp(20px, 5vw, 30px); background: #e67e22; border-radius: 2px; border: 1px solid #fff; display: flex; justify-content: center; align-items: center; font-size: clamp(9px, 2vw, 12px); }
         .dora-open { background: #fff; color: #000; font-weight: bold; }
-        .stick-counters { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; margin-top: 2px; }
+        .stick-counters { display: flex; justify-content: space-between; font-size: 10px; color: #aaa; margin-top: 1px; }
 
         .avatar-frame { position: absolute; display: flex; flex-direction: column; align-items: center; z-index: 5; }
-        .avatar-img { width: 48px; height: 48px; border-radius: 8px; border: 2px solid var(--gold-accent); background: #2c3e50 url('https://cdn-icons-png.flaticon.com/512/4140/4140048.png') center/cover; }
-        .avatar-name { font-size: 10px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; margin-top: 2px; border: 1px solid #444; }
-        .time-bank-tag { font-size: 11px; color: #f39c12; font-weight: bold; margin-top: 2px; background: #111; padding: 1px 6px; border-radius: 4px; }
+        .avatar-img { width: clamp(32px, 8vw, 48px); height: clamp(32px, 8vw, 48px); border-radius: 6px; border: 2px solid var(--gold-accent); background: #2c3e50 url('https://cdn-icons-png.flaticon.com/512/4140/4140048.png') center/cover; }
+        .avatar-name { font-size: clamp(8px, 1.8vw, 11px); background: rgba(0,0,0,0.7); padding: 1px 4px; border-radius: 3px; margin-top: 1px; border: 1px solid #444; }
+        .time-bank-tag { font-size: clamp(8px, 1.5vw, 10px); color: #f39c12; font-weight: bold; margin-top: 1px; background: #111; padding: 1px 4px; border-radius: 3px; }
         
-        .pos-bottom { bottom: 145px; left: 20px; }
-        .pos-left { left: 15px; top: 180px; }
-        .pos-top { top: 15px; right: 220px; }
-        .pos-right { right: 15px; top: 180px; }
+        .pos-bottom { bottom: calc(var(--tile-h) + 15px); left: 10px; }
+        .pos-left { left: 5px; top: 20%; }
+        .pos-top { top: 10px; right: 120px; }
+        .pos-right { right: 5px; top: 20%; }
 
         .center-board {
             grid-area: 2 / 2 / 3 / 3; justify-self: center; align-self: center;
-            width: 180px; height: 180px; background: #161b22; border: 4px solid #30363d;
-            border-radius: 16px; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.9); z-index: 2;
+            width: clamp(120px, 30vw, 180px); height: clamp(120px, 30vw, 180px); background: #161b22; border: 3px solid #30363d;
+            border-radius: 12px; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8); z-index: 2;
         }
-        .turn-timer { font-size: 42px; font-weight: bold; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.8); margin: 2px 0; }
-        .round-info { font-size: 14px; color: #58a6ff; font-weight: bold; }
-        .tiles-left { font-size: 15px; color: var(--gold-accent); font-weight: bold; }
-        .score-tag { position: absolute; font-size: 10px; color: #c9d1d9; background: #21262d; padding: 2px 6px; border-radius: 4px; border: 1px solid #30363d; }
-        .score-south { bottom: 6px; color: #2ecc71; font-weight: bold;}
-        .score-east { right: 6px; }
-        .score-north { top: 6px; }
-        .score-west { left: 6px; }
+        .turn-timer { font-size: clamp(24px, 6vw, 42px); font-weight: bold; color: #fff; margin: 1px 0; }
+        .round-info { font-size: clamp(10px, 2.5vw, 14px); color: #58a6ff; font-weight: bold; }
+        .tiles-left { font-size: clamp(11px, 2.8vw, 15px); color: var(--gold-accent); font-weight: bold; }
+        .score-tag { position: absolute; font-size: clamp(8px, 1.8vw, 11px); color: #c9d1d9; background: #21262d; padding: 1px 4px; border-radius: 3px; border: 1px solid #30363d; }
+        .score-south { bottom: 4px; color: #2ecc71; font-weight: bold;}
+        .score-east { right: 4px; }
+        .score-north { top: 4px; }
+        .score-west { left: 4px; }
 
-        .top-right-btns { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 10; }
-        .icon-btn { width: 36px; height: 36px; background: rgba(16, 26, 36, 0.8); border: 1px solid #444; border-radius: 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .top-right-btns { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; z-index: 10; }
+        .icon-btn { width: clamp(28px, 6vw, 36px); height: clamp(28px, 6vw, 36px); background: rgba(16, 26, 36, 0.8); border: 1px solid #444; border-radius: 5px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 14px; }
 
-        .river-container { position: absolute; display: flex; flex-wrap: wrap; gap: 2px; z-index: 3; }
-        .river-bottom { bottom: 220px; left: 50%; transform: translateX(-50%); width: 210px; justify-content: flex-start; }
-        .river-top { top: 140px; left: 50%; transform: translateX(-50%) rotate(180deg); width: 210px; }
-        .river-left { left: 160px; top: 50%; transform: translateY(-50%) rotate(90deg); width: 210px; }
-        .river-right { right: 160px; top: 50%; transform: translateY(-50%) rotate(-90deg); width: 210px; }
+        /* River Styling */
+        .river-container { position: absolute; display: flex; flex-wrap: wrap; gap: 1px; z-index: 3; max-width: 180px; }
+        .river-bottom { bottom: calc(var(--tile-h) + 75px); left: 50%; transform: translateX(-50%); }
+        .river-top { top: 75px; left: 50%; transform: translateX(-50%) rotate(180deg); }
+        .river-left { left: 90px; top: 50%; transform: translateY(-50%) rotate(90deg); }
+        .river-right { right: 90px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
 
+        /* Tile Styling & Formatting Fix */
         .tile {
-            background: var(--tile-bg); color: #111; border-radius: 4px; display: flex;
+            width: var(--tile-w); height: var(--tile-h);
+            background: var(--tile-bg); color: #111; border-radius: 3px; display: flex;
             justify-content: center; align-items: center; position: relative;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.5), inset 0 -2px 0 rgba(0,0,0,0.15);
-            border-bottom: 4px solid #3a5335; font-weight: bold; cursor: pointer; transition: transform 0.1s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4); border-bottom: 3px solid #3a5335;
+            font-weight: bold; cursor: pointer; flex-shrink: 0; overflow: hidden;
         }
-        .tile:hover { transform: translateY(-6px); }
-        .tile-helper { position: absolute; top: 1px; right: 2px; font-size: 9px; font-weight: 800; color: #d63031; line-height: 1; text-shadow: 0 0 2px #fff; }
-        .tile-char { font-size: 24px; }
+        .tile:hover { transform: translateY(-4px); }
+        .tile-helper { position: absolute; top: 1px; right: 2px; font-size: var(--tile-helper-font); font-weight: 800; color: #d63031; line-height: 1; }
+        .tile-char { font-size: var(--tile-font); line-height: 1; }
 
-        .tile-back { background: var(--tile-back); border-radius: 3px; border: 1px solid #795548; box-shadow: 0 2px 4px rgba(0,0,0,0.4); border-bottom: 3px solid #3e2723; }
+        .tile-back { background: var(--tile-back); border-radius: 2px; border: 1px solid #795548; border-bottom: 2px solid #3e2723; flex-shrink: 0; }
 
-        .hand-bottom-container { grid-area: 3 / 1 / 4 / 4; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 15px; z-index: 6; }
-        .hand-tiles { display: flex; gap: 3px; }
-        .hand-tiles .tile { width: 42px; height: 62px; }
-        .drawn-tile-gap { margin-left: 14px; border: 2px solid var(--gold-accent); }
+        .hand-bottom-container { grid-area: 3 / 1 / 4 / 4; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 8px; z-index: 6; width: 100vw; overflow-x: auto; }
+        .hand-tiles { display: flex; gap: 2px; max-width: 100vw; padding: 0 5px; }
+        .drawn-tile-gap { margin-left: 8px; border: 2px solid var(--gold-accent); }
         
-        .riichi-overlay {
-            position: absolute; width: 100%; height: 100%; background: rgba(231, 76, 60, 0.2); 
-            pointer-events: none; z-index: 100; display: none; box-shadow: inset 0 0 50px rgba(231, 76, 60, 0.5);
-        }
+        .riichi-overlay { position: absolute; width: 100%; height: 100%; background: rgba(231, 76, 60, 0.2); pointer-events: none; z-index: 100; display: none; }
 
-        .enemy-hand-top { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 2px; }
-        .enemy-hand-top .tile-back { width: 22px; height: 32px; }
-        .enemy-hand-side { position: absolute; display: flex; flex-direction: column; gap: 2px; }
-        .enemy-hand-side .tile-back { width: 32px; height: 20px; }
-        .side-left { left: 10px; top: 25%; }
-        .side-right { right: 10px; top: 25%; }
+        .enemy-hand-top { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); display: flex; gap: 1px; }
+        .enemy-hand-top .tile-back { width: clamp(12px, 3vw, 20px); height: clamp(18px, 4.5vw, 30px); }
+        .enemy-hand-side { position: absolute; display: flex; flex-direction: column; gap: 1px; }
+        .enemy-hand-side .tile-back { width: clamp(18px, 4.5vw, 30px); height: clamp(12px, 3vw, 20px); }
+        .side-left { left: 5px; top: 25%; }
+        .side-right { right: 5px; top: 25%; }
 
         .discard-tile { 
-            width: 32px; height: 44px; background: var(--tile-bg); border-radius: 3px; 
-            border-bottom: 3px solid #3a5335; display: flex; justify-content: center; 
-            align-items: center; position: relative; color: #111; font-weight: bold; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+            width: clamp(18px, 4.2vw, 28px); height: clamp(26px, 6vw, 38px); background: var(--tile-bg); border-radius: 2px; 
+            border-bottom: 2px solid #3a5335; display: flex; justify-content: center; align-items: center; position: relative; color: #111; font-weight: bold; overflow: hidden;
         }
-        .discard-tile .tile-char { font-size: 20px; }
-        .discard-tile .tile-helper { font-size: 9px; top: 1px; right: 2px; position: absolute; color: #d63031; font-weight: 800;}
+        .discard-tile .tile-char { font-size: clamp(11px, 2.8vw, 18px); }
+        .discard-tile .tile-helper { font-size: clamp(6px, 1.2vw, 8px); top: 1px; right: 1px; position: absolute; color: #d63031; font-weight: 800;}
         
-        .riichi-tile {
-            transform: rotate(-90deg) scale(0.9);
-            margin: 0 5px;
-            box-shadow: 3px 3px 5px rgba(0,0,0,0.6);
-            border-bottom: none; border-right: 3px solid #3a5335;
-        }
-        .riichi-tile .tile-char { transform: rotate(90deg); }
-        .riichi-tile .tile-helper { transform: rotate(90deg); top: 2px; right: 4px;}
+        .riichi-tile { transform: rotate(-90deg) scale(0.9); margin: 0 2px; }
 
-        .melds-container {
-            position: absolute; bottom: 90px; right: 20px; display: flex; gap: 10px; z-index: 6;
-        }
-        .meld-group { display: flex; gap: 2px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 6px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-        .meld-group .tile { width: 38px; height: 56px; font-size: 22px; cursor: default; }
-        .meld-group .tile:hover { transform: none; }
+        .melds-container { position: absolute; bottom: calc(var(--tile-h) + 15px); right: 10px; display: flex; gap: 5px; z-index: 6; }
+        .meld-group { display: flex; gap: 1px; background: rgba(0,0,0,0.3); padding: 2px; border-radius: 4px; }
+        .meld-group .tile { width: clamp(18px, 4vw, 30px); height: clamp(26px, 6vw, 44px); font-size: 14px; cursor: default; }
 
         #action-overlay {
-            position: absolute; bottom: 100px; right: 15%; display: none; gap: 12px; z-index: 20;
-            background: rgba(5, 12, 20, 0.9); padding: 10px 20px; border-radius: 40px; border: 2px solid var(--gold-accent);
-            box-shadow: 0 0 20px rgba(243, 156, 18, 0.4);
+            position: absolute; bottom: calc(var(--tile-h) + 25px); left: 50%; transform: translateX(-50%); display: none; gap: 8px; z-index: 20;
+            background: rgba(5, 12, 20, 0.95); padding: 8px 16px; border-radius: 30px; border: 2px solid var(--gold-accent);
         }
-        .act-btn { padding: 8px 20px; font-size: 1.1rem; border-radius: 20px; text-shadow: 1px 1px 2px #000; cursor: pointer; color: white; font-weight: bold; transition: 0.2s;}
-        .act-btn:hover { filter: brightness(1.2); transform: scale(1.05); }
-        .btn-ron { background: linear-gradient(to bottom, #e74c3c, #c0392b); border: 2px solid #ff7675; }
-        .btn-tsumo { background: linear-gradient(to bottom, #e67e22, #d35400); border: 2px solid #f39c12; }
-        .btn-riichi { background: linear-gradient(to bottom, #9b59b6, #8e44ad); border: 2px solid #d2b4de; }
-        .btn-kan { background: linear-gradient(to bottom, #1abc9c, #16a085); border: 2px solid #a3e4d7; }
-        .btn-pon { background: linear-gradient(to bottom, #3498db, #2980b9); border: 2px solid #85c1e9; }
-        .btn-chi { background: linear-gradient(to bottom, #2ecc71, #27ae60); border: 2px solid #82e0aa; }
-        .btn-skip { background: linear-gradient(to bottom, #636e72, #2d3436); border: 2px solid #b2bec3; }
+        .act-btn { padding: 6px 14px; font-size: clamp(0.75rem, 2vw, 1rem); border-radius: 15px; cursor: pointer; color: white; font-weight: bold; }
+        .btn-ron { background: #e74c3c; } .btn-tsumo { background: #e67e22; } .btn-riichi { background: #9b59b6; }
+        .btn-kan { background: #1abc9c; } .btn-pon { background: #3498db; } .btn-chi { background: #2ecc71; } .btn-skip { background: #636e72; }
+
+        /* Modal Screens */
+        .modal { position: absolute; top: 0; left: 0; width: 100vw; height: 100dvh; background: rgba(0,0,0,0.85); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 200; padding: 20px; }
+        .modal-box { background: #161b22; border: 2px solid var(--gold-accent); border-radius: 10px; padding: 20px; text-align: center; max-width: 400px; width: 90%; }
+        .ready-player-list { display: flex; flex-direction: column; gap: 8px; margin: 15px 0; text-align: left; }
+        .ready-item { display: flex; justify-content: space-between; background: #21262d; padding: 8px 12px; border-radius: 5px; font-size: 14px; }
+        .status-ready { color: #2ecc71; font-weight: bold; }
+        .status-waiting { color: #e74c3c; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -143,29 +139,63 @@
         <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_51a37c4493.mp3?filename=chinese-traditional-music-110072.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- MAIN MENU -->
     <div id="screen-main" class="screen active">
         <h1>MAHJONG SOUL WEB</h1>
         <button onclick="nav('screen-play')">Play Game</button>
         <button onclick="nav('screen-settings')">Settings</button>
     </div>
 
+    <!-- SETTINGS SCREEN -->
     <div id="screen-settings" class="screen">
         <h1>Settings</h1>
-        <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 10px; width: 300px; margin-bottom: 15px;">
+        <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 10px; width: 280px; margin-bottom: 15px;">
             <label>Music Volume:</label>
-            <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.5" onchange="updateVolume(this.value)" style="width:100%; margin-top:10px;">
+            <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.5" onchange="updateVolume(this.value)" style="width:100%; margin:10px 0;">
+            <hr style="border-color:#444; margin: 10px 0;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label>Auto-Sort Hand:</label>
+                <button id="btn-toggle-autosort" onclick="toggleAutoSortSetting()" style="padding:4px 10px; margin:0;">ON</button>
+            </div>
         </div>
-        <button onclick="nav('screen-main')">Back</button>
+        <button onclick="exitSettings()">Back</button>
     </div>
 
+    <!-- MODE SELECTION -->
     <div id="screen-play" class="screen">
-        <h1>Select Difficulty</h1>
-        <button onclick="start4PGame('Easy')">Vs AI (Easy)</button>
-        <button onclick="start4PGame('Medium')">Vs AI (Medium)</button>
-        <button onclick="start4PGame('Hard')">Vs AI (Hard)</button>
+        <h1>Select Mode</h1>
+        <button onclick="start4PGame('Medium', false)">Vs AI (Singleplayer)</button>
+        <button onclick="openPlayerLobby()">Vs Player (Multiplayer)</button>
         <button onclick="nav('screen-main')">Back</button>
     </div>
 
+    <!-- VS PLAYER LOBBY MODAL -->
+    <div id="modal-lobby" class="modal">
+        <div class="modal-box">
+            <h2>Multiplayer Lobby</h2>
+            <p style="font-size:12px; color:#aaa;">Waiting for all players to click Ready...</p>
+            <div class="ready-player-list">
+                <div class="ready-item"><span>You (South)</span><span class="status-ready" id="st-0">READY</span></div>
+                <div class="ready-item"><span>Player 2 (East)</span><span id="st-1" class="status-waiting">WAITING</span></div>
+                <div class="ready-item"><span>Player 3 (North)</span><span id="st-2" class="status-waiting">WAITING</span></div>
+                <div class="ready-item"><span>Player 4 (West)</span><span id="st-3" class="status-waiting">WAITING</span></div>
+            </div>
+            <button id="btn-lobby-ready" onclick="togglePlayerReady()">CLICK READY</button>
+            <button onclick="closeLobby()" style="background:#555;">Leave</button>
+        </div>
+    </div>
+
+    <!-- ROUND RESULT MODAL -->
+    <div id="modal-result" class="modal">
+        <div class="modal-box">
+            <h2 id="res-title">Ronde Selesai</h2>
+            <p id="res-desc" style="margin:10px 0; font-size:14px; color:#f39c12;"></p>
+            <div id="res-scores" style="font-size:12px; margin-bottom:15px; text-align:left; background:#111; padding:8px; border-radius:5px;"></div>
+            <button onclick="nextRoundOrFinish()">Lanjut ke Ronde Berikutnya</button>
+        </div>
+    </div>
+
+    <!-- GAME BOARD SCREEN -->
     <div id="screen-game" class="screen" style="padding:0;">
         <div class="riichi-overlay" id="riichi-effect"></div>
         <div id="game-board">
@@ -186,7 +216,7 @@
 
             <div class="top-right-btns">
                 <div class="icon-btn" onclick="toggleAudio()">🎵</div>
-                <div class="icon-btn" onclick="nav('screen-settings')">⚙️</div>
+                <div class="icon-btn" onclick="openSettingsFromGame()">⚙️</div>
                 <div class="icon-btn" onclick="quitGame()">🚪</div>
             </div>
 
@@ -197,15 +227,15 @@
             </div>
             <div class="avatar-frame pos-left">
                 <div class="avatar-img"></div>
-                <div class="avatar-name" id="name-left">AI West</div>
+                <div class="avatar-name" id="name-left">P3 West</div>
             </div>
             <div class="avatar-frame pos-top">
                 <div class="avatar-img"></div>
-                <div class="avatar-name" id="name-top">AI North</div>
+                <div class="avatar-name" id="name-top">P2 North</div>
             </div>
             <div class="avatar-frame pos-right">
                 <div class="avatar-img"></div>
-                <div class="avatar-name" id="name-right">AI East</div>
+                <div class="avatar-name" id="name-right">P1 East</div>
             </div>
 
             <div class="enemy-hand-top" id="enemy-hand-top"></div>
@@ -218,7 +248,7 @@
             <div class="river-container river-right" id="river-right"></div>
 
             <div class="center-board">
-                <div class="round-info">East 1</div>
+                <div class="round-info" id="round-title-display">East 1</div>
                 <div class="turn-timer" id="turn-timer-display">--</div>
                 <div class="tiles-left" id="wall-count">x 70</div>
                 
@@ -233,7 +263,6 @@
             <div class="melds-container" id="player-melds-container"></div>
 
             <div class="hand-bottom-container">
-                <button onclick="autoSortHand()" style="position:absolute; bottom:85px; right:20px; padding:4px 10px; font-size:11px;">Auto Sort</button>
                 <div class="hand-tiles" id="player-hand-tiles"></div>
             </div>
 
@@ -241,6 +270,7 @@
     </div>
 
 <script>
+    // TILE DEFINITIONS
     const TILE_TYPES = [];
     const helpers = ['1','2','3','4','5','6','7','8','9'];
     const charsMan = ['一萬','二萬','三萬','四萬','伍萬','六萬','七萬','八萬','九萬'];
@@ -254,10 +284,20 @@
     const honors = [ { val: '東', helper: 'E' }, { val: '南', helper: 'S' }, { val: '西', helper: 'W' }, { val: '北', helper: 'N' }, { val: '🀆', helper: 'Wh' }, { val: '發', helper: 'G' }, { val: '中', helper: 'R' } ];
     honors.forEach(h => TILE_TYPES.push({ id: idCounter++, val: h.val, helper: h.helper, type: 'honor', num: 0 }));
 
+    // STATE VARIABLES
     let fullDeck = [], deadWall = [], playerHands = [[], [], [], []], playerRivers = [[], [], [], []];
     let playerMelds = [[], [], [], []]; 
     let playerScores = [25000, 25000, 25000, 25000];
     
+    let activeScreenId = 'screen-main';
+    let previousScreenId = 'screen-main';
+
+    let autoSortSetting = true;
+    let isMultiplayerMode = false;
+
+    let currentRoundIndex = 0; // 0=East 1, 1=East 2, 2=East 3, 3=East 4, 4=Extra East 5
+    let currentDealerIdx = 1; // 1 = East Player at start
+
     let lastDiscardedTile = null; 
     let lastDiscarderIdx = -1;
     let isRiichi = false, pendingRiichi = false;
@@ -266,9 +306,26 @@
     let currentTurn = 0, drawnTile = null, isDiscardable = false, aiDifficulty = 'Medium';
     let timerInterval = null, baseTime = 10, extraTimeBank = 20, isActionPhase = false;
 
+    // NAVIGATION SYSTEM
     function nav(id) {
+        previousScreenId = activeScreenId;
+        activeScreenId = id;
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
+    }
+
+    function openSettingsFromGame() {
+        nav('screen-settings');
+    }
+
+    function exitSettings() {
+        nav(previousScreenId === 'screen-settings' ? 'screen-main' : previousScreenId);
+    }
+
+    function toggleAutoSortSetting() {
+        autoSortSetting = !autoSortSetting;
+        document.getElementById('btn-toggle-autosort').innerText = autoSortSetting ? 'ON' : 'OFF';
+        if (autoSortSetting && activeScreenId === 'screen-game') autoSortHand();
     }
 
     function forcePlayMusic() {
@@ -281,6 +338,82 @@
         if (bgMusic.paused) bgMusic.play(); else bgMusic.pause();
     }
     function updateVolume(val) { document.getElementById('bg-music').volume = val; }
+
+    // MULTIPLAYER LOBBY SIMULATION
+    let lobbyReadyTimer = null;
+    function openPlayerLobby() {
+        isMultiplayerMode = true;
+        document.getElementById('modal-lobby').style.display = 'flex';
+        document.getElementById('st-0').className = 'status-waiting';
+        document.getElementById('st-0').innerText = 'WAITING';
+        for(let i=1; i<=3; i++) {
+            document.getElementById(`st-${i}`).className = 'status-waiting';
+            document.getElementById(`st-${i}`).innerText = 'WAITING';
+        }
+    }
+
+    function closeLobby() {
+        clearInterval(lobbyReadyTimer);
+        document.getElementById('modal-lobby').style.display = 'none';
+    }
+
+    function togglePlayerReady() {
+        const st0 = document.getElementById('st-0');
+        st0.className = 'status-ready';
+        st0.innerText = 'READY';
+
+        // Simulate other players getting ready
+        let step = 1;
+        lobbyReadyTimer = setInterval(() => {
+            if (step <= 3) {
+                let st = document.getElementById(`st-${step}`);
+                st.className = 'status-ready';
+                st.innerText = 'READY';
+                step++;
+            } else {
+                clearInterval(lobbyReadyTimer);
+                setTimeout(() => {
+                    closeLobby();
+                    start4PGame('Hard', true);
+                }, 500);
+            }
+        }, 600);
+    }
+
+    // RIICHI MAHJONG SCORING ENGINE (CALCULATE HAN & FU)
+    function calculateRiichiPoints(han, fu, isDealer, isTsumo) {
+        let basePoint = 0;
+        if (han >= 13) basePoint = 8000; // Yakuman
+        else if (han >= 11) basePoint = 6000; // Sanbaiman
+        else if (han >= 8) basePoint = 4000; // Baiman
+        else if (han >= 6) basePoint = 3000; // Haneman
+        else if (han >= 5 || (han === 4 && fu >= 40) || (han === 3 && fu >= 70)) basePoint = 2000; // Mangan
+        else {
+            basePoint = fu * Math.pow(2, han + 2);
+            if (basePoint > 2000) basePoint = 2000;
+        }
+
+        const ceil100 = (v) => Math.ceil(v / 100) * 100;
+
+        if (isTsumo) {
+            if (isDealer) {
+                let pay = ceil100(basePoint * 2);
+                return { total: pay * 3, detail: `Setiap Ko bayar ${pay}` };
+            } else {
+                let payDealer = ceil100(basePoint * 2);
+                let payOther = ceil100(basePoint);
+                return { total: payDealer + (payOther * 2), detail: `Oya: ${payDealer}, Ko: ${payOther}` };
+            }
+        } else {
+            if (isDealer) {
+                let pay = ceil100(basePoint * 6);
+                return { total: pay, detail: `Lawan bayar ${pay}` };
+            } else {
+                let pay = ceil100(basePoint * 4);
+                return { total: pay, detail: `Lawan bayar ${pay}` };
+            }
+        }
+    }
 
     function checkWinningHand(tiles) {
         if (tiles.length < 14) return false;
@@ -327,12 +460,8 @@
         return false;
     }
 
-    // FUNGSI PEMERIKSA FURITEN
-    // Mengecek apakah kartu yang bisa membuat pemain menang pernah dibuang sendiri ke sungai
     function checkFuriten(winningTileId) {
-        let myRiver = playerRivers[0];
-        // Jika kartu kemenangan ada di sungai kita sendiri, berarti Furiten
-        return myRiver.some(t => t.id === winningTileId);
+        return playerRivers[0].some(t => t.id === winningTileId);
     }
 
     function getChiCombinations(hand, tile) {
@@ -353,23 +482,34 @@
         document.getElementById('riichi-stick-counter').innerText = `1000 x ${riichiSticks}`;
     }
 
-    function start4PGame(diff) {
+    // GAME INITIALIZATION
+    function start4PGame(diff, isMultiplayer) {
         forcePlayMusic();
         aiDifficulty = diff;
+        isMultiplayerMode = isMultiplayer;
+        currentRoundIndex = 0;
+        playerScores = [25000, 25000, 25000, 25000];
+        
+        setupRound();
+        nav('screen-game');
+    }
+
+    function setupRound() {
         extraTimeBank = 20;
         document.getElementById('player-time-bank').innerText = `+${extraTimeBank}s`;
+
+        let roundNames = ['East 1', 'East 2', 'East 3', 'East 4', 'East 5 (Extra)'];
+        document.getElementById('round-title-display').innerText = roundNames[currentRoundIndex] || 'East 1';
 
         fullDeck = [];
         TILE_TYPES.forEach(t => { for (let i = 0; i < 4; i++) fullDeck.push({ ...t, uniqueId: Math.random() }); });
         fullDeck.sort(() => Math.random() - 0.5);
 
-        // MEMBUAT DEAD WALL (14 Kartu Disisihkan)
         deadWall = fullDeck.splice(0, 14);
 
         playerHands = [[], [], [], []];
         playerRivers = [[], [], [], []];
         playerMelds = [[], [], [], []]; 
-        playerScores = [25000, 25000, 25000, 25000];
         isRiichi = false; pendingRiichi = false; riichiSticks = 0;
         document.getElementById('riichi-effect').style.display = 'none';
         
@@ -381,12 +521,12 @@
             for (let p = 0; p < 4; p++) playerHands[p].push(fullDeck.pop());
         }
 
-        // Ambil 1 dari Dead Wall untuk indikator Dora awal
         document.getElementById('dora-indicator-tile').innerText = deadWall[0].val;
 
-        autoSortHand();
+        if (autoSortSetting) autoSortHand();
+        else renderPlayerHand();
+
         renderEnemyHands();
-        nav('screen-game');
         currentTurn = 0;
         processTurn();
     }
@@ -453,7 +593,6 @@
             el.onclick = () => { if (isDiscardable) discardTile(i); };
             container.appendChild(el);
         });
-        // Sisa wall dikurangi dead wall
         document.getElementById('wall-count').innerText = `x ${fullDeck.length}`;
     }
     
@@ -486,20 +625,22 @@
     }
 
     function processTurn() {
-        // Cek sisa dek (mengabaikan dead wall)
-        if (fullDeck.length === 0) { alert("Game Draw! (Ryuukyoku - Wall Empty)"); nav('screen-main'); return; }
+        if (fullDeck.length === 0) { 
+            endRound("Draw (Ryuukyoku)", "Dinding kartu telah habis!");
+            return; 
+        }
 
         drawnTile = fullDeck.pop();
         playerHands[currentTurn].push(drawnTile);
 
         if (currentTurn === 0) {
+            if (autoSortSetting) autoSortHand();
             isDiscardable = true;
             renderPlayerHand();
             
             let actions = [];
             let currentTotalTiles = playerHands[0].length + (playerMelds[0].length * 3);
             
-            // Cek Tsumo (Menang dari tarikan sendiri tidak terhalang furiten biasa)
             if (checkWinningHand(playerHands[0]) && currentTotalTiles === 14) {
                 actions.push('Tsumo');
             }
@@ -522,17 +663,13 @@
             renderEnemyHands();
             startTimer(false);
             
-            let delay = aiDifficulty === 'Easy' ? 1200 : (aiDifficulty === 'Medium' ? 800 : 400);
+            let delay = aiDifficulty === 'Easy' ? 1000 : 500;
             setTimeout(() => {
                 let hand = playerHands[currentTurn];
                 let discardIdx = 0;
 
-                if (aiDifficulty === 'Easy') {
-                    discardIdx = Math.floor(Math.random() * hand.length);
-                } else {
-                    let honorIdx = hand.findIndex(t => t.type === 'honor');
-                    discardIdx = honorIdx !== -1 ? honorIdx : hand.length - 1;
-                }
+                let honorIdx = hand.findIndex(t => t.type === 'honor');
+                discardIdx = honorIdx !== -1 ? honorIdx : hand.length - 1;
 
                 let discarded = hand.splice(discardIdx, 1)[0];
                 drawnTile = null;
@@ -578,23 +715,16 @@
 
         if (pIdx !== 0 && !isRiichi) {
             let actions = [];
-            
-            // VALIDASI RON & FURITEN
             let isWinning = checkWinningHand([...playerHands[0], tile]);
             let isInFuriten = checkFuriten(tile.id);
 
-            // Tombol Ron hanya muncul jika menang DAN TIDAK DALAM KONDISI FURITEN
-            if (isWinning && !isInFuriten) {
-                actions.push('Ron');
-            }
+            if (isWinning && !isInFuriten) actions.push('Ron');
 
             let matchCount = playerHands[0].filter(t => t.id === tile.id).length;
             if (matchCount >= 2) actions.push('Pon');
             if (matchCount >= 3) actions.push('Kan');
 
-            if (pIdx === 3 && getChiCombinations(playerHands[0], tile).length > 0) {
-                actions.push('Chi');
-            }
+            if (pIdx === 3 && getChiCombinations(playerHands[0], tile).length > 0) actions.push('Chi');
 
             if (actions.length > 0) {
                 actions.push('Skip');
@@ -606,11 +736,8 @@
         else if (pIdx !== 0 && isRiichi) {
             let isWinning = checkWinningHand([...playerHands[0], tile]);
             let isInFuriten = checkFuriten(tile.id);
-            if (isWinning && !isInFuriten) {
-                showAvailableActions(['Ron', 'Skip']);
-            } else {
-                nextTurn();
-            }
+            if (isWinning && !isInFuriten) showAvailableActions(['Ron', 'Skip']);
+            else nextTurn();
         } else {
             nextTurn();
         }
@@ -642,9 +769,10 @@
         document.getElementById('action-overlay').style.display = 'none';
         
         if (act === 'Ron' || act === 'Tsumo') {
-            let totalWin = act === 'Ron' ? 8000 : 12000;
-            alert(`YAKUMAN! (${act.toUpperCase()}) - Kamu Menang!\n+${totalWin} Poin`);
-            nav('screen-main');
+            let isOya = (currentTurn === 0);
+            let calc = calculateRiichiPoints(3, 30, isOya, act === 'Tsumo'); // Base calculation
+            playerScores[0] += calc.total;
+            endRound(`${act.toUpperCase()} WIN!`, `Kemenangan 3 Han 30 Fu! (+${calc.total} Poin)\n${calc.detail}`);
             return;
         }
         
@@ -671,18 +799,14 @@
     function removeLastDiscard() {
         playerRivers[lastDiscarderIdx].pop(); 
         let riverEl = document.getElementById(['river-bottom', 'river-right', 'river-top', 'river-left'][lastDiscarderIdx]);
-        if (riverEl.lastChild) {
-            riverEl.removeChild(riverEl.lastChild);
-        }
+        if (riverEl.lastChild) riverEl.removeChild(riverEl.lastChild);
     }
 
     function executePon(playerIdx) {
-        let count = 0;
-        let indicesToRemove = [];
+        let count = 0, indicesToRemove = [];
         for (let i = playerHands[playerIdx].length - 1; i >= 0; i--) {
             if (playerHands[playerIdx][i].id === lastDiscardedTile.id && count < 2) {
-                indicesToRemove.push(i);
-                count++;
+                indicesToRemove.push(i); count++;
             }
         }
         let ponTiles = [];
@@ -691,29 +815,25 @@
         playerMelds[playerIdx].push(ponTiles);
 
         removeLastDiscard();
-        autoSortHand();
+        if (autoSortSetting) autoSortHand();
         renderPlayerMelds();
 
-        currentTurn = playerIdx;
-        isDiscardable = true;
-        drawnTile = null; 
+        currentTurn = playerIdx; isDiscardable = true; drawnTile = null; 
         startTimer(false);
     }
 
     function executeKan(playerIdx) {
-        let kanTiles = [];
-        let count = 0;
+        let kanTiles = [], count = 0;
         for (let i = playerHands[playerIdx].length - 1; i >= 0; i--) {
             if (playerHands[playerIdx][i].id === lastDiscardedTile.id && count < 3) {
-                kanTiles.push(playerHands[playerIdx].splice(i, 1)[0]);
-                count++;
+                kanTiles.push(playerHands[playerIdx].splice(i, 1)[0]); count++;
             }
         }
         kanTiles.push(lastDiscardedTile);
         playerMelds[playerIdx].push(kanTiles);
 
         removeLastDiscard();
-        autoSortHand();
+        if (autoSortSetting) autoSortHand();
         renderPlayerMelds();
 
         currentTurn = playerIdx;
@@ -738,18 +858,47 @@
         playerMelds[playerIdx].push(chiTiles);
 
         removeLastDiscard();
-        autoSortHand();
+        if (autoSortSetting) autoSortHand();
         renderPlayerMelds();
 
-        currentTurn = playerIdx;
-        isDiscardable = true;
-        drawnTile = null; 
+        currentTurn = playerIdx; isDiscardable = true; drawnTile = null; 
         startTimer(false);
     }
 
     function nextTurn() {
         currentTurn = (currentTurn + 1) % 4;
         processTurn();
+    }
+
+    // ROUND END & EXTENSION MECHANICS
+    function endRound(title, desc) {
+        clearInterval(timerInterval);
+        document.getElementById('res-title').innerText = title;
+        document.getElementById('res-desc').innerText = desc;
+
+        let scoreHtml = "";
+        const pNames = ["You (South)", "Player 1 (East)", "Player 2 (North)", "Player 3 (West)"];
+        for (let i = 0; i < 4; i++) {
+            scoreHtml += `<div>${pNames[i]}: <b>${playerScores[i]} Poin</b></div>`;
+        }
+        document.getElementById('res-scores').innerHTML = scoreHtml;
+        document.getElementById('modal-result').style.display = 'flex';
+    }
+
+    function nextRoundOrFinish() {
+        document.getElementById('modal-result').style.display = 'none';
+        
+        // Advance round
+        currentRoundIndex++;
+        
+        // Rule: 4 Rounds Standard. Round 5 triggered if Draw or scores equal / top player < 30000.
+        let maxScore = Math.max(...playerScores);
+        if (currentRoundIndex < 4 || (currentRoundIndex === 4 && maxScore < 30000)) {
+            setupRound();
+        } else {
+            alert("Permainan Selesai!\nSkor Akhir Anda: " + playerScores[0]);
+            nav('screen-main');
+        }
     }
 
     function quitGame() { 
