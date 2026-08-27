@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mahjong Soul Riichi Engine</title>
+    <title>Mahjong Soul Riichi Engine - Advanced</title>
     <style>
         :root {
             --bg-table: radial-gradient(circle at center, #1f4260 0%, #0d1e2d 100%);
@@ -52,8 +52,8 @@
         .turn-timer { font-size: 42px; font-weight: bold; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.8); margin: 2px 0; }
         .round-info { font-size: 14px; color: #58a6ff; font-weight: bold; }
         .tiles-left { font-size: 15px; color: var(--gold-accent); font-weight: bold; }
-        .score-tag { position: absolute; font-size: 10px; color: #c9d1d9; background: #21262d; padding: 2px 6px; border-radius: 4px; border: 1px solid #30363d; }
-        .score-south { bottom: 6px; color: #2ecc71; }
+        .score-tag { position: absolute; font-size: 10px; color: #c9d1d9; background: #21262d; padding: 2px 6px; border-radius: 4px; border: 1px solid #30363d; transition: color 0.3s; }
+        .score-south { bottom: 6px; color: #2ecc71; font-weight: bold;}
         .score-east { right: 6px; }
         .score-north { top: 6px; }
         .score-west { left: 6px; }
@@ -61,11 +61,11 @@
         .top-right-btns { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 10; }
         .icon-btn { width: 36px; height: 36px; background: rgba(16, 26, 36, 0.8); border: 1px solid #444; border-radius: 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
 
-        .river-container { position: absolute; display: flex; flex-wrap: wrap; gap: 3px; z-index: 3; }
-        .river-bottom { bottom: 185px; left: 50%; transform: translateX(-50%); width: 160px; justify-content: flex-start; }
-        .river-top { top: 95px; left: 50%; transform: translateX(-50%) rotate(180deg); width: 160px; }
-        .river-left { left: 105px; top: 50%; transform: translateY(-50%) rotate(90deg); width: 160px; }
-        .river-right { right: 105px; top: 50%; transform: translateY(-50%) rotate(-90deg); width: 160px; }
+        .river-container { position: absolute; display: flex; flex-wrap: wrap; gap: 2px; z-index: 3; }
+        .river-bottom { bottom: 220px; left: 50%; transform: translateX(-50%); width: 210px; justify-content: flex-start; }
+        .river-top { top: 140px; left: 50%; transform: translateX(-50%) rotate(180deg); width: 210px; }
+        .river-left { left: 160px; top: 50%; transform: translateY(-50%) rotate(90deg); width: 210px; }
+        .river-right { right: 160px; top: 50%; transform: translateY(-50%) rotate(-90deg); width: 210px; }
 
         .tile {
             background: var(--tile-bg); color: #111; border-radius: 4px; display: flex;
@@ -83,6 +83,11 @@
         .hand-tiles { display: flex; gap: 3px; }
         .hand-tiles .tile { width: 42px; height: 62px; }
         .drawn-tile-gap { margin-left: 14px; border: 2px solid var(--gold-accent); }
+        
+        .riichi-overlay {
+            position: absolute; width: 100%; height: 100%; background: rgba(231, 76, 60, 0.2); 
+            pointer-events: none; z-index: 100; display: none; box-shadow: inset 0 0 50px rgba(231, 76, 60, 0.5);
+        }
 
         .enemy-hand-top { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 2px; }
         .enemy-hand-top .tile-back { width: 22px; height: 32px; }
@@ -91,27 +96,45 @@
         .side-left { left: 10px; top: 25%; }
         .side-right { right: 10px; top: 25%; }
 
-        /* KARTU BUANGAN (RIVER) DENGAN SIMBOL JELAS */
         .discard-tile { 
-            width: 24px; height: 34px; background: var(--tile-bg); border-radius: 3px; 
-            border-bottom: 2px solid #3a5335; display: flex; justify-content: center; 
+            width: 32px; height: 44px; background: var(--tile-bg); border-radius: 3px; 
+            border-bottom: 3px solid #3a5335; display: flex; justify-content: center; 
             align-items: center; position: relative; color: #111; font-weight: bold; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5); transition: 0.3s;
         }
-        .discard-tile .tile-char { font-size: 14px; }
-        .discard-tile .tile-helper { font-size: 7px; top: 1px; right: 1px; position: absolute; color: #d63031; }
+        .discard-tile .tile-char { font-size: 20px; }
+        .discard-tile .tile-helper { font-size: 9px; top: 1px; right: 2px; position: absolute; color: #d63031; font-weight: 800;}
+        
+        /* Modifikasi bentuk kartu saat Riichi */
+        .riichi-tile {
+            transform: rotate(-90deg) scale(0.9);
+            margin: 0 5px;
+            box-shadow: 3px 3px 5px rgba(0,0,0,0.6);
+            border-bottom: none; border-right: 3px solid #3a5335;
+        }
+        .riichi-tile .tile-char { transform: rotate(90deg); }
+        .riichi-tile .tile-helper { transform: rotate(90deg); top: 2px; right: 4px;}
+
+        .melds-container {
+            position: absolute; bottom: 90px; right: 20px; display: flex; gap: 10px; z-index: 6;
+        }
+        .meld-group { display: flex; gap: 2px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 6px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        .meld-group .tile { width: 38px; height: 56px; font-size: 22px; cursor: default; }
+        .meld-group .tile:hover { transform: none; }
 
         #action-overlay {
             position: absolute; bottom: 100px; right: 15%; display: none; gap: 12px; z-index: 20;
             background: rgba(5, 12, 20, 0.9); padding: 10px 20px; border-radius: 40px; border: 2px solid var(--gold-accent);
             box-shadow: 0 0 20px rgba(243, 156, 18, 0.4);
         }
-        .act-btn { padding: 8px 20px; font-size: 1.1rem; border-radius: 20px; text-shadow: 1px 1px 2px #000; cursor: pointer; color: white; font-weight: bold; }
-        .act-btn:hover { filter: brightness(1.2); }
+        .act-btn { padding: 8px 20px; font-size: 1.1rem; border-radius: 20px; text-shadow: 1px 1px 2px #000; cursor: pointer; color: white; font-weight: bold; transition: 0.2s;}
+        .act-btn:hover { filter: brightness(1.2); transform: scale(1.05); }
         .btn-ron { background: linear-gradient(to bottom, #e74c3c, #c0392b); border: 2px solid #ff7675; }
         .btn-tsumo { background: linear-gradient(to bottom, #e67e22, #d35400); border: 2px solid #f39c12; }
-        .btn-pon { background: linear-gradient(to bottom, #0984e3, #74b9ff); border: 2px solid #74b9ff; }
-        .btn-chi { background: linear-gradient(to bottom, #2ecc71, #27ae60); border: 2px solid #55efc4; }
+        .btn-riichi { background: linear-gradient(to bottom, #9b59b6, #8e44ad); border: 2px solid #d2b4de; }
+        .btn-kan { background: linear-gradient(to bottom, #1abc9c, #16a085); border: 2px solid #a3e4d7; }
+        .btn-pon { background: linear-gradient(to bottom, #3498db, #2980b9); border: 2px solid #85c1e9; }
+        .btn-chi { background: linear-gradient(to bottom, #2ecc71, #27ae60); border: 2px solid #82e0aa; }
         .btn-skip { background: linear-gradient(to bottom, #636e72, #2d3436); border: 2px solid #b2bec3; }
     </style>
 </head>
@@ -145,6 +168,7 @@
     </div>
 
     <div id="screen-game" class="screen" style="padding:0;">
+        <div class="riichi-overlay" id="riichi-effect"></div>
         <div id="game-board">
             
             <div class="dora-panel">
@@ -157,7 +181,7 @@
                 </div>
                 <div class="stick-counters">
                     <span>🀆 x 0</span>
-                    <span>1000 x 0</span>
+                    <span id="riichi-stick-counter">1000 x 0</span>
                 </div>
             </div>
 
@@ -194,19 +218,20 @@
             <div class="river-container river-left" id="river-left"></div>
             <div class="river-container river-right" id="river-right"></div>
 
-            <!-- COMPASS & TIMER TERPUSAT ATAS DESAIN MEJA -->
             <div class="center-board">
                 <div class="round-info">East 1</div>
                 <div class="turn-timer" id="turn-timer-display">--</div>
                 <div class="tiles-left" id="wall-count">x 70</div>
                 
-                <div class="score-tag score-south">25000</div>
-                <div class="score-tag score-east">25000</div>
-                <div class="score-tag score-north">25000</div>
-                <div class="score-tag score-west">25000</div>
+                <div class="score-tag score-south" id="score-0">25000</div>
+                <div class="score-tag score-east" id="score-1">25000</div>
+                <div class="score-tag score-north" id="score-2">25000</div>
+                <div class="score-tag score-west" id="score-3">25000</div>
             </div>
 
             <div id="action-overlay"></div>
+            
+            <div class="melds-container" id="player-melds-container"></div>
 
             <div class="hand-bottom-container">
                 <button onclick="autoSortHand()" style="position:absolute; bottom:85px; right:20px; padding:4px 10px; font-size:11px;">Auto Sort</button>
@@ -231,6 +256,14 @@
     honors.forEach(h => TILE_TYPES.push({ id: idCounter++, val: h.val, helper: h.helper, type: 'honor', num: 0 }));
 
     let fullDeck = [], playerHands = [[], [], [], []], playerRivers = [[], [], [], []];
+    let playerMelds = [[], [], [], []]; 
+    let playerScores = [25000, 25000, 25000, 25000];
+    
+    let lastDiscardedTile = null; 
+    let lastDiscarderIdx = -1;
+    let isRiichi = false, pendingRiichi = false;
+    let riichiSticks = 0;
+
     let currentTurn = 0, drawnTile = null, isDiscardable = false, aiDifficulty = 'Medium';
     let timerInterval = null, baseTime = 10, extraTimeBank = 20, isActionPhase = false;
 
@@ -250,17 +283,14 @@
     }
     function updateVolume(val) { document.getElementById('bg-music').volume = val; }
 
-    // --- RIICHI MAHJONG VALIDATOR ENGINE ---
     function checkWinningHand(tiles) {
-        if (tiles.length !== 14) return false;
+        if (tiles.length < 14) return false;
         let counts = new Array(34).fill(0);
         tiles.forEach(t => { if (t && typeof t.id === 'number') counts[t.id]++; });
 
-        // 1. Chiitoitsu (7 Pairs)
         let pairs = counts.filter(c => c === 2).length;
-        if (pairs === 7) return true;
+        if (pairs === 7) return true; // Chiitoitsu
 
-        // 2. Standard (4 Melds + 1 Pair)
         for (let i = 0; i < 34; i++) {
             if (counts[i] >= 2) {
                 let temp = [...counts];
@@ -274,15 +304,11 @@
     function canFormMelds(counts) {
         let first = counts.findIndex(c => c > 0);
         if (first === -1) return true;
-
-        // Try Triplet (Koutsu)
         if (counts[first] >= 3) {
             counts[first] -= 3;
             if (canFormMelds(counts)) return true;
             counts[first] += 3;
         }
-
-        // Try Sequence (Shuntsu)
         if (first < 27 && (first % 9) <= 6) {
             if (counts[first] > 0 && counts[first+1] > 0 && counts[first+2] > 0) {
                 counts[first]--; counts[first+1]--; counts[first+2]--;
@@ -293,15 +319,41 @@
         return false;
     }
 
+    // Fungsi Cek Tenpai
+    function isTenpai(hand) {
+        // Tangan harus berjumlah sesuai (13, 10, 7)
+        if (hand.length % 3 !== 1) return false;
+        for (let i = 0; i < 34; i++) {
+            let mockTile = TILE_TYPES.find(t => t.id === i);
+            if (checkWinningHand([...hand, mockTile])) return true;
+        }
+        return false;
+    }
+
+    // Fungsi Deteksi Kombinasi Chi
+    function getChiCombinations(hand, tile) {
+        if (tile.type === 'honor') return [];
+        let nums = Array.from(new Set(hand.filter(t => t.type === tile.type).map(t => t.num)));
+        let n = tile.num;
+        let combos = [];
+        if (nums.includes(n-2) && nums.includes(n-1)) combos.push([n-2, n-1]);
+        if (nums.includes(n-1) && nums.includes(n+1)) combos.push([n-1, n+1]);
+        if (nums.includes(n+1) && nums.includes(n+2)) combos.push([n+1, n+2]);
+        return combos;
+    }
+
+    function updateScoresUI() {
+        for(let i = 0; i < 4; i++) {
+            document.getElementById(`score-${i}`).innerText = playerScores[i];
+        }
+        document.getElementById('riichi-stick-counter').innerText = `1000 x ${riichiSticks}`;
+    }
+
     function start4PGame(diff) {
         forcePlayMusic();
         aiDifficulty = diff;
         extraTimeBank = 20;
         document.getElementById('player-time-bank').innerText = `+${extraTimeBank}s`;
-
-        ['name-left', 'name-top', 'name-right'].forEach(id => {
-            document.getElementById(id).innerText = `AI (${diff})`;
-        });
 
         fullDeck = [];
         TILE_TYPES.forEach(t => { for (let i = 0; i < 4; i++) fullDeck.push({ ...t, uniqueId: Math.random() }); });
@@ -309,7 +361,14 @@
 
         playerHands = [[], [], [], []];
         playerRivers = [[], [], [], []];
+        playerMelds = [[], [], [], []]; 
+        playerScores = [25000, 25000, 25000, 25000];
+        isRiichi = false; pendingRiichi = false; riichiSticks = 0;
+        document.getElementById('riichi-effect').style.display = 'none';
+        
         document.querySelectorAll('.river-container').forEach(r => r.innerHTML = '');
+        document.getElementById('player-melds-container').innerHTML = '';
+        updateScoresUI();
 
         for (let i = 0; i < 13; i++) {
             for (let p = 0; p < 4; p++) playerHands[p].push(fullDeck.pop());
@@ -388,6 +447,22 @@
         });
         document.getElementById('wall-count').innerText = `x ${fullDeck.length}`;
     }
+    
+    function renderPlayerMelds() {
+        const container = document.getElementById('player-melds-container');
+        container.innerHTML = '';
+        playerMelds[0].forEach(group => {
+            let groupEl = document.createElement('div');
+            groupEl.className = 'meld-group';
+            group.forEach(t => {
+                let tileEl = document.createElement('div');
+                tileEl.className = 'tile';
+                tileEl.innerHTML = `<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span>`;
+                groupEl.appendChild(tileEl);
+            });
+            container.appendChild(groupEl);
+        });
+    }
 
     function renderEnemyHands() {
         ['enemy-hand-top', 'enemy-hand-left', 'enemy-hand-right'].forEach((id, idx) => {
@@ -402,7 +477,7 @@
     }
 
     function processTurn() {
-        if (fullDeck.length === 0) { alert("Game Draw! Wall Empty."); nav('screen-main'); return; }
+        if (fullDeck.length === 0) { alert("Game Draw! (Ryuukyoku)"); nav('screen-main'); return; }
 
         drawnTile = fullDeck.pop();
         playerHands[currentTurn].push(drawnTile);
@@ -411,11 +486,27 @@
             isDiscardable = true;
             renderPlayerHand();
             
-            // VALIDASI TSUMO OTOMATIS SAAT AMBIL KARTU
-            if (checkWinningHand(playerHands[0])) {
-                showAvailableActions(['Tsumo']);
+            let actions = [];
+            let currentTotalTiles = playerHands[0].length + (playerMelds[0].length * 3);
+            
+            // Cek Tsumo
+            if (checkWinningHand(playerHands[0]) && currentTotalTiles === 14) {
+                actions.push('Tsumo');
+            }
+            
+            // Cek Riichi (Hanya jika belum Riichi, belum ada kartu terbuka/Meld, dan status Tenpai)
+            if (!isRiichi && playerMelds[0].length === 0 && isTenpai(playerHands[0].slice(0, -1))) {
+                actions.push('Riichi');
+            }
+            
+            if (actions.length > 0) {
+                showAvailableActions(actions);
             } else {
-                startTimer(false);
+                if (isRiichi) {
+                    setTimeout(() => autoDiscard(), 800); // Auto buang jika Riichi
+                } else {
+                    startTimer(false);
+                }
             }
         } else {
             isDiscardable = false;
@@ -454,30 +545,58 @@
 
     function commitDiscard(pIdx, tile) {
         playerRivers[pIdx].push(tile);
+        lastDiscardedTile = tile; 
+        lastDiscarderIdx = pIdx;  
         
         const riverIds = ['river-bottom', 'river-right', 'river-top', 'river-left'];
         const riverEl = document.getElementById(riverIds[pIdx]);
         
-        // RENDER KARTU BUANGAN LENGKAP DENGAN KARAKTER & SYMBOL
         let dEl = document.createElement('div');
         dEl.className = 'discard-tile';
+        
+        // Logika Eksekusi Riichi
+        if (pIdx === 0 && pendingRiichi) {
+            isRiichi = true;
+            pendingRiichi = false;
+            playerScores[0] -= 1000;
+            riichiSticks++;
+            updateScoresUI();
+            dEl.classList.add('riichi-tile'); // Putar kartu
+            document.getElementById('riichi-effect').style.display = 'block'; // Efek visual riichi
+        }
+
         dEl.innerHTML = `<span class="tile-char">${tile.val}</span><span class="tile-helper">${tile.helper}</span>`;
         riverEl.appendChild(dEl);
 
-        if (pIdx !== 0) {
+        if (pIdx !== 0 && !isRiichi) {
             let actions = [];
             
-            // VALIDASI RON OTOMATIS KETIKA ENEMY MEMBUANG KARTU
+            // Cek Ron (Menang dari buangan lawan)
             if (checkWinningHand([...playerHands[0], tile])) {
                 actions.push('Ron');
             }
 
+            // Cek Pon & Kan
             let matchCount = playerHands[0].filter(t => t.id === tile.id).length;
             if (matchCount >= 2) actions.push('Pon');
+            if (matchCount >= 3) actions.push('Kan');
+
+            // Cek Chi (Hanya aktif jika pemain index 3 / sebelah kiri yang membuang)
+            if (pIdx === 3 && getChiCombinations(playerHands[0], tile).length > 0) {
+                actions.push('Chi');
+            }
 
             if (actions.length > 0) {
                 actions.push('Skip');
                 showAvailableActions(actions);
+            } else {
+                nextTurn();
+            }
+        } 
+        // Jika sudah Riichi, hanya bisa cek Ron
+        else if (pIdx !== 0 && isRiichi) {
+            if (checkWinningHand([...playerHands[0], tile])) {
+                showAvailableActions(['Ron', 'Skip']);
             } else {
                 nextTurn();
             }
@@ -512,11 +631,111 @@
         document.getElementById('action-overlay').style.display = 'none';
         
         if (act === 'Ron' || act === 'Tsumo') {
-            alert(`VICTORY! (${act.toUpperCase()}) - Real Mahjong Hand Validated!`);
+            let totalWin = act === 'Ron' ? 8000 : 12000; // Mock score
+            alert(`YAKUMAN! (${act.toUpperCase()}) - Kamu Menang!\n+${totalWin} Poin`);
             nav('screen-main');
             return;
         }
-        nextTurn();
+        
+        if (act === 'Riichi') {
+            pendingRiichi = true;
+            // Jika status Skip dicentang, pemain diberi waktu buang kartu lagi.
+            startTimer(false); 
+            return;
+        }
+
+        if (act === 'Pon') return executePon(0);
+        if (act === 'Kan') return executeKan(0);
+        if (act === 'Chi') return executeChi(0);
+
+        if (act === 'Skip') {
+            if (currentTurn === 0 && drawnTile !== null) {
+                if (isRiichi) autoDiscard();
+                else startTimer(false);
+            } else {
+                nextTurn();
+            }
+        }
+    }
+
+    function removeLastDiscard() {
+        playerRivers[lastDiscarderIdx].pop(); 
+        let riverEl = document.getElementById(['river-bottom', 'river-right', 'river-top', 'river-left'][lastDiscarderIdx]);
+        if (riverEl.lastChild) {
+            riverEl.removeChild(riverEl.lastChild);
+        }
+    }
+
+    function executePon(playerIdx) {
+        let count = 0;
+        let indicesToRemove = [];
+        for (let i = playerHands[playerIdx].length - 1; i >= 0; i--) {
+            if (playerHands[playerIdx][i].id === lastDiscardedTile.id && count < 2) {
+                indicesToRemove.push(i);
+                count++;
+            }
+        }
+        let ponTiles = [];
+        indicesToRemove.forEach(idx => ponTiles.push(playerHands[playerIdx].splice(idx, 1)[0]));
+        ponTiles.push(lastDiscardedTile);
+        playerMelds[playerIdx].push(ponTiles);
+
+        removeLastDiscard();
+        autoSortHand();
+        renderPlayerMelds();
+
+        currentTurn = playerIdx;
+        isDiscardable = true;
+        drawnTile = null; 
+        startTimer(false);
+    }
+
+    function executeKan(playerIdx) {
+        let kanTiles = [];
+        let count = 0;
+        for (let i = playerHands[playerIdx].length - 1; i >= 0; i--) {
+            if (playerHands[playerIdx][i].id === lastDiscardedTile.id && count < 3) {
+                kanTiles.push(playerHands[playerIdx].splice(i, 1)[0]);
+                count++;
+            }
+        }
+        kanTiles.push(lastDiscardedTile);
+        playerMelds[playerIdx].push(kanTiles);
+
+        removeLastDiscard();
+        autoSortHand();
+        renderPlayerMelds();
+
+        // Extra Draw (Rinshan)
+        currentTurn = playerIdx;
+        drawnTile = fullDeck.pop();
+        playerHands[playerIdx].push(drawnTile);
+        isDiscardable = true;
+        renderPlayerHand();
+        startTimer(false);
+    }
+
+    function executeChi(playerIdx) {
+        let combos = getChiCombinations(playerHands[playerIdx], lastDiscardedTile);
+        let chosenCombo = combos[0]; // Auto pick sequence pertama untuk simplifikasi
+        
+        let chiTiles = [];
+        for (let num of chosenCombo) {
+            let idx = playerHands[playerIdx].findIndex(t => t.type === lastDiscardedTile.type && t.num === num);
+            chiTiles.push(playerHands[playerIdx].splice(idx, 1)[0]);
+        }
+        chiTiles.push(lastDiscardedTile);
+        chiTiles.sort((a,b) => a.num - b.num);
+        playerMelds[playerIdx].push(chiTiles);
+
+        removeLastDiscard();
+        autoSortHand();
+        renderPlayerMelds();
+
+        currentTurn = playerIdx;
+        isDiscardable = true;
+        drawnTile = null; 
+        startTimer(false);
     }
 
     function nextTurn() {
