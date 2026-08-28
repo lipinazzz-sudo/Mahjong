@@ -2,11 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="11.0-p2p-responsive">
+    <meta name="app-version" content="16.0-mahyong-dj">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
-    <meta name="description" content="Mahjong Soul Web — PWA Riichi Mahjong dengan AI dan Local P2P multiplayer.">
-    <title>Mahjong Soul Web — Riichi Mahjong Local P2P</title>
+    <meta name="description" content="Mahyong DJ — PWA Riichi Mahjong dengan AI dan Local P2P multiplayer.">
+    <title>Mahyong DJ — Riichi Mahjong Local P2P</title>
     <style>
         :root {
             color-scheme: dark;
@@ -415,6 +415,203 @@
 .mp-scan-row{align-items:center;margin-bottom:8px}.reconnect-card{display:flex;flex-direction:column;gap:7px;margin-top:10px;padding:10px 12px;border:1px solid rgba(243,156,18,.45);background:rgba(243,156,18,.08);border-radius:10px}.reconnect-card strong{color:#f6c96d}.scanner-box{max-width:480px}.scanner-reader{width:100%;min-height:280px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:14px;background:#050b11;border:1px solid rgba(255,255,255,.12)}
 .scanner-reader video{width:100%!important;height:auto!important;border-radius:12px}.scanner-reader__scan-region{width:100%!important}.scanner-reader__dashboard{padding:8px!important}.scanner-reader__dashboard_section{margin:0!important}
 @media(max-width:600px){.scanner-box{width:min(94vw,480px);padding:14px}.scanner-reader{min-height:240px}.mp-scan-row{flex-direction:column;align-items:stretch}.mp-scan-row .btn{width:100%}}
+
+        /* ===== v15 visual polish: clearer tiles, calmer HUD, responsive table ===== */
+        .tile, .discard-tile { -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
+        .tile { overflow: visible; }
+        .tile .tile-char { z-index: 1; }
+        .tile.tile-man .tile-char,
+        .tile.tile-honor .tile-char { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; width:100%; height:100%; }
+        .tile.tile-man .tile-number { font-family: "Hiragino Mincho ProN","Yu Mincho",serif; font-size: clamp(13px, calc(var(--u)*3.05), 20px); line-height:.9; color:#191919; }
+        .tile.tile-man .tile-suit { margin-top:2px; font-family: "Hiragino Mincho ProN","Yu Mincho",serif; font-size: clamp(9px, calc(var(--u)*2.15), 15px); line-height:.85; color:#262626; letter-spacing:-.04em; }
+        .tile.tile-pin .tile-char, .tile.tile-sou .tile-char { display:flex; align-items:center; justify-content:center; width:100%; height:100%; font-size:clamp(13px, calc(var(--u)*3.05), 22px); line-height:1; }
+        .tile.tile-honor .tile-char { font-family:"Hiragino Mincho ProN","Yu Mincho",serif; font-size:clamp(15px, calc(var(--u)*3.35), 24px); color:#27313b; text-shadow:0 1px 0 rgba(255,255,255,.6); }
+        .tile.tile-honor .tile-char.honor-wind { color:#385b7a; }
+        .tile.tile-honor .tile-char.honor-dragon-red { color:#c93e43; }
+        .tile.tile-honor .tile-char.honor-dragon-green { color:#17935b; }
+        .tile.tile-honor .tile-char.honor-dragon-white { color:#6a737c; }
+        .discard-tile.tile-man .tile-char,
+        .discard-tile.tile-honor .tile-char { display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:.9; }
+        .discard-tile.tile-man .tile-number { font-size:clamp(8px,calc(var(--u)*2.0),12px); font-family:"Hiragino Mincho ProN","Yu Mincho",serif; }
+        .discard-tile.tile-man .tile-suit { font-size:clamp(5px,calc(var(--u)*1.35),8px); margin-top:1px; }
+        .discard-tile.tile-pin .tile-char,.discard-tile.tile-sou .tile-char{font-size:clamp(9px,calc(var(--u)*2.05),14px);line-height:1;}
+        .discard-tile.tile-honor .tile-char { font-family:"Hiragino Mincho ProN","Yu Mincho",serif; font-size:clamp(9px,calc(var(--u)*2.25),15px); }
+
+        .hand-status {
+            width:min(390px,78vw);
+            padding:5px 10px;
+            bottom:calc(var(--tile-h) + 24px);
+            background:linear-gradient(180deg, rgba(7,16,26,.88), rgba(3,9,15,.96));
+            border:1px solid rgba(244,177,58,.22);
+            box-shadow:0 10px 26px rgba(0,0,0,.28), 0 0 0 1px rgba(255,255,255,.02) inset;
+        }
+        .hand-status .status-main { font-size:10px; letter-spacing:.05em; text-transform:uppercase; }
+        .hand-status .status-sub { font-size:8px; opacity:.82; }
+        .hand-status.ready { box-shadow:0 0 0 1px rgba(54,211,153,.11) inset, 0 10px 26px rgba(0,0,0,.28); }
+        .hand-status.tenpai { box-shadow:0 0 0 1px rgba(99,164,255,.12) inset, 0 10px 26px rgba(0,0,0,.28); }
+        .hand-status.warning { box-shadow:0 0 0 1px rgba(244,177,58,.12) inset, 0 10px 26px rgba(0,0,0,.28); }
+        .hand-status.blocked { box-shadow:0 0 0 1px rgba(255,107,107,.13) inset, 0 10px 26px rgba(0,0,0,.28); }
+
+        #action-overlay {
+            backdrop-filter:blur(12px);
+            background:linear-gradient(180deg, rgba(5,12,20,.90), rgba(2,7,12,.97));
+            border-color:rgba(255,207,104,.5);
+        }
+        .act-btn { box-shadow:0 5px 12px rgba(0,0,0,.22); }
+        .act-btn:hover { filter:brightness(1.08); transform:translateY(-1px); }
+
+        .center-board { box-shadow:0 20px 55px rgba(0,0,0,.42), inset 0 0 0 1px rgba(255,255,255,.035), 0 0 36px rgba(87,157,194,.06); }
+        .center-board::after { content:""; position:absolute; inset:10px; border-radius:18px; pointer-events:none; border:1px solid rgba(255,255,255,.025); }
+        .pos-bottom .avatar-img, .pos-left .avatar-img, .pos-top .avatar-img, .pos-right .avatar-img { transition:transform .18s ease, box-shadow .18s ease; }
+        .player-seat:hover .avatar-img { transform:translateY(-1px); }
+
+        /* Riichi mode: dramatic but restrained table dim + pulse. */
+        .riichi-overlay {
+            background:radial-gradient(circle at 50% 46%, rgba(0,0,0,.02) 0%, rgba(0,0,0,.30) 34%, rgba(0,0,0,.76) 100%), rgba(14,0,4,.26);
+            backdrop-filter:brightness(.66) saturate(.72);
+            animation:riichiPulse 1.9s ease-in-out infinite;
+        }
+        @keyframes riichiPulse { 0%,100%{opacity:.82} 50%{opacity:1} }
+        .riichi-overlay::before { content:"RIICHI"; position:absolute; top:14%; left:50%; transform:translateX(-50%); padding:5px 12px; border-radius:999px; border:1px solid rgba(255,112,112,.28); background:rgba(36,4,10,.52); color:rgba(255,176,176,.92); font-size:clamp(9px,1.8vw,12px); font-weight:900; letter-spacing:.32em; text-indent:.32em; box-shadow:0 0 28px rgba(255,76,88,.12); }
+
+        /* Smaller landscape footprint for compact phones and tablets. */
+        @media (orientation:landscape) and (max-height:680px){
+            #game-board { --table-unit:min(1vw,1vh); }
+            .tile { width:clamp(20px,calc(var(--u)*4.75),38px); height:clamp(29px,calc(var(--u)*8.3),54px); }
+            .tile-char { font-size:clamp(12px,calc(var(--u)*2.8),21px); }
+            .tile-helper { font-size:clamp(6px,calc(var(--u)*1.2),9px); }
+            .discard-tile { width:clamp(14px,calc(var(--u)*3.15),23px); height:clamp(21px,calc(var(--u)*4.75),32px); }
+            .center-board { width:clamp(104px,calc(var(--u)*25),168px); height:clamp(104px,calc(var(--u)*25),168px); border-radius:20px; }
+            .turn-timer { font-size:clamp(25px,calc(var(--u)*5),40px); }
+            .enemy-hand-top { top:50px; }
+            .river-top { top:82px; }
+            .river-left { left:44px; }
+            .river-right { right:44px; }
+            .enemy-melds-left { left:16px; }
+            .enemy-melds-right { right:16px; }
+            .pos-left { left:2px; }
+            .pos-right { right:2px; }
+            .hand-status { width:min(340px,54vw); bottom:calc(var(--tile-h) + 16px); padding:4px 9px; }
+            .beginner-tip { display:none; }
+            #action-overlay { bottom:calc(var(--tile-h) + 10px); }
+        }
+        @media (orientation:landscape) and (max-height:430px){
+            .topbar { top:4px; left:5px; right:5px; }
+            .dora-panel { min-width:108px; padding:4px 5px; }
+            .dora-tile-box { width:17px; height:23px; font-size:9px; }
+            .icon-btn { width:30px; height:30px; font-size:12px; }
+            .pos-top { top:4px; right:74px; }
+            .enemy-hand-top { top:35px; }
+            .river-top { top:60px; }
+            .river-bottom { bottom:calc(var(--tile-h) + 30px); }
+            .center-board { width:96px; height:96px; }
+            .hand-status { display:none; }
+            #action-overlay { bottom:calc(var(--tile-h) + 3px); max-width:86vw; }
+        }
+        @media (orientation:portrait) and (max-width:600px){
+            #game-board { --table-unit:min(1vw,1.0vh); }
+            .tile { width:clamp(21px,calc(var(--u)*5.0),40px); height:clamp(31px,calc(var(--u)*8.9),56px); }
+            .tile-char { font-size:clamp(12px,calc(var(--u)*2.9),22px); }
+            .center-board { width:clamp(108px,calc(var(--u)*26),164px); height:clamp(108px,calc(var(--u)*26),164px); }
+            .river-left { left:48px; }
+            .river-right { right:48px; }
+            .hand-status { width:min(88vw,360px); bottom:calc(var(--tile-h) + 18px); }
+        }
+        @media (min-width:700px) and (max-width:1100px) and (orientation:portrait){
+            #game-board { --table-unit:min(1vw,.92vh); }
+            .tile { width:clamp(24px,calc(var(--u)*4.8),41px); height:clamp(36px,calc(var(--u)*8.6),58px); }
+            .center-board { width:clamp(130px,calc(var(--u)*26),180px); height:clamp(130px,calc(var(--u)*26),180px); }
+        }
+        @media (min-width:1200px) and (min-height:700px){
+            #game-board { --table-unit:min(.78vw,.78vh); }
+        }
+        @media (pointer:coarse){
+            .tile:hover { box-shadow:0 4px 8px rgba(0,0,0,.28); }
+            .player-seat:hover .avatar-img { transform:none; }
+        }
+
+    
+        #game-board.riichi-active::after { content:""; position:absolute; inset:0; pointer-events:none; z-index:94; box-shadow:inset 0 0 90px rgba(230,40,55,.10), inset 0 0 220px rgba(0,0,0,.18); }
+        #game-board.riichi-active .center-board { box-shadow:0 20px 55px rgba(0,0,0,.52), 0 0 34px rgba(231,76,60,.20), inset 0 0 0 1px rgba(255,255,255,.025); }
+
+    
+        #game-board.table-win::before { animation:tableWinFlash .85s ease-out both; background-image:radial-gradient(rgba(255,215,120,.14) 1px, transparent 1px); opacity:.35; }
+        #game-board.table-draw::before { animation:tableDrawFlash .75s ease-out both; }
+        @keyframes tableWinFlash { 0%{opacity:.1;filter:brightness(.9)} 35%{opacity:.75;filter:brightness(1.16)} 100%{opacity:.18;filter:brightness(1)} }
+        @keyframes tableDrawFlash { 0%{opacity:.12} 40%{opacity:.44} 100%{opacity:.18} }
+
+    
+
+        /* ===== v16: centered discards + readable tile faces + cleaner draw sorting ===== */
+        .river-left { left: calc(50% - clamp(140px, 36vmin, 430px)); }
+        .river-right { right: calc(50% - clamp(140px, 36vmin, 430px)); }
+        .river-top, .river-bottom { justify-items:center; }
+
+        /* Make Mahjong tile artwork occupy more of the face. */
+        .tile.tile-pin .tile-char,
+        .tile.tile-sou .tile-char {
+            font-size: clamp(18px, calc(var(--u) * 3.8), 31px);
+            transform: scale(1.10);
+            transform-origin: center;
+            text-shadow: 0 1px 0 rgba(255,255,255,.7);
+        }
+        .tile.tile-man .tile-number {
+            font-size: clamp(17px, calc(var(--u) * 3.55), 25px);
+            font-weight: 800;
+        }
+        .tile.tile-man .tile-suit {
+            font-size: clamp(11px, calc(var(--u) * 2.5), 17px);
+            font-weight: 700;
+        }
+        .tile.tile-honor .tile-char {
+            font-size: clamp(19px, calc(var(--u) * 3.9), 30px);
+            transform: scale(1.06);
+        }
+        .discard-tile.tile-pin .tile-char,
+        .discard-tile.tile-sou .tile-char {
+            font-size: clamp(11px, calc(var(--u) * 2.8), 18px);
+            transform: scale(1.08);
+        }
+        .discard-tile.tile-man .tile-number {
+            font-size: clamp(9px, calc(var(--u) * 2.2), 14px);
+            font-weight: 800;
+        }
+        .discard-tile.tile-man .tile-suit {
+            font-size: clamp(6px, calc(var(--u) * 1.5), 9px);
+            font-weight: 700;
+        }
+        .discard-tile.tile-honor .tile-char {
+            font-size: clamp(10px, calc(var(--u) * 2.55), 17px);
+            transform: scale(1.05);
+        }
+
+        /* Keep the just-drawn tile visibly separated on the far right. */
+        .drawn-tile-gap {
+            margin-left: clamp(6px, calc(var(--u) * 1.0), 10px);
+            border: 2px solid rgba(244,177,58,.90);
+            box-shadow: 0 0 0 2px rgba(244,177,58,.12), 0 8px 15px rgba(0,0,0,.28);
+        }
+        .drawn-tile-gap .tile-char { transform: scale(1.02); }
+
+        /* Compact phone landscape: bring all rivers closer to the center. */
+        @media (orientation:landscape) and (max-height:680px){
+            .river-left { left: calc(50% - clamp(96px, 28vmin, 250px)); }
+            .river-right { right: calc(50% - clamp(96px, 28vmin, 250px)); }
+            .river-top, .river-bottom { grid-template-columns: repeat(6, var(--discard-w)); }
+        }
+        @media (orientation:landscape) and (max-height:430px){
+            .river-left { left: calc(50% - clamp(82px, 25vmin, 190px)); }
+            .river-right { right: calc(50% - clamp(82px, 25vmin, 190px)); }
+        }
+        @media (orientation:portrait) and (max-width:600px){
+            .river-left { left: calc(50% - clamp(90px, 31vmin, 190px)); }
+            .river-right { right: calc(50% - clamp(90px, 31vmin, 190px)); }
+        }
+        @media (min-width:700px) and (min-height:600px){
+            .river-left { left: calc(50% - clamp(160px, 32vmin, 360px)); }
+            .river-right { right: calc(50% - clamp(160px, 32vmin, 360px)); }
+        }
+
 </style>
 </head>
 <body>
@@ -427,7 +624,7 @@
         <section class="screen-card glass">
             <div class="brand-lockup">
                 <div class="brand-kicker"><span class="brand-dot"></span> Riichi Mahjong</div>
-                <h1 id="main-title">MAHJONG SOUL WEB</h1>
+                <h1 id="main-title">MAHYONG DJ</h1>
                 <p class="brand-subtitle">Fast, responsive browser table for casual Riichi play.</p>
             </div>
             <div class="menu-actions">
@@ -656,6 +853,24 @@
     for (let i = 0; i < 9; i++) TILE_TYPES.push({ id: idCounter++, val: unicodeSou[i], helper: helpers[i], type: 'sou', num: i+1 });
     const honors = [ { val: '東', helper: 'E' }, { val: '南', helper: 'S' }, { val: '西', helper: 'W' }, { val: '北', helper: 'N' }, { val: '🀆', helper: 'Wh' }, { val: '發', helper: 'G' }, { val: '中', helper: 'R' } ];
     honors.forEach(h => TILE_TYPES.push({ id: idCounter++, val: h.val, helper: h.helper, type: 'honor', num: 0 }));
+
+    function tileFaceClass(t){
+        if(!t) return 'tile-face';
+        if(t.type==='honor'){
+            if(t.id===31) return 'tile-face-honor honor-dragon-white';
+            if(t.id===32) return 'tile-face-honor honor-dragon-green';
+            if(t.id===33) return 'tile-face-honor honor-dragon-red';
+            return 'tile-face-honor honor-wind';
+        }
+        return 'tile-face';
+    }
+    function tileMarkup(t){
+        if(!t) return '';
+        if(t.type==='man') return `<span class="tile-char ${tileFaceClass(t)}"><span class="tile-number">${t.helper}</span><span class="tile-suit">萬</span></span><span class="tile-helper">${t.helper}</span>`;
+        if(t.type==='honor') return `<span class="tile-char ${tileFaceClass(t)}">${t.val}</span><span class="tile-helper">${t.helper}</span>`;
+        return `<span class="tile-char ${tileFaceClass(t)}">${t.val}</span><span class="tile-helper">${t.helper}</span>`;
+    }
+
 
     // STATE VARIABLES
     let fullDeck = [], deadWall = [], playerHands = [[], [], [], []], playerRivers = [[], [], [], []];
@@ -958,9 +1173,9 @@
 
     function updateFuritenIndicator(status){const panel=byId('furiten-panel'),el=byId('furiten-status');if(!panel||!el)return;const t=status?.type;if(t!=='Temporary'&&t!=='Permanent'){panel.style.display='none';el.textContent='';return;}panel.style.display='block';el.className='furiten-status '+(t==='Permanent'?'perma':'temp');el.textContent=t==='Permanent'?'Permanent Furiten — Ron dilarang':'Temporary Furiten — tunggu discard berikutnya';}
     function mpRenderHandAndTable(s,map,hands,rivers,state){
-        const b=byId('player-hand-tiles');if(b){b.innerHTML='';(hands[s]||[]).forEach((t,i)=>{const el=document.createElement('div');el.className='tile';el.innerHTML=`<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span>`;el.onclick=()=>mpTapTile(i,t);let sy=0;el.onpointerdown=e=>sy=e.clientY;el.onpointerup=e=>{if(sy-e.clientY>35)mpSendDiscard(t)};b.appendChild(el)})}
+        const b=byId('player-hand-tiles');if(b){b.innerHTML='';(hands[s]||[]).forEach((t,i)=>{const el=document.createElement('div');el.className=`tile tile-${t.type}`;el.innerHTML=tileMarkup(t);el.onclick=()=>mpTapTile(i,t);let sy=0;el.onpointerdown=e=>sy=e.clientY;el.onpointerup=e=>{if(sy-e.clientY>35)mpSendDiscard(t)};b.appendChild(el)})}
         [['enemy-hand-top',map[2]],['enemy-hand-right',map[1]],['enemy-hand-left',map[3]]].forEach(([id,canon])=>{const el=byId(id);if(!el)return;el.innerHTML='';for(let i=0;i<(hands[canon]||[]).length;i++){const x=document.createElement('div');x.className='tile-back';el.appendChild(x)}});
-        [['river-bottom',map[0]],['river-right',map[1]],['river-top',map[2]],['river-left',map[3]]].forEach(([id,canon])=>{const el=byId(id);if(!el)return;el.innerHTML='';(rivers[canon]||[]).forEach(t=>{const d=document.createElement('div');d.className='discard-tile';d.innerHTML=`<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span>`;el.appendChild(d)})});
+        [['river-bottom',map[0]],['river-right',map[1]],['river-top',map[2]],['river-left',map[3]]].forEach(([id,canon])=>{const el=byId(id);if(!el)return;el.innerHTML='';(rivers[canon]||[]).forEach(t=>{const d=document.createElement('div');d.className=`discard-tile tile-${t.type}`;d.innerHTML=tileMarkup(t);el.appendChild(d)})});
         if(state.remoteActions?.seat===s)mpRenderActions(state.remoteActions.actions||[]);else setDisplay('action-overlay','none');
         if(state.handStatus?.seat===s){setText('hand-status-main',state.handStatus.main||'STATUS');setText('hand-status-sub',state.handStatus.sub||'')}
         const fstatus=state.furitenStates?.[s];if(fstatus)updateFuritenIndicator({type:fstatus});else setDisplay('furiten-panel','none');
@@ -1635,7 +1850,7 @@
         isRiichi = false; pendingRiichi = false; riichiSticks = 0;
         lastDiscardedTile = null; lastDiscarderIdx = -1;
         drawnTile = null; isDiscardable = false; isActionPhase = false;
-        setDisplay('riichi-effect', 'none');
+        setDisplay('riichi-effect', 'none'); byId('game-board')?.classList.remove('riichi-active');
         
         document.querySelectorAll('.river-container').forEach(r => r.innerHTML = '');
         document.getElementById('player-melds-container').innerHTML = '';
@@ -1654,8 +1869,8 @@
         renderDoraIndicators();
         updateFuritenStatusUI();
 
-        if (autoSortSetting) autoSortHand();
-        else renderPlayerHand();
+        if (autoSortSetting) playerHands[0].sort((a, b) => a.id - b.id);
+        renderPlayerHand();
 
         renderEnemyHands();
         updateHandStatus();
@@ -1788,7 +2003,7 @@
             el.className='tile'+(t===drawnTile?' drawn-tile-gap':'')+(riichiDiscardIndices.includes(i)?' riichi-legal-discard':'')+(i===selectedTileIndex?' selected-tile':'');
             el.tabIndex=0;
             const waits=waitsByDiscard[i]||[]; const waitText=waits.length?waits.map(id=>TILE_TYPES[id]?.val).filter(Boolean).join(' '):'—'; const yakuText=t.id===2?'No Yaku (simulasi 3-man)':'Terdeteksi';
-            el.innerHTML=`<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span><span class="machi-bubble ${t.id===2?'no-yaku':''}"><strong>Machi: ${waitText}</strong><span>Yaku: ${yakuText}</span></span>`;
+            el.innerHTML=`${tileMarkup(t)}<span class="machi-bubble ${t.id===2?'no-yaku':''}"><strong>Machi: ${waitText}</strong><span>Yaku: ${yakuText}</span></span>`;
             el.addEventListener('pointerdown',ev=>handleTilePointerDown(ev,i,el));
             el.addEventListener('pointerup',ev=>handleTilePointerUp(ev,i,el));
             el.addEventListener('focus',()=>{ selectHandTile(i,el); });
@@ -1809,8 +2024,8 @@
             groupEl.className = 'meld-group';
             group.forEach(t => {
                 let tileEl = document.createElement('div');
-                tileEl.className = 'tile';
-                tileEl.innerHTML = `<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span>`;
+                tileEl.className = `tile tile-${t.type}`;
+                tileEl.innerHTML = tileMarkup(t);
                 groupEl.appendChild(tileEl);
             });
             container.appendChild(groupEl);
@@ -1864,13 +2079,16 @@
                 endRound("Draw (Ryuukyoku)", "Dinding kartu telah habis!");
                 return;
             }
+            /* Auto-sort applies to the hand BEFORE the draw. The newly drawn tile stays separate at the right. */
+            if (currentTurn === 0 && autoSortSetting && playerHands[0].length > 0) {
+                playerHands[0].sort((a, b) => a.id - b.id);
+            }
             drawnTile = fullDeck.pop();
             lastDrawWasRinshan = false;
             playerHands[currentTurn].push(drawnTile);
         }
 
         if (currentTurn === 0) {
-            if (autoSortSetting) autoSortHand();
             isDiscardable = true;
             renderPlayerHand();
             updateHandStatus();
@@ -1976,6 +2194,7 @@
         selectedTileIndex = -1;
         selectedTileId = null;
         tapState = { index:-1, time:0 };
+        if (autoSortSetting) playerHands[0].sort((a, b) => a.id - b.id);
         renderPlayerHand();
         commitDiscard(0, discarded);
     }
@@ -1999,7 +2218,7 @@
             riichiSticks++;
             updateScoresUI();
             dEl.classList.add('riichi-tile'); 
-            setDisplay('riichi-effect', 'block'); 
+            setDisplay('riichi-effect', 'block'); byId('game-board')?.classList.add('riichi-active'); 
         } else if (pIdx !== 0 && aiRiichi[pIdx] && playerRivers[pIdx].length === 1) {
             dEl.classList.add('riichi-tile');
         }
@@ -2180,7 +2399,13 @@
         currentTurn = playerIdx;
         isDiscardable = playerIdx === 0;
         if (playerIdx === 0) {
-            if (autoSortSetting) autoSortHand();
+            if (autoSortSetting && drawnTile) {
+                const keep = drawnTile;
+                playerHands[0] = playerHands[0].filter(t => t !== keep).sort((a, b) => a.id - b.id);
+                playerHands[0].push(keep);
+            } else if (autoSortSetting) {
+                playerHands[0].sort((a, b) => a.id - b.id);
+            }
             renderPlayerMelds();
             renderPlayerHand();
             updateHandStatus();
@@ -2344,10 +2569,20 @@
         return roundNames[currentRoundIndex] || `East ${currentRoundIndex + 1}`;
     }
 
+    function pulseTableResult(type){
+        const board=byId('game-board');
+        if(!board)return;
+        board.classList.remove('table-win','table-draw');
+        void board.offsetWidth;
+        board.classList.add(type==='draw'?'table-draw':'table-win');
+        setTimeout(()=>board.classList.remove('table-win','table-draw'),900);
+    }
+
     function endRound(title, desc) {
         if (roundEnding) return;
         roundEnding = true;
         roundActive = false;
+        pulseTableResult(title.toUpperCase().includes('RYUUKOKU') || title.toUpperCase().includes('DRAW') ? 'draw' : 'win');
         clearInterval(timerInterval);
         if (aiMoveTimer) { clearTimeout(aiMoveTimer); aiMoveTimer = null; }
         if (autoDiscardTimer) { clearTimeout(autoDiscardTimer); autoDiscardTimer = null; }
@@ -2465,8 +2700,8 @@
         if(!roundActive||roundEnding||!tile)return;
         playerRivers[pIdx].push(tile);lastDiscardedTile=tile;lastDiscarderIdx=pIdx;
         const riverIds=['river-bottom','river-right','river-top','river-left'],riverEl=byId(riverIds[pIdx]);
-        const d=document.createElement('div');d.className='discard-tile';d.dataset.tileId=String(tile.id);d.innerHTML=`<span class="tile-char">${tile.val}</span><span class="tile-helper">${tile.helper}</span>`;if(riverEl)riverEl.appendChild(d);
-        if(pIdx===0&&pendingRiichi){isRiichi=true;pendingRiichi=false;riichiDiscardIndices=[];playerScores[0]-=1000;riichiSticks++;d.classList.add('riichi-tile');setDisplay('riichi-effect','block');}
+        const d=document.createElement('div');d.className=`discard-tile tile-${tile.type}`;d.dataset.tileId=String(tile.id);d.innerHTML=tileMarkup(tile);if(riverEl)riverEl.appendChild(d);
+        if(pIdx===0&&pendingRiichi){isRiichi=true;pendingRiichi=false;riichiDiscardIndices=[];playerScores[0]-=1000;riichiSticks++;d.classList.add('riichi-tile');setDisplay('riichi-effect','block'); byId('game-board')?.classList.add('riichi-active');}
         if(pIdx!==0&&aiRiichi[pIdx]&&playerRivers[pIdx].length===1)d.classList.add('riichi-tile');
         if(temporaryFuriten[pIdx])temporaryFuriten[pIdx]=false;
         const human=mpRoomHumanSeats().filter(x=>x!==pIdx);
