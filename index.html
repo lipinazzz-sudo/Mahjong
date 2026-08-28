@@ -1557,6 +1557,98 @@ button,.tile,.icon-btn{touch-action:manipulation;}
 }
 </style>
 
+
+<style id="landscape-safe-dora-fix-v23">
+/* ================================================================
+   V23 — DORA + SAFE MODE HARDENING
+   The dora tile image must stay inside its 23x31px indicator box.
+   Safe mode is an automatic low-complexity fallback for small/odd
+   landscape viewports (iPhone/iPad split/Stage Manager/browser bars).
+   ================================================================ */
+.dora-tile-box{
+  position:relative!important;
+  flex:0 0 auto!important;
+  width:clamp(22px,3.0vh,29px)!important;
+  height:clamp(30px,4.15vh,39px)!important;
+  overflow:hidden!important;
+}
+.dora-tile-box.has-tile .tile-svg-img{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  object-fit:fill!important;
+  display:block!important;
+}
+/* Never let an indicator asset escape the HUD because of absolute positioning. */
+.dora-tiles,.dora-panel{position:relative!important;overflow:visible!important;}
+.dora-tiles{align-items:center!important;}
+
+/* Keep North avatar, name and wall on one clean axis, below the title. */
+.pos-top{
+  top:clamp(48px,7.0vh,66px)!important;
+}
+.pos-top .avatar-img{
+  position:relative!important;
+  z-index:2!important;
+}
+.enemy-hand-top{
+  top:clamp(101px,14.0vh,126px)!important;
+  z-index:10!important;
+}
+.river-top{
+  top:clamp(145px,20.0vh,176px)!important;
+}
+
+/* SAFE MODE: automatically simplifies the board when the usable viewport
+   becomes unusually short/narrow. This is not a second layout; it is a
+   conservative fallback using the same anchors. */
+#game-board.safe-mode{
+  --center-size:clamp(104px,23vh,142px)!important;
+  --side-river:clamp(118px,17vw,178px)!important;
+  --tile-w:clamp(29px,5.8vh,40px)!important;
+  --tile-h:clamp(42px,8.0vh,57px)!important;
+  --discard-w:clamp(17px,3.0vh,22px)!important;
+  --discard-h:clamp(25px,4.3vh,32px)!important;
+}
+#game-board.safe-mode .dora-panel{
+  min-width:118px!important;
+  padding:5px 6px!important;
+}
+#game-board.safe-mode .dora-tile-box{
+  width:20px!important;height:28px!important;
+}
+#game-board.safe-mode .top-right-btns .icon-btn{
+  width:32px!important;height:32px!important;border-radius:10px!important;
+}
+#game-board.safe-mode .round-hud-shell{
+  min-width:112px!important;padding:5px 8px!important;
+}
+#game-board.safe-mode .round-hud-title{font-size:8px!important}
+#game-board.safe-mode .round-hud-sub{font-size:6px!important}
+#game-board.safe-mode .pos-top .avatar-img,
+#game-board.safe-mode .pos-bottom .avatar-img,
+#game-board.safe-mode .pos-left .avatar-img,
+#game-board.safe-mode .pos-right .avatar-img{
+  width:34px!important;height:34px!important;
+}
+#game-board.safe-mode .score-tag{min-width:48px!important;font-size:7px!important;padding:3px 5px!important}
+#game-board.safe-mode .score-north{top:-27px!important}
+#game-board.safe-mode .score-south{bottom:-27px!important}
+#game-board.safe-mode .score-west{left:-57px!important}
+#game-board.safe-mode .score-east{right:-57px!important}
+#game-board.safe-mode .hand-status{display:none!important}
+
+/* Touch safety: no selection/dragging of the HUD and no browser gesture
+   takeover while the game is active. */
+#game-board,.dora-panel,.player-seat,.river-container,.enemy-hand-top,.enemy-hand-side{
+  -webkit-user-select:none!important;
+  user-select:none!important;
+  -webkit-touch-callout:none!important;
+}
+</style>
 </head>
 <body>
 
@@ -3836,6 +3928,10 @@ window.addEventListener('pointerdown',()=>{try{if(typeof startChineseMusic==='fu
     if(b){
       b.style.setProperty('--landscape-width',w+'px');
       b.style.setProperty('--landscape-height',h+'px');
+      /* Safe mode for short landscape viewports: iPhone landscape,
+         iPad mini split view, browser chrome, or Stage Manager. */
+      const shortLandscape = !portrait && (h < 430 || (w / Math.max(h,1)) > 2.65 || w < 620);
+      b.classList.toggle('safe-mode', !!shortLandscape);
     }
   }
   sync();
