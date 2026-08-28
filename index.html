@@ -1445,6 +1445,510 @@ body{touch-action:manipulation;}
 }
 </style>
 
+
+<style id="mahyong-dj-v24-clarity-pass">
+/* ================================================================
+   MAHYONG DJ v24 — CLARITY / BALANCE PASS
+   Final visual correction only. No game logic / worker changes.
+   ================================================================ */
+
+/* 1) Dora HUD: compact, fixed-size cells so the revealed tile can never
+      stretch the panel or float outside it. */
+#game-board .dora-panel{
+  min-width:0!important;
+  width:clamp(112px,15vw,162px)!important;
+  max-width:162px!important;
+  padding:6px 7px!important;
+  overflow:hidden!important;
+  contain:layout paint!important;
+}
+#game-board .dora-tiles{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  gap:3px!important;
+  width:100%!important;
+  min-width:0!important;
+  overflow:hidden!important;
+}
+#game-board .dora-tile-box{
+  flex:0 0 clamp(17px,2.35vw,24px)!important;
+  width:clamp(17px,2.35vw,24px)!important;
+  min-width:clamp(17px,2.35vw,24px)!important;
+  height:clamp(24px,3.35vw,33px)!important;
+  min-height:0!important;
+  position:relative!important;
+  overflow:hidden!important;
+  display:grid!important;
+  place-items:center!important;
+  line-height:1!important;
+}
+#game-board .dora-tile-box.has-tile > .tile-svg-img,
+#game-board .dora-tile-box.has-tile > img{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:fill!important;
+  display:block!important;
+}
+#game-board .dora-caption,
+#game-board .hud-label{font-size:8px!important;letter-spacing:.13em!important;}
+#game-board .stick-counters{font-size:8px!important;margin-top:5px!important;}
+#game-board .kan-info{font-size:8px!important;margin-top:4px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* 2) The center table is a true square. It is deliberately smaller so that
+      the tiles and player information remain the visual priority. */
+#game-board .center-board{
+  left:var(--mid-x)!important;
+  top:var(--mid-y)!important;
+  width:clamp(118px,15.8vmin,158px)!important;
+  height:clamp(118px,15.8vmin,158px)!important;
+  aspect-ratio:1/1!important;
+  border-radius:18px!important;
+  border-width:2px!important;
+  background:
+    linear-gradient(145deg,rgba(18,33,48,.97),rgba(4,10,17,.98))!important;
+  box-shadow:
+    0 16px 36px rgba(0,0,0,.40),
+    inset 0 0 0 1px rgba(255,255,255,.045),
+    inset 0 0 26px rgba(0,0,0,.20)!important;
+}
+#game-board .center-board::before{
+  inset:7px!important;
+  border-radius:12px!important;
+  border-color:rgba(255,255,255,.055)!important;
+}
+#game-board .center-board::after{
+  inset:13px!important;
+  border-radius:9px!important;
+  border:1px solid rgba(255,195,71,.055)!important;
+}
+#game-board .round-info{font-size:clamp(10px,1.55vw,13px)!important;letter-spacing:.16em!important;}
+#game-board .turn-timer{font-size:clamp(29px,4.6vw,42px)!important;margin:4px 0 2px!important;}
+#game-board .tiles-left{font-size:9px!important;}
+
+/* 3) Scores become small orbiting tags rather than four big boxes. */
+#game-board .score-tag{
+  min-width:46px!important;
+  padding:4px 6px!important;
+  border-radius:999px!important;
+  font-size:8px!important;
+  line-height:1.0!important;
+  box-shadow:0 4px 10px rgba(0,0,0,.22)!important;
+  backdrop-filter:blur(4px)!important;
+}
+#game-board .score-tag::before{font-size:6px!important;margin-bottom:2px!important;}
+#game-board .score-south{bottom:-29px!important;}
+#game-board .score-north{top:-29px!important;}
+#game-board .score-east{right:-57px!important;}
+#game-board .score-west{left:-57px!important;}
+
+/* 4) Seat avatars: self is always to the left of the player's hand;
+      top avatar is centered above the opponent's wall. */
+#game-board .pos-bottom{
+  left:max(calc(var(--safe-l) + 8px),calc(var(--mid-x) - min(46vw,360px) - 58px))!important;
+  bottom:calc(var(--tile-h) + var(--safe-b) + 5px)!important;
+  transform:none!important;
+}
+#game-board .pos-top{
+  left:var(--mid-x)!important;
+  right:auto!important;
+  top:calc(var(--safe-t) + 5px)!important;
+  transform:translateX(-50%)!important;
+}
+#game-board .pos-left{
+  left:max(calc(var(--safe-l) + 7px),7px)!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+}
+#game-board .pos-right{
+  right:max(calc(var(--safe-r) + 7px),7px)!important;
+  left:auto!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+}
+#game-board .avatar-img{
+  width:clamp(34px,6.2vw,46px)!important;
+  height:clamp(34px,6.2vw,46px)!important;
+  border-radius:12px!important;
+}
+#game-board .avatar-name{font-size:8px!important;padding:3px 6px!important;}
+#game-board .time-bank-tag{font-size:8px!important;padding:2px 5px!important;}
+
+/* 5) Side walls/cards move inward, leaving the avatar cleanly outside them. */
+#game-board .side-left{left:clamp(60px,7vw,92px)!important;top:30%!important;}
+#game-board .side-right{right:clamp(60px,7vw,92px)!important;top:30%!important;}
+#game-board .enemy-hand-top{
+  left:var(--mid-x)!important;
+  top:calc(var(--safe-t) + 55px)!important;
+  transform:translateX(-50%)!important;
+}
+#game-board .enemy-melds-left{left:clamp(66px,8vw,96px)!important;}
+#game-board .enemy-melds-right{right:clamp(66px,8vw,96px)!important;}
+
+/* 6) Discard rivers stay balanced around the square center. */
+#game-board .river-left{
+  left:calc(var(--mid-x) - var(--river-side-gap,170px))!important;
+  right:auto!important;
+  top:50%!important;
+}
+#game-board .river-right{
+  left:calc(var(--mid-x) + var(--river-side-gap,170px))!important;
+  right:auto!important;
+  top:50%!important;
+}
+#game-board .river-top{left:var(--mid-x)!important;transform:translateX(-50%) rotate(180deg)!important;}
+#game-board .river-bottom{left:var(--mid-x)!important;transform:translateX(-50%)!important;}
+
+/* 7) Compact mobile portrait. Keep tiles useful; shrink HUD before shrinking
+      the actual hand. */
+@media (orientation:portrait) and (max-width:600px){
+  #game-board{--river-side-gap:clamp(100px,28vw,156px)!important;}
+  #game-board .dora-panel{width:112px!important;max-width:112px!important;padding:5px 6px!important;}
+  #game-board .dora-tile-box{flex-basis:18px!important;width:18px!important;height:26px!important;min-width:18px!important;}
+  #game-board .center-board{width:clamp(116px,29vmin,136px)!important;height:clamp(116px,29vmin,136px)!important;}
+  #game-board .score-south{bottom:-27px!important;}
+  #game-board .score-north{top:-27px!important;}
+  #game-board .score-east{right:-55px!important;}
+  #game-board .score-west{left:-55px!important;}
+  #game-board .pos-bottom{left:max(calc(var(--safe-l) + 7px),8px)!important;}
+  #game-board .side-left{left:58px!important;}
+  #game-board .side-right{right:58px!important;}
+  #game-board .enemy-melds-left{left:62px!important;}
+  #game-board .enemy-melds-right{right:62px!important;}
+  #game-board .river-left{left:calc(var(--mid-x) - clamp(96px,27vw,150px))!important;}
+  #game-board .river-right{left:calc(var(--mid-x) + clamp(96px,27vw,150px))!important;}
+}
+
+/* 8) Small landscape phones: preserve readable hand/discards instead of
+      letting the whole table collapse. */
+@media (orientation:landscape) and (max-height:600px){
+  #game-board{--river-side-gap:clamp(112px,19vw,215px)!important;}
+  #game-board .dora-panel{width:112px!important;max-width:112px!important;padding:5px 6px!important;}
+  #game-board .dora-tile-box{flex-basis:17px!important;width:17px!important;height:24px!important;min-width:17px!important;}
+  #game-board .center-board{width:clamp(116px,27vh,138px)!important;height:clamp(116px,27vh,138px)!important;}
+  #game-board .score-south{bottom:-25px!important;}
+  #game-board .score-north{top:-25px!important;}
+  #game-board .score-east{right:-53px!important;}
+  #game-board .score-west{left:-53px!important;}
+  #game-board .pos-bottom{left:max(calc(var(--safe-l) + 7px),8px)!important;}
+  #game-board .side-left{left:54px!important;}
+  #game-board .side-right{right:54px!important;}
+  #game-board .enemy-melds-left{left:58px!important;}
+  #game-board .enemy-melds-right{right:58px!important;}
+  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 47px)!important;}
+  #game-board .river-top{top:calc(var(--safe-t) + 70px)!important;}
+  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 39px)!important;}
+}
+
+@media (orientation:landscape) and (max-height:430px){
+  #game-board .center-board{width:112px!important;height:112px!important;}
+  #game-board .avatar-img{width:32px!important;height:32px!important;}
+  #game-board .avatar-name{font-size:7px!important;}
+}
+
+/* 9) iPad / tablet portrait: center the top seat and keep the score orbit compact. */
+@media (min-width:700px) and (max-width:1100px) and (orientation:portrait){
+  #game-board .dora-panel{width:142px!important;max-width:142px!important;}
+  #game-board .center-board{width:clamp(132px,20vmin,154px)!important;height:clamp(132px,20vmin,154px)!important;}
+  #game-board .score-south{bottom:-30px!important;}
+  #game-board .score-north{top:-30px!important;}
+  #game-board .score-east{right:-56px!important;}
+  #game-board .score-west{left:-56px!important;}
+  #game-board .side-left{left:72px!important;}
+  #game-board .side-right{right:72px!important;}
+}
+
+/* 10) Desktop: same visual hierarchy, just more breathing room. */
+@media (min-width:1100px){
+  #game-board .dora-panel{width:154px!important;max-width:154px!important;}
+  #game-board .center-board{width:152px!important;height:152px!important;}
+  #game-board .score-tag{min-width:50px!important;}
+  #game-board .score-east{right:-59px!important;}
+  #game-board .score-west{left:-59px!important;}
+  #game-board .side-left{left:76px!important;}
+  #game-board .side-right{right:76px!important;}
+}
+
+/* Keep all game interactions on-device and stop browser gesture zooming. */
+html,body,#screen-game,#game-board{overscroll-behavior:none!important;}
+body{touch-action:manipulation!important;-webkit-user-select:none!important;user-select:none!important;}
+#game-board{touch-action:none!important;}
+#game-board button,#game-board .tile{touch-action:manipulation!important;}
+
+
+/* ===== v24.1 BALANCED MOBILE TABLE — position correction =====
+/* Fix Dora: SVG images must be contained by the small Dora slot, never by the topbar. */
+#game-board .dora-tile-box{
+  position:relative !important;
+  overflow:hidden !important;
+  contain:layout paint !important;
+}
+#game-board .dora-tile-box .tile-svg-img{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  object-fit:fill !important;
+  transform:none !important;
+  filter:none !important;
+}
+
+/* Smaller, truly square centre table + compact orbiting scores. */
+#game-board .center-board{
+  width:clamp(104px,17vmin,150px) !important;
+  height:clamp(104px,17vmin,150px) !important;
+  border-radius:22px !important;
+}
+#game-board .round-info{font-size:clamp(9px,1.55vmin,13px) !important;}
+#game-board .turn-timer{font-size:clamp(29px,4.9vmin,44px) !important; margin:4px 0 2px !important;}
+#game-board .tiles-left{font-size:9px !important;}
+#game-board .score-tag{
+  min-width:48px !important;
+  padding:4px 6px !important;
+  border-radius:999px !important;
+  font-size:8px !important;
+  line-height:1.0 !important;
+}
+#game-board .score-tag::before{font-size:5px !important; margin-bottom:1px !important;}
+#game-board .score-south{bottom:-27px !important;}
+#game-board .score-north{top:-27px !important;}
+#game-board .score-east{right:-53px !important;}
+#game-board .score-west{left:-53px !important;}
+
+/* Top avatar: centred and separated from the opponent wall. */
+#game-board .player-seat.pos-top{
+  left:var(--mid-x) !important;
+  right:auto !important;
+  top:calc(var(--safe-t) + 45px) !important;
+  transform:translateX(-50%) !important;
+}
+#game-board .player-seat.pos-top .avatar-img{
+  width:36px !important;
+  height:36px !important;
+  border-radius:10px !important;
+}
+#game-board .player-seat.pos-top .avatar-name{font-size:7px !important; padding:2px 5px !important; margin-top:2px !important;}
+#game-board .enemy-hand-top{
+  left:var(--mid-x) !important;
+  top:calc(var(--safe-t) + 94px) !important;
+  transform:translateX(-50%) !important;
+}
+
+/* Left/right avatars stay safely outside their wall/river and never cover tiles. */
+#game-board .player-seat.pos-left{left:calc(var(--safe-l) + 10px) !important; top:50% !important; transform:translateY(-50%) !important;}
+#game-board .player-seat.pos-right{right:calc(var(--safe-r) + 10px) !important; top:50% !important; transform:translateY(-50%) !important;}
+#game-board .side-left{left:58px !important;}
+#game-board .side-right{right:58px !important;}
+
+/* Our avatar: same horizontal band as the hand, just left of it and slightly inward. */
+#game-board .player-seat.pos-bottom{
+  top:auto !important;
+  bottom:calc(var(--safe-b) + 7px) !important;
+  left:clamp(74px, calc(50% - 43vw), 33vw) !important;
+  transform:none !important;
+  align-items:center !important;
+}
+#game-board .player-seat.pos-bottom .avatar-img{
+  width:36px !important;
+  height:36px !important;
+  border-radius:10px !important;
+}
+#game-board .player-seat.pos-bottom .avatar-name{font-size:7px !important; padding:2px 5px !important; margin-top:2px !important;}
+#game-board .player-seat.pos-bottom .time-bank-tag{font-size:7px !important; padding:2px 5px !important; margin-top:2px !important;}
+
+/* Keep our hand centered but never let the status panel fight with the tiles. */
+#game-board .hand-bottom-container{
+  min-height:calc(var(--tile-h) + 12px) !important;
+  padding-bottom:max(5px,var(--safe-b)) !important;
+}
+#game-board .hand-tiles{gap:3px !important; padding-inline:8px !important;}
+#game-board .hand-status{bottom:calc(var(--tile-h) + var(--safe-b) + 13px) !important;}
+
+/* Discard rivers: compact and balanced around the smaller centre square. */
+#game-board .river-top{
+  top:calc(var(--safe-t) + 132px) !important;
+}
+#game-board .river-bottom{
+  bottom:calc(var(--tile-h) + var(--safe-b) + 58px) !important;
+}
+#game-board .river-left{
+  left:calc(var(--mid-x) - clamp(88px,19vw,180px)) !important;
+}
+#game-board .river-right{
+  left:calc(var(--mid-x) + clamp(88px,19vw,180px)) !important;
+  right:auto !important;
+}
+
+/* Small portrait phones. */
+@media (max-width:600px) and (orientation:portrait){
+  #game-board .center-board{width:112px !important;height:112px !important;border-radius:19px !important;}
+  #game-board .score-south{bottom:-23px !important;}
+  #game-board .score-north{top:-23px !important;}
+  #game-board .score-east{right:-48px !important;}
+  #game-board .score-west{left:-48px !important;}
+  #game-board .player-seat.pos-top{top:calc(var(--safe-t) + 42px) !important;}
+  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 88px) !important;}
+  #game-board .river-top{top:calc(var(--safe-t) + 126px) !important;}
+  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 54px) !important;}
+  #game-board .river-left{left:calc(var(--mid-x) - clamp(84px,19vw,132px)) !important;}
+  #game-board .river-right{left:calc(var(--mid-x) + clamp(84px,19vw,132px)) !important;}
+  #game-board .player-seat.pos-bottom{left:clamp(58px,20vw,118px) !important;}
+}
+
+/* Very small portrait phones: preserve a readable square centre and move avatar inward. */
+@media (max-width:420px) and (orientation:portrait){
+  #game-board .center-board{width:106px !important;height:106px !important;}
+  #game-board .player-seat.pos-bottom{left:74px !important;}
+  #game-board .player-seat.pos-top{top:38px !important;}
+  #game-board .enemy-hand-top{top:80px !important;}
+  #game-board .river-top{top:116px !important;}
+}
+
+/* Compact landscape phones. */
+@media (orientation:landscape) and (max-height:560px){
+  #game-board .center-board{width:108px !important;height:108px !important;}
+  #game-board .score-south{bottom:-22px !important;}
+  #game-board .score-north{top:-22px !important;}
+  #game-board .score-east{right:-46px !important;}
+  #game-board .score-west{left:-46px !important;}
+  #game-board .player-seat.pos-top{top:30px !important;}
+  #game-board .enemy-hand-top{top:72px !important;}
+  #game-board .river-top{top:96px !important;}
+  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 38px) !important;}
+  #game-board .player-seat.pos-bottom{left:clamp(58px,18vw,150px) !important;bottom:calc(var(--safe-b) + 4px) !important;}
+  #game-board .side-left{left:48px !important;}
+  #game-board .side-right{right:48px !important;}
+  #game-board .river-left{left:calc(var(--mid-x) - clamp(92px,18vw,210px)) !important;}
+  #game-board .river-right{left:calc(var(--mid-x) + clamp(92px,18vw,210px)) !important;}
+}
+
+/* iPad: keep the same square-table logic, simply allow a little more breathing room. */
+@media (min-width:700px) and (min-height:500px){
+  #game-board .center-board{width:130px !important;height:130px !important;}
+  #game-board .score-south{bottom:-26px !important;}
+  #game-board .score-north{top:-26px !important;}
+  #game-board .score-east{right:-51px !important;}
+  #game-board .score-west{left:-51px !important;}
+  #game-board .player-seat.pos-bottom{left:clamp(110px, calc(50% - 34vw), 30vw) !important;}
+}
+
+/* Desktop: still compact; the table should read as a square game board, not a card. */
+@media (min-width:1100px){
+  #game-board .center-board{width:138px !important;height:138px !important;}
+  #game-board .score-south{bottom:-28px !important;}
+  #game-board .score-north{top:-28px !important;}
+  #game-board .score-east{right:-53px !important;}
+  #game-board .score-west{left:-53px !important;}
+  #game-board .player-seat.pos-bottom{left:clamp(150px, calc(50% - 31vw), 34vw) !important;}
+}
+
+
+/* ===== MAHYONG DJ v24.2 — discard river cleanup + calm riichi ===== */
+#game-board .river-container{
+  display:grid !important;
+  align-content:start !important;
+  justify-content:center !important;
+  gap:3px !important;
+  padding:2px !important;
+  box-sizing:border-box !important;
+  overflow:visible !important;
+}
+#game-board .river-top,#game-board .river-bottom{
+  grid-template-columns:repeat(6,var(--discard-w)) !important;
+  grid-template-rows:repeat(3,var(--discard-h)) !important;
+  width:calc(var(--discard-w)*6 + 18px) !important;
+  height:calc(var(--discard-h)*3 + 10px) !important;
+}
+#game-board .river-left,#game-board .river-right{
+  grid-template-columns:repeat(3,var(--discard-w)) !important;
+  grid-template-rows:repeat(6,var(--discard-h)) !important;
+  width:calc(var(--discard-w)*3 + 9px) !important;
+  height:calc(var(--discard-h)*6 + 15px) !important;
+  transform:translateY(-50%) !important;
+}
+#game-board .river-left{
+  left:calc(var(--mid-x) - clamp(92px,16vw,155px)) !important;
+}
+#game-board .river-right{
+  left:calc(var(--mid-x) + clamp(92px,16vw,155px)) !important;
+}
+#game-board .river-container .discard-tile{
+  width:var(--discard-w) !important;
+  height:var(--discard-h) !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+  transform:none !important;
+}
+#game-board .river-top .discard-tile,#game-board .river-bottom .discard-tile{
+  justify-self:center;
+}
+#game-board .river-left .discard-tile,#game-board .river-right .discard-tile{
+  justify-self:center;
+}
+/* Compact square center and scores. */
+#game-board .center-board{width:clamp(98px,15.5vmin,136px) !important;height:clamp(98px,15.5vmin,136px) !important;border-radius:20px !important;}
+#game-board .score-tag{min-width:44px !important;padding:3px 5px !important;font-size:7px !important;}
+#game-board .score-tag::before{font-size:4.5px !important;}
+@media(max-width:600px) and (orientation:portrait){
+  #game-board .river-left{left:calc(var(--mid-x) - 76px) !important;}
+  #game-board .river-right{left:calc(var(--mid-x) + 76px) !important;}
+  #game-board .river-top{top:calc(var(--safe-t) + 116px) !important;}
+  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 46px) !important;}
+  #game-board .center-board{width:104px !important;height:104px !important;}
+}
+@media(max-width:560px) and (orientation:landscape){
+  #game-board .river-left{left:calc(var(--mid-x) - 88px) !important;}
+  #game-board .river-right{left:calc(var(--mid-x) + 88px) !important;}
+  #game-board .river-top{top:calc(var(--safe-t) + 58px) !important;}
+  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 32px) !important;}
+  #game-board .center-board{width:104px !important;height:104px !important;}
+}
+/* Riichi is intentionally calm: no full-table darkening/filter/animation. */
+#game-board.riichi-active,#game-board.riichi-active::after,#game-board.riichi-active .riichi-overlay{filter:none !important;animation:none !important;}
+#game-board.riichi-active::after{background:transparent !important;box-shadow:none !important;}
+#game-board.riichi-active .riichi-overlay{display:none !important;background:none !important;box-shadow:none !important;}
+#game-board.riichi-active .center-board{box-shadow:0 18px 44px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.04) !important;border-color:rgba(255,255,255,.13) !important;}
+#game-board.riichi-active .turn-timer{color:inherit !important;text-shadow:none !important;}
+</style>
+
+<style id="mahyong-dj-beginner-advisor">
+/* ===== Beginner advisor: explicit discard + waits, compact and touch friendly ===== */
+.lobby-back-btn{margin-top:10px;}
+.hand-status .advisor-line{margin-top:4px;color:#dfe8f2;font-size:9px;font-weight:800;line-height:1.25;}
+.hand-status .advisor-line .advisor-discard{color:#ffcf68;}
+.hand-status .advisor-line .advisor-wait{color:#66e6b0;}
+.hand-status .advisor-line .advisor-yaku{color:#8fc7ff;}
+.tile.advisor-recommended{
+  outline:2px solid rgba(86,230,171,.95)!important;
+  outline-offset:2px;
+  box-shadow:0 0 0 3px rgba(86,230,171,.13),0 10px 22px rgba(0,0,0,.32)!important;
+}
+.tile.advisor-recommended::after{
+  content:'BUANG'; position:absolute; left:50%; bottom:-18px; transform:translateX(-50%);
+  padding:2px 5px; border-radius:999px; white-space:nowrap; z-index:40;
+  background:rgba(4,14,12,.94); color:#66e6b0; border:1px solid rgba(86,230,171,.42);
+  font-size:7px; font-weight:900; letter-spacing:.05em; pointer-events:none;
+}
+.tile.advisor-wait-highlight{box-shadow:0 0 0 2px rgba(99,164,255,.68),0 6px 16px rgba(0,0,0,.28)!important;}
+.machi-bubble .advisor-detail{display:block;margin-top:3px;color:#aebbd0;font-size:8px;line-height:1.25;}
+@media (max-width:600px){
+  .hand-status{bottom:calc(var(--tile-h) + var(--safe-b) + 17px)!important;width:min(94vw,420px)!important;padding:6px 9px!important;}
+  .hand-status .advisor-line{font-size:8px;}
+  .hand-status .status-sub{font-size:7px;}
+  .tile.advisor-recommended::after{font-size:6px;bottom:-16px;}
+}
+@media (orientation:landscape) and (max-height:560px){
+  .hand-status{max-width:48vw!important;}
+  .hand-status .advisor-line{font-size:7px;}
+}
+</style>
+
 </head>
 <body>
 
@@ -1499,7 +2003,7 @@ body{touch-action:manipulation;}
             <div class="menu-actions">
                 <button class="btn btn-primary" onclick="start4PGame('Medium', false)">Vs AI <span class="btn-note">• Singleplayer</span></button>
                 <button class="btn btn-secondary" onclick="openPlayerLobby()">Vs Player <span class="btn-note">• Multiplayer Lobby</span></button>
-                <button class="btn btn-secondary" onclick="nav('screen-main')">Back</button>
+                <button class="btn btn-secondary" onclick="nav('screen-main')">← Kembali ke Menu</button>
             </div>
         </section>
     </main>
@@ -1552,9 +2056,11 @@ body{touch-action:manipulation;}
                 <div class="lobby-actions">
                     <button class="btn btn-primary btn-wide" id="btn-lobby-ready" onclick="togglePlayerReady()">SIAP</button>
                     <button class="btn btn-primary btn-wide" id="btn-lobby-start" onclick="mpStartGame()" hidden>MULAI GAME</button>
+                    <button class="btn btn-secondary btn-wide" onclick="backFromLobby()">← Kembali ke Mode</button>
                     <button class="btn btn-secondary btn-wide" onclick="closeLobby()">Keluar</button>
                 </div>
             </div>
+            <button class="btn btn-secondary btn-wide lobby-back-btn" onclick="backFromPlayerLobby()">← Kembali ke Pilih Mode</button>
         </section>
     </div>
 
@@ -1831,12 +2337,23 @@ body{touch-action:manipulation;}
         if(musicStep%8===6) pluckChinese(musicScale[(base+2)%musicScale.length],now+0.16,0.58,0.5);
         musicStep++;
     }
+    let musicLoopToken=0;
     function startChineseMusic(){
         const ctx=ensureMusicContext(); if(!ctx||!musicEnabled)return;
         if(ctx.state==='suspended')ctx.resume().catch(()=>{});
-        if(musicTimer)return; musicTick(); musicTimer=setInterval(musicTick,860);
+        if(musicTimer) return;
+        const token=++musicLoopToken;
+        musicStep=0;
+        musicTick();
+        musicTimer=setInterval(()=>{
+            if(token!==musicLoopToken || !musicEnabled){ clearInterval(musicTimer); musicTimer=null; return; }
+            musicTick();
+        }, 900);
     }
-    function stopChineseMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null;}}
+    function stopChineseMusic(){
+        musicLoopToken++;
+        if(musicTimer){clearInterval(musicTimer);musicTimer=null;}
+    }
     function forcePlayMusic(){ startChineseMusic(); }
     function toggleAudio(){ musicEnabled=!musicEnabled; if(musicEnabled){startChineseMusic()}else{stopChineseMusic()} const b=byId('audio-toggle-label'); if(b)b.textContent=musicEnabled?'ON':'OFF'; }
     function updateVolume(val){ const v=Math.max(0,Math.min(1,Number(val))); if(musicMaster)musicMaster.gain.value=v*0.24; setText('volume-value',Math.round(v*100)+'%'); }
@@ -1940,6 +2457,15 @@ body{touch-action:manipulation;}
         if(mp.ws?.readyState===WebSocket.OPEN) mp.ws.send(JSON.stringify({type,...data}));
     }
 
+    function backFromPlayerLobby(){
+        clearTimeout(mpAutoStartTimer);
+        try{ if(mp.ws){ mp.ws.onclose=null; mp.ws.close(); } }catch(e){}
+        mp.ws=null; mp.connected=false; mp.room=null; mp.seat=null; mp.host=false; mp.ready=false; mp.started=false;
+        isMultiplayerMode=false;
+        setDisplay('modal-lobby','none');
+        nav('screen-play');
+    }
+
     function openPlayerLobby(){
         isMultiplayerMode=true;
         setDisplay('modal-lobby','flex');
@@ -1957,6 +2483,17 @@ body{touch-action:manipulation;}
             setText('lobby-help','Menghubungkan ke Room '+code+'…');
             mpConnect(code,'guest');
         }
+    }
+
+    function backFromLobby(){
+        clearTimeout(mpAutoStartTimer);clearTimeout(mpReconnectTimer);
+        try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}
+        mp.ws=null;mp.connected=false;
+        mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,playerName:(byId('mp-name')?.value||mp.playerName||'Player')};
+        isMultiplayerMode=false;
+        setDisplay('modal-lobby','none');
+        mpSetConnection(false);
+        nav('screen-play');
     }
 
     function closeLobby(){
@@ -2064,7 +2601,8 @@ body{touch-action:manipulation;}
 
     function updateFuritenIndicator(status){const panel=byId('furiten-panel'),el=byId('furiten-status');if(!panel||!el)return;const t=status?.type;if(t!=='Temporary'&&t!=='Permanent'){panel.style.display='none';el.textContent='';return;}panel.style.display='block';el.className='furiten-status '+(t==='Permanent'?'perma':'temp');el.textContent=t==='Permanent'?'Permanent Furiten — Ron dilarang':'Temporary Furiten — tunggu discard berikutnya';}
     function mpRenderHandAndTable(s,map,hands,rivers,state){
-        const b=byId('player-hand-tiles');if(b){b.innerHTML='';(hands[s]||[]).forEach((t,i)=>{const el=document.createElement('div');el.className=`tile tile-${t.type}${t.num===5&&t.type!=='honor'?' red-five-tile':''}`;el.innerHTML=tileMarkup(t);el.onclick=()=>mpTapTile(i,t);let sy=0;el.onpointerdown=e=>{sy=e.clientY;el.classList.remove('swipe-arming')};el.onpointermove=e=>{if(sy&&sy-e.clientY>30)el.classList.add('swipe-arming')};el.onpointerup=e=>{el.classList.remove('swipe-arming');if(sy-e.clientY>35)mpSendDiscard(t)};b.appendChild(el)})}
+        const b=byId('player-hand-tiles');if(b){b.innerHTML='';(hands[s]||[]).forEach((t,i)=>{const el=document.createElement('div');el.className=`tile tile-${t.type}${t.num===5&&t.type!=='honor'?' red-five-tile':''}`;el.dataset.uid=t.uniqueId||'';el.innerHTML=tileMarkup(t);el.onclick=()=>mpTapTile(i,t);let sy=0;el.onpointerdown=e=>{sy=e.clientY;el.classList.remove('swipe-arming')};el.onpointermove=e=>{if(sy&&sy-e.clientY>30)el.classList.add('swipe-arming')};el.onpointerup=e=>{el.classList.remove('swipe-arming');if(sy-e.clientY>35)mpSendDiscard(t)};b.appendChild(el)});}
+        if(s===0){ const prevHands=playerHands[0]; const prevMelds=playerMelds[0]; playerHands[0]=hands[s]||[]; playerMelds[0]=prevMelds; updateHandStatus(); const advice=getBestDiscardAdvice(playerHands[0],playerMelds[0]?.length||0); markBeginnerAdvisorTiles(advice); playerHands[0]=prevHands; playerMelds[0]=prevMelds; }
         [['enemy-hand-top',map[2]],['enemy-hand-right',map[1]],['enemy-hand-left',map[3]]].forEach(([id,canon])=>{const el=byId(id);if(!el)return;el.innerHTML='';for(let i=0;i<(hands[canon]||[]).length;i++){const x=document.createElement('div');x.className='tile-back';el.appendChild(x)}});
         [['river-bottom',map[0]],['river-right',map[1]],['river-top',map[2]],['river-left',map[3]]].forEach(([id,canon])=>{const el=byId(id);if(!el)return;el.innerHTML='';(rivers[canon]||[]).forEach(t=>{const d=document.createElement('div');d.className=`discard-tile tile-${t.type}`;d.innerHTML=tileMarkup(t);el.appendChild(d)})});
         if(state.remoteActions?.seat===s)mpRenderActions(state.remoteActions.actions||[]);else setDisplay('action-overlay','none');
@@ -2811,6 +3349,67 @@ body{touch-action:manipulation;}
         return best;
     }
 
+    function advisorTileLabel(id){
+        const t=TILE_TYPES[id];
+        if(!t) return '?';
+        if(t.type==='man') return `${t.num}萬`;
+        if(t.type==='pin') return `${t.num}-pin`;
+        if(t.type==='sou') return `${t.num}-sou`;
+        return t.val;
+    }
+
+    function getBestDiscardAdvice(hand, meldCount=0){
+        if(!Array.isArray(hand) || hand.length!==14) return null;
+        const candidates=[];
+        for(let i=0;i<hand.length;i++){
+            const remaining=hand.filter((_,j)=>j!==i);
+            const waits=getWaitIds(remaining,meldCount);
+            if(!waits.length) continue;
+            let bestOutcome=null;
+            for(const wid of waits){
+                const outcome=evaluateYakuAndScore(0,TILE_TYPES[wid],true);
+                if(outcome?.valid && (!bestOutcome || outcome.han>bestOutcome.han || (outcome.han===bestOutcome.han && outcome.fu>bestOutcome.fu))) bestOutcome=outcome;
+            }
+            candidates.push({index:i,tile:hand[i],waits,bestOutcome,score:(bestOutcome?.han||0)*100+waits.length});
+        }
+        if(!candidates.length) return null;
+        candidates.sort((a,b)=>b.score-a.score);
+        const topScore=candidates[0].score;
+        const top=candidates.filter(c=>c.score===topScore).slice(0,3);
+        return {top,candidates};
+    }
+
+    function updateBeginnerAdvisor(hand, meldCount, box){
+        if(!box) return;
+        let line=box.querySelector('.advisor-line');
+        if(!line){line=document.createElement('div');line.className='advisor-line';box.appendChild(line);}
+        line.textContent='';
+        if(hand.length!==14){line.style.display='none';return;}
+        const advice=getBestDiscardAdvice(hand,meldCount);
+        if(!advice){
+            line.style.display='block';
+            line.innerHTML='<span class="advisor-yaku">Belum ada buangan yang langsung membuat Tenpai.</span>';
+            return;
+        }
+        line.style.display='block';
+        const discardText=advice.top.map(a=>advisorTileLabel(a.tile.id)).join(' / ');
+        const waits=[...new Set(advice.top.flatMap(a=>a.waits))];
+        const waitText=waits.slice(0,8).map(advisorTileLabel).join(' ')+(waits.length>8?' …':'');
+        const yaku=new Set();
+        advice.top.forEach(a=>{ if(a.bestOutcome?.yakuStr) yaku.add(a.bestOutcome.yakuStr); });
+        line.innerHTML=`<span class="advisor-discard">Buang: ${escapeHtml(discardText)}</span> · <span class="advisor-wait">Tunggu: ${escapeHtml(waitText)}</span>${yaku.size?` · <span class="advisor-yaku">${escapeHtml([...yaku][0])}</span>`:''}`;
+    }
+
+    function markBeginnerAdvisorTiles(advice){
+        document.querySelectorAll('#player-hand-tiles .tile').forEach((el)=>el.classList.remove('advisor-recommended'));
+        if(!advice?.top?.length) return;
+        const ids=new Set(advice.top.map(a=>a.tile.uniqueId));
+        document.querySelectorAll('#player-hand-tiles .tile').forEach(el=>{
+            const uid=el.dataset.uid;
+            if(uid && ids.has(uid)) el.classList.add('advisor-recommended');
+        });
+    }
+
     function updateHandStatus() {
         const box = document.getElementById('hand-status');
         const main = document.getElementById('hand-status-main');
@@ -2831,14 +3430,31 @@ body{touch-action:manipulation;}
                 box.classList.add('ready');
                 main.textContent = `BISA MENANG • ${win.han} Han • ${win.fu} Fu`;
                 sub.textContent = `Yaku: ${formatYakuNames(win)}`;
+                updateBeginnerAdvisor(hand, meldCount, box);
+                markBeginnerAdvisorTiles(null);
                 return;
             }
             if (structural) {
                 box.classList.add('blocked');
                 main.textContent = 'BENTUK LENGKAP • NO YAKU';
-                sub.textContent = 'Belum dapat menang. Pastikan ada minimal 1 yaku.';
+                sub.textContent = 'Belum dapat menang. Pilih buangan yang membuka pola Yaku.';
+                updateBeginnerAdvisor(hand, meldCount, box);
+                const advice=getBestDiscardAdvice(hand,meldCount); markBeginnerAdvisorTiles(advice);
                 return;
             }
+            const advice=getBestDiscardAdvice(hand,meldCount);
+            if(advice){
+                box.classList.add('tenpai');
+                main.textContent='SARAN PEMBUANGAN';
+                sub.textContent='Buang kartu yang ditandai untuk menuju Tenpai dengan peluang Yaku terbaik.';
+                updateBeginnerAdvisor(hand,meldCount,box); markBeginnerAdvisorTiles(advice);
+            }else{
+                box.classList.add('warning');
+                main.textContent='BELUM TENPAI';
+                sub.textContent='Prioritaskan membentuk 4 set + 1 pasangan.';
+                updateBeginnerAdvisor(hand,meldCount,box); markBeginnerAdvisorTiles(null);
+            }
+            return;
         }
 
         const expected13 = 13 - meldCount * 3;
@@ -2849,19 +3465,21 @@ body{touch-action:manipulation;}
                 box.classList.add('tenpai');
                 main.textContent = `TENPAI • ${waits.length} WAIT`;
                 sub.textContent = outcome && outcome.valid
-                    ? `Menang pada: ${waits.map(id => TILE_TYPES[id]?.val).filter(Boolean).join(' ')} • Yaku: ${formatYakuNames(outcome)} • ${outcome.han} Han`
-                    : 'Belum bisa menang: wait yang tersedia belum menghasilkan yaku.';
+                    ? `Menang pada: ${waits.map(advisorTileLabel).join(' ')} • Yaku: ${formatYakuNames(outcome)} • ${outcome.han} Han`
+                    : `Menunggu: ${waits.map(advisorTileLabel).join(' ')} • belum ada Yaku pada semua wait.`;
             } else {
                 box.classList.add('warning');
                 main.textContent = 'BELUM TENPAI';
                 sub.textContent = 'Prioritaskan membentuk 4 set + 1 pasangan.';
             }
+            updateBeginnerAdvisor(hand,meldCount,box); markBeginnerAdvisorTiles(null);
             return;
         }
 
         box.classList.add('warning');
         main.textContent = 'STATUS TANGAN';
         sub.textContent = '4 set + 1 pasangan + minimal 1 yaku untuk menang.';
+        updateBeginnerAdvisor(hand,meldCount,box); markBeginnerAdvisorTiles(null);
     }
 
     function updateScoresUI() {
@@ -3081,6 +3699,7 @@ body{touch-action:manipulation;}
         playerHands[0].forEach((t,i)=>{
             const el=document.createElement('div');
             el.className='tile tile-'+t.type+(t.num===5&&t.type!=='honor'?' red-five-tile':'')+(t===drawnTile?' drawn-tile-gap':'')+(riichiDiscardIndices.includes(i)?' riichi-legal-discard':'')+(i===selectedTileIndex?' selected-tile':'');
+            el.dataset.uid=t.uniqueId||'';
             el.tabIndex=0;
             const waits=waitsByDiscard[i]||[]; const waitText=waits.length?waits.map(id=>TILE_TYPES[id]?.val).filter(Boolean).join(' '):'—'; const yakuText=t.id===2?'No Yaku (simulasi 3-man)':'Terdeteksi';
             el.innerHTML=`${tileMarkup(t)}<span class="machi-bubble ${t.id===2?'no-yaku':''}"><strong>Machi: ${waitText}</strong><span>Yaku: ${yakuText}</span></span>`;
@@ -4023,6 +4642,45 @@ window.addEventListener('pointerdown',()=>{try{if(typeof startChineseMusic==='fu
   addEventListener('resize',sync,{passive:true});
   addEventListener('orientationchange',()=>setTimeout(sync,80),{passive:true});
   if(window.visualViewport) window.visualViewport.addEventListener('resize',sync,{passive:true});
+})();
+</script>
+
+
+<script>
+/* v24.1: keep the live table fixed-size; browser gestures must not steal double-tap discard. */
+(function(){
+  const board=()=>document.getElementById('game-board');
+  document.addEventListener('gesturestart', e=>{ if(board()) e.preventDefault(); }, {passive:false});
+  document.addEventListener('gesturechange', e=>{ if(board()) e.preventDefault(); }, {passive:false});
+  document.addEventListener('gestureend', e=>{ if(board()) e.preventDefault(); }, {passive:false});
+  document.addEventListener('dblclick', e=>{ if(board() && board().contains(e.target)) e.preventDefault(); }, {passive:false});
+})();
+</script>
+
+<script id="mahyong-dj-v24-2-touch-guard">
+(function(){
+  const root=()=>document.getElementById('game-board');
+  document.addEventListener('touchstart',e=>{ if(root() && root().contains(e.target) && e.touches.length>1) e.preventDefault(); },{passive:false});
+  let lastTap=0;
+  document.addEventListener('touchend',e=>{
+    if(!root() || !root().contains(e.target)) return;
+    const now=Date.now();
+    if(now-lastTap<300) e.preventDefault();
+    lastTap=now;
+  },{passive:false});
+})();
+</script>
+
+<script id="mahyong-dj-no-zoom">
+(function(){
+  function blockGameZoom(){
+    const board=document.getElementById('game-board'); if(!board) return;
+    board.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});
+    board.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});
+    board.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});
+    board.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',blockGameZoom,{once:true}); else blockGameZoom();
 })();
 </script>
 
