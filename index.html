@@ -1649,6 +1649,221 @@ button,.tile,.icon-btn{touch-action:manipulation;}
   -webkit-touch-callout:none!important;
 }
 </style>
+
+<style id="landscape-reference-v24">
+/* ================================================================
+   V24 — CLEAN LANDSCAPE / REFERENCE-LIKE TOP LAYOUT
+   Layout-only: game logic, worker, multiplayer and tile engine untouched.
+   ================================================================ */
+
+/* Remove the decorative title from the playing table. */
+#game-board .round-hud-shell{
+  display:none!important;
+}
+
+/* Keep the three utility controls together at the far right. */
+#game-board .top-right-btns{
+  position:absolute!important;
+  top:2px!important;
+  right:0!important;
+  display:flex!important;
+  gap:8px!important;
+  z-index:60!important;
+}
+#game-board .top-right-btns .icon-btn{
+  width:42px!important;
+  height:42px!important;
+  min-width:42px!important;
+  padding:0!important;
+  border-radius:12px!important;
+}
+
+/* Dora is a compact fixed HUD and its tile can never escape the box. */
+#game-board .dora-panel{
+  position:relative!important;
+  width:178px!important;
+  min-width:178px!important;
+  max-width:178px!important;
+  height:126px!important;
+  padding:9px 11px!important;
+  overflow:hidden!important;
+  z-index:55!important;
+}
+#game-board .dora-tiles{
+  height:45px!important;
+  gap:4px!important;
+  align-items:center!important;
+}
+#game-board .dora-tile-box{
+  position:relative!important;
+  flex:0 0 28px!important;
+  width:28px!important;
+  height:40px!important;
+  min-width:28px!important;
+  max-width:28px!important;
+  min-height:40px!important;
+  max-height:40px!important;
+  overflow:hidden!important;
+  padding:0!important;
+}
+#game-board .dora-tile-box .tile-svg,
+#game-board .dora-tile-box .tile-svg-img{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:fill!important;
+}
+
+/* TOP PLAYER:
+   place the avatar horizontally between Dora HUD and the top hand,
+   instead of directly on top of the wall/hand. */
+#game-board .player-seat.pos-top{
+  top:7px!important;
+  left:calc(50% - clamp(235px,24vw,330px))!important;
+  right:auto!important;
+  transform:none!important;
+  width:54px!important;
+  z-index:58!important;
+  pointer-events:none!important;
+}
+#game-board .pos-top .avatar-img{
+  width:44px!important;
+  height:44px!important;
+  border-radius:12px!important;
+  margin:0 auto!important;
+}
+#game-board .pos-top .avatar-name{
+  margin-top:2px!important;
+  padding:2px 5px!important;
+  font-size:7px!important;
+  white-space:nowrap!important;
+}
+
+/* Top hand stays centered and starts below the avatar. */
+#game-board .enemy-hand-top{
+  top:78px!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  z-index:18!important;
+  gap:3px!important;
+}
+#game-board .enemy-hand-top .tile-back{
+  width:clamp(20px,3.1vh,28px)!important;
+  height:clamp(29px,4.45vh,38px)!important;
+}
+
+/* Top discard is kept below the wall, with no overlap with avatar. */
+#game-board .river-top{
+  top:132px!important;
+  z-index:7!important;
+}
+
+/* Left/right avatars remain outside their discard lanes. */
+#game-board .pos-left{
+  left:12px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  z-index:25!important;
+}
+#game-board .pos-right{
+  right:12px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  z-index:25!important;
+}
+#game-board .side-left{
+  left:12px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  margin-left:54px!important;
+}
+#game-board .side-right{
+  right:12px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  margin-right:54px!important;
+}
+
+/* Bottom player avatar sits beside the hand area rather than in the corner. */
+#game-board .pos-bottom{
+  left:clamp(70px,calc(50% - 34vw),300px)!important;
+  bottom:calc(var(--tile-h) + 6px)!important;
+  z-index:30!important;
+}
+
+/* Make the central table a true compact square. */
+#game-board #center-board-box{
+  width:clamp(118px,23vh,158px)!important;
+  height:clamp(118px,23vh,158px)!important;
+  aspect-ratio:1/1!important;
+  border-radius:22px!important;
+}
+
+/* Prevent accidental browser zoom/scroll gestures while playing. */
+html,body,#screen-game,#game-board{
+  overscroll-behavior:none!important;
+  -webkit-user-select:none!important;
+  user-select:none!important;
+  -webkit-touch-callout:none!important;
+}
+#game-board,
+#game-board *{
+  touch-action:manipulation!important;
+}
+
+/* Small landscape phones: keep every element inside the safe viewport. */
+@media (orientation:landscape) and (max-height:430px){
+  #game-board .dora-panel{
+    width:142px!important;
+    min-width:142px!important;
+    max-width:142px!important;
+    height:96px!important;
+    padding:6px 8px!important;
+  }
+  #game-board .dora-tile-box{
+    flex-basis:22px!important;
+    width:22px!important;
+    min-width:22px!important;
+    max-width:22px!important;
+    height:31px!important;
+    min-height:31px!important;
+    max-height:31px!important;
+  }
+  #game-board .player-seat.pos-top{
+    left:calc(50% - clamp(205px,25vw,270px))!important;
+    top:4px!important;
+  }
+  #game-board .pos-top .avatar-img{
+    width:38px!important;
+    height:38px!important;
+  }
+  #game-board .pos-top .avatar-name{
+    font-size:6px!important;
+  }
+  #game-board .enemy-hand-top{
+    top:64px!important;
+  }
+  #game-board .river-top{
+    top:106px!important;
+  }
+  #game-board .top-right-btns .icon-btn{
+    width:36px!important;
+    height:36px!important;
+    min-width:36px!important;
+  }
+}
+
+/* iPad / iPad mini landscape: preserve the same composition, just more room. */
+@media (orientation:landscape) and (min-width:700px){
+  #game-board .player-seat.pos-top{
+    left:calc(50% - clamp(250px,24vw,350px))!important;
+  }
+}
+</style>
+
 </head>
 <body>
 
