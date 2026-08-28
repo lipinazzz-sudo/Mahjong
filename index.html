@@ -1153,6 +1153,150 @@
   .river-left{left:calc(50% - clamp(142px,22vw,240px));}
   .river-right{right:calc(50% - clamp(142px,22vw,240px));}
 }
+
+/* ===== MAHYONG DJ v23 — SAFE VIEWPORT GEOMETRY =====
+   Geometry is derived from the usable screen rectangle rather than the raw
+   viewport edges. This prevents iPhone landscape camera/notch areas from
+   squeezing or overlapping the table. */
+#game-board{
+  --safe-l:env(safe-area-inset-left,0px);
+  --safe-r:env(safe-area-inset-right,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-mid-x:calc((100% + var(--safe-l) - var(--safe-r))/2);
+  --safe-mid-y:calc((100% + var(--safe-t) - var(--safe-b))/2);
+  width:100%;
+  height:100dvh;
+  max-width:none;
+  max-height:none;
+  overflow:hidden;
+}
+#game-board .topbar{
+  top:max(6px,var(--safe-t));
+  left:max(8px,var(--safe-l));
+  right:max(8px,var(--safe-r));
+}
+#game-board .center-board{
+  left:var(--safe-mid-x);
+  top:var(--safe-mid-y);
+}
+#game-board .player-seat.pos-bottom{
+  left:var(--safe-mid-x);
+  bottom:calc(var(--tile-h) + var(--safe-b) + 6px);
+  transform:translateX(-50%);
+}
+#game-board .player-seat.pos-top{
+  left:var(--safe-mid-x);
+  right:auto;
+  top:calc(var(--safe-t) + 6px);
+  transform:translateX(-50%);
+}
+#game-board .player-seat.pos-left{
+  left:calc(var(--safe-l) + 6px);
+}
+#game-board .player-seat.pos-right{
+  right:calc(var(--safe-r) + 6px);
+}
+#game-board .enemy-hand-top{
+  left:var(--safe-mid-x);
+  top:calc(var(--safe-t) + 58px);
+}
+#game-board .side-left{left:calc(var(--safe-l) + 6px)}
+#game-board .side-right{right:calc(var(--safe-r) + 6px)}
+#game-board .river-top{
+  left:var(--safe-mid-x);
+  top:calc(var(--safe-t) + 72px);
+}
+#game-board .river-bottom{
+  left:var(--safe-mid-x);
+  bottom:calc(var(--tile-h) + var(--safe-b) + 48px);
+}
+#game-board .river-left{
+  left:calc(var(--safe-mid-x) - clamp(110px,21vw,235px));
+}
+#game-board .river-right{
+  right:auto;
+  left:calc(var(--safe-mid-x) + clamp(110px,21vw,235px));
+}
+#game-board .melds-container{
+  right:calc(max(6px,var(--safe-r)) + 2px);
+  bottom:calc(var(--tile-h) + var(--safe-b) + 6px);
+}
+#game-board .hand-bottom-container{
+  left:var(--safe-l);
+  right:var(--safe-r);
+  bottom:var(--safe-b);
+  width:auto;
+  min-height:calc(var(--tile-h) + var(--safe-b) + 10px);
+}
+#game-board #action-overlay{
+  left:var(--safe-mid-x);
+  bottom:calc(var(--tile-h) + var(--safe-b) + 44px);
+}
+#game-board .hand-status{
+  left:var(--safe-mid-x);
+  bottom:calc(var(--tile-h) + var(--safe-b) + 8px);
+}
+#game-board .beginner-tip{
+  left:var(--safe-mid-x);
+  bottom:calc(var(--tile-h) + var(--safe-b) + 48px);
+}
+#game-board .furiten-panel{
+  left:var(--safe-mid-x);
+  bottom:calc(var(--tile-h) + var(--safe-b) + 80px);
+}
+
+/* Small landscape phones: use screen width as the touch-size budget and
+   pull the whole table inward so every control remains inside the usable area. */
+@media (orientation:landscape) and (max-height:560px){
+  #game-board{
+    --tile-w:clamp(34px,6.0vw,46px);
+    --tile-h:clamp(49px,8.6vw,66px);
+    --discard-w:clamp(18px,2.9vw,25px);
+    --discard-h:clamp(28px,4.25vw,36px);
+  }
+  #game-board .center-board{width:clamp(108px,22vh,132px);height:clamp(108px,22vh,132px)}
+  #game-board .river-left{left:calc(var(--safe-mid-x) - clamp(92px,19vw,205px))}
+  #game-board .river-right{left:calc(var(--safe-mid-x) + clamp(92px,19vw,205px))}
+  #game-board .river-top{top:calc(var(--safe-t) + 52px)}
+  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 34px)}
+  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 42px)}
+  #game-board .pos-top{top:var(--safe-t)}
+  #game-board .pos-left,#game-board .pos-right{top:50%}
+  #game-board .hand-status{bottom:calc(var(--tile-h) + var(--safe-b) + 2px);width:min(48vw,320px)}
+  #game-board .beginner-tip{display:none}
+}
+
+/* Very narrow landscape screens: keep the table readable instead of shrinking
+   tiles into tiny icons. The hand can scroll horizontally when needed. */
+@media (orientation:landscape) and (max-width:420px){
+  #game-board{
+    --tile-w:clamp(33px,7.0vw,40px);
+    --tile-h:clamp(48px,10vw,58px);
+    --discard-w:clamp(17px,3.35vw,22px);
+    --discard-h:clamp(26px,4.9vw,33px);
+  }
+  #game-board .center-board{width:102px;height:102px}
+  #game-board .river-left{left:calc(var(--safe-mid-x) - clamp(82px,17vw,175px))}
+  #game-board .river-right{left:calc(var(--safe-mid-x) + clamp(82px,17vw,175px))}
+  #game-board .score-tag{min-width:48px;font-size:7px;padding:3px 5px}
+}
+
+/* Portrait phones: prioritize a comfortable hand while keeping the safe inset. */
+@media (orientation:portrait) and (max-width:600px){
+  #game-board .river-left{left:calc(var(--safe-mid-x) - clamp(94px,25vw,155px))}
+  #game-board .river-right{left:calc(var(--safe-mid-x) + clamp(94px,25vw,155px))}
+  #game-board .river-top{top:calc(var(--safe-t) + 88px)}
+  #game-board .pos-top{top:calc(var(--safe-t) + 4px)}
+  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 84px)}
+}
+
+/* Tablets/desktops: keep generous negative space while using the safe center. */
+@media (min-width:900px){
+  #game-board .river-left{left:calc(var(--safe-mid-x) - clamp(150px,18vw,310px))}
+  #game-board .river-right{left:calc(var(--safe-mid-x) + clamp(150px,18vw,310px))}
+}
+
 </style>
 </head>
 <body>
