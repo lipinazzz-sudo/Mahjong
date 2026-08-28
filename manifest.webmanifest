@@ -1,18 +1,15 @@
 {
-  "name": "Mahjong Soul Web",
+  "name": "Mahjong Soul Web — Local P2P",
   "short_name": "Mahjong Soul",
-  "description": "Riichi Mahjong lokal untuk browser, HP, iPad, dan desktop.",
-  "lang": "id-ID",
-  "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "any",
   "background_color": "#06101a",
   "theme_color": "#08131f",
-  "categories": ["games", "entertainment"],
+  "orientation": "any",
+  "description": "Riichi Mahjong untuk desktop, HP, iPad, portrait, landscape, dan local P2P.",
   "icons": [
-    {"src":"./icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-    {"src":"./icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+    {"src":"./icons/icon-192.png","sizes":"192x192","type":"image/png"},
+    {"src":"./icons/icon-512.png","sizes":"512x512","type":"image/png"}
   ]
 }

@@ -2,16 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="5.0-stable">
+    <meta name="app-version" content="11.0-p2p-responsive">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
-    <meta name="description" content="Mahjong Soul Web — browser Riichi Mahjong untuk desktop, HP, iPad, portrait, dan landscape.">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Mahjong Soul Web">
-    <link rel="manifest" href="./manifest.webmanifest">
-    <title>Mahjong Soul Web — Riichi Mahjong</title>
+    <meta name="description" content="Mahjong Soul Web — PWA Riichi Mahjong dengan AI dan Local P2P multiplayer.">
+    <title>Mahjong Soul Web — Riichi Mahjong Local P2P</title>
     <style>
         :root {
             color-scheme: dark;
@@ -354,130 +349,67 @@
         }
     .round-ready-tag{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.04em}.round-ready-tag.ready{background:rgba(46,204,113,.16);color:#5ee79a;border:1px solid rgba(46,204,113,.35)}.round-ready-tag.noten{background:rgba(231,76,60,.12);color:#ff8b80;border:1px solid rgba(231,76,60,.3)}
 
-    /* ---------- Responsive 2026 layout: viewport-safe on small phones, iPad and desktop ---------- */
-    :root {
-        --safe-top: max(8px, env(safe-area-inset-top));
-        --safe-right: max(8px, env(safe-area-inset-right));
-        --safe-bottom: max(8px, env(safe-area-inset-bottom));
-        --safe-left: max(8px, env(safe-area-inset-left));
-    }
-    body { min-width:0; min-height:0; overscroll-behavior:none; }
-    .screen { min-width:0; min-height:0; overflow:hidden; }
-    #game-board {
-        width:100%; height:100%;
-        min-width:0; min-height:0;
-        padding-top:var(--safe-top); padding-right:var(--safe-right);
-        padding-bottom:var(--safe-bottom); padding-left:var(--safe-left);
-    }
-    .topbar { top:calc(8px + var(--safe-top)); left:calc(8px + var(--safe-left)); right:calc(8px + var(--safe-right)); }
-    .hand-bottom-container { padding-left:var(--safe-left); padding-right:var(--safe-right); padding-bottom:var(--safe-bottom); }
-    .tile { width:clamp(23px, 5.5vmin, 44px); height:clamp(34px, 8.2vmin, 63px); }
-    .tile-char { font-size:clamp(13px, 3.0vmin, 24px); }
-    .tile-helper { font-size:clamp(6px, 1.35vmin, 10px); }
-    .drawn-tile-gap { margin-left:clamp(4px, 1vmin, 8px); }
-    .hand-tiles { gap:clamp(2px, .6vmin, 4px); max-width:100%; min-width:max-content; }
-    .center-board {
-        width:clamp(118px, 34vmin, 194px);
-        height:clamp(118px, 34vmin, 194px);
-        max-width:calc(100vw - 120px);
-        max-height:calc(100dvh - 120px);
-    }
-    .turn-timer { font-size:clamp(28px, 6vmin, 46px); }
-    .round-info { font-size:clamp(10px, 1.8vmin, 12px); }
-    .tiles-left { font-size:clamp(9px, 1.8vmin, 12px); }
-    .river-container { grid-template-columns:repeat(6,var(--discard-w)); }
-    .discard-tile { width:clamp(15px, 3.6vmin, 27px); height:clamp(22px, 5.2vmin, 38px); }
-    .discard-tile .tile-char { font-size:clamp(9px, 2.35vmin, 16px); }
-    .dora-tile-box { width:clamp(18px, 3.2vmin, 24px); height:clamp(25px, 4.7vmin, 32px); }
-    .avatar-img { width:clamp(30px, 6.5vmin, 50px); height:clamp(30px, 6.5vmin, 50px); }
-    .avatar-name { max-width:24vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .lobby-box{max-width:520px}.mp-setup{display:grid;gap:10px}.field-label{font-size:12px;color:#9ca3af;text-align:left}.field-input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #34404f;background:#0e1722;color:#fff;font-size:15px;outline:none}.field-input:focus{border-color:#58a6ff;box-shadow:0 0 0 3px rgba(88,166,255,.12)}.mp-join-row{display:grid;grid-template-columns:1.2fr 1fr .9fr;gap:8px;align-items:center}.room-code-input{text-align:center;letter-spacing:3px}.mp-hint{font-size:12px;line-height:1.5;color:#8b949e;text-align:left;padding:10px 12px;background:rgba(255,255,255,.035);border-radius:9px}.connection-badge{font-size:10px;font-weight:800;letter-spacing:.08em;padding:5px 8px;border-radius:999px;border:1px solid #334155}.connection-badge.online{color:#86efac;border-color:#166534;background:#052e16}.connection-badge.offline{color:#fca5a5;border-color:#7f1d1d;background:#2b0b0b}.mp-room-panel{display:grid;gap:12px}.room-share-card{display:flex;justify-content:space-between;align-items:center;padding:13px 14px;border-radius:12px;background:#0b1320;border:1px solid #263244}.room-share-card strong{display:block;font-size:30px;letter-spacing:5px;color:#f6c453;margin-top:2px}.lobby-actions{display:grid;gap:8px}
 
-    /* Small phones: keep rivers away from the center and compress side HUD. */
-    @media (max-width:560px) {
-        .topbar { gap:4px; }
-        .dora-panel { padding:5px 6px; max-width:48vw; }
-        .top-right-btns { gap:4px; }
-        .top-right-btns .icon-btn { width:32px; height:32px; }
-        .pos-bottom { left:auto; right:8px; bottom:calc(var(--tile-h) + 12px); }
-        .pos-top { top:calc(8px + var(--safe-top)); right:88px; }
-        .pos-left { left:3px; top:39%; }
-        .pos-right { right:3px; top:39%; }
-        .side-left { left:2px; top:29%; }
-        .side-right { right:2px; top:29%; }
-        .enemy-melds-left { left:18px; }
-        .enemy-melds-right { right:18px; }
-        .river-left { left:46px; }
-        .river-right { right:46px; }
-        .river-top { top:92px; }
-        .river-bottom { bottom:calc(var(--tile-h) + 48px); }
-        .enemy-hand-top { top:56px; }
-        .hand-status { width:min(92vw,430px); bottom:calc(var(--tile-h) + 7px); font-size:9px; }
-        .hand-status .status-main { font-size:10px; }
-        .hand-status .status-sub { font-size:8px; }
-        #action-overlay { bottom:calc(var(--tile-h) + 44px); max-width:95vw; }
-        .act-btn { min-width:54px; min-height:34px; padding:5px 8px; font-size:11px; }
-        .beginner-tip { display:none; }
-        .furiten-panel { bottom:calc(var(--tile-h) + 72px); }
-    }
 
-    /* Portrait phones / narrow iPads: use a compact vertical table without overflow. */
-    @media (orientation:portrait) {
-        #game-board { overflow:hidden; }
-        .center-board { width:clamp(112px, 30vmin, 154px); height:clamp(112px, 30vmin, 154px); }
-        .river-top { top:18%; }
-        .river-bottom { bottom:calc(var(--tile-h) + 13vh); }
-        .river-left { left:clamp(42px, 11vw, 90px); }
-        .river-right { right:clamp(42px, 11vw, 90px); }
-        .side-left,.side-right { top:31%; }
-        .enemy-hand-top { top:12%; }
-        .enemy-melds-top { top:17%; }
-        .enemy-melds-left { left:clamp(18px, 7vw, 60px); top:53%; }
-        .enemy-melds-right { right:clamp(18px, 7vw, 60px); top:53%; }
-        .melds-container { right:50%; transform:translateX(50%); bottom:calc(var(--tile-h) + 8px); max-width:60vw; overflow:hidden; }
-        .hand-bottom-container { min-height:calc(var(--tile-h) + 8px); }
-        .hand-tiles { justify-content:flex-start; }
-    }
+/* ===== P2P + Responsive v11 ===== */
+:root{--table-unit:1vw}
+.mp-p2p-choice{display:grid;grid-template-columns:1fr 1fr;gap:8px}.p2p-card{display:grid;gap:8px;padding:12px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.035);border-radius:12px;text-align:left}.p2p-card-title{font-size:12px;font-weight:900;color:#f6c453;letter-spacing:.08em;text-transform:uppercase}.p2p-row{display:flex;align-items:center;justify-content:space-between;gap:8px}.p2p-seat-label{font-size:12px;font-weight:900;color:#dce5ef}.p2p-mini{font-size:10px;line-height:1.4;color:#8995a3}.signal-box{min-height:90px;resize:none;font:11px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all}.p2p-card[hidden]{display:none!important}.signal-qr{display:none;justify-self:center;width:min(220px,70vw);height:auto;background:#fff;border-radius:10px;padding:6px}.signal-qr.visible{display:block}
+@media(max-width:560px){.mp-p2p-choice{grid-template-columns:1fr}.modal-box{max-height:92dvh;overflow:auto}}
 
-    /* Landscape phones: height is the limiting dimension. */
-    @media (orientation:landscape) and (max-height:600px) {
-        :root { --tile-w:clamp(21px, 6.2vh, 38px); --tile-h:clamp(31px, 9.0vh, 54px); --discard-w:clamp(14px, 3.6vh, 24px); --discard-h:clamp(21px, 5.3vh, 32px); }
-        .topbar { top:calc(5px + var(--safe-top)); }
-        .dora-panel { padding:4px 6px; }
-        .dora-tile-box { width:19px; height:26px; font-size:10px; }
-        .avatar-img { width:30px; height:30px; }
-        .avatar-name,.time-bank-tag { font-size:7px; }
-        .pos-bottom { left:auto; right:7px; bottom:calc(var(--tile-h) + 6px); }
-        .pos-left,.pos-right { top:40%; }
-        .pos-top { top:calc(4px + var(--safe-top)); right:82px; }
-        .enemy-hand-top { top:43px; }
-        .river-top { top:74px; }
-        .river-bottom { bottom:calc(var(--tile-h) + 38px); }
-        .river-left { left:58px; }
-        .river-right { right:58px; }
-        .enemy-melds-top { top:36px; }
-        .enemy-melds-left { left:28px; }
-        .enemy-melds-right { right:28px; }
-        .melds-container { bottom:calc(var(--tile-h) + 8px); }
-        .hand-status { bottom:calc(var(--tile-h) + 5px); width:min(54vw,500px); padding:4px 9px; }
-        #action-overlay { bottom:calc(var(--tile-h) + 34px); padding:6px 8px; }
-        .act-btn { min-height:31px; }
-        .beginner-tip { bottom:calc(var(--tile-h) + 34px); }
-    }
+/* Dynamic table scale: one unit follows the smaller viewport axis. */
+#game-board{--u:var(--table-unit)}
+.tile{width:clamp(22px,calc(var(--u)*5.7),44px);height:clamp(32px,calc(var(--u)*9.8),63px)}
+.tile-char{font-size:clamp(13px,calc(var(--u)*3.15),24px)}
+.tile-helper{font-size:clamp(7px,calc(var(--u)*1.45),10px)}
+.discard-tile{width:clamp(15px,calc(var(--u)*3.65),27px);height:clamp(23px,calc(var(--u)*5.35),38px)}
+.discard-tile .tile-char{font-size:clamp(9px,calc(var(--u)*2.35),16px)}
+.center-board{width:clamp(112px,calc(var(--u)*30),194px);height:clamp(112px,calc(var(--u)*30),194px)}
+.turn-timer{font-size:clamp(28px,calc(var(--u)*6.0),46px)}
+.avatar-img{width:clamp(34px,calc(var(--u)*8),50px);height:clamp(34px,calc(var(--u)*8),50px)}
+.enemy-hand-top .tile-back{width:clamp(12px,calc(var(--u)*3),20px);height:clamp(17px,calc(var(--u)*4.5),29px)}
+.enemy-hand-side .tile-back{width:clamp(17px,calc(var(--u)*4.5),29px);height:clamp(12px,calc(var(--u)*3),20px)}
+.meld-group .tile{width:clamp(17px,calc(var(--u)*4),31px);height:clamp(25px,calc(var(--u)*6),45px)}
 
-    /* Tablets / iPad landscape: use balanced dimensions instead of desktop 44px tiles. */
-    @media (min-width:768px) and (max-width:1366px) and (orientation:landscape) {
-        .tile { width:clamp(26px, 5.0vmin, 43px); height:clamp(39px, 7.7vmin, 60px); }
-        .tile-char { font-size:clamp(15px, 2.8vmin, 23px); }
-        .river-left { left:clamp(92px, 13vw, 150px); }
-        .river-right { right:clamp(92px, 13vw, 150px); }
-        .center-board { width:clamp(142px, 29vmin, 190px); height:clamp(142px, 29vmin, 190px); }
-    }
+@media(max-width:600px) and (orientation:portrait){
+  #game-board{--table-unit:min(1vw,1.05vh)}
+  .topbar{top:max(6px,env(safe-area-inset-top));left:6px;right:6px}
+  .dora-panel{min-width:124px;padding:5px 6px}.dora-tile-box{width:19px;height:27px;font-size:11px}.stick-counters{font-size:8px}.kan-info{font-size:8px}
+  .top-right-btns{gap:4px}.icon-btn{width:32px;height:32px;font-size:13px}
+  .pos-bottom{left:50%;transform:translateX(-50%);bottom:calc(clamp(32px,calc(var(--u)*9.8),63px) + 8px)}
+  .pos-left{left:3px;top:44%;transform:translateY(-50%)} .pos-right{right:3px;top:44%;transform:translateY(-50%)}
+  .pos-top{top:58px;right:92px}
+  .enemy-hand-top{top:88px}.side-left{left:5px;top:30%}.side-right{right:5px;top:30%}
+  .river-top{top:122px}.river-left{left:62px}.river-right{right:62px}.river-bottom{bottom:calc(clamp(32px,calc(var(--u)*9.8),63px) + 52px)}
+  .enemy-melds-top{top:110px;left:18%}.enemy-melds-left{left:22px}.enemy-melds-right{right:22px}
+  .melds-container{right:6px;bottom:calc(clamp(32px,calc(var(--u)*9.8),63px) + 7px)}
+  #action-overlay{bottom:calc(clamp(32px,calc(var(--u)*9.8),63px) + 48px);max-width:95vw;padding:6px 7px}.act-btn{min-width:52px;min-height:34px;padding:6px 8px;font-size:11px}
+  .hand-status{width:min(92vw,460px);bottom:calc(clamp(32px,calc(var(--u)*9.8),63px) + 2px);padding:6px 9px}.hand-status .status-main{font-size:10px}.hand-status .status-sub{font-size:8px}
+  .beginner-tip{bottom:calc(clamp(32px,calc(var(--u)*9.8),63px) + 44px);font-size:7px}
+  .hand-bottom-container{padding-bottom:max(4px,env(safe-area-inset-bottom));overflow-x:auto;overflow-y:hidden}.hand-tiles{gap:2px;padding:2px 8px;min-width:max-content}
+}
+@media(max-width:420px) and (orientation:portrait){
+  #game-board{--table-unit:min(1vw,.95vh)}
+  .dora-panel{transform:scale(.9);transform-origin:top left}.top-right-btns{transform:scale(.9);transform-origin:top right}
+  .center-board{width:106px;height:106px;border-radius:18px}.round-info{font-size:10px}.turn-timer{font-size:28px}.tiles-left{font-size:10px}.score-tag{min-width:48px;font-size:8px;padding:3px 4px}
+  .pos-left,.pos-right{top:46%}.side-left{left:2px}.side-right{right:2px}.river-left{left:48px}.river-right{right:48px}
+}
+@media(max-height:560px) and (orientation:landscape){
+  #game-board{--table-unit:min(1vw,1.0vh)}
+  .topbar{top:max(5px,env(safe-area-inset-top));left:6px;right:6px}.dora-panel{min-width:118px;padding:4px 6px}.dora-tile-box{width:18px;height:25px;font-size:10px}
+  .pos-bottom{left:50%;transform:translateX(-50%);bottom:calc(clamp(32px,calc(var(--u)*9.8),54px) + 6px)}
+  .pos-top{top:5px;right:88px}.pos-left{left:3px;top:50%}.pos-right{right:3px;top:50%}
+  .enemy-hand-top{top:44px}.side-left,.side-right{top:25%}
+  .river-top{top:76px}.river-bottom{bottom:calc(clamp(32px,calc(var(--u)*9.8),54px) + 36px)}.river-left{left:50px}.river-right{right:50px}
+  .enemy-melds-top{top:46px}.enemy-melds-left{left:18px}.enemy-melds-right{right:18px}.melds-container{right:6px;bottom:calc(clamp(32px,calc(var(--u)*9.8),54px) + 4px)}
+  #action-overlay{bottom:calc(clamp(32px,calc(var(--u)*9.8),54px) + 7px);max-width:88vw}.hand-status{bottom:calc(clamp(32px,calc(var(--u)*9.8),54px) + 1px);width:min(58vw,450px)}.beginner-tip{display:none}
+  .hand-bottom-container{padding-bottom:2px}.hand-tiles{gap:2px}
+}
+@media(min-width:900px) and (min-height:600px){
+  #game-board{--table-unit:min(.95vw,.95vh)}
+}
 
-    /* Large desktop monitors: don't stretch gameplay controls endlessly. */
-    @media (min-width:1367px) {
-        #game-board { max-width:1920px; margin:0 auto; }
-        .hand-bottom-container { padding-bottom:12px; }
-    }
+@supports(height:100svh){html,body,.screen,#game-board{height:100svh}}
 </style>
 </head>
 <body>
@@ -541,21 +473,55 @@
     </main>
 
     <div id="modal-lobby" class="modal" role="dialog" aria-modal="true" aria-labelledby="lobby-title">
-        <section class="modal-box glass">
+        <section class="modal-box glass lobby-box">
             <div class="modal-head">
                 <div>
-                    <div class="modal-title" id="lobby-title">Multiplayer Lobby</div>
-                    <p class="modal-copy">Menunggu semua pemain menyatakan siap.</p>
+                    <div class="modal-kicker">ONLINE FRIEND ROOM</div>
+                    <div class="modal-title" id="lobby-title">Multiplayer</div>
+                    <p class="modal-copy" id="lobby-help">Buat room atau masuk menggunakan kode 5 digit.</p>
+                </div>
+                <div id="mp-connection-badge" class="connection-badge offline">OFFLINE</div>
+            </div>
+            <div id="mp-setup" class="mp-setup">
+                <label class="field-label" for="mp-name">Nama pemain</label>
+                <input class="field-input" id="mp-name" maxlength="20" placeholder="Nama kamu" value="Player">
+                <div class="mp-p2p-choice">
+                    <button class="btn btn-primary" onclick="mpCreateRoom()">Buat Room P2P</button>
+                    <button class="btn btn-secondary" onclick="mpShowJoinForm()">Gabung dari Undangan</button>
+                </div>
+                <div id="mp-host-invite" class="p2p-card" hidden>
+                    <div class="p2p-card-title">Undangan pemain berikutnya</div>
+                    <div class="p2p-row"><span class="p2p-seat-label" id="mp-invite-seat">East</span><button class="btn btn-secondary btn-compact" onclick="mpGenerateInvite()">Buat Kode Undangan</button></div>
+                    <textarea class="field-input signal-box" id="mp-offer-code" placeholder="Offer akan muncul di sini..." readonly></textarea><canvas id="mp-offer-qr" class="signal-qr" width=220 height=220 aria-label="QR Offer"></canvas>
+                    <div class="p2p-row"><button class="btn btn-secondary btn-compact" onclick="mpCopySignal('mp-offer-code')">Salin Offer</button><span class="p2p-mini" id="mp-invite-help">Kirim offer ke teman di perangkat lain.</span></div>
+                    <label class="field-label" for="mp-answer-code">Tempel Answer dari teman</label>
+                    <textarea class="field-input signal-box" id="mp-answer-code" placeholder="Tempel answer di sini..."></textarea>
+                    <button class="btn btn-primary btn-wide" onclick="mpApplyAnswer()">Hubungkan Pemain</button>
+                </div>
+                <div id="mp-guest-invite" class="p2p-card" hidden>
+                    <div class="p2p-card-title">Gabung Room P2P</div>
+                    <label class="field-label" for="mp-offer-input">Tempel Offer dari host</label>
+                    <textarea class="field-input signal-box" id="mp-offer-input" placeholder="Tempel kode offer host..."></textarea>
+                    <button class="btn btn-primary btn-wide" onclick="mpAcceptOffer()">Buat Answer</button>
+                    <label class="field-label" for="mp-answer-output">Answer untuk dikirim kembali ke host</label>
+                    <textarea class="field-input signal-box" id="mp-answer-output" placeholder="Answer muncul setelah offer diproses..." readonly></textarea>
+                    <button class="btn btn-secondary btn-wide" onclick="mpCopySignal('mp-answer-output')">Salin Answer</button>
+                    <div class="mp-hint">Tidak perlu server atau PC host khusus. Satu perangkat pemain menjadi host sementara dan tetap ikut bermain.</div>
+                </div>
+                <div class="mp-hint">Mode ini memakai WebRTC langsung. Semua perangkat harus membuka game melalui HTTPS (misalnya GitHub Pages) dan berada di jaringan Wi‑Fi yang sama untuk pengalaman LAN terbaik.</div>
+            </div>
+            <div id="mp-room-panel" class="mp-room-panel" hidden>
+                <div class="room-share-card">
+                    <div><span class="hud-label">ROOM CODE</span><strong id="mp-room-code-display">-----</strong></div>
+                    <button class="btn btn-secondary btn-compact" onclick="mpCopyRoomInfo()">Salin Info</button>
+                </div>
+                <div id="mp-player-list" class="ready-player-list"></div>
+                <div class="lobby-actions">
+                    <button class="btn btn-primary btn-wide" id="btn-lobby-ready" onclick="togglePlayerReady()">SIAP</button>
+                    <button class="btn btn-primary btn-wide" id="btn-lobby-start" onclick="mpStartGame()" hidden>MULAI GAME</button>
+                    <button class="btn btn-secondary btn-wide" onclick="closeLobby()">Keluar</button>
                 </div>
             </div>
-            <div class="ready-player-list">
-                <div class="ready-item"><span>You <small>(South)</small></span><span class="status-ready" id="st-0">READY</span></div>
-                <div class="ready-item"><span>Player 2 <small>(East)</small></span><span id="st-1" class="status-waiting">WAITING</span></div>
-                <div class="ready-item"><span>Player 3 <small>(North)</small></span><span id="st-2" class="status-waiting">WAITING</span></div>
-                <div class="ready-item"><span>Player 4 <small>(West)</small></span><span id="st-3" class="status-waiting">WAITING</span></div>
-            </div>
-            <button class="btn btn-primary btn-wide" id="btn-lobby-ready" onclick="togglePlayerReady()">CLICK READY</button>
-            <button class="btn btn-secondary btn-wide" onclick="closeLobby()">Leave</button>
         </section>
     </div>
 
@@ -745,46 +711,125 @@
     }
     function updateVolume(val) { const audio = byId('bg-music'); if (audio) audio.volume = Number(val); }
 
-    // MULTIPLAYER LOBBY SIMULATION
-    let lobbyReadyTimer = null;
-    function openPlayerLobby() {
-        isMultiplayerMode = true;
-        document.getElementById('modal-lobby').style.display = 'flex';
-        document.getElementById('st-0').className = 'status-waiting';
-        setText('st-0', 'WAITING');
-        for(let i=1; i<=3; i++) {
-            document.getElementById(`st-${i}`).className = 'status-waiting';
-            setText(`st-${i}`, 'WAITING');
+    // REAL MULTIPLAYER (LAN / FRIEND ROOM)
+    let mp = { ws:null, connected:false, room:null, seat:null, host:false, ready:false, started:false, state:null, playerName:'Player' };
+    let mpClientId = null;
+    let mpPendingRiichiSeat = -1;
+
+    function mpServerUrl(){
+        const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        return `${proto}//${location.host}`;
+    }
+    function mpSetConnection(online){
+        setText('mp-connection-badge', online ? 'ONLINE' : 'OFFLINE');
+        const b = byId('mp-connection-badge'); if(b) b.className = `connection-badge ${online?'online':'offline'}`;
+    }
+    function mpConnect(){
+        if(mp.ws && (mp.ws.readyState===WebSocket.OPEN || mp.ws.readyState===WebSocket.CONNECTING)) return;
+        if(location.protocol==='file:'){ mpSetConnection(false); return; }
+        try{
+            mp.ws=new WebSocket(mpServerUrl());
+            mp.ws.onopen=()=>{mp.connected=true;mpSetConnection(true);};
+            mp.ws.onclose=()=>{mp.connected=false;mpSetConnection(false);};
+            mp.ws.onerror=()=>{mp.connected=false;mpSetConnection(false);};
+            mp.ws.onmessage=e=>mpHandle(JSON.parse(e.data));
+        }catch(e){mp.connected=false;mpSetConnection(false);}
+    }
+    function mpSend(type,data={}){if(mp.ws&&mp.ws.readyState===WebSocket.OPEN)mp.ws.send(JSON.stringify({type,...data}));}
+    function openPlayerLobby(){isMultiplayerMode=true;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');mpConnect();}
+    function closeLobby(){mpSend('leave');setDisplay('modal-lobby','none');mp.room=null;mp.seat=null;mp.host=false;mp.ready=false;}
+    function mpCreateRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mpConnect();setTimeout(()=>mpSend('createRoom',{name:mp.playerName}),120);}
+    function mpJoinRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code))return alert('Masukkan kode room 5 digit.');mpConnect();setTimeout(()=>mpSend('joinRoom',{code,name:mp.playerName}),120);}
+    function togglePlayerReady(){mp.ready=!mp.ready;mpSend('ready',{ready:mp.ready});}
+    function mpStartGame(){if(!mp.host)return;mpSend('start');}
+    function mpCopyRoomInfo(){const code=mp.room?.code||'';const text=`Mahjong Soul Multiplayer\nBuka alamat yang diberikan host\nKode Room: ${code}`;navigator.clipboard?.writeText(text).catch(()=>{});alert(text);}
+    function mpHandle(msg){
+        if(msg.type==='hello'){mpClientId=msg.clientId;return;}
+        if(msg.type==='error'){alert(msg.message||'Multiplayer error');return;}
+        if(msg.type==='joined'){mp.room=msg.room;mp.seat=msg.seat;mp.host=!!msg.host;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('mp-room-code-display',msg.room.code);mpRenderLobby(msg.room);return;}
+        if(msg.type==='lobby'){mp.room=msg.room;mpRenderLobby(msg.room);return;}
+        if(msg.type==='startGame'){mp.started=true;if(mp.host)start4PGame('Hard',true);else nav('screen-game');return;}
+        if(msg.type==='state'&&msg.state){mpApplyRemoteState(msg.state);return;}
+        if(msg.type==='playerAction'&&mp.host){mpHandlePlayerAction(msg.seat,msg.action||{});return;}
+    }
+    function mpRenderLobby(room){const list=byId('mp-player-list');if(!list)return;const winds=['South','East','North','West'];list.innerHTML='';winds.forEach((w,i)=>{const p=room.players[i];const row=document.createElement('div');row.className='ready-item';row.innerHTML=`<span>${p?p.name:'CPU'} <small>• ${w}</small></span><span class="${p&&p.ready?'status-ready':'status-waiting'}">${p?(p.ready?'READY':'WAITING'):'OPEN'}</span>`;list.appendChild(row);});setText('btn-lobby-ready',mp.ready?'BATAL SIAP':'SIAP');const s=byId('btn-lobby-start');if(s)s.hidden=!mp.host||room.started;}
+    function mpRoomHumanSeats(){return(mp.room?.players||[]).reduce((a,p,i)=>(p?a.concat(i):a),[]);}
+    function mpStateSnapshot(extra={}){return{currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,deadWall,playerHands,playerRivers,playerMelds,playerScores,aiRiichi,lastDiscardedTile,lastDiscarderIdx,isRiichi,pendingRiichi,riichiSticks,drawnTile,baseTime,extraTimeBank,isActionPhase,doraIndicators,uraDoraIndicators,kanCount,temporaryFuriten,riichiFuriten,roundActive,roundEnding,roomPlayers:mp.room?.players||[],roundStartScores,furitenStates:temporaryFuriten.map((v,i)=>v?'Temporary':(riichiFuriten[i]?'Permanent':null)),...extra};}
+    function mpBroadcastState(extra={}){if(isMultiplayerMode&&mp.host)mpSend('state',{state:mpStateSnapshot(extra)});}
+    function mpApplyRemoteState(state){
+        if(mp.host)return;mp.state=state;isMultiplayerMode=true;nav('screen-game');
+        const s=mp.seat||0,map=[s,(s+1)%4,(s+2)%4,(s+3)%4],hands=state.playerHands||[[],[],[],[]],rivers=state.playerRivers||[[],[],[],[]];
+        playerScores=state.playerScores||playerScores;setText('round-title-display',['East 1','East 2','East 3','East 4','East 5 (Extra)'][state.currentRoundIndex]||'East 1');setText('wall-count',`x ${state.fullDeck?.length??0}`);setText('kan-counter',`KAN × ${state.kanCount||0}`);setText('riichi-stick-counter',`1000 × ${state.riichiSticks||0}`);
+        const drow=byId('dora-indicators-row');if(drow)(drow.querySelectorAll('.dora-tile-box')||[]).forEach((el,i)=>el.textContent=state.doraIndicators?.[i]?.val||'');
+        map.forEach((canon,display)=>setText(['score-0','score-1','score-2','score-3'][display],playerScores[canon]??0));
+        setText('name-left',`${state.roomPlayers?.[map[3]]?.name||'CPU'} • West`);setText('name-top',`${state.roomPlayers?.[map[2]]?.name||'CPU'} • North`);setText('name-right',`${state.roomPlayers?.[map[1]]?.name||'CPU'} • East`);
+        mpRenderHandAndTable(s,map,hands,rivers,state);
+        if(state.phase==='result' && state.result){
+            setText('res-title',state.result.title||'Ronde Selesai');
+            setText('res-desc',state.result.desc||'');
+            setText('res-round-label',`HASIL • ${['East 1','East 2','East 3','East 4','East 5 (Extra)'][state.currentRoundIndex]||'Ronde'}`);
+            const scoreBox=byId('res-scores'); if(scoreBox){ const names=state.roomPlayers||[]; scoreBox.innerHTML=state.playerScores.map((sc,canon)=>{const d=(sc-(state.roundStartScores?.[canon]??sc));const nm=names[canon]?.name||`CPU ${canon+1}`;return `<div class=\"score-row\"><div class=\"score-name\"><strong>${nm}${canon===s?' (Anda)':''}</strong><div class=\"score-seat\">${['South','East','North','West'][canon]}</div></div><div class=\"score-delta ${d>=0?'delta-up':'delta-down'}\">${d>0?'+':''}${d.toLocaleString('id-ID')}</div><div class=\"score-total\">${sc.toLocaleString('id-ID')}</div><div class=\"score-place\">#${[...state.playerScores].sort((a,b)=>b-a).indexOf(sc)+1}</div></div>`;}).join(''); }
+            setDisplay('modal-result','flex');
         }
     }
-
-    function closeLobby() {
-        clearInterval(lobbyReadyTimer);
-        document.getElementById('modal-lobby').style.display = 'none';
+    function updateFuritenIndicator(status){const panel=byId('furiten-panel'),el=byId('furiten-status');if(!panel||!el)return;const t=status?.type;if(t!=='Temporary'&&t!=='Permanent'){panel.style.display='none';el.textContent='';return;}panel.style.display='block';el.className='furiten-status '+(t==='Permanent'?'perma':'temp');el.textContent=t==='Permanent'?'Permanent Furiten — Ron dilarang':'Temporary Furiten — tunggu discard berikutnya';}
+    function mpRenderHandAndTable(s,map,hands,rivers,state){
+        const b=byId('player-hand-tiles');if(b){b.innerHTML='';(hands[s]||[]).forEach((t,i)=>{const el=document.createElement('div');el.className='tile';el.innerHTML=`<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span>`;el.onclick=()=>mpTapTile(i,t);el.addEventListener('pointerdown',e=>el._sy=e.clientY);el.addEventListener('pointerup',e=>{if(el._sy-e.clientY>35)mpSendDiscard(t);});b.appendChild(el);});}
+        [['enemy-hand-top',map[2]],['enemy-hand-right',map[1]],['enemy-hand-left',map[3]]].forEach(([id,canon])=>{const el=byId(id);if(!el)return;el.innerHTML='';for(let i=0;i<(hands[canon]||[]).length;i++){const x=document.createElement('div');x.className='tile-back';el.appendChild(x);}});
+        [['river-bottom',map[0]],['river-right',map[1]],['river-top',map[2]],['river-left',map[3]]].forEach(([id,canon])=>{const el=byId(id);if(!el)return;el.innerHTML='';(rivers[canon]||[]).forEach(t=>{const d=document.createElement('div');d.className='discard-tile';d.innerHTML=`<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span>`;el.appendChild(d);});});
+        if(state.remoteActions?.seat===s)mpRenderActions(state.remoteActions.actions||[]);else setDisplay('action-overlay','none');
+        if(state.handStatus?.seat===s){setText('hand-status-main',state.handStatus.main||'STATUS');setText('hand-status-sub',state.handStatus.sub||'');}
+        const fstatus=state.furitenStates?.[s]; if(fstatus) updateFuritenIndicator({type:fstatus}); else {const f=byId('furiten-panel');if(f)f.style.display='none';}
+    }
+    let mpTap={id:null,at:0};
+    function mpTapTile(i,t){const tiles=[...document.querySelectorAll('#player-hand-tiles .tile')];tiles.forEach(x=>x.classList.remove('selected-tile'));tiles[i]?.classList.add('selected-tile');if(mpTap.id===t.uniqueId&&Date.now()-mpTap.at<900){mpSendDiscard(t);mpTap={id:null,at:0};}else mpTap={id:t.uniqueId,at:Date.now()};}
+    function mpSendDiscard(t){mpSend('action',{action:{type:'discard',uniqueId:t.uniqueId}});}
+    function mpRenderActions(actions){const o=byId('action-overlay');if(!o)return;o.innerHTML='';if(!actions.length){o.style.display='none';return;}actions.forEach(a=>{const b=document.createElement('button');b.className=`act-btn btn-${String(a).toLowerCase()}`;b.textContent=a==='Skip'?'Lewatkan':a;b.onclick=()=>{mpSend('action',{action:{type:'call',action:a}});o.style.display='none';};o.appendChild(b);});o.style.display='flex';}
+    function getWaitIdsForSeat(seat){const h=playerHands[seat]||[],m=playerMelds[seat]?.length||0;if(h.length!==13)return [];const out=[];for(let id=0;id<34;id++){if(checkWinningHand([...h,TILE_TYPES[id]],m))out.push(id);}return out;}
+    function checkSeatFuriten(seat,id){const d=playerRivers[seat]||[];if(d.some(t=>t.id===id))return true;if(temporaryFuriten[seat]||riichiFuriten[seat])return true;const w=getWaitIdsForSeat(seat);return w.includes(id)&&d.some(t=>w.includes(t.id));}
+    function mpHandlePlayerAction(seat,action){if(!mp.host||!roomCanAct(seat)||!roundActive)return;if(action.type==='discard'){const idx=playerHands[seat].findIndex(t=>t.uniqueId===action.uniqueId);if(idx>=0)mpRemoteDiscard(seat,idx);return;}if(action.type==='call')mpRemoteCall(seat,action.action);}
+    function roomCanAct(seat){return!!mp.room?.players?.[seat];}
+    function mpRemoteDiscard(seat,idx){if(currentTurn!==seat||!roundActive)return;clearInterval(timerInterval);isDiscardable=false;const tile=playerHands[seat].splice(idx,1)[0];drawnTile=null;if(mpPendingRiichiSeat===seat){aiRiichi[seat]=true;mpPendingRiichiSeat=-1;}
+        commitDiscard(seat,tile);mpBroadcastState();}
+    function mpRemoteCall(seat,act){
+        if(['Ron','Pon','Kan','Chi','Skip'].includes(act) && mpPendingCallQueue[0]?.seat!==seat)return;
+        if(act==='Tsumo'){
+            const e=evaluateYakuAndScore(seat,null,true);
+            if(checkWinningHand(playerHands[seat])&&e.valid){playerScores[seat]+=e.points;endRound(`TSUMO by ${mp.room.players?.[seat]?.name||'Player'}`,`${e.yakuStr} (+${e.points} Pts)`);}return;
+        }
+        if(act==='Riichi'){
+            if(currentTurn!==seat||aiRiichi[seat])return;
+            aiRiichi[seat]=true;playerScores[seat]-=1000;riichiSticks++;mpPendingRiichiSeat=seat;startRemoteTurnTimer(seat);mpBroadcastState({remoteActions:{seat,actions:[]},handStatus:{seat,main:'RIICHI',sub:'Buang tile untuk mengunci tangan.'}});return;
+        }
+        if(act==='Ron'&&lastDiscardedTile){
+            const e=evaluateYakuAndScore(seat,lastDiscardedTile,false);
+            if(e.valid&&checkWinningHand([...playerHands[seat],lastDiscardedTile],playerMelds[seat].length)&&!checkSeatFuriten(seat,lastDiscardedTile.id)){
+                playerScores[seat]+=e.points;playerScores[lastDiscarderIdx]-=e.points;endRound(`RON by ${mp.room.players?.[seat]?.name||'Player'}`,`${e.yakuStr} (+${e.points} Pts)`);
+            }return;
+        }
+        if(act==='Pon'){mpPendingCallQueue=[];executePon(seat);return;}
+        if(act==='Kan'){mpPendingCallQueue=[];executeKan(seat);return;}
+        if(act==='Chi'){mpPendingCallQueue=[];executeChi(seat);return;}
+        if(act==='Skip' && mpPendingCallQueue[0]?.seat===seat){
+            const canRon=checkWinningHand([...playerHands[seat],lastDiscardedTile],playerMelds[seat].length)&&evaluateYakuAndScore(seat,lastDiscardedTile,false).valid;
+            if(canRon){temporaryFuriten[seat]=true;if(aiRiichi[seat])riichiFuriten[seat]=true;}
+            mpPendingCallQueue.shift();mpPromptNextNetworkCall();return;
+        }
+        if(act==='nextRound'){if(byId('modal-result'))byId('modal-result').style.display='none';_networkNextRoundFromRemote();}
     }
 
-    function togglePlayerReady() {
-        const st0 = document.getElementById('st-0');
-        st0.className = 'status-ready';
-        st0.textContent = 'READY';
-
-        // Simulate other players getting ready
-        let step = 1;
-        lobbyReadyTimer = setInterval(() => {
-            if (step <= 3) {
-                let st = document.getElementById(`st-${step}`);
-                st.className = 'status-ready';
-                st.textContent = 'READY';
-                step++;
-            } else {
-                clearInterval(lobbyReadyTimer);
-                setTimeout(() => {
-                    closeLobby();
-                    start4PGame('Hard', true);
-                }, 500);
-            }
-        }, 600);
+    let mpPendingCallQueue=[];
+    function mpPromptNextNetworkCall(){
+        if(!mpPendingCallQueue.length){nextTurn();mpBroadcastState();return;}
+        const q=mpPendingCallQueue[0],hand=playerHands[q.seat]||[],actions=[];
+        if(checkWinningHand([...hand,lastDiscardedTile],playerMelds[q.seat].length)&&evaluateYakuAndScore(q.seat,lastDiscardedTile,false).valid&&!checkSeatFuriten(q.seat,lastDiscardedTile.id))actions.push('Ron');
+        const same=hand.filter(t=>t.id===lastDiscardedTile.id).length;if(same>=2)actions.push('Pon');if(same>=3)actions.push('Kan');
+        if(q.seat===(lastDiscarderIdx+1)%4&&getChiCombinations(hand,lastDiscardedTile).length)actions.push('Chi');
+        actions.push('Skip');
+        if(q.seat===0)showAvailableActions(actions);else mpBroadcastState({remoteActions:{seat:q.seat,actions}});
     }
+
+    function startRemoteTurnTimer(seat){clearInterval(timerInterval);baseTime=10;extraTimeBank=20;timerInterval=setInterval(()=>{if(baseTime>0)baseTime--;else if(extraTimeBank>0)extraTimeBank--;else{clearInterval(timerInterval);const idx=playerHands[seat].length-1;if(idx>=0)mpRemoteDiscard(seat,idx);}mpBroadcastState({remoteTimer:{seat,baseTime,extraTimeBank}});},1000);}
 
 /* RIICHI ENGINE REPLACEMENT */
     // =========================
@@ -2237,13 +2282,157 @@
         document.getElementById('hand-status')?.classList.remove('action-open');
         nav('screen-main'); 
     }
-</script>
-<script>
+
+
+
+    const _networkCommitBase = commitDiscard;
+    function networkCommitDiscard(pIdx,tile){
+        if(!isMultiplayerMode||!mp.host)return _networkCommitBase(pIdx,tile);
+        if(!roundActive||roundEnding||!tile)return;
+        playerRivers[pIdx].push(tile);lastDiscardedTile=tile;lastDiscarderIdx=pIdx;
+        const riverIds=['river-bottom','river-right','river-top','river-left'],riverEl=byId(riverIds[pIdx]);
+        const d=document.createElement('div');d.className='discard-tile';d.dataset.tileId=String(tile.id);d.innerHTML=`<span class="tile-char">${tile.val}</span><span class="tile-helper">${tile.helper}</span>`;if(riverEl)riverEl.appendChild(d);
+        if(pIdx===0&&pendingRiichi){isRiichi=true;pendingRiichi=false;riichiDiscardIndices=[];playerScores[0]-=1000;riichiSticks++;d.classList.add('riichi-tile');setDisplay('riichi-effect','block');}
+        if(pIdx!==0&&aiRiichi[pIdx]&&playerRivers[pIdx].length===1)d.classList.add('riichi-tile');
+        if(temporaryFuriten[pIdx])temporaryFuriten[pIdx]=false;
+        const human=mpRoomHumanSeats().filter(x=>x!==pIdx);
+        const ron=human.filter(x=>checkWinningHand([...playerHands[x],tile],playerMelds[x].length)&&evaluateYakuAndScore(x,tile,false).valid&&!checkSeatFuriten(x,tile.id));
+        if(ron.length){mpPendingCallQueue=ron.map(x=>({seat:x}));mpPromptNextNetworkCall();mpBroadcastState();return;}
+        const pon=human.filter(x=>!aiRiichi[x]&&playerHands[x].filter(t=>t.id===tile.id).length>=2);
+        if(pon.length){mpPendingCallQueue=pon.map(x=>({seat:x}));mpPromptNextNetworkCall();mpBroadcastState();return;}
+        const next=(pIdx+1)%4;if(human.includes(next)&&getChiCombinations(playerHands[next],tile).length){mpPendingCallQueue=[{seat:next}];mpPromptNextNetworkCall();mpBroadcastState();return;}
+        // AI responses only for empty human seats.
+        for(let p=1;p<4;p++)if(p!==pIdx&&!roomCanAct(p)&&checkWinningHand([...playerHands[p],tile],playerMelds[p].length)){const e=evaluateYakuAndScore(p,tile,false);if(e.valid){playerScores[p]+=e.points;playerScores[pIdx]-=e.points;endRound(`RON by CPU ${p}`,`${e.yakuStr} (+${e.points} Pts)`);return;}}
+        for(let p=1;p<4;p++)if(p!==pIdx&&!roomCanAct(p)&&!aiRiichi[p]&&playerHands[p].filter(t=>t.id===tile.id).length>=3&&kanCount<4){executeKan(p);return;}
+        nextTurn();mpBroadcastState();
+    }
+    commitDiscard=networkCommitDiscard;
+
+    // Multiplayer lifecycle hooks.
+    const _baseStart4PGame = start4PGame;
+    start4PGame = function(diff,isMulti){ _baseStart4PGame(diff,isMulti); if(isMulti&&mp.host) setTimeout(()=>mpBroadcastState(),60); };
+    const _baseSetupRound = setupRound;
+    setupRound = function(){ _baseSetupRound(); if(isMultiplayerMode&&mp.host) setTimeout(()=>mpBroadcastState(),60); };
+    const _baseEndRound = endRound;
+    endRound = function(title,desc){ _baseEndRound(title,desc); if(isMultiplayerMode&&mp.host) mpBroadcastState({phase:'result',result:{title,desc}}); };
+    const _baseNextRound = nextRoundOrFinish;
+    nextRoundOrFinish = function(){ _baseNextRound(); if(isMultiplayerMode&&mp.host) setTimeout(()=>mpBroadcastState(),60); };
+    const _baseExecutePon = executePon;
+    executePon = function(i){ _baseExecutePon(i); if(isMultiplayerMode&&mp.host) mpBroadcastState(); };
+    const _baseExecuteKan = executeKan;
+    executeKan = function(i){ _baseExecuteKan(i); if(isMultiplayerMode&&mp.host) mpBroadcastState(); };
+    const _baseExecuteChi = executeChi;
+    executeChi = function(i){ _baseExecuteChi(i); if(isMultiplayerMode&&mp.host) mpBroadcastState(); };
+    const _baseProcessTurn = processTurn;
+    processTurn = function(options={}){
+        if(isMultiplayerMode&&mp.host&&currentTurn!==0&&roomCanAct(currentTurn)){
+            clearInterval(timerInterval);if(!roundActive||roundEnding)return;if(fullDeck.length===0){endRound('DRAW','Wall habis.');return;}
+            drawnTile=fullDeck.pop();playerHands[currentTurn].push(drawnTile);let actions=[];
+            if(checkWinningHand(playerHands[currentTurn])){const e=evaluateYakuAndScore(currentTurn,null,true);if(e.han>0)actions.push('Tsumo');}
+            if(!aiRiichi[currentTurn]&&playerMelds[currentTurn].length===0&&isTenpai(playerHands[currentTurn].slice(0,-1)))actions.push('Riichi');
+            startRemoteTurnTimer(currentTurn);mpBroadcastState({remoteActions:{seat:currentTurn,actions},handStatus:{seat:currentTurn,main:actions.includes('Tsumo')?'BISA MENANG':actions.includes('Riichi')?'TENPAI':'PILIH BUANGAN',sub:'Tap 1× untuk memilih. Tap 2× atau swipe ke atas untuk membuang.'}});return;
+        }
+        _baseProcessTurn(options);
+    };
+    const _baseMpHandle = mpHandle;
+    mpHandle = function(msg){ if(msg.type==='playerAction'&&mp.host){mpHandlePlayerAction(msg.seat,msg.action||{});return;} _baseMpHandle(msg); };
+    function _networkNextRoundFromRemote(){ _baseNextRound(); if(isMultiplayerMode&&mp.host)setTimeout(()=>mpBroadcastState(),60); }
+    nextRoundOrFinish=function(){ if(isMultiplayerMode&&!mp.host){mpSend('action',{action:{type:'nextRound'}});setDisplay('modal-result','none');return;} _networkNextRoundFromRemote(); };
+    const _baseTriggerActionNetwork=triggerAction;
+    triggerAction=function(act){if(isMultiplayerMode&&mp.host&&mpPendingCallQueue.length&&mpPendingCallQueue[0].seat===0){clearInterval(timerInterval);setDisplay('action-overlay','none');mpRemoteCall(0,act);return;} _baseTriggerActionNetwork(act);};
+    window.addEventListener('beforeunload',()=>{try{mpSend('leave');}catch(e){}});
+
+/* ===== SERVERLESS WEBRTC LOCAL P2P v11 ===== */
 (function(){
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function(){ navigator.serviceWorker.register('./sw.js').catch(function(err){ console.warn('SW registration failed:', err); }); });
+  const RTC_CFG={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}]};
+  const seats=['South','East','North','West'];
+  const P2P={role:null, peers:new Map(), hostPeer:null, pendingSeat:null, seq:0};
+  const origMpHandle=window.mpHandle;
+  function safeParse(v){try{return JSON.parse(v)}catch(e){return null}}
+  function encode(obj){const bytes=new TextEncoder().encode(JSON.stringify(obj));let s='';for(const b of bytes)s+=String.fromCharCode(b);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+  function decode(txt){try{let s=txt.trim().replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';const bin=atob(s);const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));return JSON.parse(new TextDecoder().decode(bytes))}catch(e){throw new Error('Kode undangan tidak valid.')}}
+  async function waitIce(pc){if(pc.iceGatheringState==='complete')return;await new Promise(resolve=>{const done=()=>{if(pc.iceGatheringState==='complete'){pc.removeEventListener('icegatheringstatechange',done);resolve()}};pc.addEventListener('icegatheringstatechange',done);setTimeout(resolve,7000)});}
+  function setBadge(online){if(typeof mpSetConnection==='function')mpSetConnection(online); else {setText('mp-connection-badge',online?'P2P':'OFFLINE');}}
+  function localPlayers(){return window.mp?.room?.players||[null,null,null,null]}
+  function broadcast(msg,exceptSeat=null){P2P.peers.forEach((p,seat)=>{if(seat===exceptSeat)return;if(p.dc?.readyState==='open')p.dc.send(JSON.stringify(msg))})}
+  function sendToHost(msg){if(P2P.hostPeer?.dc?.readyState==='open')P2P.hostPeer.dc.send(JSON.stringify(msg))}
+  function transportSend(type,data={}){const msg={type,...data};if(window.mp?.host)broadcast(msg);else sendToHost(msg)}
+
+  function attachHostPeer(seat,pc){
+    pc.onconnectionstatechange=()=>{if(['failed','closed','disconnected'].includes(pc.connectionState)){P2P.peers.delete(seat);const room=localPlayers();if(room[seat])room[seat]=null; if(window.mp?.room){window.mp.room.players=room;mpRenderLobby(window.mp.room);broadcast({type:'lobby',room:window.mp.room});}}};
+    pc.ondatachannel=e=>attachHostChannel(seat,e.channel);
   }
+  function attachHostChannel(seat,dc){
+    const peer=P2P.peers.get(seat);if(peer)peer.dc=dc;dc.onopen=()=>{
+      setBadge(true);
+      if(window.mp?.room){window.mp.room.players[seat]={id:'p2p-'+seat,name:`Player ${seat+1}`,ready:false};
+        window.mp.room.players[0]=window.mp.room.players[0]||{id:'host',name:window.mp.playerName||'Host',ready:false};
+        mpRenderLobby(window.mp.room);broadcast({type:'joined',room:window.mp.room,seat:seat,host:false},seat);broadcast({type:'lobby',room:window.mp.room});
+      }
+    };
+    dc.onclose=()=>{if(window.mp?.room?.players?.[seat]){window.mp.room.players[seat]=null;mpRenderLobby(window.mp.room);broadcast({type:'lobby',room:window.mp.room});}};
+    dc.onerror=()=>setBadge(false);
+    dc.onmessage=e=>{const msg=safeParse(e.data);if(!msg)return; if(msg.type==='hello'){const peer=P2P.peers.get(seat);if(peer)peer.remoteName=msg.name||`Player ${seat+1}`; if(window.mp?.room?.players?.[seat])window.mp.room.players[seat].name=peer.remoteName;mpRenderLobby(window.mp.room);broadcast({type:'lobby',room:window.mp.room});return;} if(msg.type==='ready'){if(window.mp?.room?.players?.[seat]){window.mp.room.players[seat].ready=!!msg.ready;mpRenderLobby(window.mp.room);broadcast({type:'lobby',room:window.mp.room});}return;} if(msg.type==='playerAction'){ if(typeof origMpHandle==='function')origMpHandle(msg); return;} if(msg.type==='action'){ if(typeof origMpHandle==='function')origMpHandle({...msg,type:'playerAction',seat,action:msg.action||{}}); return;} if(typeof origMpHandle==='function')origMpHandle(msg);};
+  }
+
+  async function hostCreateInvite(){
+    if(!window.mp?.host)return;
+    const seat=[1,2,3].find(s=>!P2P.peers.has(s)&&!window.mp.room?.players?.[s]);if(seat==null){alert('Semua kursi pemain sudah terisi.');return;}
+    P2P.pendingSeat=seat;setText('mp-invite-seat',seats[seat]);
+    const pc=new RTCPeerConnection(RTC_CFG);const dc=pc.createDataChannel('mahjong');
+    P2P.peers.set(seat,{pc,dc});attachHostPeer(seat,pc);attachHostChannel(seat,dc);
+    const offer=await pc.createOffer();await pc.setLocalDescription(offer);await waitIce(pc);
+    byId('mp-offer-code').value=encode(pc.localDescription);byId('mp-answer-code').value='';setDisplay('mp-host-invite','grid');mpRenderOfferQr(byId('mp-offer-code').value);
+  }
+  async function hostApplyAnswer(){
+    const seat=P2P.pendingSeat;if(seat==null){alert('Buat Offer dulu.');return;}const code=byId('mp-answer-code').value.trim();if(!code)return alert('Tempel Answer dari teman.');
+    try{const ans=decode(code);const peer=P2P.peers.get(seat);if(!peer)throw new Error('Peer tidak ditemukan');await peer.pc.setRemoteDescription(ans);window.mp.room.players[seat]={id:'p2p-'+seat,name:`Player ${seat+1}`,ready:false};mpRenderLobby(window.mp.room);broadcast({type:'lobby',room:window.mp.room});}catch(e){alert(e.message||'Answer tidak valid.');}
+  }
+  async function guestAcceptOffer(){
+    const offerCode=byId('mp-offer-input').value.trim();if(!offerCode)return alert('Tempel Offer dari host.');
+    try{const offer=decode(offerCode);const pc=new RTCPeerConnection(RTC_CFG);P2P.hostPeer={pc,dc:null};pc.ondatachannel=e=>{P2P.hostPeer.dc=e.channel;attachGuestChannel(e.channel)};pc.onconnectionstatechange=()=>setBadge(pc.connectionState==='connected');await pc.setRemoteDescription(offer);const answer=await pc.createAnswer();await pc.setLocalDescription(answer);await waitIce(pc);byId('mp-answer-output').value=encode(pc.localDescription);setDisplay('mp-guest-invite','grid');}catch(e){alert(e.message||'Offer tidak valid.');}
+  }
+  function attachGuestChannel(dc){
+    setBadge(true);dc.onopen=()=>{setBadge(true);sendToHost({type:'hello',name:window.mp.playerName||'Player'});};
+    dc.onclose=()=>setBadge(false);dc.onerror=()=>setBadge(false);
+    dc.onmessage=e=>{const msg=safeParse(e.data);if(!msg)return;if(typeof window.mpHandle==='function')window.mpHandle(msg);};
+  }
+  function guestReady(ready){sendToHost({type:'ready',ready:!!ready});}
+
+  function mpRenderOfferQr(text){
+    const canvas=byId('mp-offer-qr');if(!canvas)return;
+    canvas.classList.remove('visible');
+    const draw=()=>{if(window.QRCode&&typeof window.QRCode.toCanvas==='function'){window.QRCode.toCanvas(canvas,text,{width:220,margin:1,color:{dark:'#111827',light:'#ffffff'}},err=>{if(!err)canvas.classList.add('visible')});}};
+    if(window.QRCode)draw();else setTimeout(draw,900);
+  }
+
+  // Replace the old WebSocket-oriented transport API with WebRTC while preserving the game engine hooks.
+  window.mpConnect=function(){};
+  window.mpSend=function(type,data={}){transportSend(type,data)};
+  window.openPlayerLobby=function(){isMultiplayerMode=true;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setBadge(false);};
+  window.mpShowJoinForm=function(){setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','grid');};
+  window.mpCreateRoom=function(){
+    window.mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';window.mp.host=true;window.mp.connected=true;window.mp.room={code:String(Math.floor(10000+Math.random()*90000)),players:[null,null,null,null],started:false};window.mp.seat=0;window.mp.ready=false;window.mp.room.players[0]={id:'host',name:window.mp.playerName,ready:false};setText('mp-room-code-display',window.mp.room.code);setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');mpRenderLobby(window.mp.room);setBadge(true);setText('mp-invite-help','Kirim Offer ke satu teman, lalu tempel Answer-nya di sini.');
+  };
+  window.mpGenerateInvite=hostCreateInvite;
+  window.mpApplyAnswer=hostApplyAnswer;
+  window.mpAcceptOffer=guestAcceptOffer;
+  window.mpCopySignal=function(id){const el=byId(id);if(!el)return;const text=el.value||'';if(!text)return; navigator.clipboard?.writeText(text).then(()=>{const old=el.dataset.copied||'';el.dataset.copied='1';setTimeout(()=>el.dataset.copied=old,800)}).catch(()=>{el.select();document.execCommand('copy')});};
+  window.mpCopyRoomInfo=function(){const code=window.mp.room?.code||'';const txt=`Mahjong Soul P2P\nRoom: ${code}\nGunakan Offer/Answer untuk menghubungkan pemain.`;navigator.clipboard?.writeText(txt).catch(()=>{});alert(txt);};
+  window.togglePlayerReady=function(){window.mp.ready=!window.mp.ready;if(window.mp.host){if(window.mp.room?.players?.[0])window.mp.room.players[0].ready=window.mp.ready;mpRenderLobby(window.mp.room);broadcast({type:'lobby',room:window.mp.room});}else guestReady(window.mp.ready);};
+  window.mpStartGame=function(){if(!window.mp.host)return;if(!window.mp.room?.players?.every((p,i)=>!p||p.ready)){alert('Semua pemain yang terhubung harus READY.');return;}window.mp.room.started=true;broadcast({type:'startGame'});start4PGame('Hard',true);setDisplay('modal-lobby','none');};
+  window.closeLobby=function(){P2P.peers.forEach(p=>{try{p.pc.close()}catch(e){}});P2P.peers.clear();if(P2P.hostPeer?.pc)try{P2P.hostPeer.pc.close()}catch(e){}P2P.hostPeer=null;window.mp.room=null;window.mp.seat=null;window.mp.host=false;window.mp.ready=false;window.mp.connected=false;setDisplay('modal-lobby','none');setBadge(false);};
+  // Keep lobby state rendering aligned with P2P seat information.
+  const baseRenderLobby=window.mpRenderLobby;
+  window.mpRenderLobby=function(room){if(typeof baseRenderLobby==='function')baseRenderLobby(room);const s=window.mp.seat??0;const btn=byId('btn-lobby-start');if(btn)btn.hidden=!window.mp.host||!!room?.started;setText('mp-room-code-display',room?.code||'-----');};
+  // Intercept state/result forwarding through the preserved mpHandle.
+  window.addEventListener('beforeunload',()=>{try{closeLobby()}catch(e){}});
+  // Keep responsive scale synced with actual viewport and orientation changes.
+  function syncTableUnit(){const vv=window.visualViewport;const w=Math.max(1,vv?.width||innerWidth),h=Math.max(1,vv?.height||innerHeight);const unit=Math.min(w,h)/100;document.documentElement.style.setProperty('--table-unit',unit+'px');}
+  syncTableUnit();window.addEventListener('resize',syncTableUnit,{passive:true});window.addEventListener('orientationchange',()=>setTimeout(syncTableUnit,80),{passive:true});window.visualViewport?.addEventListener('resize',syncTableUnit,{passive:true});
 })();
+
 </script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js" defer></script>
 </body>
 </html>
