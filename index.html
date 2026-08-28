@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="24.0-mahyong-dj-responsive">
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+    <meta name="app-version" content="20.1-landscape-final">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
     <meta name="description" content="Mahyong DJ — PWA Riichi Mahjong dengan AI dan Local P2P multiplayer.">
     <title>Mahyong DJ — Riichi Mahjong Local P2P</title>
@@ -1153,996 +1153,196 @@
   .river-left{left:calc(50% - clamp(142px,22vw,240px));}
   .river-right{right:calc(50% - clamp(142px,22vw,240px));}
 }
-
-/* ===== MAHYONG DJ v23 — SAFE VIEWPORT GEOMETRY =====
-   Geometry is derived from the usable screen rectangle rather than the raw
-   viewport edges. This prevents iPhone landscape camera/notch areas from
-   squeezing or overlapping the table. */
-#game-board{
-  --safe-l:env(safe-area-inset-left,0px);
-  --safe-r:env(safe-area-inset-right,0px);
-  --safe-t:env(safe-area-inset-top,0px);
-  --safe-b:env(safe-area-inset-bottom,0px);
-  --safe-mid-x:calc((100% + var(--safe-l) - var(--safe-r))/2);
-  --safe-mid-y:calc((100% + var(--safe-t) - var(--safe-b))/2);
-  width:100%;
-  height:100dvh;
-  max-width:none;
-  max-height:none;
-  overflow:hidden;
-}
-#game-board .topbar{
-  top:max(6px,var(--safe-t));
-  left:max(8px,var(--safe-l));
-  right:max(8px,var(--safe-r));
-}
-#game-board .center-board{
-  left:var(--safe-mid-x);
-  top:var(--safe-mid-y);
-}
-#game-board .player-seat.pos-bottom{
-  left:var(--safe-mid-x);
-  bottom:calc(var(--tile-h) + var(--safe-b) + 6px);
-  transform:translateX(-50%);
-}
-#game-board .player-seat.pos-top{
-  left:var(--safe-mid-x);
-  right:auto;
-  top:calc(var(--safe-t) + 6px);
-  transform:translateX(-50%);
-}
-#game-board .player-seat.pos-left{
-  left:calc(var(--safe-l) + 6px);
-}
-#game-board .player-seat.pos-right{
-  right:calc(var(--safe-r) + 6px);
-}
-#game-board .enemy-hand-top{
-  left:var(--safe-mid-x);
-  top:calc(var(--safe-t) + 58px);
-}
-#game-board .side-left{left:calc(var(--safe-l) + 6px)}
-#game-board .side-right{right:calc(var(--safe-r) + 6px)}
-#game-board .river-top{
-  left:var(--safe-mid-x);
-  top:calc(var(--safe-t) + 72px);
-}
-#game-board .river-bottom{
-  left:var(--safe-mid-x);
-  bottom:calc(var(--tile-h) + var(--safe-b) + 48px);
-}
-#game-board .river-left{
-  left:calc(var(--safe-mid-x) - clamp(110px,21vw,235px));
-}
-#game-board .river-right{
-  right:auto;
-  left:calc(var(--safe-mid-x) + clamp(110px,21vw,235px));
-}
-#game-board .melds-container{
-  right:calc(max(6px,var(--safe-r)) + 2px);
-  bottom:calc(var(--tile-h) + var(--safe-b) + 6px);
-}
-#game-board .hand-bottom-container{
-  left:var(--safe-l);
-  right:var(--safe-r);
-  bottom:var(--safe-b);
-  width:auto;
-  min-height:calc(var(--tile-h) + var(--safe-b) + 10px);
-}
-#game-board #action-overlay{
-  left:var(--safe-mid-x);
-  bottom:calc(var(--tile-h) + var(--safe-b) + 44px);
-}
-#game-board .hand-status{
-  left:var(--safe-mid-x);
-  bottom:calc(var(--tile-h) + var(--safe-b) + 8px);
-}
-#game-board .beginner-tip{
-  left:var(--safe-mid-x);
-  bottom:calc(var(--tile-h) + var(--safe-b) + 48px);
-}
-#game-board .furiten-panel{
-  left:var(--safe-mid-x);
-  bottom:calc(var(--tile-h) + var(--safe-b) + 80px);
-}
-
-/* Small landscape phones: use screen width as the touch-size budget and
-   pull the whole table inward so every control remains inside the usable area. */
-@media (orientation:landscape) and (max-height:560px){
-  #game-board{
-    --tile-w:clamp(34px,6.0vw,46px);
-    --tile-h:clamp(49px,8.6vw,66px);
-    --discard-w:clamp(18px,2.9vw,25px);
-    --discard-h:clamp(28px,4.25vw,36px);
-  }
-  #game-board .center-board{width:clamp(108px,22vh,132px);height:clamp(108px,22vh,132px)}
-  #game-board .river-left{left:calc(var(--safe-mid-x) - clamp(92px,19vw,205px))}
-  #game-board .river-right{left:calc(var(--safe-mid-x) + clamp(92px,19vw,205px))}
-  #game-board .river-top{top:calc(var(--safe-t) + 52px)}
-  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 34px)}
-  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 42px)}
-  #game-board .pos-top{top:var(--safe-t)}
-  #game-board .pos-left,#game-board .pos-right{top:50%}
-  #game-board .hand-status{bottom:calc(var(--tile-h) + var(--safe-b) + 2px);width:min(48vw,320px)}
-  #game-board .beginner-tip{display:none}
-}
-
-/* Very narrow landscape screens: keep the table readable instead of shrinking
-   tiles into tiny icons. The hand can scroll horizontally when needed. */
-@media (orientation:landscape) and (max-width:420px){
-  #game-board{
-    --tile-w:clamp(33px,7.0vw,40px);
-    --tile-h:clamp(48px,10vw,58px);
-    --discard-w:clamp(17px,3.35vw,22px);
-    --discard-h:clamp(26px,4.9vw,33px);
-  }
-  #game-board .center-board{width:102px;height:102px}
-  #game-board .river-left{left:calc(var(--safe-mid-x) - clamp(82px,17vw,175px))}
-  #game-board .river-right{left:calc(var(--safe-mid-x) + clamp(82px,17vw,175px))}
-  #game-board .score-tag{min-width:48px;font-size:7px;padding:3px 5px}
-}
-
-/* Portrait phones: prioritize a comfortable hand while keeping the safe inset. */
-@media (orientation:portrait) and (max-width:600px){
-  #game-board .river-left{left:calc(var(--safe-mid-x) - clamp(94px,25vw,155px))}
-  #game-board .river-right{left:calc(var(--safe-mid-x) + clamp(94px,25vw,155px))}
-  #game-board .river-top{top:calc(var(--safe-t) + 88px)}
-  #game-board .pos-top{top:calc(var(--safe-t) + 4px)}
-  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 84px)}
-}
-
-/* Tablets/desktops: keep generous negative space while using the safe center. */
-@media (min-width:900px){
-  #game-board .river-left{left:calc(var(--safe-mid-x) - clamp(150px,18vw,310px))}
-  #game-board .river-right{left:calc(var(--safe-mid-x) + clamp(150px,18vw,310px))}
-}
-
 </style>
 
-<style id="mahyong-dj-v24-final-responsive">
+<style id="landscape-final-layout">
 /* ================================================================
-   MAHYONG DJ v24 — FINAL DEVICE GEOMETRY
-   One coordinate system for phone / tablet / desktop.
-   Safe-area aware, no double-tap zoom, and no viewport-specific drift.
+   MAHYONG DJ — FINAL LANDSCAPE TABLE
+   One coordinate system for iPhone/iPad/iPad mini landscape.
+   Portrait gameplay is intentionally disabled.
    ================================================================ */
-html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%;}
-body{touch-action:manipulation;}
-#screen-game{padding:0!important;}
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  -webkit-text-size-adjust:100%;
+  overscroll-behavior:none;
+  touch-action:manipulation;
+}
+button,.tile,.icon-btn{touch-action:manipulation;}
+
+/* Portrait: never try to squeeze the table into a phone portrait screen. */
+#landscape-lock{
+  display:none;
+  position:absolute;inset:0;z-index:9999;
+  align-items:center;justify-content:center;
+  padding:24px;text-align:center;
+  background:linear-gradient(145deg,#07131f,#0c2635);
+}
+#landscape-lock .lock-card{
+  width:min(340px,86vw);padding:22px 20px;border-radius:20px;
+  background:rgba(5,14,23,.94);border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 18px 50px rgba(0,0,0,.38);
+}
+#landscape-lock .lock-icon{font-size:34px;line-height:1;margin-bottom:10px}
+#landscape-lock strong{display:block;color:#f4c662;font-size:14px;letter-spacing:.12em;text-transform:uppercase}
+#landscape-lock span{display:block;margin-top:7px;color:#a7b2c0;font-size:11px;line-height:1.5}
+#screen-game.landscape-required #game-board{visibility:hidden;pointer-events:none}
+#screen-game.landscape-required #landscape-lock{display:flex}
+
+/* Stable table scale: height is the limiting dimension on landscape devices. */
 #game-board{
-  --safe-l:env(safe-area-inset-left,0px);
-  --safe-r:env(safe-area-inset-right,0px);
-  --safe-t:env(safe-area-inset-top,0px);
-  --safe-b:env(safe-area-inset-bottom,0px);
-  --mid-x:calc((100% + var(--safe-l) - var(--safe-r))/2);
-  --mid-y:calc((100% + var(--safe-t) - var(--safe-b))/2);
-  width:100%!important;height:100dvh!important;max-width:none!important;max-height:none!important;
-  overflow:hidden!important;touch-action:none!important;
-  padding:0!important;
-  position:relative!important;
-}
-/* --- stable HUD band --- */
-#game-board .topbar{
-  top:max(6px,var(--safe-t))!important;
-  left:max(8px,var(--safe-l))!important;
-  right:max(8px,var(--safe-r))!important;
-  display:grid!important;
-  grid-template-columns:auto 1fr auto!important;
-  align-items:start!important;
-  pointer-events:none!important;
-}
-#game-board .topbar>*{pointer-events:auto}
-#game-board .dora-panel{justify-self:start!important;transform:none!important;min-width:clamp(126px,20vw,220px)!important;max-width:min(43vw,240px)!important;}
-#game-board .round-hud-shell{
-  left:var(--mid-x)!important;top:max(6px,var(--safe-t))!important;transform:translateX(-50%)!important;
-  min-width:clamp(118px,16vw,170px)!important;
-  z-index:32!important;
-}
-#game-board .top-right-btns{justify-self:end!important;transform:none!important;}
-
-/* --- center table is always the same geometric anchor --- */
-#game-board .center-board{
-  left:var(--mid-x)!important;top:var(--mid-y)!important;
-  transform:translate(-50%,-50%)!important;
-  width:clamp(112px,20vmin,188px)!important;
-  height:clamp(112px,20vmin,188px)!important;
-}
-#game-board .score-tag{z-index:25!important;}
-#game-board .score-south{left:50%!important;right:auto!important;bottom:-42px!important;top:auto!important;transform:translateX(-50%)!important;}
-#game-board .score-north{left:50%!important;right:auto!important;top:-42px!important;bottom:auto!important;transform:translateX(-50%)!important;}
-#game-board .score-east{right:-78px!important;left:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;}
-#game-board .score-west{left:-78px!important;right:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;}
-
-/* --- seats: cardinal positions, never tied to arbitrary 43%/28% rules --- */
-#game-board .pos-bottom{left:var(--mid-x)!important;bottom:calc(var(--tile-h) + var(--safe-b) + 7px)!important;transform:translateX(-50%)!important;}
-#game-board .pos-top{left:var(--mid-x)!important;right:auto!important;top:calc(var(--safe-t) + 62px)!important;transform:translateX(-50%)!important;}
-#game-board .pos-left{left:calc(var(--safe-l) + 8px)!important;top:50%!important;transform:translateY(-50%)!important;}
-#game-board .pos-right{right:calc(var(--safe-r) + 8px)!important;left:auto!important;top:50%!important;transform:translateY(-50%)!important;}
-
-/* --- enemy hands stay on their own side and cannot collide with HUD --- */
-#game-board .enemy-hand-top{left:var(--mid-x)!important;top:calc(var(--safe-t) + 112px)!important;transform:translateX(-50%)!important;}
-#game-board .side-left{left:calc(var(--safe-l) + 10px)!important;top:28%!important;}
-#game-board .side-right{right:calc(var(--safe-r) + 10px)!important;left:auto!important;top:28%!important;}
-
-/* --- discard rivers use one symmetric center distance --- */
-#game-board .river-top{left:var(--mid-x)!important;top:calc(var(--safe-t) + 150px)!important;transform:translateX(-50%) rotate(180deg)!important;}
-#game-board .river-bottom{left:var(--mid-x)!important;bottom:calc(var(--tile-h) + var(--safe-b) + 70px)!important;transform:translateX(-50%)!important;}
-#game-board .river-left{left:calc(var(--mid-x) - var(--river-side-gap,180px))!important;right:auto!important;top:50%!important;transform:translateY(-50%) rotate(90deg)!important;}
-#game-board .river-right{left:calc(var(--mid-x) + var(--river-side-gap,180px))!important;right:auto!important;top:50%!important;transform:translateY(-50%) rotate(-90deg)!important;}
-
-/* --- hand and status share the same bottom safe-area anchor --- */
-#game-board .hand-bottom-container{
-  left:var(--safe-l)!important;right:var(--safe-r)!important;bottom:var(--safe-b)!important;width:auto!important;
-  min-height:calc(var(--tile-h) + 14px)!important;padding-left:8px!important;padding-right:8px!important;
-  padding-bottom:max(5px,var(--safe-b))!important;overflow-x:auto!important;overflow-y:visible!important;
-  touch-action:pan-x!important;
-}
-#game-board .hand-tiles{max-width:none!important;min-width:max-content!important;gap:3px!important;}
-#game-board .hand-status{left:var(--mid-x)!important;bottom:calc(var(--tile-h) + var(--safe-b) + 13px)!important;transform:translateX(-50%)!important;}
-#game-board #action-overlay{left:var(--mid-x)!important;bottom:calc(var(--tile-h) + var(--safe-b) + 52px)!important;transform:translateX(-50%)!important;}
-#game-board .melds-container{right:calc(max(7px,var(--safe-r)) + 2px)!important;bottom:calc(var(--tile-h) + var(--safe-b) + 8px)!important;}
-
-/* Keep the artwork large and crisp; don't let the responsive pass shrink it. */
-#game-board .tile-svg-img{width:100%!important;height:100%!important;object-fit:fill!important;}
-#game-board .tile-art{transform:scale(1.02)!important;}
-#game-board .discard-tile .tile-svg-img{width:100%!important;height:100%!important;}
-
-/* ---------- portrait ---------- */
-@media (orientation:portrait){
-  #game-board{--river-side-gap:clamp(102px,29vw,175px)!important;}
-  #game-board .pos-top{top:calc(var(--safe-t) + 64px)!important;}
-  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 116px)!important;}
-  #game-board .river-top{top:calc(var(--safe-t) + 154px)!important;}
-  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 72px)!important;}
-  #game-board .pos-left,#game-board .pos-right{top:50%!important;}
-  #game-board .score-east{right:-64px!important;}
-  #game-board .score-west{left:-64px!important;}
-}
-@media (max-width:430px) and (orientation:portrait){
-  #game-board{--river-side-gap:clamp(96px,27vw,132px)!important;}
-  #game-board .dora-panel{min-width:116px!important;max-width:43vw!important;padding:6px 7px!important;}
-  #game-board .round-hud-shell{min-width:112px!important;padding:6px 8px!important;}
-  #game-board .top-right-btns .icon-btn{width:33px!important;height:33px!important;}
-  #game-board .center-board{width:clamp(112px,31vmin,138px)!important;height:clamp(112px,31vmin,138px)!important;}
-  #game-board .score-tag{min-width:50px!important;font-size:8px!important;padding:4px 5px!important;}
-  #game-board .score-north{top:-35px!important;}
-  #game-board .score-south{bottom:-35px!important;}
-  #game-board .score-east{right:-59px!important;}
-  #game-board .score-west{left:-59px!important;}
+  --L:min(1vw,1vh);
+  --table-gap:clamp(8px,1.2vh,14px);
+  --tile-w:clamp(34px,6.05vh,48px);
+  --tile-h:clamp(50px,8.45vh,68px);
+  --discard-w:clamp(20px,3.35vh,27px);
+  --discard-h:clamp(29px,4.75vh,38px);
+  --side-river:clamp(150px,19vw,235px);
+  --center-size:clamp(124px,25vh,170px);
 }
 
-/* ---------- compact landscape phone ---------- */
-@media (orientation:landscape) and (max-height:600px){
-  #game-board{--river-side-gap:clamp(118px,20vw,235px)!important;}
-  #game-board .dora-panel{min-width:112px!important;max-width:28vw!important;padding:5px 7px!important;}
-  #game-board .round-hud-shell{min-width:104px!important;padding:5px 8px!important;}
-  #game-board .top-right-btns .icon-btn{width:32px!important;height:32px!important;}
-  #game-board .pos-top{top:calc(var(--safe-t) + 40px)!important;}
-  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 72px)!important;}
-  #game-board .river-top{top:calc(var(--safe-t) + 94px)!important;}
-  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 45px)!important;}
-  #game-board .center-board{width:clamp(110px,25vh,150px)!important;height:clamp(110px,25vh,150px)!important;}
-  #game-board .score-tag{min-width:52px!important;font-size:8px!important;padding:4px 5px!important;}
-  #game-board .score-north{top:-30px!important;}
-  #game-board .score-south{bottom:-30px!important;}
-  #game-board .score-east{right:-62px!important;}
-  #game-board .score-west{left:-62px!important;}
-  #game-board .hand-status{width:min(300px,44vw)!important;bottom:calc(var(--tile-h) + var(--safe-b) + 6px)!important;padding:4px 8px!important;}
-  #game-board #action-overlay{bottom:calc(var(--tile-h) + var(--safe-b) + 12px)!important;}
-}
-@media (orientation:landscape) and (max-height:430px){
-  #game-board{--river-side-gap:clamp(105px,18vw,185px)!important;}
-  #game-board .pos-top{top:calc(var(--safe-t) + 32px)!important;}
-  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 56px)!important;}
-  #game-board .river-top{top:calc(var(--safe-t) + 72px)!important;}
-  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 35px)!important;}
-  #game-board .hand-status{display:none!important;}
-}
+/* Keep the table itself calm: no moving background and no giant effects. */
+#game-board::after{animation:none!important;opacity:.45!important}
+#game-board.riichi-active::after{animation:none!important;box-shadow:none!important;background:none!important}
+#game-board.riichi-active .center-board{box-shadow:0 12px 28px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.04)!important}
+.riichi-overlay,#riichi-effect{display:none!important;opacity:0!important;animation:none!important;backdrop-filter:none!important}
 
-/* Never use hover to change game-piece geometry on touch screens. */
-@media (pointer:coarse){
-  #game-board .tile:hover,#game-board .discard-tile:hover{transform:none!important;}
-  #game-board .tile,#game-board .act-btn,#game-board button{touch-action:manipulation;}
+/* Compact square center, closer to Mahjong Soul's visual hierarchy. */
+.center-board{
+  width:var(--center-size)!important;height:var(--center-size)!important;
+  aspect-ratio:1/1!important;border-radius:20px!important;
+  border:2px solid rgba(255,255,255,.12)!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.04)!important;
 }
-</style>
+.round-info{font-size:clamp(11px,1.7vh,14px)!important;letter-spacing:.12em!important}
+.turn-timer{font-size:clamp(31px,5.2vh,46px)!important;margin:5px 0 2px!important}
+.tiles-left{font-size:clamp(9px,1.35vh,11px)!important}
+.score-tag{min-width:54px!important;padding:4px 7px!important;font-size:8px!important;border-radius:999px!important}
+.score-tag::before{font-size:6px!important}
+.score-north{top:-31px!important}.score-south{bottom:-31px!important}
+.score-west{left:-66px!important}.score-east{right:-66px!important}
 
-
-<style id="mahyong-dj-v24-clarity-pass">
-/* ================================================================
-   MAHYONG DJ v24 — CLARITY / BALANCE PASS
-   Final visual correction only. No game logic / worker changes.
-   ================================================================ */
-
-/* 1) Dora HUD: compact, fixed-size cells so the revealed tile can never
-      stretch the panel or float outside it. */
-#game-board .dora-panel{
-  min-width:0!important;
-  width:clamp(112px,15vw,162px)!important;
-  max-width:162px!important;
-  padding:6px 7px!important;
-  overflow:hidden!important;
-  contain:layout paint!important;
-}
-#game-board .dora-tiles{
-  display:flex!important;
-  flex-wrap:nowrap!important;
-  gap:3px!important;
-  width:100%!important;
-  min-width:0!important;
-  overflow:hidden!important;
-}
-#game-board .dora-tile-box{
-  flex:0 0 clamp(17px,2.35vw,24px)!important;
-  width:clamp(17px,2.35vw,24px)!important;
-  min-width:clamp(17px,2.35vw,24px)!important;
-  height:clamp(24px,3.35vw,33px)!important;
-  min-height:0!important;
-  position:relative!important;
-  overflow:hidden!important;
-  display:grid!important;
-  place-items:center!important;
-  line-height:1!important;
-}
-#game-board .dora-tile-box.has-tile > .tile-svg-img,
-#game-board .dora-tile-box.has-tile > img{
-  position:absolute!important;
-  inset:0!important;
-  width:100%!important;
-  height:100%!important;
-  max-width:none!important;
-  max-height:none!important;
-  object-fit:fill!important;
-  display:block!important;
-}
-#game-board .dora-caption,
-#game-board .hud-label{font-size:8px!important;letter-spacing:.13em!important;}
-#game-board .stick-counters{font-size:8px!important;margin-top:5px!important;}
-#game-board .kan-info{font-size:8px!important;margin-top:4px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
-/* 2) The center table is a true square. It is deliberately smaller so that
-      the tiles and player information remain the visual priority. */
-#game-board .center-board{
-  left:var(--mid-x)!important;
-  top:var(--mid-y)!important;
-  width:clamp(118px,15.8vmin,158px)!important;
-  height:clamp(118px,15.8vmin,158px)!important;
-  aspect-ratio:1/1!important;
-  border-radius:18px!important;
-  border-width:2px!important;
-  background:
-    linear-gradient(145deg,rgba(18,33,48,.97),rgba(4,10,17,.98))!important;
-  box-shadow:
-    0 16px 36px rgba(0,0,0,.40),
-    inset 0 0 0 1px rgba(255,255,255,.045),
-    inset 0 0 26px rgba(0,0,0,.20)!important;
-}
-#game-board .center-board::before{
-  inset:7px!important;
-  border-radius:12px!important;
-  border-color:rgba(255,255,255,.055)!important;
-}
-#game-board .center-board::after{
-  inset:13px!important;
-  border-radius:9px!important;
-  border:1px solid rgba(255,195,71,.055)!important;
-}
-#game-board .round-info{font-size:clamp(10px,1.55vw,13px)!important;letter-spacing:.16em!important;}
-#game-board .turn-timer{font-size:clamp(29px,4.6vw,42px)!important;margin:4px 0 2px!important;}
-#game-board .tiles-left{font-size:9px!important;}
-
-/* 3) Scores become small orbiting tags rather than four big boxes. */
-#game-board .score-tag{
-  min-width:46px!important;
-  padding:4px 6px!important;
-  border-radius:999px!important;
-  font-size:8px!important;
-  line-height:1.0!important;
-  box-shadow:0 4px 10px rgba(0,0,0,.22)!important;
-  backdrop-filter:blur(4px)!important;
-}
-#game-board .score-tag::before{font-size:6px!important;margin-bottom:2px!important;}
-#game-board .score-south{bottom:-29px!important;}
-#game-board .score-north{top:-29px!important;}
-#game-board .score-east{right:-57px!important;}
-#game-board .score-west{left:-57px!important;}
-
-/* 4) Seat avatars: self is always to the left of the player's hand;
-      top avatar is centered above the opponent's wall. */
-#game-board .pos-bottom{
-  left:max(calc(var(--safe-l) + 8px),calc(var(--mid-x) - min(46vw,360px) - 58px))!important;
-  bottom:calc(var(--tile-h) + var(--safe-b) + 5px)!important;
-  transform:none!important;
-}
-#game-board .pos-top{
-  left:var(--mid-x)!important;
-  right:auto!important;
-  top:calc(var(--safe-t) + 5px)!important;
+/* Top: title -> avatar -> wall, all on one clean vertical axis. */
+.round-hud-shell{top:max(5px,env(safe-area-inset-top))!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;z-index:20!important}
+.pos-top{
+  top:clamp(45px,6.2vh,58px)!important;
+  left:50%!important;right:auto!important;
   transform:translateX(-50%)!important;
 }
-#game-board .pos-left{
-  left:max(calc(var(--safe-l) + 7px),7px)!important;
-  top:50%!important;
-  transform:translateY(-50%)!important;
+.pos-top .avatar-img{width:clamp(34px,5.4vh,43px)!important;height:clamp(34px,5.4vh,43px)!important}
+.pos-top .avatar-name{margin-top:2px!important;font-size:7px!important}
+.enemy-hand-top{
+  top:clamp(91px,12vh,108px)!important;
+  left:50%!important;transform:translateX(-50%)!important;
+  gap:2px!important;
 }
-#game-board .pos-right{
-  right:max(calc(var(--safe-r) + 7px),7px)!important;
-  left:auto!important;
-  top:50%!important;
-  transform:translateY(-50%)!important;
-}
-#game-board .avatar-img{
-  width:clamp(34px,6.2vw,46px)!important;
-  height:clamp(34px,6.2vw,46px)!important;
-  border-radius:12px!important;
-}
-#game-board .avatar-name{font-size:8px!important;padding:3px 6px!important;}
-#game-board .time-bank-tag{font-size:8px!important;padding:2px 5px!important;}
+.enemy-hand-top .tile-back{width:clamp(17px,3.1vh,23px)!important;height:clamp(25px,4.35vh,31px)!important}
+.river-top{top:clamp(135px,18vh,165px)!important}
 
-/* 5) Side walls/cards move inward, leaving the avatar cleanly outside them. */
-#game-board .side-left{left:clamp(60px,7vw,92px)!important;top:30%!important;}
-#game-board .side-right{right:clamp(60px,7vw,92px)!important;top:30%!important;}
-#game-board .enemy-hand-top{
-  left:var(--mid-x)!important;
-  top:calc(var(--safe-t) + 55px)!important;
-  transform:translateX(-50%)!important;
+/* Left/right: avatar lives at the outside edge; river is inward and cannot collide. */
+.pos-left,.pos-right{
+  top:50%!important;transform:translateY(-50%)!important;
+  z-index:18!important;
 }
-#game-board .enemy-melds-left{left:clamp(66px,8vw,96px)!important;}
-#game-board .enemy-melds-right{right:clamp(66px,8vw,96px)!important;}
+.pos-left{left:max(10px,env(safe-area-inset-left))!important}
+.pos-right{right:max(10px,env(safe-area-inset-right))!important}
+.avatar-img{width:clamp(36px,5.6vh,44px)!important;height:clamp(36px,5.6vh,44px)!important;border-radius:12px!important}
+.avatar-name{font-size:8px!important;padding:3px 6px!important;margin-top:3px!important}
+.time-bank-tag{font-size:8px!important}
+.side-left,.side-right{top:50%!important;z-index:9!important}
+.side-left{left:clamp(3px,1vw,10px)!important}
+.side-right{right:clamp(3px,1vw,10px)!important}
+.enemy-hand-side .tile-back{width:clamp(18px,3.15vh,24px)!important;height:clamp(26px,4.15vh,30px)!important}
 
-/* 6) Discard rivers stay balanced around the square center. */
-#game-board .river-left{
-  left:calc(var(--mid-x) - var(--river-side-gap,170px))!important;
-  right:auto!important;
-  top:50%!important;
+/* All four discard rivers share one symmetric coordinate system. */
+.river-container{
+  width:calc(var(--discard-w)*6 + 10px)!important;
+  height:calc(var(--discard-h)*3 + 5px)!important;
+  gap:2px!important;z-index:7!important;
 }
-#game-board .river-right{
-  left:calc(var(--mid-x) + var(--river-side-gap,170px))!important;
-  right:auto!important;
-  top:50%!important;
+.river-left{left:calc(50% - var(--side-river))!important;top:50%!important;transform:translateY(-50%) rotate(90deg)!important}
+.river-right{right:calc(50% - var(--side-river))!important;top:50%!important;transform:translateY(-50%) rotate(-90deg)!important}
+.river-top{left:50%!important;transform:translateX(-50%) rotate(180deg)!important}
+.river-bottom{left:50%!important;transform:translateX(-50%)!important;bottom:clamp(92px,14vh,120px)!important}
+.discard-tile{
+  width:var(--discard-w)!important;height:var(--discard-h)!important;
+  border-radius:4px!important;box-shadow:0 2px 4px rgba(0,0,0,.28)!important;
 }
-#game-board .river-top{left:var(--mid-x)!important;transform:translateX(-50%) rotate(180deg)!important;}
-#game-board .river-bottom{left:var(--mid-x)!important;transform:translateX(-50%)!important;}
+.discard-tile .tile-svg-img{width:100%!important;height:100%!important}
 
-/* 7) Compact mobile portrait. Keep tiles useful; shrink HUD before shrinking
-      the actual hand. */
-@media (orientation:portrait) and (max-width:600px){
-  #game-board{--river-side-gap:clamp(100px,28vw,156px)!important;}
-  #game-board .dora-panel{width:112px!important;max-width:112px!important;padding:5px 6px!important;}
-  #game-board .dora-tile-box{flex-basis:18px!important;width:18px!important;height:26px!important;min-width:18px!important;}
-  #game-board .center-board{width:clamp(116px,29vmin,136px)!important;height:clamp(116px,29vmin,136px)!important;}
-  #game-board .score-south{bottom:-27px!important;}
-  #game-board .score-north{top:-27px!important;}
-  #game-board .score-east{right:-55px!important;}
-  #game-board .score-west{left:-55px!important;}
-  #game-board .pos-bottom{left:max(calc(var(--safe-l) + 7px),8px)!important;}
-  #game-board .side-left{left:58px!important;}
-  #game-board .side-right{right:58px!important;}
-  #game-board .enemy-melds-left{left:62px!important;}
-  #game-board .enemy-melds-right{right:62px!important;}
-  #game-board .river-left{left:calc(var(--mid-x) - clamp(96px,27vw,150px))!important;}
-  #game-board .river-right{left:calc(var(--mid-x) + clamp(96px,27vw,150px))!important;}
-}
+/* Melds stay inside their owner's river lane instead of crossing the avatars. */
+.enemy-melds{z-index:8!important;gap:3px!important}
+.enemy-melds-top{top:clamp(130px,17vh,160px)!important;left:50%!important;transform:translateX(-50%)!important}
+.enemy-melds-left{left:clamp(52px,7vw,88px)!important;top:50%!important;transform:translateY(-50%)!important}
+.enemy-melds-right{right:clamp(52px,7vw,88px)!important;top:50%!important;transform:translateY(-50%)!important}
 
-/* 8) Small landscape phones: preserve readable hand/discards instead of
-      letting the whole table collapse. */
-@media (orientation:landscape) and (max-height:600px){
-  #game-board{--river-side-gap:clamp(112px,19vw,215px)!important;}
-  #game-board .dora-panel{width:112px!important;max-width:112px!important;padding:5px 6px!important;}
-  #game-board .dora-tile-box{flex-basis:17px!important;width:17px!important;height:24px!important;min-width:17px!important;}
-  #game-board .center-board{width:clamp(116px,27vh,138px)!important;height:clamp(116px,27vh,138px)!important;}
-  #game-board .score-south{bottom:-25px!important;}
-  #game-board .score-north{top:-25px!important;}
-  #game-board .score-east{right:-53px!important;}
-  #game-board .score-west{left:-53px!important;}
-  #game-board .pos-bottom{left:max(calc(var(--safe-l) + 7px),8px)!important;}
-  #game-board .side-left{left:54px!important;}
-  #game-board .side-right{right:54px!important;}
-  #game-board .enemy-melds-left{left:58px!important;}
-  #game-board .enemy-melds-right{right:58px!important;}
-  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 47px)!important;}
-  #game-board .river-top{top:calc(var(--safe-t) + 70px)!important;}
-  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 39px)!important;}
+/* Bottom hand: avatar is immediately to the LEFT of the hand, not in the corner. */
+.hand-bottom-container{
+  bottom:0!important;left:0!important;right:0!important;
+  min-height:calc(var(--tile-h) + 10px)!important;
+  padding:0 max(8px,env(safe-area-inset-left)) max(5px,env(safe-area-inset-bottom))!important;
+  overflow:hidden!important;z-index:25!important;
 }
+.hand-tiles{gap:3px!important;padding:2px 0 0!important;max-width:none!important}
+.pos-bottom{
+  left:clamp(66px,calc(50% - 34vw),320px)!important;
+  bottom:calc(var(--tile-h) + 7px)!important;
+  transform:none!important;z-index:26!important;
+}
+.pos-bottom .avatar-img{width:clamp(34px,5.2vh,42px)!important;height:clamp(34px,5.2vh,42px)!important}
+.pos-bottom .avatar-name{font-size:8px!important}
+.pos-bottom .time-bank-tag{font-size:8px!important}
 
+/* Status strip never covers the hand. */
+.hand-status{
+  bottom:calc(var(--tile-h) + 8px)!important;
+  width:min(330px,36vw)!important;padding:5px 9px!important;
+  border-radius:10px!important;backdrop-filter:none!important;
+}
+.hand-status .status-main{font-size:9px!important}.hand-status .status-sub{font-size:7px!important}
+
+/* Dora HUD remains readable without occupying the table. */
+.topbar{top:max(5px,env(safe-area-inset-top))!important;left:max(6px,env(safe-area-inset-left))!important;right:max(6px,env(safe-area-inset-right))!important}
+.dora-panel{min-width:138px!important;padding:6px 8px!important;backdrop-filter:none!important}
+.dora-tile-box{width:23px!important;height:31px!important}
+
+/* Touch/game feel: remove hover transforms and expensive blur/animations. */
+.tile{transition:none!important;will-change:auto!important}
+.tile:hover,.player-seat:hover .avatar-img{transform:none!important}
+.tile.selected-tile{transform:translateY(-5px)!important}
+.tile-discard-flash,.win-flash,.draw-flash{animation:none!important}
+#game-board *{scroll-behavior:auto!important}
+
+/* Small landscape phones (iPhone-class): preserve usable hand width. */
 @media (orientation:landscape) and (max-height:430px){
-  #game-board .center-board{width:112px!important;height:112px!important;}
-  #game-board .avatar-img{width:32px!important;height:32px!important;}
-  #game-board .avatar-name{font-size:7px!important;}
+  #game-board{
+    --tile-w:clamp(31px,6.15vh,42px);
+    --tile-h:clamp(45px,8.5vh,58px);
+    --discard-w:clamp(18px,3.25vh,23px);
+    --discard-h:clamp(26px,4.65vh,33px);
+    --center-size:clamp(112px,25vh,145px);
+    --side-river:clamp(130px,18vw,185px);
+  }
+  .pos-bottom{left:clamp(56px,calc(50% - 34vw),250px)!important}
+  .pos-top{top:39px!important}.enemy-hand-top{top:78px!important}.river-top{top:118px!important}
+  .river-bottom{bottom:clamp(75px,13vh,92px)!important}
+  .hand-status{display:none!important}
+  .dora-panel{transform:none!important;min-width:120px!important}
+  .dora-tile-box{width:20px!important;height:27px!important}
+  .center-board{border-radius:18px!important}
 }
 
-/* 9) iPad / tablet portrait: center the top seat and keep the score orbit compact. */
-@media (min-width:700px) and (max-width:1100px) and (orientation:portrait){
-  #game-board .dora-panel{width:142px!important;max-width:142px!important;}
-  #game-board .center-board{width:clamp(132px,20vmin,154px)!important;height:clamp(132px,20vmin,154px)!important;}
-  #game-board .score-south{bottom:-30px!important;}
-  #game-board .score-north{top:-30px!important;}
-  #game-board .score-east{right:-56px!important;}
-  #game-board .score-west{left:-56px!important;}
-  #game-board .side-left{left:72px!important;}
-  #game-board .side-right{right:72px!important;}
+/* iPad / iPad mini landscape: use the same geometry, only allow more breathing room. */
+@media (orientation:landscape) and (min-width:700px){
+  #game-board{--side-river:clamp(170px,18.5vw,255px)}
+  .pos-bottom{left:clamp(120px,calc(50% - 34vw),360px)!important}
+  .pos-left{left:max(14px,env(safe-area-inset-left))!important}
+  .pos-right{right:max(14px,env(safe-area-inset-right))!important}
 }
 
-/* 10) Desktop: same visual hierarchy, just more breathing room. */
-@media (min-width:1100px){
-  #game-board .dora-panel{width:154px!important;max-width:154px!important;}
-  #game-board .center-board{width:152px!important;height:152px!important;}
-  #game-board .score-tag{min-width:50px!important;}
-  #game-board .score-east{right:-59px!important;}
-  #game-board .score-west{left:-59px!important;}
-  #game-board .side-left{left:76px!important;}
-  #game-board .side-right{right:76px!important;}
-}
-
-/* Keep all game interactions on-device and stop browser gesture zooming. */
-html,body,#screen-game,#game-board{overscroll-behavior:none!important;}
-body{touch-action:manipulation!important;-webkit-user-select:none!important;user-select:none!important;}
-#game-board{touch-action:none!important;}
-#game-board button,#game-board .tile{touch-action:manipulation!important;}
-
-
-/* ===== v24.1 BALANCED MOBILE TABLE — position correction =====
-/* Fix Dora: SVG images must be contained by the small Dora slot, never by the topbar. */
-#game-board .dora-tile-box{
-  position:relative !important;
-  overflow:hidden !important;
-  contain:layout paint !important;
-}
-#game-board .dora-tile-box .tile-svg-img{
-  position:absolute !important;
-  inset:0 !important;
-  width:100% !important;
-  height:100% !important;
-  max-width:100% !important;
-  max-height:100% !important;
-  object-fit:fill !important;
-  transform:none !important;
-  filter:none !important;
-}
-
-/* Smaller, truly square centre table + compact orbiting scores. */
-#game-board .center-board{
-  width:clamp(104px,17vmin,150px) !important;
-  height:clamp(104px,17vmin,150px) !important;
-  border-radius:22px !important;
-}
-#game-board .round-info{font-size:clamp(9px,1.55vmin,13px) !important;}
-#game-board .turn-timer{font-size:clamp(29px,4.9vmin,44px) !important; margin:4px 0 2px !important;}
-#game-board .tiles-left{font-size:9px !important;}
-#game-board .score-tag{
-  min-width:48px !important;
-  padding:4px 6px !important;
-  border-radius:999px !important;
-  font-size:8px !important;
-  line-height:1.0 !important;
-}
-#game-board .score-tag::before{font-size:5px !important; margin-bottom:1px !important;}
-#game-board .score-south{bottom:-27px !important;}
-#game-board .score-north{top:-27px !important;}
-#game-board .score-east{right:-53px !important;}
-#game-board .score-west{left:-53px !important;}
-
-/* Top avatar: centred and separated from the opponent wall. */
-#game-board .player-seat.pos-top{
-  left:var(--mid-x) !important;
-  right:auto !important;
-  top:calc(var(--safe-t) + 45px) !important;
-  transform:translateX(-50%) !important;
-}
-#game-board .player-seat.pos-top .avatar-img{
-  width:36px !important;
-  height:36px !important;
-  border-radius:10px !important;
-}
-#game-board .player-seat.pos-top .avatar-name{font-size:7px !important; padding:2px 5px !important; margin-top:2px !important;}
-#game-board .enemy-hand-top{
-  left:var(--mid-x) !important;
-  top:calc(var(--safe-t) + 94px) !important;
-  transform:translateX(-50%) !important;
-}
-
-/* Left/right avatars stay safely outside their wall/river and never cover tiles. */
-#game-board .player-seat.pos-left{left:calc(var(--safe-l) + 10px) !important; top:50% !important; transform:translateY(-50%) !important;}
-#game-board .player-seat.pos-right{right:calc(var(--safe-r) + 10px) !important; top:50% !important; transform:translateY(-50%) !important;}
-#game-board .side-left{left:58px !important;}
-#game-board .side-right{right:58px !important;}
-
-/* Our avatar: same horizontal band as the hand, just left of it and slightly inward. */
-#game-board .player-seat.pos-bottom{
-  top:auto !important;
-  bottom:calc(var(--safe-b) + 7px) !important;
-  left:clamp(74px, calc(50% - 43vw), 33vw) !important;
-  transform:none !important;
-  align-items:center !important;
-}
-#game-board .player-seat.pos-bottom .avatar-img{
-  width:36px !important;
-  height:36px !important;
-  border-radius:10px !important;
-}
-#game-board .player-seat.pos-bottom .avatar-name{font-size:7px !important; padding:2px 5px !important; margin-top:2px !important;}
-#game-board .player-seat.pos-bottom .time-bank-tag{font-size:7px !important; padding:2px 5px !important; margin-top:2px !important;}
-
-/* Keep our hand centered but never let the status panel fight with the tiles. */
-#game-board .hand-bottom-container{
-  min-height:calc(var(--tile-h) + 12px) !important;
-  padding-bottom:max(5px,var(--safe-b)) !important;
-}
-#game-board .hand-tiles{gap:3px !important; padding-inline:8px !important;}
-#game-board .hand-status{bottom:calc(var(--tile-h) + var(--safe-b) + 13px) !important;}
-
-/* Discard rivers: compact and balanced around the smaller centre square. */
-#game-board .river-top{
-  top:calc(var(--safe-t) + 132px) !important;
-}
-#game-board .river-bottom{
-  bottom:calc(var(--tile-h) + var(--safe-b) + 58px) !important;
-}
-#game-board .river-left{
-  left:calc(var(--mid-x) - clamp(88px,19vw,180px)) !important;
-}
-#game-board .river-right{
-  left:calc(var(--mid-x) + clamp(88px,19vw,180px)) !important;
-  right:auto !important;
-}
-
-/* Small portrait phones. */
-@media (max-width:600px) and (orientation:portrait){
-  #game-board .center-board{width:112px !important;height:112px !important;border-radius:19px !important;}
-  #game-board .score-south{bottom:-23px !important;}
-  #game-board .score-north{top:-23px !important;}
-  #game-board .score-east{right:-48px !important;}
-  #game-board .score-west{left:-48px !important;}
-  #game-board .player-seat.pos-top{top:calc(var(--safe-t) + 42px) !important;}
-  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 88px) !important;}
-  #game-board .river-top{top:calc(var(--safe-t) + 126px) !important;}
-  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 54px) !important;}
-  #game-board .river-left{left:calc(var(--mid-x) - clamp(84px,19vw,132px)) !important;}
-  #game-board .river-right{left:calc(var(--mid-x) + clamp(84px,19vw,132px)) !important;}
-  #game-board .player-seat.pos-bottom{left:clamp(58px,20vw,118px) !important;}
-}
-
-/* Very small portrait phones: preserve a readable square centre and move avatar inward. */
-@media (max-width:420px) and (orientation:portrait){
-  #game-board .center-board{width:106px !important;height:106px !important;}
-  #game-board .player-seat.pos-bottom{left:74px !important;}
-  #game-board .player-seat.pos-top{top:38px !important;}
-  #game-board .enemy-hand-top{top:80px !important;}
-  #game-board .river-top{top:116px !important;}
-}
-
-/* Compact landscape phones. */
-@media (orientation:landscape) and (max-height:560px){
-  #game-board .center-board{width:108px !important;height:108px !important;}
-  #game-board .score-south{bottom:-22px !important;}
-  #game-board .score-north{top:-22px !important;}
-  #game-board .score-east{right:-46px !important;}
-  #game-board .score-west{left:-46px !important;}
-  #game-board .player-seat.pos-top{top:30px !important;}
-  #game-board .enemy-hand-top{top:72px !important;}
-  #game-board .river-top{top:96px !important;}
-  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 38px) !important;}
-  #game-board .player-seat.pos-bottom{left:clamp(58px,18vw,150px) !important;bottom:calc(var(--safe-b) + 4px) !important;}
-  #game-board .side-left{left:48px !important;}
-  #game-board .side-right{right:48px !important;}
-  #game-board .river-left{left:calc(var(--mid-x) - clamp(92px,18vw,210px)) !important;}
-  #game-board .river-right{left:calc(var(--mid-x) + clamp(92px,18vw,210px)) !important;}
-}
-
-/* iPad: keep the same square-table logic, simply allow a little more breathing room. */
-@media (min-width:700px) and (min-height:500px){
-  #game-board .center-board{width:130px !important;height:130px !important;}
-  #game-board .score-south{bottom:-26px !important;}
-  #game-board .score-north{top:-26px !important;}
-  #game-board .score-east{right:-51px !important;}
-  #game-board .score-west{left:-51px !important;}
-  #game-board .player-seat.pos-bottom{left:clamp(110px, calc(50% - 34vw), 30vw) !important;}
-}
-
-/* Desktop: still compact; the table should read as a square game board, not a card. */
-@media (min-width:1100px){
-  #game-board .center-board{width:138px !important;height:138px !important;}
-  #game-board .score-south{bottom:-28px !important;}
-  #game-board .score-north{top:-28px !important;}
-  #game-board .score-east{right:-53px !important;}
-  #game-board .score-west{left:-53px !important;}
-  #game-board .player-seat.pos-bottom{left:clamp(150px, calc(50% - 31vw), 34vw) !important;}
-}
-
-
-/* ===== MAHYONG DJ v24.2 — discard river cleanup + calm riichi ===== */
-#game-board .river-container{
-  display:grid !important;
-  align-content:start !important;
-  justify-content:center !important;
-  gap:3px !important;
-  padding:2px !important;
-  box-sizing:border-box !important;
-  overflow:visible !important;
-}
-#game-board .river-top,#game-board .river-bottom{
-  grid-template-columns:repeat(6,var(--discard-w)) !important;
-  grid-template-rows:repeat(3,var(--discard-h)) !important;
-  width:calc(var(--discard-w)*6 + 18px) !important;
-  height:calc(var(--discard-h)*3 + 10px) !important;
-}
-#game-board .river-left,#game-board .river-right{
-  grid-template-columns:repeat(3,var(--discard-w)) !important;
-  grid-template-rows:repeat(6,var(--discard-h)) !important;
-  width:calc(var(--discard-w)*3 + 9px) !important;
-  height:calc(var(--discard-h)*6 + 15px) !important;
-  transform:translateY(-50%) !important;
-}
-#game-board .river-left{
-  left:calc(var(--mid-x) - clamp(92px,16vw,155px)) !important;
-}
-#game-board .river-right{
-  left:calc(var(--mid-x) + clamp(92px,16vw,155px)) !important;
-}
-#game-board .river-container .discard-tile{
-  width:var(--discard-w) !important;
-  height:var(--discard-h) !important;
-  min-width:0 !important;
-  min-height:0 !important;
-  margin:0 !important;
-  transform:none !important;
-}
-#game-board .river-top .discard-tile,#game-board .river-bottom .discard-tile{
-  justify-self:center;
-}
-#game-board .river-left .discard-tile,#game-board .river-right .discard-tile{
-  justify-self:center;
-}
-/* Compact square center and scores. */
-#game-board .center-board{width:clamp(98px,15.5vmin,136px) !important;height:clamp(98px,15.5vmin,136px) !important;border-radius:20px !important;}
-#game-board .score-tag{min-width:44px !important;padding:3px 5px !important;font-size:7px !important;}
-#game-board .score-tag::before{font-size:4.5px !important;}
-@media(max-width:600px) and (orientation:portrait){
-  #game-board .river-left{left:calc(var(--mid-x) - 76px) !important;}
-  #game-board .river-right{left:calc(var(--mid-x) + 76px) !important;}
-  #game-board .river-top{top:calc(var(--safe-t) + 116px) !important;}
-  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 46px) !important;}
-  #game-board .center-board{width:104px !important;height:104px !important;}
-}
-@media(max-width:560px) and (orientation:landscape){
-  #game-board .river-left{left:calc(var(--mid-x) - 88px) !important;}
-  #game-board .river-right{left:calc(var(--mid-x) + 88px) !important;}
-  #game-board .river-top{top:calc(var(--safe-t) + 58px) !important;}
-  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 32px) !important;}
-  #game-board .center-board{width:104px !important;height:104px !important;}
-}
-/* Riichi is intentionally calm: no full-table darkening/filter/animation. */
-#game-board.riichi-active,#game-board.riichi-active::after,#game-board.riichi-active .riichi-overlay{filter:none !important;animation:none !important;}
-#game-board.riichi-active::after{background:transparent !important;box-shadow:none !important;}
-#game-board.riichi-active .riichi-overlay{display:none !important;background:none !important;box-shadow:none !important;}
-#game-board.riichi-active .center-board{box-shadow:0 18px 44px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.04) !important;border-color:rgba(255,255,255,.13) !important;}
-#game-board.riichi-active .turn-timer{color:inherit !important;text-shadow:none !important;}
+/* Never let the 3D-looking CSS make the game board feel like a rectangle card. */
+#game-board{border-radius:0!important}
 </style>
 
-<style id="mahyong-dj-beginner-advisor">
-/* ===== Beginner advisor: explicit discard + waits, compact and touch friendly ===== */
-.lobby-back-btn{margin-top:10px;}
-.hand-status .advisor-line{margin-top:4px;color:#dfe8f2;font-size:9px;font-weight:800;line-height:1.25;}
-.hand-status .advisor-line .advisor-discard{color:#ffcf68;}
-.hand-status .advisor-line .advisor-wait{color:#66e6b0;}
-.hand-status .advisor-line .advisor-yaku{color:#8fc7ff;}
-.tile.advisor-recommended{
-  outline:2px solid rgba(86,230,171,.95)!important;
-  outline-offset:2px;
-  box-shadow:0 0 0 3px rgba(86,230,171,.13),0 10px 22px rgba(0,0,0,.32)!important;
-}
-.tile.advisor-recommended::after{
-  content:'BUANG'; position:absolute; left:50%; bottom:-18px; transform:translateX(-50%);
-  padding:2px 5px; border-radius:999px; white-space:nowrap; z-index:40;
-  background:rgba(4,14,12,.94); color:#66e6b0; border:1px solid rgba(86,230,171,.42);
-  font-size:7px; font-weight:900; letter-spacing:.05em; pointer-events:none;
-}
-.tile.advisor-wait-highlight{box-shadow:0 0 0 2px rgba(99,164,255,.68),0 6px 16px rgba(0,0,0,.28)!important;}
-.machi-bubble .advisor-detail{display:block;margin-top:3px;color:#aebbd0;font-size:8px;line-height:1.25;}
-@media (max-width:600px){
-  .hand-status{bottom:calc(var(--tile-h) + var(--safe-b) + 17px)!important;width:min(94vw,420px)!important;padding:6px 9px!important;}
-  .hand-status .advisor-line{font-size:8px;}
-  .hand-status .status-sub{font-size:7px;}
-  .tile.advisor-recommended::after{font-size:6px;bottom:-16px;}
-}
-@media (orientation:landscape) and (max-height:560px){
-  .hand-status{max-width:48vw!important;}
-  .hand-status .advisor-line{font-size:7px;}
-}
-</style>
-
-<style id="mahjong-final-layout-override">
-
-/* ===== MAHYONG DJ v24.5 — FINAL SEAT / RIVER GEOMETRY =====
-   One clean final override placed after the legacy responsive layers.
-   It keeps the square center table, separates avatars from rivers, and
-   makes side rivers mirror each other around the center line. */
-#game-board{
-  --safe-left:env(safe-area-inset-left,0px);
-  --safe-right:env(safe-area-inset-right,0px);
-  --safe-top:env(safe-area-inset-top,0px);
-  --safe-bottom:env(safe-area-inset-bottom,0px);
-  overflow:hidden !important;
-}
-
-/* Compact square center. */
-#game-board .center-board{
-  left:50% !important;
-  top:50% !important;
-  width:clamp(104px,18vmin,148px) !important;
-  height:clamp(104px,18vmin,148px) !important;
-  aspect-ratio:1/1 !important;
-  border-radius:22px !important;
-  transform:translate(-50%,-50%) !important;
-}
-
-/* Compact scores around the square. */
-#game-board .score-tag{
-  min-width:48px !important;
-  padding:3px 5px !important;
-  font-size:8px !important;
-  line-height:1.02 !important;
-  border-radius:999px !important;
-}
-#game-board .score-tag::before{font-size:6px !important;margin-bottom:1px !important;}
-#game-board .score-south{left:50% !important;right:auto !important;bottom:-31px !important;transform:translateX(-50%) !important;}
-#game-board .score-north{left:50% !important;right:auto !important;top:-31px !important;transform:translateX(-50%) !important;}
-#game-board .score-west{left:-58px !important;right:auto !important;top:50% !important;transform:translateY(-50%) !important;}
-#game-board .score-east{right:-58px !important;left:auto !important;top:50% !important;transform:translateY(-50%) !important;}
-
-/* Top player: avatar is centered ABOVE the opponent hand, never on top of it. */
-#game-board .player-seat.pos-top{
-  left:50% !important;
-  right:auto !important;
-  top:max(4px,var(--safe-top)) !important;
-  transform:translateX(-50%) !important;
-  z-index:31 !important;
-}
-#game-board .pos-top .avatar-img{width:38px;height:38px;}
-#game-board .pos-top .avatar-name{margin-top:2px;font-size:7px;}
-#game-board .enemy-hand-top{
-  left:50% !important;
-  transform:translateX(-50%) !important;
-  top:clamp(58px,9vh,86px) !important;
-  z-index:18 !important;
-}
-
-/* Bottom player: avatar sits on the same horizontal row as the hand,
-   slightly to the LEFT of the hand center, rather than far out at the edge. */
-#game-board .player-seat.pos-bottom{
-  left:calc(50% - clamp(170px,27vw,285px)) !important;
-  right:auto !important;
-  bottom:max(4px,var(--safe-bottom)) !important;
-  transform:none !important;
-  z-index:31 !important;
-  align-items:center !important;
-}
-#game-board .pos-bottom .avatar-img{width:40px;height:40px;}
-#game-board .pos-bottom .avatar-name{font-size:7px;white-space:nowrap;}
-#game-board .pos-bottom .time-bank-tag{font-size:7px;}
-
-/* Side players: keep them between the edge and the side river, vertically centered. */
-#game-board .player-seat.pos-left{
-  left:max(8px,var(--safe-left)) !important;
-  right:auto !important;
-  top:50% !important;
-  transform:translateY(-50%) !important;
-  z-index:31 !important;
-}
-#game-board .player-seat.pos-right{
-  right:max(8px,var(--safe-right)) !important;
-  left:auto !important;
-  top:50% !important;
-  transform:translateY(-50%) !important;
-  z-index:31 !important;
-}
-#game-board .pos-left .avatar-img,
-#game-board .pos-right .avatar-img{width:38px;height:38px;}
-#game-board .pos-left .avatar-name,
-#game-board .pos-right .avatar-name{font-size:7px;white-space:nowrap;}
-
-/* Side rivers: exact mirror around the center, fixed 6x3 grid. */
-#game-board .river-container{
-  display:grid !important;
-  grid-template-columns:repeat(6,var(--discard-w)) !important;
-  grid-template-rows:repeat(3,var(--discard-h)) !important;
-  grid-auto-flow:row !important;
-  gap:3px !important;
-  width:calc(var(--discard-w) * 6 + 15px) !important;
-  height:calc(var(--discard-h) * 3 + 6px) !important;
-  align-content:start !important;
-  justify-content:start !important;
-  transform-origin:center center !important;
-  z-index:14 !important;
-}
-#game-board .river-left{
-  left:calc(50% - clamp(150px,22vw,235px)) !important;
-  right:auto !important;
-  top:50% !important;
-  transform:translate(-50%,-50%) rotate(90deg) !important;
-}
-#game-board .river-right{
-  right:calc(50% - clamp(150px,22vw,235px)) !important;
-  left:auto !important;
-  top:50% !important;
-  transform:translate(50%,-50%) rotate(-90deg) !important;
-}
-#game-board .river-top{
-  left:50% !important;
-  right:auto !important;
-  top:clamp(108px,15vh,150px) !important;
-  transform:translateX(-50%) rotate(180deg) !important;
-}
-#game-board .river-bottom{
-  left:50% !important;
-  right:auto !important;
-  bottom:calc(var(--tile-h) + max(42px,var(--safe-bottom) + 30px)) !important;
-  transform:translateX(-50%) !important;
-}
-
-/* Keep discard art upright inside each rotated river's own tile footprint. */
-#game-board .discard-tile{position:relative !important;flex:0 0 auto !important;}
-
-/* Keep the side avatar outside the side river by using the river's outer edge as a visual boundary. */
-@media (max-width:900px){
-  #game-board .river-left{left:calc(50% - clamp(118px,27vw,180px)) !important;}
-  #game-board .river-right{right:calc(50% - clamp(118px,27vw,180px)) !important;}
-  #game-board .score-west{left:-55px !important}.score-east{right:-55px !important}
-}
-
-@media (orientation:landscape) and (max-height:560px){
-  #game-board .center-board{width:clamp(96px,20vh,122px) !important;height:clamp(96px,20vh,122px) !important;}
-  #game-board .score-tag{min-width:44px !important;font-size:7px !important;padding:3px 4px !important;}
-  #game-board .score-tag::before{font-size:5px !important;}
-  #game-board .score-south{bottom:-27px !important}.score-north{top:-27px !important}
-  #game-board .score-west{left:-49px !important}.score-east{right:-49px !important}
-  #game-board .pos-top .avatar-img{width:34px;height:34px;}
-  #game-board .pos-top .avatar-name{font-size:6px;}
-  #game-board .enemy-hand-top{top:clamp(44px,10vh,58px) !important;}
-  #game-board .pos-bottom{left:calc(50% - clamp(145px,25vw,235px)) !important;bottom:max(2px,var(--safe-bottom)) !important;}
-  #game-board .pos-bottom .avatar-img{width:34px;height:34px;}
-  #game-board .pos-left,#game-board .pos-right{top:50% !important;}
-  #game-board .pos-left .avatar-img,#game-board .pos-right .avatar-img{width:34px;height:34px;}
-  #game-board .river-top{top:clamp(74px,16vh,92px) !important;}
-  #game-board .river-bottom{bottom:calc(var(--tile-h) + max(30px,var(--safe-bottom) + 22px)) !important;}
-}
-
-@media (orientation:portrait) and (max-width:600px){
-  #game-board .center-board{width:clamp(104px,27vmin,132px) !important;height:clamp(104px,27vmin,132px) !important;}
-  #game-board .river-left{left:calc(50% - clamp(110px,30vw,155px)) !important;}
-  #game-board .river-right{right:calc(50% - clamp(110px,30vw,155px)) !important;}
-  #game-board .pos-bottom{left:calc(50% - clamp(145px,33vw,195px)) !important;bottom:max(4px,var(--safe-bottom)) !important;}
-  #game-board .pos-bottom .avatar-img{width:36px;height:36px;}
-  #game-board .river-top{top:clamp(94px,13vh,118px) !important;}
-}
-
-@media (max-width:380px) and (orientation:portrait){
-  #game-board .pos-left{left:max(5px,var(--safe-left)) !important;}
-  #game-board .pos-right{right:max(5px,var(--safe-right)) !important;}
-  #game-board .pos-bottom{left:calc(50% - 142px) !important;}
-  #game-board .center-board{width:104px !important;height:104px !important;}
-}
-
-/* RIICHI CLEAN: no screen darkening, no red vignette, no atmosphere. */
-#game-board.riichi-active,
-#game-board.riichi-active::after,
-#game-board.riichi-active::before{
-  filter:none !important;
-  animation:none !important;
-  background:none !important;
-  box-shadow:none !important;
-}
-#game-board.riichi-active .center-board{border-color:inherit !important;box-shadow:inherit !important;}
-#game-board.riichi-active .turn-timer{color:inherit !important;text-shadow:none !important;}
-#game-board.riichi-active .riichi-overlay{display:none !important;}
-
-/* Slightly larger red corner indicators for readability. */
-#game-board .tile-helper{font-size:clamp(9px,1.55vw,13px) !important;font-weight:1000 !important;top:3px !important;right:4px !important;}
-#game-board .discard-tile .tile-helper{font-size:clamp(6px,1.05vw,10px) !important;}
-
-/* Never let the browser zoom or scroll the game board. */
-#game-board, #game-board *{touch-action:none;overscroll-behavior:none;}
-#game-board .tile{touch-action:manipulation;}
-
-</style>
 </head>
 <body>
 
@@ -2197,7 +1397,7 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
             <div class="menu-actions">
                 <button class="btn btn-primary" onclick="start4PGame('Medium', false)">Vs AI <span class="btn-note">• Singleplayer</span></button>
                 <button class="btn btn-secondary" onclick="openPlayerLobby()">Vs Player <span class="btn-note">• Multiplayer Lobby</span></button>
-                <button class="btn btn-secondary" onclick="nav('screen-main')">← Kembali ke Menu</button>
+                <button class="btn btn-secondary" onclick="nav('screen-main')">Back</button>
             </div>
         </section>
     </main>
@@ -2250,11 +1450,9 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
                 <div class="lobby-actions">
                     <button class="btn btn-primary btn-wide" id="btn-lobby-ready" onclick="togglePlayerReady()">SIAP</button>
                     <button class="btn btn-primary btn-wide" id="btn-lobby-start" onclick="mpStartGame()" hidden>MULAI GAME</button>
-                    <button class="btn btn-secondary btn-wide" onclick="backFromLobby()">← Kembali ke Mode</button>
                     <button class="btn btn-secondary btn-wide" onclick="closeLobby()">Keluar</button>
                 </div>
             </div>
-            <button class="btn btn-secondary btn-wide lobby-back-btn" onclick="backFromPlayerLobby()">← Kembali ke Pilih Mode</button>
         </section>
     </div>
 
@@ -2291,6 +1489,15 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
     </div>
 
     <main id="screen-game" class="screen" aria-label="Game board">
+        
+<div id="landscape-lock" aria-live="polite">
+  <div class="lock-card">
+    <div class="lock-icon">↻</div>
+    <strong>Mode Landscape</strong>
+    <span>Putar HP atau iPad ke posisi mendatar untuk mulai bermain.</span>
+  </div>
+</div>
+
         <div class="riichi-overlay" id="riichi-effect"></div>
         <section id="game-board" aria-label="Riichi Mahjong table">
             <div class="topbar">
@@ -2438,12 +1645,7 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
     function tileMarkup(t){
         if(!t) return '';
         const src=tileAssetPath(t);
-        const helper = t.type==='honor' ? t.helper : (t.helper || '');
-        const fallback = escSvg(t.val || 'tile');
-        return `<img class="tile-svg-img" src="${src}" alt="${fallback}" draggable="false" decoding="async" loading="eager"
-                    onerror="this.dataset.failed='1'; this.style.display='none'; this.nextElementSibling.hidden=false;">
-                <span class="tile-fallback" hidden>${fallback}</span>
-                <span class="tile-corner-label" aria-hidden="true">${escSvg(helper)}</span>`;
+        return `<img class="tile-svg-img" src="${src}" alt="${escSvg(t.val||'tile')}" draggable="false" decoding="async" loading="eager">`;
     }
 
 
@@ -2536,23 +1738,12 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
         if(musicStep%8===6) pluckChinese(musicScale[(base+2)%musicScale.length],now+0.16,0.58,0.5);
         musicStep++;
     }
-    let musicLoopToken=0;
     function startChineseMusic(){
         const ctx=ensureMusicContext(); if(!ctx||!musicEnabled)return;
         if(ctx.state==='suspended')ctx.resume().catch(()=>{});
-        if(musicTimer) return;
-        const token=++musicLoopToken;
-        musicStep=0;
-        musicTick();
-        musicTimer=setInterval(()=>{
-            if(token!==musicLoopToken || !musicEnabled){ clearInterval(musicTimer); musicTimer=null; return; }
-            musicTick();
-        }, 900);
+        if(musicTimer)return; musicTick(); musicTimer=setInterval(musicTick,860);
     }
-    function stopChineseMusic(){
-        musicLoopToken++;
-        if(musicTimer){clearInterval(musicTimer);musicTimer=null;}
-    }
+    function stopChineseMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null;}}
     function forcePlayMusic(){ startChineseMusic(); }
     function toggleAudio(){ musicEnabled=!musicEnabled; if(musicEnabled){startChineseMusic()}else{stopChineseMusic()} const b=byId('audio-toggle-label'); if(b)b.textContent=musicEnabled?'ON':'OFF'; }
     function updateVolume(val){ const v=Math.max(0,Math.min(1,Number(val))); if(musicMaster)musicMaster.gain.value=v*0.24; setText('volume-value',Math.round(v*100)+'%'); }
@@ -2656,15 +1847,6 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
         if(mp.ws?.readyState===WebSocket.OPEN) mp.ws.send(JSON.stringify({type,...data}));
     }
 
-    function backFromPlayerLobby(){
-        clearTimeout(mpAutoStartTimer);
-        try{ if(mp.ws){ mp.ws.onclose=null; mp.ws.close(); } }catch(e){}
-        mp.ws=null; mp.connected=false; mp.room=null; mp.seat=null; mp.host=false; mp.ready=false; mp.started=false;
-        isMultiplayerMode=false;
-        setDisplay('modal-lobby','none');
-        nav('screen-play');
-    }
-
     function openPlayerLobby(){
         isMultiplayerMode=true;
         setDisplay('modal-lobby','flex');
@@ -2682,17 +1864,6 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
             setText('lobby-help','Menghubungkan ke Room '+code+'…');
             mpConnect(code,'guest');
         }
-    }
-
-    function backFromLobby(){
-        clearTimeout(mpAutoStartTimer);clearTimeout(mpReconnectTimer);
-        try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}
-        mp.ws=null;mp.connected=false;
-        mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,playerName:(byId('mp-name')?.value||mp.playerName||'Player')};
-        isMultiplayerMode=false;
-        setDisplay('modal-lobby','none');
-        mpSetConnection(false);
-        nav('screen-play');
     }
 
     function closeLobby(){
@@ -2800,8 +1971,7 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
 
     function updateFuritenIndicator(status){const panel=byId('furiten-panel'),el=byId('furiten-status');if(!panel||!el)return;const t=status?.type;if(t!=='Temporary'&&t!=='Permanent'){panel.style.display='none';el.textContent='';return;}panel.style.display='block';el.className='furiten-status '+(t==='Permanent'?'perma':'temp');el.textContent=t==='Permanent'?'Permanent Furiten — Ron dilarang':'Temporary Furiten — tunggu discard berikutnya';}
     function mpRenderHandAndTable(s,map,hands,rivers,state){
-        const b=byId('player-hand-tiles');if(b){b.innerHTML='';(hands[s]||[]).forEach((t,i)=>{const el=document.createElement('div');el.className=`tile tile-${t.type}${t.num===5&&t.type!=='honor'?' red-five-tile':''}`;el.dataset.uid=t.uniqueId||'';el.innerHTML=tileMarkup(t);el.onclick=()=>mpTapTile(i,t);let sy=0;el.onpointerdown=e=>{sy=e.clientY;el.classList.remove('swipe-arming')};el.onpointermove=e=>{if(sy&&sy-e.clientY>30)el.classList.add('swipe-arming')};el.onpointerup=e=>{el.classList.remove('swipe-arming');if(sy-e.clientY>35)mpSendDiscard(t)};b.appendChild(el)});}
-        if(s===0){ const prevHands=playerHands[0]; const prevMelds=playerMelds[0]; playerHands[0]=hands[s]||[]; playerMelds[0]=prevMelds; updateHandStatus(); const advice=getBestDiscardAdvice(playerHands[0],playerMelds[0]?.length||0); markBeginnerAdvisorTiles(advice); playerHands[0]=prevHands; playerMelds[0]=prevMelds; }
+        const b=byId('player-hand-tiles');if(b){b.innerHTML='';(hands[s]||[]).forEach((t,i)=>{const el=document.createElement('div');el.className=`tile tile-${t.type}${t.num===5&&t.type!=='honor'?' red-five-tile':''}`;el.innerHTML=tileMarkup(t);el.onclick=()=>mpTapTile(i,t);let sy=0;el.onpointerdown=e=>{sy=e.clientY;el.classList.remove('swipe-arming')};el.onpointermove=e=>{if(sy&&sy-e.clientY>30)el.classList.add('swipe-arming')};el.onpointerup=e=>{el.classList.remove('swipe-arming');if(sy-e.clientY>35)mpSendDiscard(t)};b.appendChild(el)})}
         [['enemy-hand-top',map[2]],['enemy-hand-right',map[1]],['enemy-hand-left',map[3]]].forEach(([id,canon])=>{const el=byId(id);if(!el)return;el.innerHTML='';for(let i=0;i<(hands[canon]||[]).length;i++){const x=document.createElement('div');x.className='tile-back';el.appendChild(x)}});
         [['river-bottom',map[0]],['river-right',map[1]],['river-top',map[2]],['river-left',map[3]]].forEach(([id,canon])=>{const el=byId(id);if(!el)return;el.innerHTML='';(rivers[canon]||[]).forEach(t=>{const d=document.createElement('div');d.className=`discard-tile tile-${t.type}`;d.innerHTML=tileMarkup(t);el.appendChild(d)})});
         if(state.remoteActions?.seat===s)mpRenderActions(state.remoteActions.actions||[]);else setDisplay('action-overlay','none');
@@ -2823,7 +1993,7 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
         if(['Ron','Pon','Kan','Chi','Skip'].includes(act)&&mpPendingCallQueue[0]?.seat!==seat)return;
         if(act==='Tsumo'){const e=evaluateYakuAndScore(seat,null,true);if(checkWinningHand(playerHands[seat],playerMelds[seat].length)&&e.valid){playerScores[seat]+=e.points;endRound(`TSUMO by ${mp.room.players?.[seat]?.name||'Player'}`,`${e.yakuStr} (+${e.points} Pts)`)}return}
         if(act==='Riichi'){if(currentTurn!==seat||aiRiichi[seat])return;aiRiichi[seat]=true;playerScores[seat]-=1000;riichiSticks++;mpPendingRiichiSeat=seat;startRemoteTurnTimer(seat);mpBroadcastState({remoteActions:{seat,actions:[]},handStatus:{seat,main:'RIICHI',sub:'Buang tile untuk mengunci tangan.'}});return}
-        if(act==='Ron'&&lastDiscardedTile){const e=evaluateYakuAndScore(seat,lastDiscardedTile,false);if(e.valid&&checkWinningHand([...playerHands[seat],lastDiscardedTile],playerMelds[seat].length)&&!checkSeatFuriten(seat,lastDiscardedTile.id)){playerScores[seat]+=e.points;playerScores[lastDiscarderIdx]-=e.points;endRound(`RON by ${mp.room.players?.[seat]?.name||'Player'}`,`${e.yakuStr} (+${e.points} Pts)`)}return}
+        if(act==='Ron'&&lastDiscardedTile){const e=evaluateYakuAndScore(seat,lastDiscardedTile,false);if(e.valid&&checkWinningHand([...playerHands[seat],lastDiscardedTile],playerMelds[seat].length)&&!checkSeatFuriten(seat,lastDiscardedTile.id)){playerScores[seat]+=e.points;playerScores[lastDiscarderIdx]-=e.points;endRound(`RON by ${mp.room.players?.[seat]?.name||'Player'}`,`${e.yakuStr} (+${e.points} Pts)`) }return}
         if(act==='Pon'){mpPendingCallQueue=[];executePon(seat);return}
         if(act==='Kan'){mpPendingCallQueue=[];executeKan(seat);return}
         if(act==='Chi'){mpPendingCallQueue=[];executeChi(seat);return}
@@ -2864,108 +2034,6 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
     let aiMoveTimer = null, autoDiscardTimer = null, roundToken = 0;
     let roundActive = false;
     let roundEnding = false;
-
-    let honbaCount = 0;
-    let roundOutcome = null;
-    let matchFinished = false;
-    let ippatsuEligible = [false, false, false, false];
-    let doubleRiichiEligible = [false, false, false, false];
-    let lastWinMethod = null;
-
-    const SEAT_ORDER_V24 = [1, 0, 3, 2]; // East, South, West, North by canonical player index.
-    function getSeatWindForPlayer(pIdx) {
-        const di = SEAT_ORDER_V24.indexOf(currentDealerIdx);
-        const pi = SEAT_ORDER_V24.indexOf(pIdx);
-        if (di < 0 || pi < 0) return PLAYER_SEAT_WINDS[pIdx] || 'S';
-        return WIND_ORDER[(pi - di + 4) % 4];
-    }
-    function getSeatLabelForPlayer(pIdx) {
-        return getSeatWindForPlayer(pIdx);
-    }
-
-    function calculateWinPayments(han, fu, isDealer, isTsumo) {
-        let basePoint;
-        const yakuman = han >= 13;
-        if (yakuman) {
-            if (isTsumo) {
-                return isDealer
-                    ? { total: 48000, payments: [16000,16000,16000], detail: 'Yakuman tsumo • setiap Ko bayar 16000' }
-                    : { total: 32000, payments: [16000,8000,8000], detail: 'Yakuman tsumo • Oya 16000, Ko 8000' };
-            }
-            return { total: isDealer ? 48000 : 32000, ron: isDealer ? 48000 : 32000, detail: 'Yakuman ron' };
-        }
-        if (han >= 11) basePoint = 6000;
-        else if (han >= 8) basePoint = 4000;
-        else if (han >= 6) basePoint = 3000;
-        else if (han >= 5 || (han === 4 && fu >= 40) || (han === 3 && fu >= 70)) basePoint = 2000;
-        else basePoint = Math.min(fu * Math.pow(2, han + 2), 2000);
-        if (isTsumo) {
-            if (isDealer) {
-                const pay = ceil100(basePoint * 2);
-                return { total: pay * 3, payments: [pay,pay,pay], detail: `Setiap Ko bayar ${pay}` };
-            }
-            const payDealer = ceil100(basePoint * 2);
-            const payOther = ceil100(basePoint);
-            return { total: payDealer + payOther * 2, payments: [payOther,payDealer,payOther], detail: `Oya: ${payDealer}, Ko: ${payOther}` };
-        }
-        const ron = ceil100(basePoint * (isDealer ? 6 : 4));
-        return { total: ron, ron, detail: `Lawan bayar ${ron}` };
-    }
-
-    function applyWinSettlement(winner, loser, result, method, titleOverride, descExtra='') {
-        if (!result?.valid || roundEnding || !roundActive) return false;
-        const isTsumo = method === 'tsumo';
-        const isDealer = winner === currentDealerIdx;
-        const calc = calculateWinPayments(result.han, result.fu, isDealer, isTsumo);
-        const before = [...playerScores];
-        const honba = honbaCount;
-        const kyotaku = riichiSticks;
-        const delta = [0,0,0,0];
-
-        if (isTsumo) {
-            const seatOrder = [0,1,2,3].filter(p => p !== winner);
-            seatOrder.forEach((payer) => {
-                const basePay = isDealer
-                    ? (calc.payments?.[0] || Math.ceil(calc.total / 3))
-                    : (payer === currentDealerIdx ? (calc.payments?.[1] || Math.ceil(calc.total / 2)) : (calc.payments?.[0] || Math.ceil(calc.total / 4)));
-                const pay = basePay + honba * 100;
-                playerScores[payer] -= pay;
-                delta[payer] -= pay;
-            });
-            const gain = calc.total + honba * 300 + kyotaku * 1000;
-            playerScores[winner] += gain;
-            delta[winner] += gain;
-        } else {
-            const pay = (calc.ron || calc.total) + honba * 300;
-            if (loser == null || loser === winner) return false;
-            playerScores[loser] -= pay;
-            playerScores[winner] += pay + kyotaku * 1000;
-            delta[loser] -= pay;
-            delta[winner] += pay + kyotaku * 1000;
-        }
-
-        riichiSticks = 0; // winner collects all kyotaku.
-        lastWinMethod = method;
-        roundOutcome = {
-            kind: 'win', winner, loser: isTsumo ? null : loser, method,
-            dealerWon: winner === currentDealerIdx, honbaUsed: honba,
-            kyotakuClaimed: kyotaku, deltas: delta, beforeScores: before,
-            result
-        };
-        const title = titleOverride || `${method.toUpperCase()} WIN!`;
-        const paymentsText = isTsumo
-            ? `Pembayaran: ${calc.detail}${honba ? ` + ${honba} honba` : ''}${kyotaku ? ` + ${kyotaku * 1000} kyotaku` : ''}.`
-            : `Pembayaran: ${calc.total.toLocaleString('id-ID')}${honba ? ` + ${honba}×300 honba` : ''}${kyotaku ? ` + ${kyotaku * 1000} kyotaku` : ''}.`;
-        endRound(title, `${result.yakuStr} • ${result.han} Han • ${result.fu} Fu\n${paymentsText}${descExtra ? `\n${descExtra}` : ''}`);
-        return true;
-    }
-
-    // Ura-dora and ippatsu helpers.
-    function markRiichiDeclared(pIdx, isDouble=false) {
-        ippatsuEligible[pIdx] = true;
-        doubleRiichiEligible[pIdx] = !!isDouble;
-    }
-    function cancelIppatsuForAll() { ippatsuEligible = [false,false,false,false]; }
 
     function ceil100(v) { return Math.ceil(v / 100) * 100; }
 
@@ -3187,7 +2255,7 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
         const groups = decomposition.groups;
         const pairId = decomposition.pairId;
         const roundWind = 'E';
-        const seatWind = getSeatWindForPlayer(pIdx);
+        const seatWind = PLAYER_SEAT_WINDS[pIdx] || 'S';
 
         if (pIdx === 0 ? isRiichi : aiRiichi[pIdx]) yaku.push({ name: 'Riichi', han: 1 });
         if (isTsumo && closed) yaku.push({ name: 'Menzen Tsumo', han: 1 });
@@ -3267,78 +2335,6 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
         return yaku;
     }
 
-    // Additional yaku layer (keeps the proven base evaluator and adds common Riichi yaku).
-    const __evaluateStandardYakuV24Base = evaluateStandardYaku;
-    evaluateStandardYaku = function(hand, melds, decomposition, winTile, isTsumo, pIdx) {
-        let yaku = __evaluateStandardYakuV24Base(hand, melds, decomposition, winTile, isTsumo, pIdx);
-        const allTiles = getAllTilesForHand(hand, melds);
-        const groups = decomposition?.groups || [];
-        const allGroups = [...groups, ...((melds || []).map(g => ({
-            type: g.length === 4 || g.every(t => t.id === g[0].id) ? 'triplet' : 'sequence', ids: g.map(t=>t.id)
-        })) )];
-        const triplets = allGroups.filter(g=>g.type==='triplet');
-        const dragons = [31,32,33];
-        const winds = [27,28,29,30];
-        const closed = (melds || []).length === 0;
-
-        if (yaku.some(y=>y.name==='Riichi') && doubleRiichiEligible[pIdx]) {
-            yaku = yaku.filter(y=>y.name!=='Riichi');
-            yaku.push({name:'Double Riichi',han:2});
-        }
-        if (ippatsuEligible[pIdx]) yaku.push({name:'Ippatsu',han:1});
-        if (isTsumo && fullDeck.length === 0) yaku.push({name:'Haitei Raoyue',han:1});
-        if (!isTsumo && fullDeck.length === 0) yaku.push({name:'Houtei Raoyui',han:1});
-        if (lastWinMethod === 'chankan') yaku.push({name:'Chankan',han:1});
-
-        // Sanshoku Doukou: triplets of the same number in all three suits.
-        const tripletIds = new Set(triplets.map(g=>g.ids[0]));
-        for (let n=1;n<=9;n++) {
-            if ([n-1,9+n-1,18+n-1].every(id=>tripletIds.has(id))) { yaku.push({name:'Sanshoku Doukou',han:2}); break; }
-        }
-        // Sankantsu / Daisangen / Shousangen / wind yakuman.
-        const kanCountHere = (melds||[]).filter(g=>g.length===4).length;
-        if (kanCountHere >= 3) yaku.push({name:'Sankantsu',han:2});
-        const dragonTriplets = dragons.filter(id=>tripletIds.has(id)).length;
-        if (dragonTriplets === 3) yaku.push({name:'Daisangen',han:13,yakuman:true});
-        else if (dragonTriplets === 2 && dragons.some(id=>decomposition.pairId===id)) yaku.push({name:'Shousangen',han:2});
-        const windTriplets = winds.filter(id=>tripletIds.has(id)).length;
-        if (windTriplets === 4) yaku.push({name:'Daisuushi',han:26,yakuman:true});
-        else if (windTriplets === 3 && winds.some(id=>decomposition.pairId===id)) yaku.push({name:'Shousuushi',han:13,yakuman:true});
-
-        // Ryanpeikou supersedes two Iipeiko in a closed hand.
-        if (closed) {
-            const seqKeys = groups.filter(g=>g.type==='sequence').map(g=>g.ids.join('-'));
-            const freq = {}; seqKeys.forEach(k=>freq[k]=(freq[k]||0)+1);
-            const pairs = Object.values(freq).filter(v=>v>=2).length;
-            if (pairs>=2) {
-                yaku = yaku.filter(y=>!/^Iipeiko/.test(y.name));
-                yaku.push({name:'Ryanpeikou',han:3});
-            }
-        }
-
-        // Ryuuiisou: only green sou tiles plus green dragon.
-        if (allTiles.length === 14 && allTiles.every(t=>
-            (t.type==='sou' && [2,3,4,6,8].includes(t.num)) || t.id===32
-        )) yaku.push({name:'Ryuuiisou',han:13,yakuman:true});
-
-        // Chuuren Poutou (closed, one suit, exact 1112345678999 + one duplicate).
-        if (closed && hand.length===14) {
-            const suits=new Set(hand.map(t=>t.type));
-            if (suits.size===1 && [...suits][0] !== 'honor') {
-                const c=tileCounts(hand); const base=([1,1,1,1,1,1,1,1,1]);
-                let ok=true, extra=0;
-                for(let i=1;i<=9;i++){
-                    const id=(suits.has('man')?0:suits.has('pin')?9:18)+(i-1);
-                    const need=(i===1||i===9)?3:1;
-                    if(c[id]<need) ok=false;
-                    extra += c[id]-need;
-                }
-                if(ok && extra===1) yaku.push({name:'Chuuren Poutou',han:13,yakuman:true});
-            }
-        }
-        return yaku;
-    };
-
     function evaluateChiitoitsu(hand, melds, isTsumo, pIdx) {
         if ((melds || []).length) return [];
         const counts = tileCounts(hand);
@@ -3364,62 +2360,63 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
 
     function calculateFu(decomp, hand, melds, winTile, isTsumo, pIdx, yaku) {
         if (yaku.some(y => y.name === 'Chiitoitsu')) return 25;
-        const winId = winTile?.id;
-        const seatWind = getSeatWindForPlayer(pIdx);
-        const roundWind = 'E';
         if (yaku.some(y => y.name === 'Pinfu')) return isTsumo ? 20 : 30;
 
+        const closed = (melds || []).length === 0;
         let fu = 20;
         if (isTsumo) fu += 2;
-        else if ((melds || []).length === 0) fu += 10;
+        else if (closed) fu += 10;
 
-        // Pair value: dragons, seat wind, round wind; double wind pair is 4 fu.
-        const pairId = decomp?.pairId;
-        const pairTile = Number.isInteger(pairId) ? TILE_TYPES[pairId] : null;
-        if (pairTile?.type === 'honor') {
-            const isDragon = pairId >= 31;
-            const isSeat = pairId === 27 + WIND_ORDER.indexOf(seatWind);
-            const isRound = pairId === 27 + WIND_ORDER.indexOf(roundWind);
-            if (isDragon || isSeat || isRound) fu += (isSeat && isRound) ? 4 : 2;
-        }
+        if (isValuePair(decomp.pairId, PLAYER_SEAT_WINDS[pIdx] || 'S', 'E')) fu += 2;
 
         const allGroups = [
-            ...((decomp?.groups || []).map(g => ({ ...g, open: false }))),
-            ...((melds || []).map(g => ({
-                type: g.length === 4 || g.every(t => t.id === g[0].id) ? 'triplet' : 'sequence',
-                ids: g.map(t => t.id), open: true
-            })))
+            ...decomp.groups.map(g => ({ ...g, open: false })),
+            ...((melds || []).map(g => ({ type: g.every(t => t.id === g[0].id) ? 'triplet' : 'sequence', ids: g.map(t => t.id), open: true })))
         ];
-
         for (const g of allGroups) {
             if (g.type !== 'triplet') continue;
             const t = TILE_TYPES[g.ids[0]];
             const terminalHonor = isTerminalOrHonor(t);
+            const open = g.open;
             const isKan = g.ids.length === 4;
-            if (isKan) fu += terminalHonor ? (g.open ? 16 : 32) : (g.open ? 8 : 16);
-            else fu += terminalHonor ? (g.open ? 4 : 8) : (g.open ? 2 : 4);
+            if (isKan) fu += terminalHonor ? (open ? 16 : 32) : (open ? 8 : 16);
+            else fu += terminalHonor ? (open ? 4 : 8) : (open ? 2 : 4);
         }
 
-        // Wait fu: tanki / kanchan / penchan = 2 fu; ryanmen = 0.
-        if (Number.isInteger(winId) && Number.isInteger(pairId) && pairId === winId) {
-            fu += 2;
-        } else if (Number.isInteger(winId)) {
-            const seq = (decomp?.groups || []).find(g => g.type === 'sequence' && g.ids.includes(winId));
-            if (seq) {
-                const nums = seq.ids.map(id => TILE_TYPES[id].num).sort((a,b) => a-b);
-                const n = TILE_TYPES[winId].num;
-                const edgeWait = (nums[0] === 1 && n === 3) || (nums[0] === 7 && n === 7);
-                const middleWait = nums[1] === n;
-                if (edgeWait || middleWait) fu += 2;
-            }
+        if (decomp.groups.every(g => g.type === 'sequence') &&
+            sequenceIsEdgeWait(decomp.groups.find(g => g.ids.includes(winTile.id))?.ids || [], winTile.id)) {
+            fu += 0; // ryanmen has no extra fu
+        } else {
+            fu += 2; // tanki / kanchan / penchan
         }
 
         return Math.max(20, Math.ceil(fu / 10) * 10);
     }
 
     function calculateRiichiPoints(han, fu, isDealer, isTsumo) {
-        const p = calculateWinPayments(han, fu, isDealer, isTsumo);
-        return { total: p.total, detail: p.detail };
+        if (han >= 13) return isTsumo
+            ? (isDealer ? { total: 24000, detail: 'Semua lawan bayar 8000' } : { total: 16000, detail: 'Oya bayar 8000, Ko masing-masing 4000' })
+            : { total: isDealer ? 48000 : 32000, detail: 'Bayaran Yakuman dari lawan' };
+
+        let basePoint;
+        if (han >= 11) basePoint = 6000;
+        else if (han >= 8) basePoint = 4000;
+        else if (han >= 6) basePoint = 3000;
+        else if (han >= 5 || (han === 4 && fu >= 40) || (han === 3 && fu >= 70)) basePoint = 2000;
+        else basePoint = Math.min(fu * Math.pow(2, han + 2), 2000);
+
+        if (isTsumo) {
+            if (isDealer) {
+                const pay = ceil100(basePoint * 2);
+                return { total: pay * 3, detail: `Setiap Ko bayar ${pay}` };
+            }
+            const payDealer = ceil100(basePoint * 2);
+            const payOther = ceil100(basePoint);
+            return { total: payDealer + payOther * 2, detail: `Oya: ${payDealer}, Ko: ${payOther}` };
+        }
+
+        const pay = ceil100(basePoint * (isDealer ? 6 : 4));
+        return { total: pay, detail: `Lawan bayar ${pay}` };
     }
 
     function evaluateRiichiHand(pIdx, winningTile, isTsumo) {
@@ -3548,67 +2545,6 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
         return best;
     }
 
-    function advisorTileLabel(id){
-        const t=TILE_TYPES[id];
-        if(!t) return '?';
-        if(t.type==='man') return `${t.num}萬`;
-        if(t.type==='pin') return `${t.num}-pin`;
-        if(t.type==='sou') return `${t.num}-sou`;
-        return t.val;
-    }
-
-    function getBestDiscardAdvice(hand, meldCount=0){
-        if(!Array.isArray(hand) || hand.length!==14) return null;
-        const candidates=[];
-        for(let i=0;i<hand.length;i++){
-            const remaining=hand.filter((_,j)=>j!==i);
-            const waits=getWaitIds(remaining,meldCount);
-            if(!waits.length) continue;
-            let bestOutcome=null;
-            for(const wid of waits){
-                const outcome=evaluateYakuAndScore(0,TILE_TYPES[wid],true);
-                if(outcome?.valid && (!bestOutcome || outcome.han>bestOutcome.han || (outcome.han===bestOutcome.han && outcome.fu>bestOutcome.fu))) bestOutcome=outcome;
-            }
-            candidates.push({index:i,tile:hand[i],waits,bestOutcome,score:(bestOutcome?.han||0)*100+waits.length});
-        }
-        if(!candidates.length) return null;
-        candidates.sort((a,b)=>b.score-a.score);
-        const topScore=candidates[0].score;
-        const top=candidates.filter(c=>c.score===topScore).slice(0,3);
-        return {top,candidates};
-    }
-
-    function updateBeginnerAdvisor(hand, meldCount, box){
-        if(!box) return;
-        let line=box.querySelector('.advisor-line');
-        if(!line){line=document.createElement('div');line.className='advisor-line';box.appendChild(line);}
-        line.textContent='';
-        if(hand.length!==14){line.style.display='none';return;}
-        const advice=getBestDiscardAdvice(hand,meldCount);
-        if(!advice){
-            line.style.display='block';
-            line.innerHTML='<span class="advisor-yaku">Belum ada buangan yang langsung membuat Tenpai.</span>';
-            return;
-        }
-        line.style.display='block';
-        const discardText=advice.top.map(a=>advisorTileLabel(a.tile.id)).join(' / ');
-        const waits=[...new Set(advice.top.flatMap(a=>a.waits))];
-        const waitText=waits.slice(0,8).map(advisorTileLabel).join(' ')+(waits.length>8?' …':'');
-        const yaku=new Set();
-        advice.top.forEach(a=>{ if(a.bestOutcome?.yakuStr) yaku.add(a.bestOutcome.yakuStr); });
-        line.innerHTML=`<span class="advisor-discard">Buang: ${escapeHtml(discardText)}</span> · <span class="advisor-wait">Tunggu: ${escapeHtml(waitText)}</span>${yaku.size?` · <span class="advisor-yaku">${escapeHtml([...yaku][0])}</span>`:''}`;
-    }
-
-    function markBeginnerAdvisorTiles(advice){
-        document.querySelectorAll('#player-hand-tiles .tile').forEach((el)=>el.classList.remove('advisor-recommended'));
-        if(!advice?.top?.length) return;
-        const ids=new Set(advice.top.map(a=>a.tile.uniqueId));
-        document.querySelectorAll('#player-hand-tiles .tile').forEach(el=>{
-            const uid=el.dataset.uid;
-            if(uid && ids.has(uid)) el.classList.add('advisor-recommended');
-        });
-    }
-
     function updateHandStatus() {
         const box = document.getElementById('hand-status');
         const main = document.getElementById('hand-status-main');
@@ -3629,31 +2565,14 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
                 box.classList.add('ready');
                 main.textContent = `BISA MENANG • ${win.han} Han • ${win.fu} Fu`;
                 sub.textContent = `Yaku: ${formatYakuNames(win)}`;
-                updateBeginnerAdvisor(hand, meldCount, box);
-                markBeginnerAdvisorTiles(null);
                 return;
             }
             if (structural) {
                 box.classList.add('blocked');
                 main.textContent = 'BENTUK LENGKAP • NO YAKU';
-                sub.textContent = 'Belum dapat menang. Pilih buangan yang membuka pola Yaku.';
-                updateBeginnerAdvisor(hand, meldCount, box);
-                const advice=getBestDiscardAdvice(hand,meldCount); markBeginnerAdvisorTiles(advice);
+                sub.textContent = 'Belum dapat menang. Pastikan ada minimal 1 yaku.';
                 return;
             }
-            const advice=getBestDiscardAdvice(hand,meldCount);
-            if(advice){
-                box.classList.add('tenpai');
-                main.textContent='SARAN PEMBUANGAN';
-                sub.textContent='Buang kartu yang ditandai untuk menuju Tenpai dengan peluang Yaku terbaik.';
-                updateBeginnerAdvisor(hand,meldCount,box); markBeginnerAdvisorTiles(advice);
-            }else{
-                box.classList.add('warning');
-                main.textContent='BELUM TENPAI';
-                sub.textContent='Prioritaskan membentuk 4 set + 1 pasangan.';
-                updateBeginnerAdvisor(hand,meldCount,box); markBeginnerAdvisorTiles(null);
-            }
-            return;
         }
 
         const expected13 = 13 - meldCount * 3;
@@ -3664,26 +2583,24 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
                 box.classList.add('tenpai');
                 main.textContent = `TENPAI • ${waits.length} WAIT`;
                 sub.textContent = outcome && outcome.valid
-                    ? `Menang pada: ${waits.map(advisorTileLabel).join(' ')} • Yaku: ${formatYakuNames(outcome)} • ${outcome.han} Han`
-                    : `Menunggu: ${waits.map(advisorTileLabel).join(' ')} • belum ada Yaku pada semua wait.`;
+                    ? `Menang pada: ${waits.map(id => TILE_TYPES[id]?.val).filter(Boolean).join(' ')} • Yaku: ${formatYakuNames(outcome)} • ${outcome.han} Han`
+                    : 'Belum bisa menang: wait yang tersedia belum menghasilkan yaku.';
             } else {
                 box.classList.add('warning');
                 main.textContent = 'BELUM TENPAI';
                 sub.textContent = 'Prioritaskan membentuk 4 set + 1 pasangan.';
             }
-            updateBeginnerAdvisor(hand,meldCount,box); markBeginnerAdvisorTiles(null);
             return;
         }
 
         box.classList.add('warning');
         main.textContent = 'STATUS TANGAN';
         sub.textContent = '4 set + 1 pasangan + minimal 1 yaku untuk menang.';
-        updateBeginnerAdvisor(hand,meldCount,box); markBeginnerAdvisorTiles(null);
     }
 
     function updateScoresUI() {
         for (let i = 0; i < 4; i++) setText(`score-${i}`, playerScores[i]);
-        setText('riichi-stick-counter', `1000 × ${riichiSticks}`); setText('kan-info', `Rinshan 4 • Kandora ${doraIndicators?.length||0} • Honba ${honbaCount}`);
+        setText('riichi-stick-counter', `1000 × ${riichiSticks}`);
     }
 
     // GAME INITIALIZATION
@@ -3694,12 +2611,7 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
         aiDifficulty = diff;
         isMultiplayerMode = isMultiplayer;
         currentRoundIndex = 0;
-        currentDealerIdx = 1; // East starts as dealer
         playerScores = [25000, 25000, 25000, 25000];
-        honbaCount = 0;
-        riichiSticks = 0;
-        roundOutcome = null;
-        matchFinished = false;
         
         nav('screen-game');
         setupRound();
@@ -3735,14 +2647,11 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
         playerRivers = [[], [], [], []];
         playerMelds = [[], [], [], []]; 
         aiRiichi = [false, false, false, false];
-        ippatsuEligible = [false,false,false,false];
-        doubleRiichiEligible = [false,false,false,false];
-        lastWinMethod = null;
         temporaryFuriten = [false, false, false, false];
         riichiFuriten = [false, false, false, false];
         pendingPlayerActions = [];
         riichiDiscardIndices = [];
-        isRiichi = false; pendingRiichi = false;
+        isRiichi = false; pendingRiichi = false; riichiSticks = 0;
         lastDiscardedTile = null; lastDiscarderIdx = -1;
         drawnTile = null; isDiscardable = false; isActionPhase = false;
         setDisplay('riichi-effect', 'none'); byId('game-board')?.classList.remove('riichi-active');
@@ -3769,7 +2678,7 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
 
         renderEnemyHands();
         updateHandStatus();
-        currentTurn = currentDealerIdx;
+        currentTurn = 0;
         roundActive = true;
         roundEnding = false;
         processTurn();
@@ -3898,7 +2807,6 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
         playerHands[0].forEach((t,i)=>{
             const el=document.createElement('div');
             el.className='tile tile-'+t.type+(t.num===5&&t.type!=='honor'?' red-five-tile':'')+(t===drawnTile?' drawn-tile-gap':'')+(riichiDiscardIndices.includes(i)?' riichi-legal-discard':'')+(i===selectedTileIndex?' selected-tile':'');
-            el.dataset.uid=t.uniqueId||'';
             el.tabIndex=0;
             const waits=waitsByDiscard[i]||[]; const waitText=waits.length?waits.map(id=>TILE_TYPES[id]?.val).filter(Boolean).join(' '):'—'; const yakuText=t.id===2?'No Yaku (simulasi 3-man)':'Terdeteksi';
             el.innerHTML=`${tileMarkup(t)}<span class="machi-bubble ${t.id===2?'no-yaku':''}"><strong>Machi: ${waitText}</strong><span>Yaku: ${yakuText}</span></span>`;
@@ -4038,8 +2946,9 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
                 canRevealUraDora = aiRiichi[currentTurn];
                 let evalScore = evaluateYakuAndScore(currentTurn, null, true);
                 if (!evalScore.valid) { /* structural agari without yaku: continue play */ } else {
+                playerScores[currentTurn] += evalScore.points;
                 let pNames = ["You", "P1 (East)", "P2 (North)", "P3 (West)"];
-                applyWinSettlement(currentTurn, null, evalScore, 'tsumo', `TSUMO by ${pNames[currentTurn]}!`);
+                endRound(`TSUMO by ${pNames[currentTurn]}!`, `${evalScore.yakuStr} - ${evalScore.points} Pts`);
                 return;
                 }
             }
@@ -4049,7 +2958,6 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
                 aiRiichi[currentTurn] = true;
                 playerScores[currentTurn] -= 1000;
                 riichiSticks++;
-                markRiichiDeclared(currentTurn, playerRivers[currentTurn].length===0);
                 updateScoresUI();
             }
             
@@ -4067,7 +2975,13 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
                     discardIdx = hand.indexOf(drawnTile);
                     if (discardIdx === -1) discardIdx = hand.length - 1;
                 } else {
-                    discardIdx = chooseAIDiscardIndexV24(currentTurn);
+                    // Smart Discard: Prioritize isolated Honor tiles -> Terminals (1/9)
+                    let honorIdx = hand.findIndex(t => t.type === 'honor');
+                    let terminalIdx = hand.findIndex(t => t.num === 1 || t.num === 9);
+                    
+                    if (honorIdx !== -1) discardIdx = honorIdx;
+                    else if (terminalIdx !== -1) discardIdx = terminalIdx;
+                    else discardIdx = Math.floor(Math.random() * hand.length);
                 }
 
                 let discarded = hand.splice(discardIdx, 1)[0];
@@ -4075,85 +2989,6 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
                 commitDiscard(currentTurn, discarded);
             }, delay);
         }
-    }
-
-    // ---------- Shanten / Ukeire AI ----------
-    const __shantenMemoV24 = new Map();
-    function calculateStandardShantenV24(tiles, openMelds=0) {
-        const counts = tileCounts(tiles);
-        const key = counts.join('') + '|' + openMelds;
-        if (__shantenMemoV24.has(key)) return __shantenMemoV24.get(key);
-        let best = 8 - openMelds * 2;
-        const c = counts.slice();
-        function dfs(idx, m, t, pair) {
-            while(idx<34 && c[idx]===0) idx++;
-            if(idx>=34){
-                const mm=Math.min(4,m+openMelds), tt=Math.min(t,4-mm);
-                best=Math.min(best,8-mm*2-tt-pair);
-                return;
-            }
-            // Skip tile.
-            const saved=c[idx]; c[idx]=0; dfs(idx+1,m,t,pair); c[idx]=saved;
-            if(c[idx]>=3){c[idx]-=3;dfs(idx,m+1,t,pair);c[idx]+=3;}
-            if(pair===0 && c[idx]>=2){c[idx]-=2;dfs(idx,m,t,1);c[idx]+=2;}
-            if(c[idx]>=2){c[idx]-=2;dfs(idx,m,t+1,pair);c[idx]+=2;}
-            if(idx<27 && idx%9<=6 && c[idx+1]>0 && c[idx+2]>0){c[idx]--;c[idx+1]--;c[idx+2]--;dfs(idx,m+1,t,pair);c[idx]++;c[idx+1]++;c[idx+2]++;}
-            if(idx<27 && idx%9<=7 && c[idx+1]>0){c[idx]--;c[idx+1]--;dfs(idx,m,t+1,pair);c[idx]++;c[idx+1]++;}
-            if(idx<27 && idx%9<=6 && c[idx+2]>0){c[idx]--;c[idx+2]--;dfs(idx,m,t+1,pair);c[idx]++;c[idx+2]++;}
-        }
-        dfs(0,0,0,0);
-        return __shantenMemoV24.set(key,best).get(key);
-    }
-    function calculateShantenV24(tiles, openMelds=0){
-        const counts=tileCounts(tiles);
-        const standard=calculateStandardShantenV24(tiles,openMelds);
-        if(openMelds===0){
-            const distinct=counts.filter(c=>c>0).length;
-            const pairs=counts.filter(c=>c>=2).length;
-            const chiitoi=6-pairs+Math.max(0,7-distinct);
-            const terminals=[0,8,9,17,18,26,27,28,29,30,31,32,33];
-            const unique=terminals.filter(id=>counts[id]>0).length;
-            const hasPair=terminals.some(id=>counts[id]>=2);
-            const kokushi=13-unique-(hasPair?1:0);
-            return Math.min(standard,chiitoi,kokushi);
-        }
-        return standard;
-    }
-    function getAvailableTileCountV24(id){
-        return (fullDeck||[]).reduce((n,t)=>n+(t.id===id?1:0),0);
-    }
-    function getUkeireForDiscardV24(hand13, openMelds, baseShanten){
-        let total=0;
-        for(const t of TILE_TYPES){
-            const c=tileCounts(hand13); if(c[t.id]>=4) continue;
-            const next=calculateShantenV24([...hand13,t],openMelds);
-            if(next<baseShanten) total+=getAvailableTileCountV24(t.id);
-        }
-        return total;
-    }
-    function isSafeAgainstRiichiV24(tileId, selfIdx){
-        for(let p=0;p<4;p++) if(p!==selfIdx && (aiRiichi[p]|| (p===0&&isRiichi))) {
-            if((playerRivers[p]||[]).some(t=>t.id===tileId)) return true;
-        }
-        return false;
-    }
-    function chooseAIDiscardIndexV24(pIdx){
-        const hand=playerHands[pIdx]||[]; if(hand.length<=1)return 0;
-        if(aiRiichi[pIdx]){
-            const d=hand.indexOf(drawnTile); return d>=0?d:hand.length-1;
-        }
-        let best=null;
-        for(let i=0;i<hand.length;i++){
-            const h13=hand.filter((_,j)=>j!==i);
-            const sh=calculateShantenV24(h13,playerMelds[pIdx].length);
-            const uke=getUkeireForDiscardV24(h13,playerMelds[pIdx].length,sh);
-            const t=hand[i];
-            const isolated=(t.type==='honor'||t.num===1||t.num===9)?1:0;
-            const safe=isSafeAgainstRiichiV24(t.id,pIdx)?1:0;
-            const key=[-sh, uke, safe, isolated, -(t.type==='honor'?0:1)];
-            if(!best || key.some((v,k)=>v>(best.key[k]||-Infinity) && key.slice(0,k).every((x,j)=>x===best.key[j]))) best={i,key,sh,uke};
-        }
-        return best?.i ?? 0;
     }
 
     function discardTile(index) {
@@ -4212,8 +3047,10 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
                 if (isWin) {
                     let evalScore = evaluateYakuAndScore(p, tile, false);
                     if (!evalScore.valid) continue;
+                    playerScores[p] += evalScore.points;
+                    playerScores[pIdx] -= evalScore.points;
                     let pNames = ["You", "Player 1 (East)", "Player 2 (North)", "Player 3 (West)"];
-                    applyWinSettlement(p, pIdx, evalScore, 'ron', `RON by ${pNames[p]}!`);
+                    endRound(`RON by ${pNames[p]}!`, `${evalScore.yakuStr} (+${evalScore.points} Pts paid by ${pNames[pIdx]})`);
                     return;
                 }
             }
@@ -4298,9 +3135,13 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
             pendingPlayerActions = [];
             riichiDiscardIndices = [];
             canRevealUraDora = isRiichi;
-            const evalScore = evaluateYakuAndScore(0, act === 'Ron' ? lastDiscardedTile : null, act === 'Tsumo');
-            if (!evalScore.valid) return;
-            applyWinSettlement(0, act === 'Ron' ? lastDiscarderIdx : null, evalScore, act === 'Tsumo' ? 'tsumo' : 'ron', `${act.toUpperCase()} WIN!`);
+            let evalScore = evaluateYakuAndScore(0, act === 'Ron' ? lastDiscardedTile : null, act === 'Tsumo');
+            if (!evalScore.valid || evalScore.points <= 0) return;
+            playerScores[0] += evalScore.points;
+            if (act === 'Ron' && lastDiscarderIdx !== -1) {
+                playerScores[lastDiscarderIdx] -= evalScore.points;
+            }
+            endRound(`${act.toUpperCase()} WIN!`, `${evalScore.yakuStr} (+${evalScore.points} Poin)\n${evalScore.detail}`);
             return;
         }
         
@@ -4341,7 +3182,6 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
     }
 
     function executePon(playerIdx) {
-        cancelIppatsuForAll();
         let count = 0, indicesToRemove = [];
         for (let i = playerHands[playerIdx].length - 1; i >= 0; i--) {
             if (playerHands[playerIdx][i].id === lastDiscardedTile.id && count < 2) {
@@ -4407,7 +3247,6 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
     }
 
     function executeKan(playerIdx) {
-        cancelIppatsuForAll();
         if (!lastDiscardedTile || kanCount >= 4) return false;
         const a = takeTilesById(playerHands[playerIdx], lastDiscardedTile.id, 3);
         if (a.length !== 3) return false;
@@ -4416,7 +3255,6 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
     }
 
     function executeAnkan(playerIdx, tileId) {
-        cancelIppatsuForAll();
         if (!roundActive || roundEnding || kanCount >= 4) return false;
         const a = takeTilesById(playerHands[playerIdx], tileId, 4);
         if (a.length !== 4) {
@@ -4437,30 +3275,10 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
         return continueAfterKanDraw(playerIdx);
     }
 
-    function tryChankanV24(playerIdx, tile) {
-        if (!tile || !roundActive || roundEnding) return false;
-        for (let p=0;p<4;p++) {
-            if (p===playerIdx) continue;
-            const isHuman = p===0 || roomCanAct?.(p);
-            const canRon = checkWinningHand([...(playerHands[p]||[]), tile], (playerMelds[p]||[]).length);
-            if (!canRon) continue;
-            lastWinMethod='chankan';
-            const ev=evaluateYakuAndScore(p,tile,false);
-            if (!ev.valid) { lastWinMethod=null; continue; }
-            if (p===0 && checkFuriten(tile.id)) { lastWinMethod=null; continue; }
-            applyWinSettlement(p,playerIdx,ev,'ron',`CHANKAN by ${p===0?'You':`Player ${p+1}`}!`,'Kan dibatalkan karena tile Kan menjadi winning tile.');
-            return true;
-        }
-        return false;
-    }
-
     function executeShouminkan(playerIdx, meldIndex) {
-        cancelIppatsuForAll();
         if (!roundActive || roundEnding || kanCount >= 4) return false;
         const g = playerMelds[playerIdx][meldIndex];
         if (!g || g.length !== 3 || !g.every(t => t.id === g[0].id)) return false;
-        const candidate = playerHands[playerIdx].find(t => t.id === g[0].id);
-        if (candidate && tryChankanV24(playerIdx, candidate)) return true;
         const i = playerHands[playerIdx].findIndex(t => t.id === g[0].id);
         if (i < 0) return false;
         g.push(playerHands[playerIdx].splice(i, 1)[0]);
@@ -4485,7 +3303,6 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
     }
 
     function executeChi(playerIdx) {
-        cancelIppatsuForAll();
         const combos = getChiCombinations(playerHands[playerIdx], lastDiscardedTile);
         const chosenCombo = combos[0];
         if (!chosenCombo || !lastDiscardedTile) return;
@@ -4529,23 +3346,33 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
 
     function settleExhaustiveDraw() {
         if (!roundActive || roundEnding) return;
-        const tenpai = [0,1,2,3].map(getPlayerTenpaiStatus);
-        const readyPlayers = tenpai.map((v,i)=>v?i:-1).filter(i=>i!==-1);
-        const notenPlayers = tenpai.map((v,i)=>!v?i:-1).filter(i=>i!==-1);
-        const deltas=[0,0,0,0];
-        let description='';
-        if (readyPlayers.length>0 && readyPlayers.length<4) {
-            const gain=3000/readyPlayers.length, loss=3000/notenPlayers.length;
-            readyPlayers.forEach(p=>{playerScores[p]+=gain;deltas[p]+=gain;});
-            notenPlayers.forEach(p=>{playerScores[p]-=loss;deltas[p]-=loss;});
+
+        const tenpai = [0, 1, 2, 3].map(getPlayerTenpaiStatus);
+        const readyPlayers = tenpai.map((v, i) => v ? i : -1).filter(i => i !== -1);
+        const notenPlayers = tenpai.map((v, i) => !v ? i : -1).filter(i => i !== -1);
+
+        let description = '';
+
+        if (readyPlayers.length > 0 && readyPlayers.length < 4) {
+            const gain = 3000 / readyPlayers.length;
+            const loss = 3000 / notenPlayers.length;
+            readyPlayers.forEach(p => { playerScores[p] += gain; });
+            notenPlayers.forEach(p => { playerScores[p] -= loss; });
+
             updateScoresUI();
-            description=`Tenpai: ${readyPlayers.map(p=>['You','Player 1','Player 2','Player 3'][p]).join(', ')}. +${gain.toLocaleString('id-ID')} per Tenpai; -${loss.toLocaleString('id-ID')} per Noten.`;
-        } else if(readyPlayers.length===4) description='Semua pemain Tenpai. Tidak ada pembayaran Tenpai/Noten.';
-        else description='Tidak ada pemain Tenpai. Tidak ada pembayaran Tenpai/Noten.';
-        const dealerTenpai=tenpai[currentDealerIdx]===true;
-        roundOutcome={kind:'draw',winner:null,loser:null,method:'draw',dealerWon:false,dealerTenpai,honbaUsed:honbaCount,kyotakuClaimed:0,deltas,beforeScores:[...roundStartScores]};
-        const readyCount=readyPlayers.length;
-        endRound(readyCount>0?`RYUUKYOKU • ${readyCount} TENPAI`:'RYUUKYOKU • SEMUA NOTEN',`${description}\nDealer: ${dealerTenpai?'TENPAI → RENCHAN':'NOTEN → dealer berpindah'}.`);
+
+            const names = ['You (South)', 'Player 1 (East)', 'Player 2 (North)', 'Player 3 (West)'];
+            const readyNames = readyPlayers.map(p => names[p]).join(', ');
+            description = `Tenpai: ${readyNames}. Masing-masing +${gain.toLocaleString('id-ID')} poin; Noten membayar total 3000 poin.`;
+        } else if (readyPlayers.length === 4) {
+            description = 'Semua pemain Tenpai. Tidak ada pembayaran Tenpai/Noten.';
+        } else {
+            description = 'Tidak ada pemain Tenpai. Tidak ada pembayaran Tenpai/Noten.';
+        }
+
+        const readyCount = readyPlayers.length;
+        const title = readyCount > 0 ? `RYUUKYOKU • ${readyCount} TENPAI` : 'RYUUKYOKU • SEMUA NOTEN';
+        endRound(title, description);
     }
 
     // ROUND END & EXTENSION MECHANICS
@@ -4644,7 +3471,6 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
         const scoreBox = byId('res-scores');
         if (scoreBox) scoreBox.innerHTML = scoreHtml;
         setDisplay('modal-result', 'flex');
-        if (!roundOutcome) roundOutcome = {kind: isDraw ? 'draw' : 'win', dealerWon:false, dealerTenpai:false};
     }
 
     function nextRoundOrFinish() {
@@ -4652,28 +3478,16 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
         setDisplay('modal-result', 'none');
         document.getElementById('hand-status')?.classList.remove('action-open');
         pendingPlayerActions = [];
-        const outcome = roundOutcome || {};
-        const maxScore = Math.max(...playerScores);
-
-        // Every hand advances East 1 → East 2 → ...; dealer may renchan without changing seat.
         currentRoundIndex++;
-        if (outcome.kind === 'win') {
-            if (outcome.dealerWon) honbaCount += 1;
-            else { honbaCount = 0; currentDealerIdx = SEAT_ORDER_V24[(SEAT_ORDER_V24.indexOf(currentDealerIdx)+1)%4]; }
-        } else if (outcome.kind === 'draw') {
-            honbaCount += 1;
-            if (!outcome.dealerTenpai) currentDealerIdx = SEAT_ORDER_V24[(SEAT_ORDER_V24.indexOf(currentDealerIdx)+1)%4];
-        }
-
-        // East 1-4, plus one extension hand when no player has reached 30k yet.
-        const shouldContinue = currentRoundIndex < 4 || (currentRoundIndex === 4 && maxScore < 30000);
-        if (shouldContinue) {
+        
+        // Standard match flow: East 1-4, with East 5 extra only when the configured extension condition is met.
+        let maxScore = Math.max(...playerScores);
+        if (currentRoundIndex < 4 || (currentRoundIndex === 4 && maxScore < 30000)) {
+            nav('screen-game');
             nav('screen-game');
             setupRound();
         } else {
-            matchFinished = true;
-            const finalPlace = [...playerScores].sort((a,b)=>b-a).indexOf(playerScores[0])+1;
-            alert(`Permainan Selesai!\nPeringkat Anda: #${finalPlace}\nSkor Akhir: ${Math.round(playerScores[0]).toLocaleString('id-ID')}`);
+            alert("Permainan Selesai!\nSkor Akhir Anda: " + playerScores[0]);
             nav('screen-main');
         }
     }
@@ -4700,10 +3514,9 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
         playerRivers[pIdx].push(tile);lastDiscardedTile=tile;lastDiscarderIdx=pIdx;
         const riverIds=['river-bottom','river-right','river-top','river-left'],riverEl=byId(riverIds[pIdx]);
         const d=document.createElement('div');d.className=`discard-tile tile-${tile.type}`;d.dataset.tileId=String(tile.id);d.innerHTML=tileMarkup(tile);if(riverEl)riverEl.appendChild(d);
-        if(pIdx===0&&pendingRiichi){isRiichi=true;pendingRiichi=false;riichiDiscardIndices=[];playerScores[0]-=1000;riichiSticks++;markRiichiDeclared(0, playerRivers[0].length===1);d.classList.add('riichi-tile');setDisplay('riichi-effect','block'); byId('game-board')?.classList.add('riichi-active');}
+        if(pIdx===0&&pendingRiichi){isRiichi=true;pendingRiichi=false;riichiDiscardIndices=[];playerScores[0]-=1000;riichiSticks++;d.classList.add('riichi-tile');setDisplay('riichi-effect','block'); byId('game-board')?.classList.add('riichi-active');}
         if(pIdx!==0&&aiRiichi[pIdx]&&playerRivers[pIdx].length===1)d.classList.add('riichi-tile');
         if(temporaryFuriten[pIdx])temporaryFuriten[pIdx]=false;
-        if(ippatsuEligible[pIdx] && (isRiichi || aiRiichi[pIdx]) && playerRivers[pIdx].length>1) ippatsuEligible[pIdx]=false;
         const human=mpRoomHumanSeats().filter(x=>x!==pIdx);
         const ron=human.filter(x=>checkWinningHand([...playerHands[x],tile],playerMelds[x].length)&&evaluateYakuAndScore(x,tile,false).valid&&!checkSeatFuriten(x,tile.id));
         if(ron.length){mpPendingCallQueue=ron.map(x=>({seat:x}));mpPromptNextNetworkCall();mpBroadcastState();return;}
@@ -4794,92 +3607,35 @@ window.addEventListener('pointerdown',()=>{try{if(typeof startChineseMusic==='fu
 })();
 </script>
 
-<script id="mahyong-dj-v24-device-lock">
-(function(){
-  const board=()=>document.getElementById('game-board');
-  function px(v){const n=parseFloat(v);return Number.isFinite(n)?n:0;}
-  function sync(){
-    const b=board(); if(!b)return;
-    const vv=window.visualViewport;
-    const w=Math.max(1,vv?.width||window.innerWidth||1);
-    const h=Math.max(1,vv?.height||window.innerHeight||1);
-    const landscape=w>h;
-    /* Touch-size budget: width dominates landscape, height dominates portrait,
-       with hard minimums so a 4-player hand never becomes microscopic. */
-    let tileW;
-    if(landscape){
-      tileW=Math.min(49,Math.max(35,(w-34)/14.15));
-      if(h<430) tileW=Math.min(tileW,43);
-    }else{
-      tileW=Math.min(45,Math.max(32,(w-22)/14.15));
-    }
-    const tileH=tileW*1.43;
-    const discardW=Math.max(19,Math.min(28,tileW*.59));
-    const discardH=discardW*1.42;
-    const center=Math.max(112,Math.min(188,Math.min(w*.22,h*.26)));
-    const gap=landscape
-      ? Math.max(108,Math.min(235,w*.205))
-      : Math.max(98,Math.min(175,w*.29));
-    b.style.setProperty('--tile-w',tileW.toFixed(2)+'px');
-    b.style.setProperty('--tile-h',tileH.toFixed(2)+'px');
-    b.style.setProperty('--discard-w',discardW.toFixed(2)+'px');
-    b.style.setProperty('--discard-h',discardH.toFixed(2)+'px');
-    b.style.setProperty('--river-side-gap',gap.toFixed(2)+'px');
-    b.style.setProperty('--center-size',center.toFixed(2)+'px');
-    /* Expose viewport measurements for any later UI component without
-       changing the worker / multiplayer code. */
-    b.style.setProperty('--viewport-w',w.toFixed(2)+'px');
-    b.style.setProperty('--viewport-h',h.toFixed(2)+'px');
-  }
-  function stopZoom(e){
-    if(e.type==='dblclick'||e.type==='gesturestart'||e.type==='gesturechange'||e.type==='gestureend'){
-      e.preventDefault();
-    }
-  }
-  ['dblclick','gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,stopZoom,{passive:false}));
-  sync();
-  addEventListener('resize',sync,{passive:true});
-  addEventListener('orientationchange',()=>setTimeout(sync,80),{passive:true});
-  if(window.visualViewport) window.visualViewport.addEventListener('resize',sync,{passive:true});
-})();
-</script>
-
-
 <script>
-/* v24.1: keep the live table fixed-size; browser gestures must not steal double-tap discard. */
+/* FINAL LANDSCAPE GUARD — gameplay uses one geometry on phone/iPad/iPad mini. */
 (function(){
-  const board=()=>document.getElementById('game-board');
-  document.addEventListener('gesturestart', e=>{ if(board()) e.preventDefault(); }, {passive:false});
-  document.addEventListener('gesturechange', e=>{ if(board()) e.preventDefault(); }, {passive:false});
-  document.addEventListener('gestureend', e=>{ if(board()) e.preventDefault(); }, {passive:false});
-  document.addEventListener('dblclick', e=>{ if(board() && board().contains(e.target)) e.preventDefault(); }, {passive:false});
-})();
-</script>
-
-<script id="mahyong-dj-v24-2-touch-guard">
-(function(){
-  const root=()=>document.getElementById('game-board');
-  document.addEventListener('touchstart',e=>{ if(root() && root().contains(e.target) && e.touches.length>1) e.preventDefault(); },{passive:false});
-  let lastTap=0;
-  document.addEventListener('touchend',e=>{
-    if(!root() || !root().contains(e.target)) return;
-    const now=Date.now();
-    if(now-lastTap<300) e.preventDefault();
-    lastTap=now;
-  },{passive:false});
-})();
-</script>
-
-<script id="mahyong-dj-no-zoom">
-(function(){
-  function blockGameZoom(){
-    const board=document.getElementById('game-board'); if(!board) return;
-    board.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});
-    board.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});
-    board.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});
-    board.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
+  const game=document.getElementById('screen-game');
+  if(!game) return;
+  function sync(){
+    const vv=window.visualViewport;
+    const w=Math.max(1,vv?.width||window.innerWidth);
+    const h=Math.max(1,vv?.height||window.innerHeight);
+    const portrait=h>w;
+    game.classList.toggle('landscape-required',portrait);
+    const b=document.getElementById('game-board');
+    if(b){
+      b.style.setProperty('--landscape-width',w+'px');
+      b.style.setProperty('--landscape-height',h+'px');
+    }
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',blockGameZoom,{once:true}); else blockGameZoom();
+  sync();
+  window.addEventListener('resize',sync,{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(sync,80),{passive:true});
+  if(window.visualViewport) window.visualViewport.addEventListener('resize',sync,{passive:true});
+
+  /* Prevent accidental browser zoom/double-tap while a round is running. */
+  let lastTouch=0;
+  document.addEventListener('touchend',function(e){
+    const now=Date.now();
+    if(now-lastTouch<320 && document.getElementById('screen-game')?.classList.contains('active')) e.preventDefault();
+    lastTouch=now;
+  },{passive:false});
 })();
 </script>
 
