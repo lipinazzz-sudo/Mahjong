@@ -410,6 +410,11 @@
 }
 
 @supports(height:100svh){html,body,.screen,#game-board{height:100svh}}
+
+/* ===== QR SCANNER + RECONNECT v12 ===== */
+.mp-scan-row{align-items:center;margin-bottom:8px}.reconnect-card{display:flex;flex-direction:column;gap:7px;margin-top:10px;padding:10px 12px;border:1px solid rgba(243,156,18,.45);background:rgba(243,156,18,.08);border-radius:10px}.reconnect-card strong{color:#f6c96d}.scanner-box{max-width:480px}.scanner-reader{width:100%;min-height:280px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:14px;background:#050b11;border:1px solid rgba(255,255,255,.12)}
+.scanner-reader video{width:100%!important;height:auto!important;border-radius:12px}.scanner-reader__scan-region{width:100%!important}.scanner-reader__dashboard{padding:8px!important}.scanner-reader__dashboard_section{margin:0!important}
+@media(max-width:600px){.scanner-box{width:min(94vw,480px);padding:14px}.scanner-reader{min-height:240px}.mp-scan-row{flex-direction:column;align-items:stretch}.mp-scan-row .btn{width:100%}}
 </style>
 </head>
 <body>
@@ -478,7 +483,7 @@
                 <div>
                     <div class="modal-kicker">ONLINE FRIEND ROOM</div>
                     <div class="modal-title" id="lobby-title">Multiplayer</div>
-                    <p class="modal-copy" id="lobby-help">Buat room atau masuk menggunakan kode 5 digit.</p>
+                    <p class="modal-copy" id="lobby-help">Buat room sekali. Teman cukup scan QR untuk otomatis masuk, siap, dan saat 4 pemain siap game dimulai.</p>
                 </div>
                 <div id="mp-connection-badge" class="connection-badge offline">OFFLINE</div>
             </div>
@@ -486,29 +491,30 @@
                 <label class="field-label" for="mp-name">Nama pemain</label>
                 <input class="field-input" id="mp-name" maxlength="20" placeholder="Nama kamu" value="Player">
                 <div class="mp-p2p-choice">
-                    <button class="btn btn-primary" onclick="mpCreateRoom()">Buat Room P2P</button>
-                    <button class="btn btn-secondary" onclick="mpShowJoinForm()">Gabung dari Undangan</button>
+                    <button class="btn btn-primary" onclick="mpCreateRoom()">Buat Room</button>
+                    <button class="btn btn-secondary" onclick="mpShowJoinForm()">Masukkan Kode</button>
                 </div>
                 <div id="mp-host-invite" class="p2p-card" hidden>
-                    <div class="p2p-card-title">Undangan pemain berikutnya</div>
-                    <div class="p2p-row"><span class="p2p-seat-label" id="mp-invite-seat">East</span><button class="btn btn-secondary btn-compact" onclick="mpGenerateInvite()">Buat Kode Undangan</button></div>
-                    <textarea class="field-input signal-box" id="mp-offer-code" placeholder="Offer akan muncul di sini..." readonly></textarea><canvas id="mp-offer-qr" class="signal-qr" width=220 height=220 aria-label="QR Offer"></canvas>
-                    <div class="p2p-row"><button class="btn btn-secondary btn-compact" onclick="mpCopySignal('mp-offer-code')">Salin Offer</button><span class="p2p-mini" id="mp-invite-help">Kirim offer ke teman di perangkat lain.</span></div>
-                    <label class="field-label" for="mp-answer-code">Tempel Answer dari teman</label>
-                    <textarea class="field-input signal-box" id="mp-answer-code" placeholder="Tempel answer di sini..."></textarea>
-                    <button class="btn btn-primary btn-wide" onclick="mpApplyAnswer()">Hubungkan Pemain</button>
+                    <div class="p2p-card-title">Bagikan Room</div>
+                    <div class="room-share-big"><span class="hud-label">ROOM CODE</span><strong id="mp-host-room-code">-----</strong></div>
+                    <canvas id="mp-offer-qr" class="signal-qr" width="240" height="240" aria-label="QR Room"></canvas>
+                    <div class="p2p-mini" id="mp-invite-help">Scan QR ini dari HP/iPad lain. Room akan terbuka dan pemain otomatis bergabung.</div>
+                    <div class="p2p-row"><input class="field-input" id="mp-room-link" readonly><button class="btn btn-secondary btn-compact" onclick="mpCopyRoomLink()">Salin Link</button></div>
+                    <div class="p2p-mini">Tidak perlu Offer/Answer manual.</div>
                 </div>
                 <div id="mp-guest-invite" class="p2p-card" hidden>
-                    <div class="p2p-card-title">Gabung Room P2P</div>
-                    <label class="field-label" for="mp-offer-input">Tempel Offer dari host</label>
-                    <textarea class="field-input signal-box" id="mp-offer-input" placeholder="Tempel kode offer host..."></textarea>
-                    <button class="btn btn-primary btn-wide" onclick="mpAcceptOffer()">Buat Answer</button>
-                    <label class="field-label" for="mp-answer-output">Answer untuk dikirim kembali ke host</label>
-                    <textarea class="field-input signal-box" id="mp-answer-output" placeholder="Answer muncul setelah offer diproses..." readonly></textarea>
-                    <button class="btn btn-secondary btn-wide" onclick="mpCopySignal('mp-answer-output')">Salin Answer</button>
-                    <div class="mp-hint">Tidak perlu server atau PC host khusus. Satu perangkat pemain menjadi host sementara dan tetap ikut bermain.</div>
+                    <div class="p2p-card-title">Gabung Room</div>
+                    <label class="field-label" for="mp-room-code">Kode Room</label>
+                    <input class="field-input" id="mp-room-code" maxlength="5" inputmode="numeric" placeholder="12345">
+                    <button class="btn btn-primary btn-wide" onclick="mpJoinRoom()">Gabung Sekarang</button>
+                    <div class="mp-hint">Biasanya tidak perlu mengetik kode. Scan QR host dan room akan terbuka otomatis.</div>
+                    <div id="mp-reconnect-card" class="reconnect-card" hidden>
+                        <strong id="mp-reconnect-title">Menyambungkan kembali</strong>
+                        <span id="mp-reconnect-text">Sesi room tersimpan.</span>
+                        <button class="btn btn-secondary btn-compact" onclick="mpReconnect()">Sambungkan Kembali</button>
+                    </div>
                 </div>
-                <div class="mp-hint">Mode ini memakai WebRTC langsung. Semua perangkat harus membuka game melalui HTTPS (misalnya GitHub Pages) dan berada di jaringan Wi‑Fi yang sama untuk pengalaman LAN terbaik.</div>
+                <div class="mp-hint">Mode multiplayer memakai room server ringan untuk signaling dan sinkronisasi. Game dapat dibuka dari GitHub Pages; semua pemain cukup menggunakan link/QR yang sama.</div>
             </div>
             <div id="mp-room-panel" class="mp-room-panel" hidden>
                 <div class="room-share-card">
@@ -522,6 +528,21 @@
                     <button class="btn btn-secondary btn-wide" onclick="closeLobby()">Keluar</button>
                 </div>
             </div>
+        </section>
+    </div>
+
+    <div id="modal-qr-scanner" class="modal" role="dialog" aria-modal="true" aria-labelledby="qr-scanner-title" hidden>
+        <section class="modal-box glass scanner-box">
+            <div class="modal-head">
+                <div>
+                    <div class="modal-kicker">CAMERA PAIRING</div>
+                    <div class="modal-title" id="qr-scanner-title">Scan QR Offer</div>
+                    <p class="modal-copy">Arahkan kamera ke QR Offer dari host.</p>
+                </div>
+                <button class="btn btn-secondary btn-compact" onclick="mpStopScanner()">Tutup</button>
+            </div>
+            <div id="mp-scanner-reader" class="scanner-reader"></div>
+            <div id="mp-scanner-status" class="mp-hint">Meminta izin kamera…</div>
         </section>
     </div>
 
@@ -670,7 +691,10 @@
     }
     function setDisplay(id, value) {
         const el = byId(id);
-        if (el) el.style.display = value;
+        if (el) {
+            el.hidden = (value === 'none');
+            el.style.display = value;
+        }
         return el;
     }
 
@@ -2427,12 +2451,276 @@
   window.mpRenderLobby=function(room){if(typeof baseRenderLobby==='function')baseRenderLobby(room);const s=window.mp.seat??0;const btn=byId('btn-lobby-start');if(btn)btn.hidden=!window.mp.host||!!room?.started;setText('mp-room-code-display',room?.code||'-----');};
   // Intercept state/result forwarding through the preserved mpHandle.
   window.addEventListener('beforeunload',()=>{try{closeLobby()}catch(e){}});
+  /* ===== DIRECT QR SCAN + SESSION RECONNECT v12 ===== */
+  const STORAGE_KEY='mahjongSoulP2PSessionV12';
+  let scannerInstance=null;
+  let reconnectTimer=null;
+  function saveSession(extra={}){
+    try{localStorage.setItem(STORAGE_KEY,JSON.stringify({
+      role:window.mp?.host?'host':'guest', host:!!window.mp?.host, seat:window.mp?.seat??null,
+      name:window.mp?.playerName||'Player', roomCode:window.mp?.room?.code||'',
+      offer:byId('mp-offer-code')?.value||'', answer:byId('mp-answer-output')?.value||'',
+      updatedAt:Date.now(), ...extra
+    }))}catch(e){}
+  }
+  function loadSession(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')}catch(e){return null}}
+  function clearSavedSession(){try{localStorage.removeItem(STORAGE_KEY)}catch(e){}}
+  function showReconnect(show,title='Koneksi terputus',text='Sesi tersimpan. Gunakan Sambungkan Kembali untuk membuat jalur P2P baru.') {
+    const box=byId('mp-reconnect-card'); if(!box)return; box.hidden=!show; setText('mp-reconnect-title',title);setText('mp-reconnect-text',text);
+  }
+  async function startQrScanner(){
+    const modal=byId('modal-qr-scanner'), reader=byId('mp-scanner-reader'), status=byId('mp-scanner-status');
+    if(!modal||!reader)return;
+    setDisplay('modal-qr-scanner','flex'); reader.innerHTML=''; setText('mp-scanner-status','Meminta izin kamera…');
+    const onSuccess=async text=>{if(!text)return; byId('mp-offer-input').value=text; setText('mp-scanner-status','QR terbaca. Menyiapkan koneksi…'); await stopQrScanner(); setDisplay('mp-guest-invite','grid'); try{await guestAcceptOffer()}catch(e){}};
+    try{
+      if(window.Html5Qrcode){
+        scannerInstance=new Html5Qrcode('mp-scanner-reader');
+        const cams=await Html5Qrcode.getCameras();
+        const cam=(cams||[]).find(c=>/back|rear|environment/i.test(c.label||''))||cams?.[0];
+        if(!cam)throw new Error('Kamera tidak ditemukan.');
+        await scannerInstance.start(cam.id,{fps:10,qrbox:{width:Math.min(280,Math.max(180,innerWidth-90)),height:Math.min(280,Math.max(180,innerWidth-90))}},onSuccess,()=>{});
+        setText('mp-scanner-status','Arahkan QR Offer ke bingkai kamera.'); return;
+      }
+      if('BarcodeDetector' in window){
+        const formats=await BarcodeDetector.getSupportedFormats(); if(!formats.includes('qr_code'))throw new Error('QR scanner native tidak tersedia.');
+        const video=document.createElement('video'); video.setAttribute('playsinline',''); video.autoplay=true; video.muted=true; video.style.width='100%'; reader.appendChild(video);
+        const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false}); video.srcObject=stream; await video.play();
+        const detector=new BarcodeDetector({formats:['qr_code']});
+        const tick=async()=>{if(!video.srcObject)return; try{const codes=await detector.detect(video);if(codes[0]?.rawValue){byId('mp-offer-input').value=codes[0].rawValue; stream.getTracks().forEach(t=>t.stop());setDisplay('modal-qr-scanner','none');await guestAcceptOffer();return;}}catch(e){} requestAnimationFrame(tick)}; tick();
+        setText('mp-scanner-status','Arahkan QR Offer ke kamera.'); return;
+      }
+      throw new Error('Scanner QR tidak tersedia di browser ini. Gunakan tempel kode manual.');
+    }catch(e){setText('mp-scanner-status',e.message||'Kamera tidak dapat digunakan.');}
+  }
+  async function stopQrScanner(){
+    if(scannerInstance){try{await scannerInstance.stop()}catch(e){} try{scannerInstance.clear()}catch(e){} scannerInstance=null;}
+    const r=byId('mp-scanner-reader'); if(r)r.innerHTML=''; setDisplay('modal-qr-scanner','none');
+  }
+  window.mpScanOffer=startQrScanner; window.mpStopScanner=stopQrScanner;
+
+  async function recreateHostPeer(seat){
+    if(!window.mp?.host)return;
+    P2P.pendingSeat=seat; const old=P2P.peers.get(seat); try{old?.pc?.close()}catch(e){} P2P.peers.delete(seat);
+    const pc=new RTCPeerConnection(RTC_CFG), dc=pc.createDataChannel('mahjong'); P2P.peers.set(seat,{pc,dc}); attachHostPeer(seat,pc); attachHostChannel(seat,dc);
+    const offer=await pc.createOffer({iceRestart:true}); await pc.setLocalDescription(offer); await waitIce(pc);
+    const code=encode(pc.localDescription); if(byId('mp-offer-code'))byId('mp-offer-code').value=code; mpRenderOfferQr(code); setDisplay('mp-host-invite','grid'); saveSession({offer:code});
+    setText('mp-invite-help','Koneksi dibuat ulang. Scan QR Offer baru dari perangkat tamu.');
+  }
+  async function recreateGuestPeer(){
+    const saved=loadSession(); if(!saved?.offer){setDisplay('mp-guest-invite','grid');alert('Offer lama tidak tersedia. Host perlu membuat QR Offer baru.');return;}
+    if(P2P.hostPeer?.pc)try{P2P.hostPeer.pc.close()}catch(e){}
+    const pc=new RTCPeerConnection(RTC_CFG); P2P.hostPeer={pc,dc:null}; pc.ondatachannel=e=>{P2P.hostPeer.dc=e.channel;attachGuestChannel(e.channel)};
+    pc.onconnectionstatechange=()=>{const st=pc.connectionState;if(st==='connected'){setBadge(true);showReconnect(false)}else if(['failed','closed','disconnected'].includes(st)){setBadge(false);showReconnect(true);}};
+    await pc.setRemoteDescription(decode(saved.offer)); const answer=await pc.createAnswer(); await pc.setLocalDescription(answer); await waitIce(pc);
+    const code=encode(pc.localDescription); byId('mp-offer-input').value=saved.offer; byId('mp-answer-output').value=code; saveSession({answer:code}); setDisplay('mp-guest-invite','grid');
+    setText('mp-scanner-status','Answer baru dibuat. Kirim kembali ke host.');
+  }
+  window.mpReconnect=async function(){
+    const saved=loadSession();
+    if(window.mp?.host){ const seat=P2P.pendingSeat??[1,2,3].find(s=>window.mp.room?.players?.[s]); if(seat==null){alert('Tidak ada kursi pemain untuk reconnect.');return;} await recreateHostPeer(seat); }
+    else { if(saved?.answer && P2P.hostPeer?.pc?.remoteDescription){showReconnect(false);return;} await recreateGuestPeer(); }
+  };
+
+  // Save a durable session and expose a gentle reconnect hint on disconnect.
+  const originalHostCreateInvite=window.mpGenerateInvite; window.mpGenerateInvite=async function(){await originalHostCreateInvite();saveSession();};
+  const originalHostApplyAnswer=window.mpApplyAnswer; window.mpApplyAnswer=async function(){await originalHostApplyAnswer();saveSession();};
+  const originalGuestAcceptOffer=window.mpAcceptOffer; window.mpAcceptOffer=async function(){await originalGuestAcceptOffer();saveSession();};
+  window.addEventListener('pagehide',()=>saveSession()); window.addEventListener('pageshow',()=>{const saved=loadSession();if(saved){if(saved.role==='guest'&&!window.mp?.host)setTimeout(()=>showReconnect(true,'Sesi P2P tersimpan','Perangkat ini memiliki sesi P2P sebelumnya.'),350);}});
+
+  const origHostPeer=attachHostPeer;
+  attachHostPeer=function(seat,pc){origHostPeer(seat,pc); const base=pc.onconnectionstatechange; pc.onconnectionstatechange=()=>{base?.(); const st=pc.connectionState; if(st==='connected'){saveSession({connectedAt:Date.now()});showReconnect(false)} else if(['failed','closed','disconnected'].includes(st)){showReconnect(true);clearTimeout(reconnectTimer);reconnectTimer=setTimeout(()=>{if(window.mp?.host&&window.mp?.room?.players?.[seat])mpReconnect()},2500);}};};
+
   // Keep responsive scale synced with actual viewport and orientation changes.
   function syncTableUnit(){const vv=window.visualViewport;const w=Math.max(1,vv?.width||innerWidth),h=Math.max(1,vv?.height||innerHeight);const unit=Math.min(w,h)/100;document.documentElement.style.setProperty('--table-unit',unit+'px');}
   syncTableUnit();window.addEventListener('resize',syncTableUnit,{passive:true});window.addEventListener('orientationchange',()=>setTimeout(syncTableUnit,80),{passive:true});window.visualViewport?.addEventListener('resize',syncTableUnit,{passive:true});
 })();
 
 </script>
+
+<script>
+/* ===== MULTIPLAYER v13: QR AUTO-JOIN + CLOUD ROOM SERVER =====
+   The game engine remains client-side; the room service only coordinates players,
+   relays commands/state, and makes QR-based joining automatic. */
+(function(){
+  const MP_CFG = {
+    signalingBase: 'https://YOUR-MAHJONG-ROOM-WORKER.workers.dev', // GANTI dengan URL Cloudflare Worker kamu
+    roomParam: 'room'
+  };
+  const SESSION_KEY = 'mahjongSoulRoomV13';
+  let autoStartTimer = null;
+  let joiningFromUrl = false;
+
+  function mpUrl(){
+    const base=MP_CFG.signalingBase.replace(/\/$/,'');
+    return base;
+  }
+  function mpWsUrl(code,name,role){
+    const base=mpUrl().replace(/^http/,'ws');
+    return base + '/ws?room=' + encodeURIComponent(code) + '&name=' + encodeURIComponent(name) + '&role=' + role;
+  }
+  function saveRoomSession(extra={}){
+    try{localStorage.setItem(SESSION_KEY,JSON.stringify({
+      room:mp.room?.code||'', seat:mp.seat??null, name:mp.playerName||'Player', host:!!mp.host,
+      updatedAt:Date.now(), ...extra
+    }))}catch(e){}
+  }
+  function loadRoomSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch(e){return null}}
+  function clearRoomSession(){try{localStorage.removeItem(SESSION_KEY)}catch(e){}}
+
+  function getRoomFromUrl(){
+    try{
+      const u=new URL(location.href);return (u.searchParams.get(MP_CFG.roomParam)||'').trim();
+    }catch(e){return '';}
+  }
+  function roomUrl(code){
+    const u=new URL(location.href);u.searchParams.set(MP_CFG.roomParam,code);u.searchParams.delete('offer');u.searchParams.delete('answer');
+    return u.href;
+  }
+  function renderRoomQr(code){
+    const link=roomUrl(code); const canvas=byId('mp-offer-qr'); const input=byId('mp-room-link');
+    if(input) input.value=link;
+    setText('mp-host-room-code',code||'-----');
+    const draw=()=>{
+      try{
+        if(window.QRCode?.toCanvas&&canvas){
+          QRCode.toCanvas(canvas,link,{width:230,margin:2,errorCorrectionLevel:'M'},()=>{});
+          return true;
+        }
+      }catch(e){}
+      return false;
+    };
+    if(!draw()){
+      let tries=0; const t=setInterval(()=>{tries++; if(draw()||tries>30)clearInterval(t)},150);
+    }
+  }
+  async function copyText(text){try{await navigator.clipboard.writeText(text);return true}catch(e){return false}}
+
+  function closeMpSocket(){
+    try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}
+    mp.ws=null;mp.connected=false;mpSetConnection(false);
+  }
+
+  // Replace transport functions used by the existing game engine.
+  mpServerUrl = function(){ return mpWsUrl(mp.room?.code||'',mp.playerName||'Player',mp.host?'host':'guest'); };
+  mpConnect = function(code,role){
+    const roomCode=code||mp.room?.code||getRoomFromUrl();
+    const r=role||(mp.host?'host':'guest');
+    if(!roomCode)return false;
+    if(mp.ws&&(mp.ws.readyState===WebSocket.OPEN||mp.ws.readyState===WebSocket.CONNECTING))return true;
+    if(location.protocol==='file:'){mpSetConnection(false);return false;}
+    try{
+      const ws=new WebSocket(mpWsUrl(roomCode,mp.playerName||'Player',r)); mp.ws=ws;
+      ws.onopen=()=>{
+        mp.connected=true;mpSetConnection(true);
+        ws.send(JSON.stringify({type:r==='host'?'createRoom':'joinRoom',code:roomCode,name:mp.playerName||'Player',clientId:mpClientId||''}));
+      };
+      ws.onclose=()=>{mp.connected=false;mpSetConnection(false); if(mp.room&&!mp.started) setTimeout(()=>mpReconnect(),1200);};
+      ws.onerror=()=>{mp.connected=false;mpSetConnection(false);};
+      ws.onmessage=e=>{try{mpHandle(JSON.parse(e.data))}catch(err){console.error('MP message error',err)}};
+      return true;
+    }catch(e){mp.connected=false;mpSetConnection(false);console.error(e);return false;}
+  };
+  mpSend = function(type,data={}){
+    if(mp.ws?.readyState===WebSocket.OPEN) mp.ws.send(JSON.stringify({type,...data}));
+  };
+
+  window.openPlayerLobby=function(){
+    isMultiplayerMode=true; setDisplay('modal-lobby','flex'); setDisplay('mp-setup','grid'); setDisplay('mp-room-panel','none');
+    const code=getRoomFromUrl();
+    if(code){ joiningFromUrl=true; setDisplay('mp-setup','none'); setDisplay('mp-guest-invite','none'); mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player'; mpConnect(code,'guest'); }
+    else { setText('lobby-help','Buat room sekali. Teman cukup scan QR untuk otomatis masuk, siap, dan saat 4 pemain siap game dimulai.'); }
+  };
+
+  window.mpCreateRoom=function(){
+    mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';
+    const code=String(Math.floor(10000+Math.random()*90000));
+    mp.room={code,players:[null,null,null,null],started:false};mp.seat=0;mp.host=true;mp.ready=true;mp.started=false;isMultiplayerMode=true;
+    mp.room.players[0]={id:'host-local',name:mp.playerName,ready:true};
+    setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setText('mp-room-code-display',code);renderRoomQr(code);mpRenderLobby(mp.room);saveRoomSession();mpConnect(code,'host');
+  };
+
+  window.mpJoinRoom=function(){
+    mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';
+    const code=(byId('mp-room-code')?.value||'').trim();
+    if(!/^\d{5}$/.test(code)){alert('Masukkan kode room 5 digit.');return;}
+    joiningFromUrl=false;mp.host=false;mp.ready=false;mp.seat=null;isMultiplayerMode=true;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-guest-invite','none');mpConnect(code,'guest');
+  };
+  window.mpShowJoinForm=function(){setDisplay('mp-setup','grid');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','block');};
+  window.mpCopyRoomLink=function(){const link=byId('mp-room-link')?.value||roomUrl(mp.room?.code||'');copyText(link).then(()=>{setText('mp-invite-help','Link room sudah disalin.');});};
+  window.mpCopyRoomInfo=function(){const code=mp.room?.code||'';const link=roomUrl(code);copyText(link).then(()=>alert('Link Room:\n'+link));};
+
+  window.togglePlayerReady=function(){
+    if(!mp.room)return; mp.ready=!mp.ready; mpSend('ready',{ready:mp.ready});
+  };
+  window.mpStartGame=function(){
+    if(!mp.host||!mp.room)return;
+    const humans=(mp.room.players||[]).filter(Boolean);
+    if(humans.length<2){alert('Butuh minimal 2 pemain.');return;}
+    if(!humans.every(p=>p.ready)){alert('Semua pemain yang terhubung harus READY.');return;}
+    mpSend('start');
+  };
+  window.closeLobby=function(){
+    try{mpSend('leave')}catch(e){} closeMpSocket(); clearRoomSession(); mp.room=null;mp.seat=null;mp.host=false;mp.ready=false;mp.started=false;isMultiplayerMode=false;
+    setDisplay('modal-lobby','none');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');
+  };
+  window.mpReconnect=function(){
+    const saved=loadRoomSession(); if(!saved?.room)return;
+    mp.playerName=saved.name||'Player';mp.room=mp.room||{code:saved.room,players:[null,null,null,null],started:false};mp.host=!!saved.host;mp.seat=saved.seat;mp.ready=true;isMultiplayerMode=true;
+    setDisplay('modal-lobby','flex');setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');
+    mpConnect(saved.room,mp.host?'host':'guest');
+  };
+
+  // Lobby rendering: host is auto-ready. Guests are auto-ready on join.
+  const priorLobbyRender=mpRenderLobby;
+  mpRenderLobby=function(room){
+    if(typeof priorLobbyRender==='function')priorLobbyRender(room);
+    if(room?.code) {setText('mp-room-code-display',room.code);setText('mp-host-room-code',room.code);if(mp.host)renderRoomQr(room.code);}
+    const humanCount=(room?.players||[]).filter(Boolean).length;
+    const allReady=humanCount>=2&&(room.players.filter(Boolean).every(p=>p.ready));
+    const startBtn=byId('btn-lobby-start'); if(startBtn){startBtn.hidden=!mp.host||!!room?.started;startBtn.disabled=!allReady;}
+    if(mp.host&&humanCount===4&&allReady&&!room.started){
+      clearTimeout(autoStartTimer);
+      setText('lobby-help','4 pemain READY. Permainan akan dimulai otomatis…');
+      autoStartTimer=setTimeout(()=>{if(mp.host&&mp.room&&!mp.room.started)mpStartGame()},1200);
+    }
+  };
+
+  // Auto-ready after joined. Also auto-join URL room as soon as the page loads.
+  const previousMpHandle=mpHandle;
+  mpHandle=function(msg){
+    if(msg.type==='joined'){
+      mp.room=msg.room;mp.seat=msg.seat;mp.host=!!msg.host;mp.started=!!msg.room.started;
+      mp.ready=!!(msg.room.players?.[msg.seat]?.ready);
+      if(!mp.host&&!mp.ready){mp.ready=true;setTimeout(()=>mpSend('ready',{ready:true}),50);}
+      if(mp.host&&!mp.ready){mp.ready=true;setTimeout(()=>mpSend('ready',{ready:true}),50);}
+      setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('mp-room-code-display',msg.room.code);mpRenderLobby(msg.room);saveRoomSession();
+      if(mp.host){setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');renderRoomQr(msg.room.code);}
+      else {setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');}
+      return;
+    }
+    if(msg.type==='lobby'){
+      mp.room=msg.room; mpRenderLobby(msg.room); saveRoomSession(); return;
+    }
+    if(msg.type==='startGame'){
+      mp.started=true; mp.room&&(mp.room.started=true);saveRoomSession({started:true}); if(mp.host)start4PGame('Hard',true); else nav('screen-game'); return;
+    }
+    if(msg.type==='error'){console.warn('room error',msg.message);alert(msg.message||'Room error');return;}
+    if(typeof previousMpHandle==='function') return previousMpHandle(msg);
+  };
+
+  // Query auto-join and session resume.
+  function bootAutoJoin(){
+    const code=getRoomFromUrl(); const name=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';
+    if(!code)return;
+    mp.playerName=name;isMultiplayerMode=true;setDisplay('modal-lobby','flex');setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');
+    setText('lobby-help','Menghubungkan ke Room '+code+'…'); joiningFromUrl=true; mpConnect(code,'guest');
+  }
+  window.addEventListener('DOMContentLoaded',()=>setTimeout(bootAutoJoin,250));
+  window.addEventListener('pagehide',()=>saveRoomSession());
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js" defer></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" defer></script>
 </body>
 </html>
