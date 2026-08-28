@@ -352,7 +352,7 @@
         .lobby-box{max-width:520px}.mp-setup{display:grid;gap:10px}.field-label{font-size:12px;color:#9ca3af;text-align:left}.field-input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #34404f;background:#0e1722;color:#fff;font-size:15px;outline:none}.field-input:focus{border-color:#58a6ff;box-shadow:0 0 0 3px rgba(88,166,255,.12)}.mp-join-row{display:grid;grid-template-columns:1.2fr 1fr .9fr;gap:8px;align-items:center}.room-code-input{text-align:center;letter-spacing:3px}.mp-hint{font-size:12px;line-height:1.5;color:#8b949e;text-align:left;padding:10px 12px;background:rgba(255,255,255,.035);border-radius:9px}.connection-badge{font-size:10px;font-weight:800;letter-spacing:.08em;padding:5px 8px;border-radius:999px;border:1px solid #334155}.connection-badge.online{color:#86efac;border-color:#166534;background:#052e16}.connection-badge.offline{color:#fca5a5;border-color:#7f1d1d;background:#2b0b0b}.mp-room-panel{display:grid;gap:12px}.room-share-card{display:flex;justify-content:space-between;align-items:center;padding:13px 14px;border-radius:12px;background:#0b1320;border:1px solid #263244}.room-share-card strong{display:block;font-size:30px;letter-spacing:5px;color:#f6c453;margin-top:2px}.lobby-actions{display:grid;gap:8px}
 
 
-/* ===== P2P + Responsive v11 ===== */
+/* ===== P2P + Responsive v11 (superseded by Cloud Room v13 transport below) ===== */
 :root{--table-unit:1vw}
 .mp-p2p-choice{display:grid;grid-template-columns:1fr 1fr;gap:8px}.p2p-card{display:grid;gap:8px;padding:12px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.035);border-radius:12px;text-align:left}.p2p-card-title{font-size:12px;font-weight:900;color:#f6c453;letter-spacing:.08em;text-transform:uppercase}.p2p-row{display:flex;align-items:center;justify-content:space-between;gap:8px}.p2p-seat-label{font-size:12px;font-weight:900;color:#dce5ef}.p2p-mini{font-size:10px;line-height:1.4;color:#8995a3}.signal-box{min-height:90px;resize:none;font:11px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all}.p2p-card[hidden]{display:none!important}.signal-qr{display:none;justify-self:center;width:min(220px,70vw);height:auto;background:#fff;border-radius:10px;padding:6px}.signal-qr.visible{display:block}
 @media(max-width:560px){.mp-p2p-choice{grid-template-columns:1fr}.modal-box{max-height:92dvh;overflow:auto}}
@@ -740,19 +740,25 @@
     let mpClientId = null;
     let mpPendingRiichiSeat = -1;
 
-    function mpServerUrl(){
-        const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-        return `${proto}//${location.host}`;
+    // Cloudflare Worker URL used for multiplayer room coordination.
+    // Example: https://mahjong-room.your-subdomain.workers.dev
+    const MP_WORKER_URL = 'https://YOUR-WORKER.workers.dev';
+
+    function mpServerUrl(roomCode=''){
+        if (!MP_WORKER_URL || MP_WORKER_URL.includes('YOUR-WORKER')) return null;
+        const base = MP_WORKER_URL.replace(/\/$/, '');
+        return `${base.replace(/^http:/,'ws:').replace(/^https:/,'wss:')}/ws?room=${encodeURIComponent(roomCode)}`;
     }
     function mpSetConnection(online){
         setText('mp-connection-badge', online ? 'ONLINE' : 'OFFLINE');
         const b = byId('mp-connection-badge'); if(b) b.className = `connection-badge ${online?'online':'offline'}`;
     }
-    function mpConnect(){
+    function mpConnect(roomCode=''){
         if(mp.ws && (mp.ws.readyState===WebSocket.OPEN || mp.ws.readyState===WebSocket.CONNECTING)) return;
-        if(location.protocol==='file:'){ mpSetConnection(false); return; }
+        const url = mpServerUrl(roomCode);
+        if(!url){ mpSetConnection(false); return; }
         try{
-            mp.ws=new WebSocket(mpServerUrl());
+            mp.ws=new WebSocket(url);
             mp.ws.onopen=()=>{mp.connected=true;mpSetConnection(true);};
             mp.ws.onclose=()=>{mp.connected=false;mpSetConnection(false);};
             mp.ws.onerror=()=>{mp.connected=false;mpSetConnection(false);};
@@ -760,10 +766,10 @@
         }catch(e){mp.connected=false;mpSetConnection(false);}
     }
     function mpSend(type,data={}){if(mp.ws&&mp.ws.readyState===WebSocket.OPEN)mp.ws.send(JSON.stringify({type,...data}));}
-    function openPlayerLobby(){isMultiplayerMode=true;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');mpConnect();}
+    function openPlayerLobby(){isMultiplayerMode=true;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');mpSetConnection(false);}
     function closeLobby(){mpSend('leave');setDisplay('modal-lobby','none');mp.room=null;mp.seat=null;mp.host=false;mp.ready=false;}
-    function mpCreateRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mpConnect();setTimeout(()=>mpSend('createRoom',{name:mp.playerName}),120);}
-    function mpJoinRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code))return alert('Masukkan kode room 5 digit.');mpConnect();setTimeout(()=>mpSend('joinRoom',{code,name:mp.playerName}),120);}
+    function mpCreateRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mpConnect('00000');setTimeout(()=>mpSend('createRoom',{name:mp.playerName}),250);}
+    function mpJoinRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code))return alert('Masukkan kode room 5 digit.');mpConnect(code);setTimeout(()=>mpSend('joinRoom',{code,name:mp.playerName}),250);}
     function togglePlayerReady(){mp.ready=!mp.ready;mpSend('ready',{ready:mp.ready});}
     function mpStartGame(){if(!mp.host)return;mpSend('start');}
     function mpCopyRoomInfo(){const code=mp.room?.code||'';const text=`Mahjong Soul Multiplayer\nBuka alamat yang diberikan host\nKode Room: ${code}`;navigator.clipboard?.writeText(text).catch(()=>{});alert(text);}
@@ -2544,7 +2550,9 @@
    relays commands/state, and makes QR-based joining automatic. */
 (function(){
   const MP_CFG = {
-    signalingBase: 'https://YOUR-MAHJONG-ROOM-WORKER.workers.dev', // GANTI dengan URL Cloudflare Worker kamu
+    // SET ONCE after deploying the Cloudflare Worker.
+    // Example: https://mahjong-room.your-subdomain.workers.dev
+    signalingBase: 'https://YOUR-MAHJONG-ROOM-WORKER.workers.dev',
     roomParam: 'room'
   };
   const SESSION_KEY = 'mahjongSoulRoomV13';
