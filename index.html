@@ -742,7 +742,7 @@
 
     // Cloudflare Worker URL used for multiplayer room coordination.
     // Example: https://mahjong-room.your-subdomain.workers.dev
-    const MP_WORKER_URL = 'https://YOUR-WORKER.workers.dev';
+    const MP_WORKER_URL = 'https://mahjong-room.mahjongjong.workers.dev';
 
     function mpServerUrl(roomCode=''){
         if (!MP_WORKER_URL || MP_WORKER_URL.includes('YOUR-WORKER')) return null;
