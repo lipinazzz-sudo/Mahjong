@@ -158,6 +158,31 @@
         .result-score-list { margin: 14px 0 18px; background: rgba(0,0,0,.20); border: 1px solid var(--line); border-radius: 11px; padding: 10px; }
         .result-score-list > div { display:flex; justify-content:space-between; gap:12px; padding: 7px 3px; border-bottom: 1px solid rgba(255,255,255,.06); font-size: 12px; }
         .result-score-list > div:last-child { border-bottom: 0; }
+        .result-modal-box { width: min(94vw, 620px); }
+        .modal-kicker { color: var(--gold); font-size: 10px; font-weight: 900; letter-spacing: .16em; margin-bottom: 4px; }
+        .result-badge { flex: 0 0 auto; padding: 7px 10px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid var(--line); color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: .08em; }
+        .result-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 16px 0 18px; }
+        .result-summary-card { background: rgba(255,255,255,.045); border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; }
+        .result-summary-label { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+        .result-summary-value { margin-top: 4px; font-size: 14px; font-weight: 900; }
+        .result-summary-sub { margin-top: 3px; color: var(--muted); font-size: 10px; line-height: 1.35; }
+        .result-section-title { font-size: 11px; font-weight: 900; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+        .score-row { display:grid !important; grid-template-columns: 1.4fr .7fr .7fr .65fr; align-items:center; gap:8px !important; }
+        .score-name { min-width:0; }
+        .score-name strong { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .score-seat { color:var(--muted); font-size:9px; margin-top:2px; }
+        .score-delta { font-weight:900; text-align:right; }
+        .score-total { font-weight:900; text-align:right; }
+        .score-place { text-align:center; color:var(--muted); font-weight:900; }
+        .delta-up { color:var(--green); }
+        .delta-down { color:var(--red); }
+        .delta-flat { color:var(--muted); }
+        .score-head { color:var(--muted); font-size:9px; text-transform:uppercase; letter-spacing:.07em; }
+        @media (max-width: 520px) {
+            .result-summary { grid-template-columns: 1fr; }
+            .score-row { grid-template-columns: 1fr .8fr .9fr; }
+            .score-place { display:none; }
+        }
 
         /* ---------- Game board ---------- */
         #screen-game { padding: 0; }
@@ -322,7 +347,8 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { scroll-behavior:auto !important; transition:none !important; animation:none !important; }
         }
-    </style>
+    .round-ready-tag{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.04em}.round-ready-tag.ready{background:rgba(46,204,113,.16);color:#5ee79a;border:1px solid rgba(46,204,113,.35)}.round-ready-tag.noten{background:rgba(231,76,60,.12);color:#ff8b80;border:1px solid rgba(231,76,60,.3)}
+</style>
 </head>
 <body>
 
@@ -404,13 +430,17 @@
     </div>
 
     <div id="modal-result" class="modal" role="dialog" aria-modal="true" aria-labelledby="res-title">
-        <section class="modal-box glass">
+        <section class="modal-box glass result-modal-box">
             <div class="modal-head">
                 <div>
+                    <div class="modal-kicker" id="res-round-label">HASIL RONDE</div>
                     <div class="modal-title" id="res-title">Ronde Selesai</div>
                     <p class="modal-copy" id="res-desc"></p>
                 </div>
+                <div class="result-badge" id="res-badge">RESULT</div>
             </div>
+            <div id="res-summary" class="result-summary"></div>
+            <div class="result-section-title">Papan Skor</div>
             <div id="res-scores" class="result-score-list"></div>
             <button class="btn btn-primary btn-wide" onclick="nextRoundOrFinish()">Lanjut ke Ronde Berikutnya</button>
         </section>
@@ -514,6 +544,7 @@
     let fullDeck = [], deadWall = [], playerHands = [[], [], [], []], playerRivers = [[], [], [], []];
     let playerMelds = [[], [], [], []]; 
     let playerScores = [25000, 25000, 25000, 25000];
+    let roundStartScores = [25000, 25000, 25000, 25000];
     let aiRiichi = [false, false, false, false];
     
     let activeScreenId = 'screen-main';
@@ -1225,6 +1256,7 @@
         if (aiMoveTimer) { clearTimeout(aiMoveTimer); aiMoveTimer = null; }
         if (autoDiscardTimer) { clearTimeout(autoDiscardTimer); autoDiscardTimer = null; }
         roundToken++;
+        roundStartScores = [...playerScores];
         setDisplay('modal-result', 'none');
         setDisplay('action-overlay', 'none');
         extraTimeBank = 20;
@@ -1916,7 +1948,53 @@
         processTurn();
     }
 
+    // EXHAUSTIVE DRAW (RYUUKYOKU) / TENPAI-NOTEN SETTLEMENT
+    // Standard riichi rule: 3000 points are transferred between Noten and Tenpai players.
+    // Tenpai players split the 3000-point pool; Noten players split the 3000-point payment.
+    function getPlayerTenpaiStatus(pIdx) {
+        const hand = playerHands[pIdx] || [];
+        const meldCount = (playerMelds[pIdx] || []).length;
+        // At exhaustive draw, players should have 13 concealed tiles (or equivalent after melds).
+        return isTenpai(hand, meldCount);
+    }
+
+    function settleExhaustiveDraw() {
+        if (!roundActive || roundEnding) return;
+
+        const tenpai = [0, 1, 2, 3].map(getPlayerTenpaiStatus);
+        const readyPlayers = tenpai.map((v, i) => v ? i : -1).filter(i => i !== -1);
+        const notenPlayers = tenpai.map((v, i) => !v ? i : -1).filter(i => i !== -1);
+
+        let description = '';
+
+        if (readyPlayers.length > 0 && readyPlayers.length < 4) {
+            const gain = 3000 / readyPlayers.length;
+            const loss = 3000 / notenPlayers.length;
+            readyPlayers.forEach(p => { playerScores[p] += gain; });
+            notenPlayers.forEach(p => { playerScores[p] -= loss; });
+
+            updateScoresUI();
+
+            const names = ['You (South)', 'Player 1 (East)', 'Player 2 (North)', 'Player 3 (West)'];
+            const readyNames = readyPlayers.map(p => names[p]).join(', ');
+            description = `Tenpai: ${readyNames}. Masing-masing +${gain.toLocaleString('id-ID')} poin; Noten membayar total 3000 poin.`;
+        } else if (readyPlayers.length === 4) {
+            description = 'Semua pemain Tenpai. Tidak ada pembayaran Tenpai/Noten.';
+        } else {
+            description = 'Tidak ada pemain Tenpai. Tidak ada pembayaran Tenpai/Noten.';
+        }
+
+        const readyCount = readyPlayers.length;
+        const title = readyCount > 0 ? `RYUUKYOKU • ${readyCount} TENPAI` : 'RYUUKYOKU • SEMUA NOTEN';
+        endRound(title, description);
+    }
+
     // ROUND END & EXTENSION MECHANICS
+    function getRoundName() {
+        const roundNames = ['East 1', 'East 2', 'East 3', 'East 4', 'East 5 (Extra)'];
+        return roundNames[currentRoundIndex] || `East ${currentRoundIndex + 1}`;
+    }
+
     function endRound(title, desc) {
         if (roundEnding) return;
         roundEnding = true;
@@ -1930,11 +2008,68 @@
         canRevealUraDora = title.includes('WIN') && (isRiichi || aiRiichi.some(Boolean));
         setText('res-title', title);
         setText('res-desc', desc);
+        setText('res-round-label', `HASIL • ${getRoundName()}`);
 
-        let scoreHtml = "";
-        const pNames = ["You (South)", "Player 1 (East)", "Player 2 (North)", "Player 3 (West)"];
+        const isDraw = title.toUpperCase().includes('RYUUKOKU') || title.toUpperCase().includes('DRAW');
+        const winnerMatch = title.match(/(?:TSUMO by|RON by)\s+(.+?)(?:!|$)/i);
+        const winnerName = winnerMatch ? winnerMatch[1] : (isDraw ? 'Tidak ada pemenang' : 'Ronde selesai');
+        const deltas = playerScores.map((score, i) => score - (roundStartScores[i] ?? score));
+        const sorted = [...playerScores].map((score, i) => ({ score, i })).sort((a,b) => b.score - a.score);
+        const places = Array(4);
+        sorted.forEach((entry, idx) => { places[entry.i] = idx + 1; });
+
+        const badge = byId('res-badge');
+        if (badge) {
+            badge.textContent = isDraw ? 'DRAW' : 'WIN';
+            badge.className = `result-badge ${isDraw ? 'draw' : 'win'}`;
+        }
+
+        const summary = byId('res-summary');
+        if (summary) {
+            const leader = sorted[0];
+            const myDelta = deltas[0];
+            const deltaText = `${myDelta > 0 ? '+' : ''}${myDelta.toLocaleString('id-ID')}`;
+            const deltaClass = myDelta > 0 ? 'delta-up' : myDelta < 0 ? 'delta-down' : 'delta-flat';
+            summary.innerHTML = `
+                <div class="result-summary-card">
+                    <div class="result-summary-label">Hasil</div>
+                    <div class="result-summary-value">${winnerName}</div>
+                    <div class="result-summary-sub">${isDraw ? 'Pembagian Tenpai / Noten diterapkan bila berlaku.' : desc}</div>
+                </div>
+                <div class="result-summary-card">
+                    <div class="result-summary-label">Perubahan Anda</div>
+                    <div class="result-summary-value ${deltaClass}">${deltaText}</div>
+                    <div class="result-summary-sub">Skor akhir: ${playerScores[0].toLocaleString('id-ID')}</div>
+                </div>
+                <div class="result-summary-card">
+                    <div class="result-summary-label">Pimpinan</div>
+                    <div class="result-summary-value">${['You','P1','P2','P3'][leader.i]} • ${leader.score.toLocaleString('id-ID')}</div>
+                    <div class="result-summary-sub">Peringkat Anda: #${places[0]}</div>
+                </div>`;
+        }
+
+        const names = [
+            { name:'You', seat:'South' },
+            { name:'Player 1', seat:'East' },
+            { name:'Player 2', seat:'North' },
+            { name:'Player 3', seat:'West' }
+        ];
+        let scoreHtml = `
+            <div class="score-row score-head">
+                <div>Pemain</div><div>Perubahan</div><div>Total</div><div>Peringkat</div>
+            </div>`;
         for (let i = 0; i < 4; i++) {
-            scoreHtml += `<div>${pNames[i]}: <b>${playerScores[i]} Poin</b></div>`;
+            const delta = deltas[i];
+            const deltaClass = delta > 0 ? 'delta-up' : delta < 0 ? 'delta-down' : 'delta-flat';
+            const deltaText = delta > 0 ? `+${delta.toLocaleString('id-ID')}` : delta.toLocaleString('id-ID');
+            const ready = getPlayerTenpaiStatus(i);
+            const status = isDraw ? ` <span class="round-ready-tag ${ready ? 'ready' : 'noten'}">${ready ? 'TENPAI' : 'NOTEN'}</span>` : '';
+            scoreHtml += `<div class="score-row">
+                <div class="score-name"><strong>${names[i].name}${i === 0 ? ' (Anda)' : ''}${status}</strong><div class="score-seat">${names[i].seat}${i === currentDealerIdx ? ' • Oya' : ''}</div></div>
+                <div class="score-delta ${deltaClass}">${deltaText}</div>
+                <div class="score-total">${playerScores[i].toLocaleString('id-ID')}</div>
+                <div class="score-place">#${places[i]}</div>
+            </div>`;
         }
         const scoreBox = byId('res-scores');
         if (scoreBox) scoreBox.innerHTML = scoreHtml;
@@ -1948,7 +2083,7 @@
         pendingPlayerActions = [];
         currentRoundIndex++;
         
-        // Rule: 4 Rounds Standard. Round 5 triggered if Draw or scores equal / top player < 30000.
+        // Standard match flow: East 1-4, with East 5 extra only when the configured extension condition is met.
         let maxScore = Math.max(...playerScores);
         if (currentRoundIndex < 4 || (currentRoundIndex === 4 && maxScore < 30000)) {
             nav('screen-game');
