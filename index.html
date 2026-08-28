@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="20.0-mahyong-dj">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+    <meta name="app-version" content="24.0-mahyong-dj-responsive">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
     <meta name="description" content="Mahyong DJ — PWA Riichi Mahjong dengan AI dan Local P2P multiplayer.">
     <title>Mahyong DJ — Riichi Mahjong Local P2P</title>
@@ -1298,6 +1298,153 @@
 }
 
 </style>
+
+<style id="mahyong-dj-v24-final-responsive">
+/* ================================================================
+   MAHYONG DJ v24 — FINAL DEVICE GEOMETRY
+   One coordinate system for phone / tablet / desktop.
+   Safe-area aware, no double-tap zoom, and no viewport-specific drift.
+   ================================================================ */
+html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%;}
+body{touch-action:manipulation;}
+#screen-game{padding:0!important;}
+#game-board{
+  --safe-l:env(safe-area-inset-left,0px);
+  --safe-r:env(safe-area-inset-right,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --mid-x:calc((100% + var(--safe-l) - var(--safe-r))/2);
+  --mid-y:calc((100% + var(--safe-t) - var(--safe-b))/2);
+  width:100%!important;height:100dvh!important;max-width:none!important;max-height:none!important;
+  overflow:hidden!important;touch-action:none!important;
+  padding:0!important;
+  position:relative!important;
+}
+/* --- stable HUD band --- */
+#game-board .topbar{
+  top:max(6px,var(--safe-t))!important;
+  left:max(8px,var(--safe-l))!important;
+  right:max(8px,var(--safe-r))!important;
+  display:grid!important;
+  grid-template-columns:auto 1fr auto!important;
+  align-items:start!important;
+  pointer-events:none!important;
+}
+#game-board .topbar>*{pointer-events:auto}
+#game-board .dora-panel{justify-self:start!important;transform:none!important;min-width:clamp(126px,20vw,220px)!important;max-width:min(43vw,240px)!important;}
+#game-board .round-hud-shell{
+  left:var(--mid-x)!important;top:max(6px,var(--safe-t))!important;transform:translateX(-50%)!important;
+  min-width:clamp(118px,16vw,170px)!important;
+  z-index:32!important;
+}
+#game-board .top-right-btns{justify-self:end!important;transform:none!important;}
+
+/* --- center table is always the same geometric anchor --- */
+#game-board .center-board{
+  left:var(--mid-x)!important;top:var(--mid-y)!important;
+  transform:translate(-50%,-50%)!important;
+  width:clamp(112px,20vmin,188px)!important;
+  height:clamp(112px,20vmin,188px)!important;
+}
+#game-board .score-tag{z-index:25!important;}
+#game-board .score-south{left:50%!important;right:auto!important;bottom:-42px!important;top:auto!important;transform:translateX(-50%)!important;}
+#game-board .score-north{left:50%!important;right:auto!important;top:-42px!important;bottom:auto!important;transform:translateX(-50%)!important;}
+#game-board .score-east{right:-78px!important;left:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;}
+#game-board .score-west{left:-78px!important;right:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;}
+
+/* --- seats: cardinal positions, never tied to arbitrary 43%/28% rules --- */
+#game-board .pos-bottom{left:var(--mid-x)!important;bottom:calc(var(--tile-h) + var(--safe-b) + 7px)!important;transform:translateX(-50%)!important;}
+#game-board .pos-top{left:var(--mid-x)!important;right:auto!important;top:calc(var(--safe-t) + 62px)!important;transform:translateX(-50%)!important;}
+#game-board .pos-left{left:calc(var(--safe-l) + 8px)!important;top:50%!important;transform:translateY(-50%)!important;}
+#game-board .pos-right{right:calc(var(--safe-r) + 8px)!important;left:auto!important;top:50%!important;transform:translateY(-50%)!important;}
+
+/* --- enemy hands stay on their own side and cannot collide with HUD --- */
+#game-board .enemy-hand-top{left:var(--mid-x)!important;top:calc(var(--safe-t) + 112px)!important;transform:translateX(-50%)!important;}
+#game-board .side-left{left:calc(var(--safe-l) + 10px)!important;top:28%!important;}
+#game-board .side-right{right:calc(var(--safe-r) + 10px)!important;left:auto!important;top:28%!important;}
+
+/* --- discard rivers use one symmetric center distance --- */
+#game-board .river-top{left:var(--mid-x)!important;top:calc(var(--safe-t) + 150px)!important;transform:translateX(-50%) rotate(180deg)!important;}
+#game-board .river-bottom{left:var(--mid-x)!important;bottom:calc(var(--tile-h) + var(--safe-b) + 70px)!important;transform:translateX(-50%)!important;}
+#game-board .river-left{left:calc(var(--mid-x) - var(--river-side-gap,180px))!important;right:auto!important;top:50%!important;transform:translateY(-50%) rotate(90deg)!important;}
+#game-board .river-right{left:calc(var(--mid-x) + var(--river-side-gap,180px))!important;right:auto!important;top:50%!important;transform:translateY(-50%) rotate(-90deg)!important;}
+
+/* --- hand and status share the same bottom safe-area anchor --- */
+#game-board .hand-bottom-container{
+  left:var(--safe-l)!important;right:var(--safe-r)!important;bottom:var(--safe-b)!important;width:auto!important;
+  min-height:calc(var(--tile-h) + 14px)!important;padding-left:8px!important;padding-right:8px!important;
+  padding-bottom:max(5px,var(--safe-b))!important;overflow-x:auto!important;overflow-y:visible!important;
+  touch-action:pan-x!important;
+}
+#game-board .hand-tiles{max-width:none!important;min-width:max-content!important;gap:3px!important;}
+#game-board .hand-status{left:var(--mid-x)!important;bottom:calc(var(--tile-h) + var(--safe-b) + 13px)!important;transform:translateX(-50%)!important;}
+#game-board #action-overlay{left:var(--mid-x)!important;bottom:calc(var(--tile-h) + var(--safe-b) + 52px)!important;transform:translateX(-50%)!important;}
+#game-board .melds-container{right:calc(max(7px,var(--safe-r)) + 2px)!important;bottom:calc(var(--tile-h) + var(--safe-b) + 8px)!important;}
+
+/* Keep the artwork large and crisp; don't let the responsive pass shrink it. */
+#game-board .tile-svg-img{width:100%!important;height:100%!important;object-fit:fill!important;}
+#game-board .tile-art{transform:scale(1.02)!important;}
+#game-board .discard-tile .tile-svg-img{width:100%!important;height:100%!important;}
+
+/* ---------- portrait ---------- */
+@media (orientation:portrait){
+  #game-board{--river-side-gap:clamp(102px,29vw,175px)!important;}
+  #game-board .pos-top{top:calc(var(--safe-t) + 64px)!important;}
+  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 116px)!important;}
+  #game-board .river-top{top:calc(var(--safe-t) + 154px)!important;}
+  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 72px)!important;}
+  #game-board .pos-left,#game-board .pos-right{top:50%!important;}
+  #game-board .score-east{right:-64px!important;}
+  #game-board .score-west{left:-64px!important;}
+}
+@media (max-width:430px) and (orientation:portrait){
+  #game-board{--river-side-gap:clamp(96px,27vw,132px)!important;}
+  #game-board .dora-panel{min-width:116px!important;max-width:43vw!important;padding:6px 7px!important;}
+  #game-board .round-hud-shell{min-width:112px!important;padding:6px 8px!important;}
+  #game-board .top-right-btns .icon-btn{width:33px!important;height:33px!important;}
+  #game-board .center-board{width:clamp(112px,31vmin,138px)!important;height:clamp(112px,31vmin,138px)!important;}
+  #game-board .score-tag{min-width:50px!important;font-size:8px!important;padding:4px 5px!important;}
+  #game-board .score-north{top:-35px!important;}
+  #game-board .score-south{bottom:-35px!important;}
+  #game-board .score-east{right:-59px!important;}
+  #game-board .score-west{left:-59px!important;}
+}
+
+/* ---------- compact landscape phone ---------- */
+@media (orientation:landscape) and (max-height:600px){
+  #game-board{--river-side-gap:clamp(118px,20vw,235px)!important;}
+  #game-board .dora-panel{min-width:112px!important;max-width:28vw!important;padding:5px 7px!important;}
+  #game-board .round-hud-shell{min-width:104px!important;padding:5px 8px!important;}
+  #game-board .top-right-btns .icon-btn{width:32px!important;height:32px!important;}
+  #game-board .pos-top{top:calc(var(--safe-t) + 40px)!important;}
+  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 72px)!important;}
+  #game-board .river-top{top:calc(var(--safe-t) + 94px)!important;}
+  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 45px)!important;}
+  #game-board .center-board{width:clamp(110px,25vh,150px)!important;height:clamp(110px,25vh,150px)!important;}
+  #game-board .score-tag{min-width:52px!important;font-size:8px!important;padding:4px 5px!important;}
+  #game-board .score-north{top:-30px!important;}
+  #game-board .score-south{bottom:-30px!important;}
+  #game-board .score-east{right:-62px!important;}
+  #game-board .score-west{left:-62px!important;}
+  #game-board .hand-status{width:min(300px,44vw)!important;bottom:calc(var(--tile-h) + var(--safe-b) + 6px)!important;padding:4px 8px!important;}
+  #game-board #action-overlay{bottom:calc(var(--tile-h) + var(--safe-b) + 12px)!important;}
+}
+@media (orientation:landscape) and (max-height:430px){
+  #game-board{--river-side-gap:clamp(105px,18vw,185px)!important;}
+  #game-board .pos-top{top:calc(var(--safe-t) + 32px)!important;}
+  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 56px)!important;}
+  #game-board .river-top{top:calc(var(--safe-t) + 72px)!important;}
+  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 35px)!important;}
+  #game-board .hand-status{display:none!important;}
+}
+
+/* Never use hover to change game-piece geometry on touch screens. */
+@media (pointer:coarse){
+  #game-board .tile:hover,#game-board .discard-tile:hover{transform:none!important;}
+  #game-board .tile,#game-board .act-btn,#game-board button{touch-action:manipulation;}
+}
+</style>
+
 </head>
 <body>
 
@@ -3828,5 +3975,56 @@ window.addEventListener('pointerdown',()=>{try{if(typeof startChineseMusic==='fu
   window.visualViewport?.addEventListener('resize',syncMahyongSizing,{passive:true});
 })();
 </script>
+
+<script id="mahyong-dj-v24-device-lock">
+(function(){
+  const board=()=>document.getElementById('game-board');
+  function px(v){const n=parseFloat(v);return Number.isFinite(n)?n:0;}
+  function sync(){
+    const b=board(); if(!b)return;
+    const vv=window.visualViewport;
+    const w=Math.max(1,vv?.width||window.innerWidth||1);
+    const h=Math.max(1,vv?.height||window.innerHeight||1);
+    const landscape=w>h;
+    /* Touch-size budget: width dominates landscape, height dominates portrait,
+       with hard minimums so a 4-player hand never becomes microscopic. */
+    let tileW;
+    if(landscape){
+      tileW=Math.min(49,Math.max(35,(w-34)/14.15));
+      if(h<430) tileW=Math.min(tileW,43);
+    }else{
+      tileW=Math.min(45,Math.max(32,(w-22)/14.15));
+    }
+    const tileH=tileW*1.43;
+    const discardW=Math.max(19,Math.min(28,tileW*.59));
+    const discardH=discardW*1.42;
+    const center=Math.max(112,Math.min(188,Math.min(w*.22,h*.26)));
+    const gap=landscape
+      ? Math.max(108,Math.min(235,w*.205))
+      : Math.max(98,Math.min(175,w*.29));
+    b.style.setProperty('--tile-w',tileW.toFixed(2)+'px');
+    b.style.setProperty('--tile-h',tileH.toFixed(2)+'px');
+    b.style.setProperty('--discard-w',discardW.toFixed(2)+'px');
+    b.style.setProperty('--discard-h',discardH.toFixed(2)+'px');
+    b.style.setProperty('--river-side-gap',gap.toFixed(2)+'px');
+    b.style.setProperty('--center-size',center.toFixed(2)+'px');
+    /* Expose viewport measurements for any later UI component without
+       changing the worker / multiplayer code. */
+    b.style.setProperty('--viewport-w',w.toFixed(2)+'px');
+    b.style.setProperty('--viewport-h',h.toFixed(2)+'px');
+  }
+  function stopZoom(e){
+    if(e.type==='dblclick'||e.type==='gesturestart'||e.type==='gesturechange'||e.type==='gestureend'){
+      e.preventDefault();
+    }
+  }
+  ['dblclick','gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,stopZoom,{passive:false}));
+  sync();
+  addEventListener('resize',sync,{passive:true});
+  addEventListener('orientationchange',()=>setTimeout(sync,80),{passive:true});
+  if(window.visualViewport) window.visualViewport.addEventListener('resize',sync,{passive:true});
+})();
+</script>
+
 </body>
 </html>
