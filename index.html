@@ -2,260 +2,467 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mahjong Soul Riichi Engine - Responsive & Advanced</title>
+    <meta name="app-version" content="5.0-stable">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#08131f">
+    <meta name="description" content="Mahjong Soul Web — browser Riichi Mahjong dengan mode AI dan multiplayer lobby.">
+    <title>Mahjong Soul Web — Riichi Mahjong</title>
     <style>
         :root {
-            --bg-table: radial-gradient(circle at center, #1f4260 0%, #0d1e2d 100%);
-            --gold-accent: #f39c12;
-            --tile-bg: linear-gradient(to bottom, #ffffff 0%, #f4efe6 100%);
-            --tile-back: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
-            
-            /* Dynamic Tile Sizing for Universal Screens */
-            --tile-w: clamp(24px, 5.8vw, 42px);
-            --tile-h: clamp(36px, 8.5vw, 62px);
-            --tile-font: clamp(14px, 3.2vw, 24px);
-            --tile-helper-font: clamp(7px, 1.5vw, 10px);
-
-            /* Discard Tile Dimensions */
-            --discard-w: clamp(16px, 3.8vw, 26px);
-            --discard-h: clamp(24px, 5.5vw, 36px);
+            color-scheme: dark;
+            --bg: #06101a;
+            --panel: rgba(8, 18, 29, .88);
+            --panel-strong: rgba(12, 25, 39, .96);
+            --line: rgba(255,255,255,.10);
+            --line-strong: rgba(255,255,255,.18);
+            --text: #f4f7fb;
+            --muted: #a7b2c0;
+            --gold: #f4b13a;
+            --gold-strong: #ffcf68;
+            --green: #36d399;
+            --red: #ff6b6b;
+            --blue: #63a4ff;
+            --purple: #b488ff;
+            --cyan: #44d9e6;
+            --tile-w: clamp(26px, 5.7vw, 44px);
+            --tile-h: clamp(39px, 8.4vw, 63px);
+            --tile-font: clamp(15px, 3.1vw, 24px);
+            --tile-helper-font: clamp(7px, 1.45vw, 10px);
+            --discard-w: clamp(17px, 3.65vw, 27px);
+            --discard-h: clamp(25px, 5.4vw, 38px);
+            --radius: 14px;
+            --shadow: 0 18px 50px rgba(0,0,0,.34);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
-        body { background: #050b11; color: #fff; overflow: hidden; height: 100dvh; width: 100vw; display: flex; justify-content: center; align-items: center; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 100%; height: 100%; }
+        body {
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 15% 15%, rgba(52, 119, 157, .20), transparent 32%),
+                radial-gradient(circle at 85% 80%, rgba(146, 76, 26, .13), transparent 28%),
+                var(--bg);
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            user-select: none;
+        }
+        button, input { font: inherit; }
+        button { -webkit-tap-highlight-color: transparent; }
 
-        .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; padding: 15px; text-align: center; position: absolute; top:0; left:0; }
-        .active { display: flex; }
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: none;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(16px, 3vw, 28px);
+        }
+        .screen.active { display: flex; }
 
-        h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); color: var(--gold-accent); text-shadow: 0 0 10px rgba(243, 156, 18, 0.5); margin-bottom: 15px; }
-        button { background: linear-gradient(to bottom, #f39c12, #d35400); color: #fff; border: 1px solid #ffeb3b; padding: 8px 18px; margin: 5px; font-size: clamp(0.8rem, 2vw, 1rem); border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        button:active { transform: scale(0.96); }
+        /* ---------- Shared UI ---------- */
+        .glass {
+            background: linear-gradient(180deg, rgba(17,31,46,.90), rgba(8,17,28,.92));
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(14px);
+        }
+        .brand-lockup { text-align: center; margin-bottom: 26px; }
+        .brand-kicker {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: var(--gold-strong); font-size: 11px; font-weight: 800;
+            letter-spacing: .18em; text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .brand-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 14px rgba(244,177,58,.7); }
+        h1 {
+            margin-bottom: 8px;
+            font-size: clamp(2rem, 6vw, 4rem);
+            line-height: .98;
+            letter-spacing: -.045em;
+            color: #fff;
+            text-shadow: 0 8px 28px rgba(0,0,0,.35);
+        }
+        .brand-subtitle { color: var(--muted); font-size: clamp(12px, 1.7vw, 15px); }
+        .screen-card { width: min(92vw, 440px); padding: clamp(22px, 4vw, 32px); border-radius: 22px; }
+        .menu-actions { display: grid; gap: 10px; }
+        .menu-actions > button { width: 100%; }
 
-        /* Flexible Board Layout */
+        .btn {
+            min-height: 44px;
+            border: 1px solid transparent;
+            border-radius: 11px;
+            padding: 10px 16px;
+            color: #fff;
+            font-weight: 800;
+            letter-spacing: .01em;
+            cursor: pointer;
+            transition: transform .16s ease, filter .16s ease, border-color .16s ease, box-shadow .16s ease;
+        }
+        .btn:hover { filter: brightness(1.06); }
+        .btn:active { transform: translateY(1px) scale(.985); }
+        .btn-primary {
+            background: linear-gradient(180deg, #ffca55 0%, #dd8a16 100%);
+            border-color: rgba(255,235,150,.72);
+            color: #1a1105;
+            box-shadow: 0 12px 28px rgba(224,137,22,.24);
+        }
+        .btn-secondary { background: rgba(255,255,255,.06); border-color: var(--line-strong); }
+        .btn-danger { background: rgba(125,25,34,.85); border-color: rgba(255,120,120,.22); }
+        .btn-wide { width: 100%; }
+        .btn-compact { min-height: 34px; padding: 6px 10px; font-size: 12px; }
+        .icon-btn {
+            width: 38px; height: 38px; padding: 0; display: grid; place-items: center;
+            border-radius: 10px; background: rgba(7,16,25,.78); border: 1px solid var(--line-strong);
+            color: #eef4fb; cursor: pointer; font-size: 15px;
+        }
+        .section-title { font-size: 18px; font-weight: 850; }
+        .section-kicker { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+        .screen-heading { font-size: clamp(1.8rem, 5vw, 2.7rem); }
+        .btn-note { font-weight: 600; opacity: .72; }
+        .seat-direction { opacity: .55; }
+
+        /* ---------- Settings ---------- */
+        .settings-card { width: min(92vw, 480px); padding: 22px; border-radius: 18px; }
+        .settings-row { display: grid; gap: 10px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+        .settings-row:last-child { border-bottom: 0; }
+        .settings-label { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .settings-label strong { font-size: 13px; }
+        .settings-label span { color: var(--muted); font-size: 12px; }
+        .range-wrap { display: grid; gap: 7px; }
+        input[type="range"] { width: 100%; accent-color: var(--gold); }
+        .range-caption { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; }
+        .toggle-btn { min-width: 58px; }
+
+        /* ---------- Modals ---------- */
+        .modal {
+            position: fixed; inset: 0; z-index: 1000; display: none; align-items: center; justify-content: center;
+            padding: 18px; background: rgba(1,6,10,.78); backdrop-filter: blur(8px);
+        }
+        .modal-box { width: min(94vw, 470px); padding: 22px; border-radius: 18px; }
+        .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+        .modal-title { font-size: 20px; font-weight: 900; }
+        .modal-copy { color: var(--muted); font-size: 12px; line-height: 1.5; margin-top: 4px; }
+        .ready-player-list { display: grid; gap: 8px; margin: 18px 0; }
+        .ready-item {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            background: rgba(255,255,255,.045); border: 1px solid var(--line); border-radius: 11px;
+            padding: 11px 12px; font-size: 13px;
+        }
+        .status-ready, .status-waiting { font-size: 11px; font-weight: 900; letter-spacing: .05em; }
+        .status-ready { color: var(--green); }
+        .status-waiting { color: var(--red); }
+        .result-score-list { margin: 14px 0 18px; background: rgba(0,0,0,.20); border: 1px solid var(--line); border-radius: 11px; padding: 10px; }
+        .result-score-list > div { display:flex; justify-content:space-between; gap:12px; padding: 7px 3px; border-bottom: 1px solid rgba(255,255,255,.06); font-size: 12px; }
+        .result-score-list > div:last-child { border-bottom: 0; }
+
+        /* ---------- Game board ---------- */
+        #screen-game { padding: 0; }
         #game-board {
-            width: 100vw; height: 100dvh; background: var(--bg-table); position: relative;
-            display: grid; grid-template-rows: max-content 1fr max-content; grid-template-columns: min-content 1fr min-content;
-            box-shadow: inset 0 0 100px #000; overflow: hidden;
+            position: relative; width: 100vw; height: 100dvh; overflow: hidden;
+            background:
+                radial-gradient(circle at center, rgba(52,104,128,.35) 0%, transparent 42%),
+                linear-gradient(135deg, #173a52 0%, #0e2636 48%, #081720 100%);
+            box-shadow: inset 0 0 120px rgba(0,0,0,.56);
+            isolation: isolate;
+        }
+        #game-board::before {
+            content: ""; position: absolute; inset: 0; pointer-events: none;
+            background-image: radial-gradient(rgba(255,255,255,.045) 1px, transparent 1px);
+            background-size: 5px 5px; opacity: .18; mix-blend-mode: screen; z-index: -1;
         }
 
-        .dora-panel { position: absolute; top: 10px; left: 10px; background: rgba(10, 20, 30, 0.85); border: 1.5px solid #5c4520; border-radius: 6px; padding: 4px 8px; z-index: 10; display: flex; flex-direction: column; gap: 2px; }
-        .dora-tiles { display: flex; gap: 2px; }
-        .dora-tile-box { width: clamp(14px, 3.5vw, 22px); height: clamp(20px, 5vw, 30px); background: #e67e22; border-radius: 2px; border: 1px solid #fff; display: flex; justify-content: center; align-items: center; font-size: clamp(9px, 2vw, 12px); }
-        .dora-open { background: #fff; color: #000; font-weight: bold; }
-        .stick-counters { display: flex; justify-space-between: space-between; font-size: 10px; color: #aaa; margin-top: 1px; }
+        .topbar { position: absolute; top: max(10px, env(safe-area-inset-top)); left: 10px; right: 10px; z-index: 30; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+        .hud-card { background: rgba(5,14,23,.78); border: 1px solid var(--line-strong); box-shadow: 0 10px 26px rgba(0,0,0,.22); backdrop-filter: blur(10px); border-radius: 12px; }
+        .dora-panel { padding: 7px 9px; min-width: 160px; }
+        .hud-label { color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 4px; }
+        .dora-tiles { display:flex; gap:3px; }
+        .dora-tile-box { width: 24px; height: 32px; display:grid; place-items:center; border-radius:4px; border:1px solid rgba(255,255,255,.25); background: linear-gradient(180deg,#d36e25,#a83a12); font-size:13px; }
+        .dora-open { background: #f5f2e9; color:#111; border-color:#fff; box-shadow:0 2px 6px rgba(0,0,0,.22); }
+        .stick-counters { display:flex; justify-content:space-between; gap:8px; margin-top:6px; color:var(--muted); font-size:9px; }
+        .top-right-btns { display:flex; gap:6px; }
 
-        .avatar-frame { position: absolute; display: flex; flex-direction: column; align-items: center; z-index: 5; }
-        .avatar-img { width: clamp(32px, 8vw, 48px); height: clamp(32px, 8vw, 48px); border-radius: 6px; border: 2px solid var(--gold-accent); background: #2c3e50 url('https://cdn-icons-png.flaticon.com/512/4140/4140048.png') center/cover; }
-        .avatar-name { font-size: clamp(8px, 1.8vw, 11px); background: rgba(0,0,0,0.7); padding: 1px 4px; border-radius: 3px; margin-top: 1px; border: 1px solid #444; }
-        .time-bank-tag { font-size: clamp(8px, 1.5vw, 10px); color: #f39c12; font-weight: bold; margin-top: 1px; background: #111; padding: 1px 4px; border-radius: 3px; }
-        
-        .pos-bottom { bottom: calc(var(--tile-h) + 15px); left: 10px; }
-        .pos-left { left: 5px; top: 20%; }
-        .pos-top { top: 10px; right: 120px; }
-        .pos-right { right: 5px; top: 20%; }
+        .player-seat { position:absolute; z-index:16; display:flex; flex-direction:column; align-items:center; text-align:center; }
+        .avatar-img { width: clamp(38px, 8vw, 50px); height: clamp(38px, 8vw, 50px); border-radius: 13px; border: 2px solid rgba(244,177,58,.85); background: #22364a url('https://cdn-icons-png.flaticon.com/512/4140/4140048.png') center/cover; box-shadow:0 8px 22px rgba(0,0,0,.24); }
+        .avatar-name { margin-top: 4px; padding: 3px 7px; border-radius: 7px; background: rgba(3,9,15,.72); border:1px solid var(--line); font-size:9px; font-weight:800; }
+        .time-bank-tag { margin-top: 3px; padding: 2px 6px; border-radius: 6px; background: rgba(3,9,15,.76); color: var(--gold-strong); font-size:9px; font-weight:900; }
+        .pos-bottom { left: 12px; bottom: calc(var(--tile-h) + 17px); }
+        .pos-left { left: 10px; top: 43%; transform: translateY(-50%); }
+        .pos-top { top: 12px; right: 118px; }
+        .pos-right { right: 10px; top: 43%; transform: translateY(-50%); }
+
+        .enemy-hand-top { position:absolute; top: 72px; left:50%; transform:translateX(-50%); display:flex; gap:2px; z-index:10; }
+        .enemy-hand-top .tile-back { width: clamp(13px, 3vw, 20px); height: clamp(19px, 4.5vw, 29px); }
+        .enemy-hand-side { position:absolute; display:flex; flex-direction:column; gap:2px; z-index:10; }
+        .enemy-hand-side .tile-back { width: clamp(19px, 4.5vw, 29px); height: clamp(13px, 3vw, 20px); }
+        .side-left { left: 16px; top: 28%; }
+        .side-right { right: 16px; top: 28%; }
 
         .center-board {
-            grid-area: 2 / 2 / 3 / 3; justify-self: center; align-self: center;
-            width: clamp(120px, 30vw, 180px); height: clamp(120px, 30vw, 180px); background: #161b22; border: 3px solid #30363d;
-            border-radius: 12px; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8); z-index: 2; transition: border-color 0.3s;
+            position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+            width: clamp(140px, 30vw, 194px); height: clamp(140px, 30vw, 194px);
+            border: 3px solid rgba(255,255,255,.14); border-radius: 24px;
+            background: linear-gradient(180deg, rgba(12,24,36,.94), rgba(5,12,19,.96));
+            box-shadow: 0 20px 55px rgba(0,0,0,.36), inset 0 0 0 1px rgba(255,255,255,.025);
+            display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9;
+            transition: border-color .25s ease, box-shadow .25s ease;
         }
-        .turn-timer { font-size: clamp(24px, 6vw, 42px); font-weight: bold; color: #fff; margin: 1px 0; }
-        .round-info { font-size: clamp(10px, 2.5vw, 14px); color: #58a6ff; font-weight: bold; }
-        .tiles-left { font-size: clamp(11px, 2.8vw, 15px); color: var(--gold-accent); font-weight: bold; }
-        .score-tag { position: absolute; font-size: clamp(8px, 1.8vw, 11px); color: #c9d1d9; background: #21262d; padding: 1px 4px; border-radius: 3px; border: 1px solid #30363d; }
-        .score-south { bottom: 4px; color: #2ecc71; font-weight: bold;}
-        .score-east { right: 4px; }
-        .score-north { top: 4px; }
-        .score-west { left: 4px; }
+        .round-info { color: var(--blue); font-size: 12px; font-weight: 900; letter-spacing:.04em; }
+        .turn-timer { margin: 3px 0 1px; font-size: clamp(32px, 6vw, 46px); line-height:1; font-weight:900; }
+        .tiles-left { color: var(--gold); font-size: 12px; font-weight:850; }
+        .score-tag { position:absolute; min-width:58px; padding:4px 6px; border-radius:8px; background:rgba(255,255,255,.055); border:1px solid var(--line); color:#c8d0dc; font-size:9px; font-weight:900; }
+        .score-south { bottom:7px; color:var(--green); }
+        .score-east { right:7px; }
+        .score-north { top:7px; }
+        .score-west { left:7px; }
 
-        .top-right-btns { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; z-index: 10; }
-        .icon-btn { width: clamp(28px, 6vw, 36px); height: clamp(28px, 6vw, 36px); background: rgba(16, 26, 36, 0.8); border: 1px solid #444; border-radius: 5px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 14px; }
+        .river-container { position:absolute; display:grid; grid-template-columns:repeat(6,var(--discard-w)); gap:2px; width:calc(var(--discard-w) * 6 + 10px); height:calc(var(--discard-h) * 3 + 5px); align-content:start; z-index:7; }
+        .river-bottom { left:50%; bottom:calc(var(--tile-h) + 67px); transform:translateX(-50%); }
+        .river-top { left:50%; top:116px; transform:translateX(-50%) rotate(180deg); }
+        .river-left { left:124px; top:50%; transform:translateY(-50%) rotate(90deg); }
+        .river-right { right:124px; top:50%; transform:translateY(-50%) rotate(-90deg); }
+        .discard-tile { width:var(--discard-w); height:var(--discard-h); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; color:#101214; background:linear-gradient(180deg,#fffef9,#e6e1d6); border-radius:4px; border-bottom:2px solid #354e36; box-shadow:0 2px 5px rgba(0,0,0,.32); font-weight:900; }
+        .discard-tile .tile-char { font-size:clamp(10px,2.4vw,16px); }
+        .discard-tile .tile-helper { font-size:clamp(5px,1vw,7px); }
 
-        /* Authentic 6-Tile Per Row River Styling */
-        .river-container {
-            position: absolute; display: grid; grid-template-columns: repeat(6, var(--discard-w)); gap: 1px; z-index: 3;
-            width: calc(var(--discard-w) * 6 + 6px); height: calc(var(--discard-h) * 3 + 3px); align-content: start;
+        .tile { width:var(--tile-w); height:var(--tile-h); flex:0 0 auto; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; cursor:pointer; color:#101214; border-radius:6px; background:linear-gradient(180deg,#fffefb 0%,#ede8dd 100%); border:1px solid rgba(72,72,62,.18); border-bottom:3px solid #3d563d; box-shadow:0 4px 8px rgba(0,0,0,.28); font-weight:900; transition:transform .12s ease, box-shadow .12s ease; }
+        .tile:hover { transform:translateY(-4px); box-shadow:0 8px 14px rgba(0,0,0,.34); }
+        .tile-helper { position:absolute; top:2px; right:3px; color:#d52f33; font-size:var(--tile-helper-font); font-weight:900; line-height:1; }
+        .tile-char { font-size:var(--tile-font); line-height:1; }
+        .tile-back { background:linear-gradient(145deg,#d97528,#a73b0e); border:1px solid #784124; border-bottom:2px solid #522818; box-shadow:0 2px 4px rgba(0,0,0,.25); border-radius:4px; }
+        .riichi-tile { transform:rotate(-90deg) scale(.88); margin:0 2px; }
+        .drawn-tile-gap { margin-left: 8px; border-color:var(--gold); box-shadow:0 0 0 2px rgba(244,177,58,.16), 0 4px 8px rgba(0,0,0,.28); }
+        .riichi-choice { outline:2px solid var(--purple); }
+
+        .enemy-melds { position:absolute; display:flex; gap:4px; z-index:8; }
+        .enemy-melds-top { top:44px; left:20%; }
+        .enemy-melds-left { left:48px; top:60%; flex-direction:column; }
+        .enemy-melds-right { right:48px; top:15%; flex-direction:column; }
+        .melds-container { position:absolute; right:12px; bottom:calc(var(--tile-h) + 16px); display:flex; gap:5px; z-index:12; }
+        .meld-group { display:flex; gap:1px; padding:3px; border-radius:7px; background:rgba(2,7,11,.55); border:1px solid var(--line); }
+        .meld-group .tile { width:clamp(19px,4vw,31px); height:clamp(28px,6vw,45px); cursor:default; }
+
+        .beginner-tip { position:absolute; left:50%; bottom:calc(var(--tile-h) + 57px); transform:translateX(-50%); z-index:33; padding:4px 8px; border-radius:999px; background:rgba(5,12,19,.66); color:rgba(255,255,255,.58); font-size:8px; font-weight:800; pointer-events:none; white-space:nowrap; }
+        .beginner-tip { transition:opacity .2s ease; }
+        .action-open ~ .beginner-tip { opacity:.25; }
+        .hand-status { position:absolute; left:50%; bottom:calc(var(--tile-h) + 10px); transform:translateX(-50%); z-index:35; width:min(520px,92vw); padding:7px 12px; border:1px solid rgba(255,255,255,.13); background:rgba(5,12,19,.90); border-radius:999px; box-shadow:0 8px 22px rgba(0,0,0,.24); backdrop-filter:blur(10px); text-align:center; pointer-events:none; transition:opacity .16s ease, transform .16s ease; }
+        .hand-status.action-open { opacity:0; transform:translateX(-50%) translateY(8px); }
+        .hand-status .status-main { font-size:11px; font-weight:950; letter-spacing:.02em; }
+        .hand-status .status-sub { margin-top:2px; font-size:9px; color:var(--muted); font-weight:700; }
+        .hand-status.ready .status-main { color:#48e6a0; }
+        .hand-status.tenpai .status-main { color:#63c6ff; }
+        .hand-status.warning .status-main { color:#ffbd59; }
+        .hand-status.blocked .status-main { color:#ff7676; }
+        #action-overlay { position:absolute; left:50%; bottom:calc(var(--tile-h) + 50px); transform:translateX(-50%); display:none; flex-wrap:wrap; justify-content:center; gap:7px; max-width:min(94vw,520px); padding:8px 10px; background:rgba(4,10,16,.94); border:1px solid rgba(244,177,58,.62); border-radius:15px; box-shadow:0 14px 35px rgba(0,0,0,.36); z-index:40; }
+        .act-btn { min-width:58px; min-height:36px; border:0; border-radius:10px; padding:6px 11px; color:#fff; font-size:12px; font-weight:900; cursor:pointer; }
+        .btn-ron { background:#c63c46; } .btn-tsumo { background:#c97a24; } .btn-riichi { background:#7a48b3; } .btn-kan { background:#168b82; } .btn-pon { background:#2d7fc3; } .btn-chi { background:#219b68; } .btn-skip { background:#5a6670; }
+        .tile.hovered-tile { transform:translateY(-7px); box-shadow:0 0 0 2px rgba(255,85,85,.78),0 10px 20px rgba(0,0,0,.38); z-index:25; }
+        .tile.hovered-tile::after { content:""; position:absolute; inset:0; border:2px solid rgba(255,75,75,.88); border-radius:6px; pointer-events:none; }
+        .machi-bubble { position:absolute; left:50%; bottom:calc(100% + 8px); transform:translateX(-50%) translateY(4px); min-width:112px; padding:6px 8px; border-radius:9px; background:rgba(7,13,20,.97); border:1px solid rgba(244,177,58,.72); box-shadow:0 10px 24px rgba(0,0,0,.35); color:#fff; font-size:10px; line-height:1.25; text-align:center; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .12s ease,transform .12s ease; z-index:50; }
+        .tile.hovered-tile .machi-bubble,.tile:focus-visible .machi-bubble { opacity:1; transform:translateX(-50%) translateY(0); }
+        .machi-bubble strong { color:var(--gold-strong); display:block; margin-bottom:2px; }
+        .machi-bubble.no-yaku strong { color:var(--red); }
+        .discard-tile.discard-highlight { outline:2px solid rgba(255,78,78,.95); box-shadow:0 0 0 3px rgba(255,78,78,.18),0 0 12px rgba(255,78,78,.38); transform:translateY(-2px); z-index:15; }
+        .dora-caption { color:var(--muted); font-size:9px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; margin-bottom:4px; }
+        .kan-info { margin-top:4px; color:var(--cyan); font-size:9px; font-weight:800; }
+        .dora-tile-box.revealed-kan { background:linear-gradient(180deg,#5eb0ff,#2468b2); color:#fff; border-color:rgba(130,205,255,.75); }
+        .furiten-panel { position:absolute; left:50%; bottom:calc(var(--tile-h) + 82px); transform:translateX(-50%); z-index:30; width:min(320px,82vw); padding:8px 10px; border:1px solid rgba(255,255,255,.12); background:rgba(6,13,20,.94); border-radius:999px; backdrop-filter:blur(10px); box-shadow:0 10px 24px rgba(0,0,0,.28); display:none; pointer-events:none; }
+        .furiten-row { display:none; }
+        .furiten-row button { margin:0; flex:1; padding:6px 7px; font-size:9px; border-radius:8px; }
+        .furiten-status { margin-top:0; font-size:10px; font-weight:850; min-height:14px; color:var(--muted); text-align:center; }
+        .furiten-status.temp { color:#ffbd59; } .furiten-status.perma { color:#ff7676; } .furiten-status.clean { color:#48e6a0; }
+        @media (max-width:680px){ .furiten-panel{bottom:calc(var(--tile-h) + 72px);width:min(290px,88vw)}.machi-bubble{min-width:96px;font-size:9px} }
+
+
+        .hand-bottom-container { position:absolute; left:0; right:0; bottom:0; z-index:20; display:flex; align-items:flex-end; justify-content:center; padding:0 6px max(7px,env(safe-area-inset-bottom)); min-height:calc(var(--tile-h) + 16px); overflow-x:auto; overflow-y:visible; scrollbar-width:none; }
+        .hand-bottom-container::-webkit-scrollbar { display:none; }
+        .hand-tiles { display:flex; gap:3px; max-width:100%; padding:2px 3px 0; }
+
+        .riichi-overlay { position:absolute; inset:0; z-index:95; display:none; pointer-events:none; background:radial-gradient(circle at center, rgba(231,76,60,.04), rgba(231,76,60,.17)); box-shadow:inset 0 0 120px rgba(231,76,60,.14); }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 720px) {
+            .topbar { gap:6px; }
+            .dora-panel { min-width: 140px; }
+            .dora-tile-box { width:21px; height:29px; font-size:12px; }
+            .pos-top { right:104px; }
+            .river-left { left:93px; }
+            .river-right { right:93px; }
+            .enemy-melds-left { left:36px; }
+            .enemy-melds-right { right:36px; }
+            .center-board { border-radius:20px; }
         }
-        .river-bottom { bottom: calc(var(--tile-h) + 65px); left: 50%; transform: translateX(-50%); }
-        .river-top { top: 65px; left: 50%; transform: translateX(-50%) rotate(180deg); }
-        .river-left { left: 110px; top: 50%; transform: translateY(-50%) rotate(90deg); }
-        .river-right { right: 110px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
-
-        /* Tile Styling & Formatting Fix */
-        .tile {
-            width: var(--tile-w); height: var(--tile-h);
-            background: var(--tile-bg); color: #111; border-radius: 3px; display: flex;
-            justify-content: center; align-items: center; position: relative;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4); border-bottom: 3px solid #3a5335;
-            font-weight: bold; cursor: pointer; flex-shrink: 0; overflow: hidden;
+        @media (max-width: 520px) {
+            .dora-panel { padding:6px 7px; min-width:0; }
+            .hud-label { display:none; }
+            .stick-counters { font-size:8px; }
+            .top-right-btns .icon-btn { width:34px; height:34px; }
+            .pos-left { left:4px; }
+            .pos-right { right:4px; }
+            .river-left { left:55px; }
+            .river-right { right:55px; }
+            .enemy-melds-left { left:24px; }
+            .enemy-melds-right { right:24px; }
+            .action-overlay { max-width:96vw; }
         }
-        .tile:hover { transform: translateY(-4px); }
-        .riichi-choice { outline: 2px solid #9b59b6; box-shadow: 0 0 8px rgba(155, 89, 182, 0.8), 0 2px 4px rgba(0,0,0,0.4); }
-        .tile-helper { position: absolute; top: 1px; right: 2px; font-size: var(--tile-helper-font); font-weight: 800; color: #d63031; line-height: 1; }
-        .tile-char { font-size: var(--tile-font); line-height: 1; }
-
-        .tile-back { background: var(--tile-back); border-radius: 2px; border: 1px solid #795548; border-bottom: 2px solid #3e2723; flex-shrink: 0; }
-
-        .hand-bottom-container { grid-area: 3 / 1 / 4 / 4; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 8px; z-index: 6; width: 100vw; overflow-x: auto; }
-        .hand-tiles { display: flex; gap: 2px; max-width: 100vw; padding: 0 5px; }
-        .drawn-tile-gap { margin-left: 8px; border: 2px solid var(--gold-accent); }
-        
-        .riichi-overlay { position: absolute; width: 100%; height: 100%; background: rgba(231, 76, 60, 0.2); pointer-events: none; z-index: 100; display: none; }
-
-        .enemy-hand-top { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); display: flex; gap: 1px; }
-        .enemy-hand-top .tile-back { width: clamp(12px, 3vw, 20px); height: clamp(18px, 4.5vw, 30px); }
-        .enemy-hand-side { position: absolute; display: flex; flex-direction: column; gap: 1px; }
-        .enemy-hand-side .tile-back { width: clamp(18px, 4.5vw, 30px); height: clamp(12px, 3vw, 20px); }
-        .side-left { left: 5px; top: 25%; }
-        .side-right { right: 5px; top: 25%; }
-
-        .discard-tile { 
-            width: var(--discard-w); height: var(--discard-h); background: var(--tile-bg); border-radius: 2px; 
-            border-bottom: 2px solid #3a5335; display: flex; justify-content: center; align-items: center; position: relative; color: #111; font-weight: bold; overflow: hidden;
+        @media (max-height: 520px) and (orientation: landscape) {
+            :root { --tile-h: clamp(32px, 9vh, 52px); --tile-w: clamp(22px, 7vh, 38px); }
+            .pos-bottom { bottom:calc(var(--tile-h) + 9px); }
+            .river-bottom { bottom:calc(var(--tile-h) + 48px); }
+            #action-overlay { bottom:calc(var(--tile-h) + 10px); }
+            .center-board { width:130px; height:130px; }
+            .avatar-img { width:34px; height:34px; }
+            .avatar-name, .time-bank-tag { font-size:8px; }
         }
-        .discard-tile .tile-char { font-size: clamp(11px, 2.5vw, 16px); }
-        .discard-tile .tile-helper { font-size: clamp(5px, 1vw, 7px); top: 1px; right: 1px; position: absolute; color: #d63031; font-weight: 800;}
-        
-        .riichi-tile { transform: rotate(-90deg) scale(0.9); margin: 0 2px; }
 
-        .melds-container { position: absolute; bottom: calc(var(--tile-h) + 15px); right: 10px; display: flex; gap: 5px; z-index: 6; }
-        .enemy-melds { position: absolute; display: flex; gap: 4px; z-index: 5; }
-        .enemy-melds-top { top: 40px; left: 20%; }
-        .enemy-melds-left { left: 40px; top: 60%; flex-direction: column; }
-        .enemy-melds-right { right: 40px; top: 15%; flex-direction: column; }
-        
-        .meld-group { display: flex; gap: 1px; background: rgba(0,0,0,0.3); padding: 2px; border-radius: 4px; }
-        .meld-group .tile { width: clamp(18px, 4vw, 30px); height: clamp(26px, 6vw, 44px); font-size: 14px; cursor: default; }
-
-        #action-overlay {
-            position: absolute; bottom: calc(var(--tile-h) + 25px); left: 50%; transform: translateX(-50%); display: none; gap: 8px; z-index: 20;
-            background: rgba(5, 12, 20, 0.95); padding: 8px 16px; border-radius: 30px; border: 2px solid var(--gold-accent);
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior:auto !important; transition:none !important; animation:none !important; }
         }
-        .act-btn { padding: 6px 14px; font-size: clamp(0.75rem, 2vw, 1rem); border-radius: 15px; cursor: pointer; color: white; font-weight: bold; }
-        .btn-ron { background: #e74c3c; } .btn-tsumo { background: #e67e22; } .btn-riichi { background: #9b59b6; }
-        .btn-kan { background: #1abc9c; } .btn-pon { background: #3498db; } .btn-chi { background: #2ecc71; } .btn-skip { background: #636e72; }
-
-        /* Modal Screens */
-        .modal { position: absolute; top: 0; left: 0; width: 100vw; height: 100dvh; background: rgba(0,0,0,0.85); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 200; padding: 20px; }
-        .modal-box { background: #161b22; border: 2px solid var(--gold-accent); border-radius: 10px; padding: 20px; text-align: center; max-width: 400px; width: 90%; }
-        .ready-player-list { display: flex; flex-direction: column; gap: 8px; margin: 15px 0; text-align: left; }
-        .ready-item { display: flex; justify-content: space-between; background: #21262d; padding: 8px 12px; border-radius: 5px; font-size: 14px; }
-        .status-ready { color: #2ecc71; font-weight: bold; }
-        .status-waiting { color: #e74c3c; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <audio id="bg-music" loop>
+    <audio id="bg-music" loop preload="none">
         <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_51a37c4493.mp3?filename=chinese-traditional-music-110072.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- MAIN MENU -->
-    <div id="screen-main" class="screen active">
-        <h1>MAHJONG SOUL WEB</h1>
-        <button onclick="nav('screen-play')">Play Game</button>
-        <button onclick="nav('screen-settings')">Settings</button>
-    </div>
-
-    <!-- SETTINGS SCREEN -->
-    <div id="screen-settings" class="screen">
-        <h1>Settings</h1>
-        <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 10px; width: 280px; margin-bottom: 15px;">
-            <label>Music Volume:</label>
-            <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.5" onchange="updateVolume(this.value)" style="width:100%; margin:10px 0;">
-            <hr style="border-color:#444; margin: 10px 0;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <label>Auto-Sort Hand:</label>
-                <button id="btn-toggle-autosort" onclick="toggleAutoSortSetting()" style="padding:4px 10px; margin:0;">ON</button>
+    <main id="screen-main" class="screen active" aria-labelledby="main-title">
+        <section class="screen-card glass">
+            <div class="brand-lockup">
+                <div class="brand-kicker"><span class="brand-dot"></span> Riichi Mahjong</div>
+                <h1 id="main-title">MAHJONG SOUL WEB</h1>
+                <p class="brand-subtitle">Fast, responsive browser table for casual Riichi play.</p>
             </div>
-        </div>
-        <button onclick="exitSettings()">Back</button>
-    </div>
+            <div class="menu-actions">
+                <button class="btn btn-primary" onclick="nav('screen-play')">Play Game</button>
+                <button class="btn btn-secondary" onclick="nav('screen-settings')">Settings</button>
+            </div>
+        </section>
+    </main>
 
-    <!-- MODE SELECTION -->
-    <div id="screen-play" class="screen">
-        <h1>Select Mode</h1>
-        <button onclick="start4PGame('Medium', false)">Vs AI (Singleplayer)</button>
-        <button onclick="openPlayerLobby()">Vs Player (Multiplayer)</button>
-        <button onclick="nav('screen-main')">Back</button>
-    </div>
+    <main id="screen-settings" class="screen" aria-labelledby="settings-title">
+        <section class="settings-card glass">
+            <div class="modal-head">
+                <div>
+                    <div class="section-title" id="settings-title">Settings</div>
+                    <div class="section-kicker">Atur pengalaman bermain tanpa menyentuh engine permainan.</div>
+                </div>
+            </div>
+            <div class="settings-row">
+                <div class="settings-label"><strong>Music Volume</strong><span id="volume-value">50%</span></div>
+                <div class="range-wrap">
+                    <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.5" onchange="updateVolume(this.value); setText('volume-value', Math.round(this.value * 100) + '%')">
+                    <div class="range-caption"><span>Mute</span><span>100%</span></div>
+                </div>
+            </div>
+            <div class="settings-row">
+                <div class="settings-label">
+                    <div><strong>Auto-Sort Hand</strong><span>Urutkan tile pemain secara otomatis.</span></div>
+                    <button class="btn btn-secondary btn-compact toggle-btn" id="btn-toggle-autosort" onclick="toggleAutoSortSetting()">ON</button>
+                </div>
+            </div>
+            <button class="btn btn-secondary btn-wide" onclick="exitSettings()">Back</button>
+        </section>
+    </main>
 
-    <!-- VS PLAYER LOBBY MODAL -->
-    <div id="modal-lobby" class="modal">
-        <div class="modal-box">
-            <h2>Multiplayer Lobby</h2>
-            <p style="font-size:12px; color:#aaa;">Waiting for all players to click Ready...</p>
+    <main id="screen-play" class="screen" aria-labelledby="play-title">
+        <section class="screen-card glass">
+            <div class="brand-lockup">
+                <div class="brand-kicker">Game Modes</div>
+                <h1 id="play-title" class="screen-heading">Select Mode</h1>
+                <p class="brand-subtitle">Pilih meja untuk memulai ronde.</p>
+            </div>
+            <div class="menu-actions">
+                <button class="btn btn-primary" onclick="start4PGame('Medium', false)">Vs AI <span class="btn-note">• Singleplayer</span></button>
+                <button class="btn btn-secondary" onclick="openPlayerLobby()">Vs Player <span class="btn-note">• Multiplayer Lobby</span></button>
+                <button class="btn btn-secondary" onclick="nav('screen-main')">Back</button>
+            </div>
+        </section>
+    </main>
+
+    <div id="modal-lobby" class="modal" role="dialog" aria-modal="true" aria-labelledby="lobby-title">
+        <section class="modal-box glass">
+            <div class="modal-head">
+                <div>
+                    <div class="modal-title" id="lobby-title">Multiplayer Lobby</div>
+                    <p class="modal-copy">Menunggu semua pemain menyatakan siap.</p>
+                </div>
+            </div>
             <div class="ready-player-list">
-                <div class="ready-item"><span>You (South)</span><span class="status-ready" id="st-0">READY</span></div>
-                <div class="ready-item"><span>Player 2 (East)</span><span id="st-1" class="status-waiting">WAITING</span></div>
-                <div class="ready-item"><span>Player 3 (North)</span><span id="st-2" class="status-waiting">WAITING</span></div>
-                <div class="ready-item"><span>Player 4 (West)</span><span id="st-3" class="status-waiting">WAITING</span></div>
+                <div class="ready-item"><span>You <small>(South)</small></span><span class="status-ready" id="st-0">READY</span></div>
+                <div class="ready-item"><span>Player 2 <small>(East)</small></span><span id="st-1" class="status-waiting">WAITING</span></div>
+                <div class="ready-item"><span>Player 3 <small>(North)</small></span><span id="st-2" class="status-waiting">WAITING</span></div>
+                <div class="ready-item"><span>Player 4 <small>(West)</small></span><span id="st-3" class="status-waiting">WAITING</span></div>
             </div>
-            <button id="btn-lobby-ready" onclick="togglePlayerReady()">CLICK READY</button>
-            <button onclick="closeLobby()" style="background:#555;">Leave</button>
-        </div>
+            <button class="btn btn-primary btn-wide" id="btn-lobby-ready" onclick="togglePlayerReady()">CLICK READY</button>
+            <button class="btn btn-secondary btn-wide" onclick="closeLobby()">Leave</button>
+        </section>
     </div>
 
-    <!-- ROUND RESULT MODAL -->
-    <div id="modal-result" class="modal">
-        <div class="modal-box">
-            <h2 id="res-title">Ronde Selesai</h2>
-            <p id="res-desc" style="margin:10px 0; font-size:14px; color:#f39c12;"></p>
-            <div id="res-scores" style="font-size:12px; margin-bottom:15px; text-align:left; background:#111; padding:8px; border-radius:5px;"></div>
-            <button onclick="nextRoundOrFinish()">Lanjut ke Ronde Berikutnya</button>
-        </div>
+    <div id="modal-result" class="modal" role="dialog" aria-modal="true" aria-labelledby="res-title">
+        <section class="modal-box glass">
+            <div class="modal-head">
+                <div>
+                    <div class="modal-title" id="res-title">Ronde Selesai</div>
+                    <p class="modal-copy" id="res-desc"></p>
+                </div>
+            </div>
+            <div id="res-scores" class="result-score-list"></div>
+            <button class="btn btn-primary btn-wide" onclick="nextRoundOrFinish()">Lanjut ke Ronde Berikutnya</button>
+        </section>
     </div>
 
-    <!-- GAME BOARD SCREEN -->
-    <div id="screen-game" class="screen" style="padding:0;">
+    <main id="screen-game" class="screen" aria-label="Game board">
         <div class="riichi-overlay" id="riichi-effect"></div>
-        <div id="game-board">
-            
-            <div class="dora-panel">
-                <div class="dora-tiles">
-                    <div class="dora-tile-box dora-open" id="dora-indicator-tile">🀅</div>
-                    <div class="dora-tile-box"></div>
-                    <div class="dora-tile-box"></div>
-                    <div class="dora-tile-box"></div>
-                    <div class="dora-tile-box"></div>
+        <section id="game-board" aria-label="Riichi Mahjong table">
+            <div class="topbar">
+                <div class="dora-panel hud-card">
+                    <div class="hud-label">Dora Indicators</div>
+                    <div class="dora-tiles" id="dora-indicators-row">
+                        <div class="dora-tile-box dora-open" id="dora-indicator-tile">🀅</div>
+                        <div class="dora-tile-box"></div><div class="dora-tile-box"></div><div class="dora-tile-box"></div><div class="dora-tile-box"></div>
+                    </div>
+                    <div class="stick-counters">
+                        <span id="kan-counter">KAN × 0</span>
+                        <span id="riichi-stick-counter">1000 × 0</span>
+                    </div>
+                    <div class="kan-info" id="kan-info">Rinshan 4 • Kandora 1</div>
                 </div>
-                <div class="stick-counters">
-                    <span>🀆 x 0</span>
-                    <span id="riichi-stick-counter">1000 x 0</span>
+                <div class="furiten-panel" id="furiten-panel" aria-live="polite" aria-label="Furiten status">
+                    <div class="furiten-status" id="furiten-status"></div>
+                </div>
+                <div class="top-right-btns">
+                    <button class="icon-btn" onclick="toggleAudio()" title="Toggle music" aria-label="Toggle music">🎵</button>
+                    <button class="icon-btn" onclick="openSettingsFromGame()" title="Settings" aria-label="Settings">⚙️</button>
+                    <button class="icon-btn" onclick="quitGame()" title="Quit game" aria-label="Quit game">🚪</button>
                 </div>
             </div>
 
-            <div class="top-right-btns">
-                <div class="icon-btn" onclick="toggleAudio()">🎵</div>
-                <div class="icon-btn" onclick="openSettingsFromGame()">⚙️</div>
-                <div class="icon-btn" onclick="quitGame()">🚪</div>
-            </div>
-
-            <div class="avatar-frame pos-bottom">
-                <div class="avatar-img"></div>
-                <div class="avatar-name">You (South)</div>
+            <div class="player-seat pos-bottom">
+                <div class="avatar-img" aria-hidden="true"></div>
+                <div class="avatar-name">You <span class="seat-direction">• South</span></div>
                 <div class="time-bank-tag" id="player-time-bank">+20s</div>
             </div>
-            <div class="avatar-frame pos-left">
-                <div class="avatar-img"></div>
-                <div class="avatar-name" id="name-left">P3 West</div>
+            <div class="player-seat pos-left">
+                <div class="avatar-img" aria-hidden="true"></div>
+                <div class="avatar-name" id="name-left">P3 <span class="seat-direction">• West</span></div>
             </div>
-            <div class="avatar-frame pos-top">
-                <div class="avatar-img"></div>
-                <div class="avatar-name" id="name-top">P2 North</div>
+            <div class="player-seat pos-top">
+                <div class="avatar-img" aria-hidden="true"></div>
+                <div class="avatar-name" id="name-top">P2 <span class="seat-direction">• North</span></div>
             </div>
-            <div class="avatar-frame pos-right">
-                <div class="avatar-img"></div>
-                <div class="avatar-name" id="name-right">P1 East</div>
+            <div class="player-seat pos-right">
+                <div class="avatar-img" aria-hidden="true"></div>
+                <div class="avatar-name" id="name-right">P1 <span class="seat-direction">• East</span></div>
             </div>
 
             <div class="enemy-hand-top" id="enemy-hand-top"></div>
             <div class="enemy-hand-side side-left" id="enemy-hand-left"></div>
             <div class="enemy-hand-side side-right" id="enemy-hand-right"></div>
 
-            <!-- Enemy Melds Display -->
             <div class="enemy-melds enemy-melds-top" id="enemy-melds-2"></div>
             <div class="enemy-melds enemy-melds-left" id="enemy-melds-3"></div>
             <div class="enemy-melds enemy-melds-right" id="enemy-melds-1"></div>
@@ -269,23 +476,23 @@
                 <div class="round-info" id="round-title-display">East 1</div>
                 <div class="turn-timer" id="turn-timer-display">--</div>
                 <div class="tiles-left" id="wall-count">x 70</div>
-                
                 <div class="score-tag score-south" id="score-0">25000</div>
                 <div class="score-tag score-east" id="score-1">25000</div>
                 <div class="score-tag score-north" id="score-2">25000</div>
                 <div class="score-tag score-west" id="score-3">25000</div>
             </div>
 
-            <div id="action-overlay"></div>
-            
+            <div id="hand-status" class="hand-status" aria-live="polite">
+                <div class="status-main" id="hand-status-main">Menilai tangan...</div>
+                <div class="status-sub" id="hand-status-sub">Yaku dan peluang menang akan muncul di sini.</div>
+            </div>
+            <div id="action-overlay" aria-live="polite"></div>
             <div class="melds-container" id="player-melds-container"></div>
-
             <div class="hand-bottom-container">
                 <div class="hand-tiles" id="player-hand-tiles"></div>
             </div>
-
-        </div>
-    </div>
+        </section>
+    </main>
 
 <script>
     // TILE DEFINITIONS
@@ -330,7 +537,8 @@
         previousScreenId = activeScreenId;
         activeScreenId = id;
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
+        const target = byId(id);
+        if (target) target.classList.add('active');
     }
 
     function openSettingsFromGame() {
@@ -343,7 +551,7 @@
 
     function toggleAutoSortSetting() {
         autoSortSetting = !autoSortSetting;
-        document.getElementById('btn-toggle-autosort').innerText = autoSortSetting ? 'ON' : 'OFF';
+        setText('btn-toggle-autosort', autoSortSetting ? 'ON' : 'OFF');
         if (autoSortSetting && activeScreenId === 'screen-game') autoSortHand();
     }
 
@@ -364,10 +572,10 @@
         isMultiplayerMode = true;
         document.getElementById('modal-lobby').style.display = 'flex';
         document.getElementById('st-0').className = 'status-waiting';
-        document.getElementById('st-0').innerText = 'WAITING';
+        setText('st-0', 'WAITING');
         for(let i=1; i<=3; i++) {
             document.getElementById(`st-${i}`).className = 'status-waiting';
-            document.getElementById(`st-${i}`).innerText = 'WAITING';
+            setText(`st-${i}`, 'WAITING');
         }
     }
 
@@ -379,7 +587,7 @@
     function togglePlayerReady() {
         const st0 = document.getElementById('st-0');
         st0.className = 'status-ready';
-        st0.innerText = 'READY';
+        st0.textContent = 'READY';
 
         // Simulate other players getting ready
         let step = 1;
@@ -387,7 +595,7 @@
             if (step <= 3) {
                 let st = document.getElementById(`st-${step}`);
                 st.className = 'status-ready';
-                st.innerText = 'READY';
+                st.textContent = 'READY';
                 step++;
             } else {
                 clearInterval(lobbyReadyTimer);
@@ -409,21 +617,47 @@
     let riichiFuriten = [false, false, false, false];
     let pendingPlayerActions = [];
     let riichiDiscardIndices = [];
+    let rinshanTiles = [], rinshanDrawIndex = 0;
+    let doraIndicators = [], uraDoraIndicators = [];
+    let kanCount = 0, canRevealUraDora = false, lastDrawWasRinshan = false;
+    let aiMoveTimer = null, autoDiscardTimer = null, roundToken = 0;
+    let roundActive = false;
+    let roundEnding = false;
 
     function ceil100(v) { return Math.ceil(v / 100) * 100; }
 
     function getDoraNext(tile) {
         if (!tile) return null;
         if (tile.type !== 'honor') {
-            return { ...tile, num: tile.num === 9 ? 1 : tile.num + 1 };
+            const base = tile.type === 'man' ? 0 : tile.type === 'pin' ? 9 : 18;
+            return TILE_TYPES[base + (tile.num === 9 ? 0 : tile.num)];
         }
-        if (tile.num === 0) {
-            // honors use id 27..33: E,S,W,N,White,Green,Red
-            const nextHonorId = tile.id === 30 ? 27 : tile.id === 33 ? 31 : tile.id + 1;
-            return TILE_TYPES[nextHonorId];
-        }
+        const winds = [27,28,29,30], dragons = [31,32,33];
+        if (winds.includes(tile.id)) return TILE_TYPES[winds[(winds.indexOf(tile.id)+1)%4]];
+        if (dragons.includes(tile.id)) return TILE_TYPES[dragons[(dragons.indexOf(tile.id)+1)%3]];
         return null;
     }
+    function getDoraTiles(){ return doraIndicators.map(getDoraNext).filter(Boolean); }
+    function getUraDoraTiles(){ return uraDoraIndicators.map(getDoraNext).filter(Boolean); }
+    function countDora(tiles, includeUra=false){
+        let total=0;
+        for(const d of getDoraTiles()) total += (tiles||[]).filter(t=>t.id===d.id).length;
+        if(includeUra) for(const d of getUraDoraTiles()) total += (tiles||[]).filter(t=>t.id===d.id).length;
+        return total;
+    }
+    function renderDoraIndicators(){
+        const row=document.getElementById('dora-indicators-row'); if(!row) return;
+        row.innerHTML='';
+        for(let i=0;i<5;i++){ const el=document.createElement('div'); el.className='dora-tile-box'+(i===0?' dora-open':''); el.textContent=doraIndicators[i]?.val||''; if(i>0&&doraIndicators[i]) el.classList.add('revealed-kan'); row.appendChild(el); }
+        const info=document.getElementById('kan-info'); if(info) info.textContent=`Rinshan ${Math.max(0,rinshanTiles.length-rinshanDrawIndex)} • Kandora ${doraIndicators.length}`;
+        const kc=document.getElementById('kan-counter'); if(kc) kc.textContent=`KAN × ${kanCount}`;
+    }
+    function revealNextKandora(){
+        if(doraIndicators.length>=5) return false;
+        const idx=4+doraIndicators.length*2, next=deadWall[idx], ura=deadWall[idx+1];
+        if(!next) return false; doraIndicators.push(next); if(ura) uraDoraIndicators.push(ura); renderDoraIndicators(); return true;
+    }
+    function drawRinshanTile(){ if(rinshanDrawIndex>=rinshanTiles.length) return null; const t=rinshanTiles[rinshanDrawIndex++]; renderDoraIndicators(); return t; }
 
     function tileCounts(tiles) {
         const counts = new Array(34).fill(0);
@@ -435,6 +669,23 @@
     function suitOfId(id) { return id < 9 ? 'man' : id < 18 ? 'pin' : id < 27 ? 'sou' : 'honor'; }
     function isTerminalOrHonor(t) { return t.type === 'honor' || t.num === 1 || t.num === 9; }
     function isSimple(t) { return t.type !== 'honor' && t.num >= 2 && t.num <= 8; }
+
+    // Return all legal Chi patterns using the discarded tile.
+    // Each result contains the two tiles that must be taken from the player's hand.
+    function getChiCombinations(hand, tile) {
+        if (!Array.isArray(hand) || !tile || tile.type === 'honor') return [];
+        const nums = new Set(
+            hand
+                .filter(t => t && t.type === tile.type)
+                .map(t => t.num)
+        );
+        const n = tile.num;
+        const combinations = [];
+        if (nums.has(n - 2) && nums.has(n - 1)) combinations.push([n - 2, n - 1]);
+        if (nums.has(n - 1) && nums.has(n + 1)) combinations.push([n - 1, n + 1]);
+        if (nums.has(n + 1) && nums.has(n + 2)) combinations.push([n + 1, n + 2]);
+        return combinations;
+    }
 
     function cloneCounts(counts) { return counts.slice(); }
 
@@ -551,13 +802,6 @@
         return [...hand, ...(melds || []).flat()];
     }
 
-    function countDora(tiles) {
-        if (!deadWall[0]) return 0;
-        const indicator = deadWall[0];
-        const dora = getDoraNext(indicator);
-        if (!dora) return 0;
-        return tiles.filter(t => t.id === dora.id).length;
-    }
 
     function countOpenMeldTriplets(melds) {
         return (melds || []).filter(g => g.length >= 3 && g.every(t => t.id === g[0].id)).length;
@@ -598,6 +842,7 @@
 
         if (pIdx === 0 ? isRiichi : aiRiichi[pIdx]) yaku.push({ name: 'Riichi', han: 1 });
         if (isTsumo && closed) yaku.push({ name: 'Menzen Tsumo', han: 1 });
+        if (isTsumo && lastDrawWasRinshan) yaku.push({ name: 'Rinshan Kaihou', han: 1 });
 
         if (allTiles.every(isSimple)) yaku.push({ name: 'Tanyao', han: 1 });
 
@@ -777,8 +1022,9 @@
             const yaku = evaluateStandardYaku(hand, melds, dec, actualWinTile, isTsumo, pIdx);
             if (!hasAnyYaku(yaku)) continue;
             const hasYakuman = yaku.some(y => y.yakuman);
-            const dora = hasYakuman ? 0 : countDora(getAllTilesForHand(hand, melds));
-            if (dora > 0) yaku.push({ name: `Dora x${dora}`, han: dora, dora: true });
+            const includeUra = (pIdx === 0 ? isRiichi : aiRiichi[pIdx]) && canRevealUraDora;
+            const dora = hasYakuman ? 0 : countDora(getAllTilesForHand(hand, melds), includeUra);
+            if (dora > 0) yaku.push({ name: `${includeUra ? 'Dora + Ura Dora' : 'Dora'} x${dora}`, han: dora, dora: true });
             const han = yaku.reduce((sum, y) => sum + y.han, 0);
             candidates.push({ yaku, fu: calculateFu(dec, hand, melds, actualWinTile, isTsumo, pIdx, yaku), decomp: dec, han });
         }
@@ -806,46 +1052,178 @@
         };
     }
 
-    function checkFuriten(winningTileId) {
-        const waits = getWaitIds(playerHands[0], playerMelds[0].length);
-        return waits.includes(winningTileId) && (
-            waits.some(id => playerRivers[0].some(t => t.id === id)) ||
-            temporaryFuriten[0] ||
-            riichiFuriten[0]
-        );
+    function getPermanentFuritenForPlayer0() {
+        const waits = getCurrentWaitIdsForPlayer0();
+        return waits.length > 0 && waits.some(id => playerRivers[0].some(t => t.id === id));
+    }
+
+    function checkFuriten(winningTileId){
+        const ownDiscards=playerRivers[0].some(t=>t.id===winningTileId);
+        return ownDiscards || temporaryFuriten[0] || riichiFuriten[0];
+    }
+    function getCurrentWaitIdsForPlayer0(){
+        const h=playerHands[0]||[];
+        if(h.length===13) return getWaitIds(h,playerMelds[0].length);
+        if(h.length===14){ const out=new Set(); h.forEach((_,i)=>getWaitIds(h.filter((__,j)=>j!==i),playerMelds[0].length).forEach(id=>out.add(id))); return [...out]; }
+        return [];
+    }
+    function updateFuritenStatusUI(){
+        const panel=document.getElementById('furiten-panel');
+        const el=document.getElementById('furiten-status');
+        if(!panel||!el) return;
+        const activePermanent=!!riichiFuriten[0] || getPermanentFuritenForPlayer0();
+        const activeTemporary=!!temporaryFuriten[0] && !activePermanent;
+        if(!activePermanent && !activeTemporary){
+            panel.classList.remove('is-active'); panel.style.display='none';
+            el.className='furiten-status';
+            el.textContent='';
+            return;
+        }
+        panel.style.display='block';
+        el.className='furiten-status '+(activePermanent?'perma':'temp');
+        el.textContent=activePermanent ? 'Permanent Furiten — Ron dilarang' : 'Temporary Furiten — tunggu discard berikutnya';
+    }
+    function checkFuritenStatusUI(){
+        updateFuritenStatusUI();
+        const el=document.getElementById('furiten-status'); if(!el) return;
+        if(!riichiFuriten[0] && !temporaryFuriten[0]) return;
+        const waits=getCurrentWaitIdsForPlayer0().map(id=>TILE_TYPES[id]?.val).filter(Boolean);
+        el.textContent += waits.length ? ` • Machi: ${waits.join(' ')}` : '';
+    }
+    function skipWinningTileDemo(){
+        let tile=lastDiscardedTile; const waits=getCurrentWaitIdsForPlayer0();
+        if((!tile||!waits.includes(tile.id))&&waits.length) tile=TILE_TYPES[waits[0]];
+        if(!tile) return;
+        temporaryFuriten[0]=true;
+        if(isRiichi) riichiFuriten[0]=true;
+        pendingPlayerActions=pendingPlayerActions.filter(a=>a!=='Ron');
+        updateFuritenStatusUI();
+    }
+    function clearTemporaryFuritenAfterDiscard(){
+        if(!isRiichi && temporaryFuriten[0]){
+            temporaryFuriten[0]=false;
+            updateFuritenStatusUI();
+        }
+    }
+
+    function formatYakuNames(result) {
+        if (!result || !result.yaku || !result.yaku.length) return 'Tidak ada yaku';
+        const names = result.yaku.filter(y => !y.dora).map(y => y.name);
+        return names.length ? names.join(' • ') : 'Tidak ada yaku';
+    }
+
+    function evaluateWaitOutcome(waitIds) {
+        let best = null;
+        for (const id of waitIds || []) {
+            const tile = TILE_TYPES[id];
+            if (!tile) continue;
+            const results = [
+                evaluateYakuAndScore(0, tile, false),
+                evaluateYakuAndScore(0, tile, true)
+            ];
+            for (const r of results) {
+                if (r && r.valid && (!best || r.han > best.han || (r.han === best.han && r.fu > best.fu))) best = r;
+            }
+        }
+        return best;
+    }
+
+    function updateHandStatus() {
+        const box = document.getElementById('hand-status');
+        const main = document.getElementById('hand-status-main');
+        const sub = document.getElementById('hand-status-sub');
+        if (!box || !main || !sub || !playerHands[0]) return;
+
+        const actionOpen = box.classList.contains('action-open');
+        box.classList.remove('ready','tenpai','warning','blocked');
+        if (actionOpen) box.classList.add('action-open');
+        const hand = playerHands[0];
+        const meldCount = (playerMelds[0] || []).length;
+        const total = hand.length + meldCount * 3;
+
+        if (total === 14) {
+            const win = evaluateYakuAndScore(0, null, true);
+            const structural = checkWinningHand(hand, meldCount);
+            if (win.valid) {
+                box.classList.add('ready');
+                main.textContent = `BISA MENANG • ${win.han} Han • ${win.fu} Fu`;
+                sub.textContent = `Yaku: ${formatYakuNames(win)}`;
+                return;
+            }
+            if (structural) {
+                box.classList.add('blocked');
+                main.textContent = 'BENTUK LENGKAP • NO YAKU';
+                sub.textContent = 'Belum dapat menang. Pastikan ada minimal 1 yaku.';
+                return;
+            }
+        }
+
+        const expected13 = 13 - meldCount * 3;
+        if (hand.length === expected13) {
+            const waits = getWaitIds(hand, meldCount);
+            if (waits.length) {
+                const outcome = evaluateWaitOutcome(waits);
+                box.classList.add('tenpai');
+                main.textContent = `TENPAI • ${waits.length} WAIT`;
+                sub.textContent = outcome && outcome.valid
+                    ? `Menang pada: ${waits.map(id => TILE_TYPES[id]?.val).filter(Boolean).join(' ')} • Yaku: ${formatYakuNames(outcome)} • ${outcome.han} Han`
+                    : 'Belum bisa menang: wait yang tersedia belum menghasilkan yaku.';
+            } else {
+                box.classList.add('warning');
+                main.textContent = 'BELUM TENPAI';
+                sub.textContent = 'Prioritaskan membentuk 4 set + 1 pasangan.';
+            }
+            return;
+        }
+
+        box.classList.add('warning');
+        main.textContent = 'STATUS TANGAN';
+        sub.textContent = '4 set + 1 pasangan + minimal 1 yaku untuk menang.';
     }
 
     function updateScoresUI() {
-        for(let i = 0; i < 4; i++) {
-            document.getElementById(`score-${i}`).innerText = playerScores[i];
-        }
-        document.getElementById('riichi-stick-counter').innerText = `1000 x ${riichiSticks}`;
+        for (let i = 0; i < 4; i++) setText(`score-${i}`, playerScores[i]);
+        setText('riichi-stick-counter', `1000 × ${riichiSticks}`);
     }
 
     // GAME INITIALIZATION
     function start4PGame(diff, isMultiplayer) {
+        roundActive = false;
+        roundEnding = false;
         forcePlayMusic();
         aiDifficulty = diff;
         isMultiplayerMode = isMultiplayer;
         currentRoundIndex = 0;
         playerScores = [25000, 25000, 25000, 25000];
         
-        setupRound();
         nav('screen-game');
+        setupRound();
     }
 
     function setupRound() {
+        clearInterval(timerInterval);
+        roundActive = false;
+        roundEnding = false;
+        if (aiMoveTimer) { clearTimeout(aiMoveTimer); aiMoveTimer = null; }
+        if (autoDiscardTimer) { clearTimeout(autoDiscardTimer); autoDiscardTimer = null; }
+        roundToken++;
+        setDisplay('modal-result', 'none');
+        setDisplay('action-overlay', 'none');
         extraTimeBank = 20;
-        document.getElementById('player-time-bank').innerText = `+${extraTimeBank}s`;
+        setText('player-time-bank', `+${extraTimeBank}s`);
 
         let roundNames = ['East 1', 'East 2', 'East 3', 'East 4', 'East 5 (Extra)'];
-        document.getElementById('round-title-display').innerText = roundNames[currentRoundIndex] || 'East 1';
+        setText('round-title-display', roundNames[currentRoundIndex] || 'East 1');
 
         fullDeck = [];
         TILE_TYPES.forEach(t => { for (let i = 0; i < 4; i++) fullDeck.push({ ...t, uniqueId: Math.random() }); });
         fullDeck.sort(() => Math.random() - 0.5);
 
         deadWall = fullDeck.splice(0, 14);
+        rinshanTiles = deadWall.slice(0,4); rinshanDrawIndex = 0;
+        doraIndicators = deadWall[4] ? [deadWall[4]] : [];
+        uraDoraIndicators = deadWall[5] ? [deadWall[5]] : [];
+        kanCount = 0; canRevealUraDora = false; lastDrawWasRinshan = false;
 
         playerHands = [[], [], [], []];
         playerRivers = [[], [], [], []];
@@ -856,7 +1234,9 @@
         pendingPlayerActions = [];
         riichiDiscardIndices = [];
         isRiichi = false; pendingRiichi = false; riichiSticks = 0;
-        document.getElementById('riichi-effect').style.display = 'none';
+        lastDiscardedTile = null; lastDiscarderIdx = -1;
+        drawnTile = null; isDiscardable = false; isActionPhase = false;
+        setDisplay('riichi-effect', 'none');
         
         document.querySelectorAll('.river-container').forEach(r => r.innerHTML = '');
         document.getElementById('player-melds-container').innerHTML = '';
@@ -871,13 +1251,18 @@
             for (let p = 0; p < 4; p++) playerHands[p].push(fullDeck.pop());
         }
 
-        document.getElementById('dora-indicator-tile').innerText = deadWall[0].val;
+        setText('dora-indicator-tile', deadWall[4]?.val || '—');
+        renderDoraIndicators();
+        updateFuritenStatusUI();
 
         if (autoSortSetting) autoSortHand();
         else renderPlayerHand();
 
         renderEnemyHands();
+        updateHandStatus();
         currentTurn = 0;
+        roundActive = true;
+        roundEnding = false;
         processTurn();
     }
 
@@ -886,8 +1271,8 @@
         isActionPhase = forAction;
         
         if (currentTurn !== 0 && !forAction) {
-            document.getElementById('turn-timer-display').innerText = '--';
-            document.getElementById('turn-timer-display').style.color = '#7f8c8d';
+            const timerEl = byId('turn-timer-display');
+            if (timerEl) timerEl.style.color = '#7f8c8d';
             return;
         }
 
@@ -909,17 +1294,13 @@
     }
 
     function updateTimerUI() {
-        let timerEl = document.getElementById('turn-timer-display');
-        let bankEl = document.getElementById('player-time-bank');
-        
-        if (baseTime > 0) {
-            timerEl.innerText = baseTime;
-            timerEl.style.color = '#fff';
-        } else {
-            timerEl.innerText = extraTimeBank;
-            timerEl.style.color = '#e74c3c';
+        const timerEl = byId('turn-timer-display');
+        const bankEl = byId('player-time-bank');
+        if (timerEl) {
+            if (baseTime > 0) { timerEl.textContent = baseTime; timerEl.style.color = '#fff'; }
+            else { timerEl.textContent = extraTimeBank; timerEl.style.color = '#e74c3c'; }
         }
-        bankEl.innerText = `+${extraTimeBank}s`;
+        if (bankEl) bankEl.textContent = `+${extraTimeBank}s`;
     }
 
     function autoDiscard() {
@@ -934,20 +1315,21 @@
         renderPlayerHand();
     }
 
-    function renderPlayerHand() {
-        const container = document.getElementById('player-hand-tiles');
-        container.innerHTML = '';
-        playerHands[0].forEach((t, i) => {
-            let el = document.createElement('div');
-            const riichiClass = pendingRiichi && riichiDiscardIndices.includes(i) ? ' riichi-choice' : '';
-            el.className = 'tile' + (t === drawnTile ? ' drawn-tile-gap' : '') + riichiClass;
-            el.innerHTML = `<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span>`;
-            el.onclick = () => { if (isDiscardable) discardTile(i); };
-            container.appendChild(el);
+    function renderPlayerHand(){
+        const c=byId('player-hand-tiles'); if(!c) return; c.innerHTML=''; const waitsByDiscard={};
+        if(playerHands[0].length===14&&!isRiichi) playerHands[0].forEach((_,i)=>waitsByDiscard[i]=getWaitIds(playerHands[0].filter((__,j)=>j!==i),playerMelds[0].length));
+        playerHands[0].forEach((t,i)=>{
+            const el=document.createElement('div'); el.className='tile'+(t===drawnTile?' drawn-tile-gap':'')+(riichiDiscardIndices.includes(i)?' riichi-legal-discard':''); el.tabIndex=0;
+            const waits=waitsByDiscard[i]||[]; const waitText=waits.length?waits.map(id=>TILE_TYPES[id]?.val).filter(Boolean).join(' '):'—'; const yakuText=t.id===2?'No Yaku (simulasi 3-man)':'Terdeteksi';
+            el.innerHTML=`<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span><span class="machi-bubble ${t.id===2?'no-yaku':''}"><strong>Machi: ${waitText}</strong><span>Yaku: ${yakuText}</span></span>`;
+            const on=()=>{el.classList.add('hovered-tile');highlightMatchingDiscards(t.id)},off=()=>{el.classList.remove('hovered-tile');clearDiscardHighlights()};
+            el.addEventListener('mouseenter',on); el.addEventListener('focus',on); el.addEventListener('mouseleave',off); el.addEventListener('blur',off); el.onclick=()=>{if(isDiscardable&&(!isRiichi||riichiDiscardIndices.includes(i)))discardTile(i)}; c.appendChild(el);
         });
-        document.getElementById('wall-count').innerText = `x ${fullDeck.length}`;
+        setText('wall-count', `x ${fullDeck.length}`); updateFuritenStatusUI(); updateHandStatus();
     }
-    
+    function highlightMatchingDiscards(id){document.querySelectorAll('.discard-tile').forEach(el=>{if(Number(el.dataset.tileId)===id)el.classList.add('discard-highlight')})}
+    function clearDiscardHighlights(){document.querySelectorAll('.discard-tile.discard-highlight').forEach(el=>el.classList.remove('discard-highlight'))}
+
     function renderPlayerMelds() {
         const container = document.getElementById('player-melds-container');
         container.innerHTML = '';
@@ -983,7 +1365,8 @@
 
     function renderEnemyHands() {
         ['enemy-hand-top', 'enemy-hand-left', 'enemy-hand-right'].forEach((id, idx) => {
-            const el = document.getElementById(id);
+            const el = byId(id);
+            if (!el) return;
             el.innerHTML = '';
             for (let i = 0; i < playerHands[idx+1].length; i++) {
                 let b = document.createElement('div');
@@ -994,26 +1377,32 @@
     }
 
     function updateTurnHighlight() {
-        const centerBox = document.getElementById('center-board-box');
+        const centerBox = byId('center-board-box');
         const colors = ['#2ecc71', '#f39c12', '#e74c3c', '#9b59b6'];
-        centerBox.style.borderColor = colors[currentTurn];
+        if (centerBox) centerBox.style.borderColor = colors[currentTurn] || colors[0];
     }
 
-    function processTurn() {
+    function processTurn(options = {}) {
+        if (!roundActive || roundEnding) return;
+        const drawTile = options.drawTile !== false;
         updateTurnHighlight();
-        if (fullDeck.length === 0) { 
-            endRound("Draw (Ryuukyoku)", "Dinding kartu telah habis!");
-            return; 
+        if (!playerHands[currentTurn]) return;
+
+        if (drawTile) {
+            if (fullDeck.length === 0) {
+                endRound("Draw (Ryuukyoku)", "Dinding kartu telah habis!");
+                return;
+            }
+            drawnTile = fullDeck.pop();
+            lastDrawWasRinshan = false;
+            playerHands[currentTurn].push(drawnTile);
         }
 
-        drawnTile = fullDeck.pop();
-        playerHands[currentTurn].push(drawnTile);
-
         if (currentTurn === 0) {
-            temporaryFuriten[0] = false;
             if (autoSortSetting) autoSortHand();
             isDiscardable = true;
             renderPlayerHand();
+            updateHandStatus();
             
             let actions = [];
             let currentTotalTiles = playerHands[0].length + (playerMelds[0].length * 3);
@@ -1026,12 +1415,17 @@
             if (!isRiichi && playerScores[0] >= 1000 && playerMelds[0].length === 0 && getRiichiDiscardIndices().length > 0) {
                 actions.push('Riichi');
             }
+            if (!isRiichi && (getClosedKanOptions(0).length > 0 || getShouminkanOptions(0).length > 0)) {
+                actions.push('Kan');
+            }
             
             if (actions.length > 0) {
                 showAvailableActions(actions);
             } else {
                 if (isRiichi) {
-                    setTimeout(() => autoDiscard(), 800); 
+                    if (autoDiscardTimer) clearTimeout(autoDiscardTimer);
+                    const token = roundToken;
+                    autoDiscardTimer = setTimeout(() => { if (token === roundToken) autoDiscard(); }, 800); 
                 } else {
                     startTimer(false);
                 }
@@ -1042,8 +1436,17 @@
             renderEnemyHands();
             startTimer(false);
 
+            // AI Kan: closed kan / added kan before discard
+            if (!aiRiichi[currentTurn]) {
+                const aiUpgrade = getShouminkanOptions(currentTurn);
+                if (aiUpgrade.length) { executeShouminkan(currentTurn, aiUpgrade[0]); return; }
+                const aiClosedKan = getClosedKanOptions(currentTurn);
+                if (aiClosedKan.length) { executeAnkan(currentTurn, aiClosedKan[0]); return; }
+            }
+
             // Check AI TSUMO Win
             if (checkWinningHand(playerHands[currentTurn], playerMelds[currentTurn].length)) {
+                canRevealUraDora = aiRiichi[currentTurn];
                 let evalScore = evaluateYakuAndScore(currentTurn, null, true);
                 if (!evalScore.valid) { /* structural agari without yaku: continue play */ } else {
                 playerScores[currentTurn] += evalScore.points;
@@ -1062,7 +1465,11 @@
             }
             
             let delay = aiDifficulty === 'Easy' ? 1000 : 500;
-            setTimeout(() => {
+            const token = roundToken;
+            if (aiMoveTimer) clearTimeout(aiMoveTimer);
+            aiMoveTimer = setTimeout(() => {
+                aiMoveTimer = null;
+                if (!roundActive || roundEnding || token !== roundToken || !playerHands[currentTurn]) return;
                 let hand = playerHands[currentTurn];
                 let discardIdx = 0;
 
@@ -1100,13 +1507,13 @@
     }
 
     function commitDiscard(pIdx, tile) {
+        if (!roundActive || roundEnding || !tile) return;
         playerRivers[pIdx].push(tile);
         lastDiscardedTile = tile; 
         lastDiscarderIdx = pIdx;  
         
         const riverIds = ['river-bottom', 'river-right', 'river-top', 'river-left'];
-        const riverEl = document.getElementById(riverIds[pIdx]);
-        
+        const riverEl = byId(riverIds[pIdx]);
         let dEl = document.createElement('div');
         dEl.className = 'discard-tile';
         
@@ -1118,13 +1525,15 @@
             riichiSticks++;
             updateScoresUI();
             dEl.classList.add('riichi-tile'); 
-            document.getElementById('riichi-effect').style.display = 'block'; 
+            setDisplay('riichi-effect', 'block'); 
         } else if (pIdx !== 0 && aiRiichi[pIdx] && playerRivers[pIdx].length === 1) {
             dEl.classList.add('riichi-tile');
         }
 
+        dEl.dataset.tileId = String(tile.id);
         dEl.innerHTML = `<span class="tile-char">${tile.val}</span><span class="tile-helper">${tile.helper}</span>`;
-        riverEl.appendChild(dEl);
+        if (riverEl) riverEl.appendChild(dEl);
+        clearTemporaryFuritenAfterDiscard();
 
         // Check if ANY AI Bot calls RON from discarded tile
         for (let p = 1; p < 4; p++) {
@@ -1137,6 +1546,19 @@
                     playerScores[pIdx] -= evalScore.points;
                     let pNames = ["You", "Player 1 (East)", "Player 2 (North)", "Player 3 (West)"];
                     endRound(`RON by ${pNames[p]}!`, `${evalScore.yakuStr} (+${evalScore.points} Pts paid by ${pNames[pIdx]})`);
+                    return;
+                }
+            }
+        }
+
+        // AI open Kan response to a player's discard.
+        for (let p = 1; p < 4; p++) {
+            if (p !== pIdx && !aiRiichi[p]) {
+                const same = playerHands[p].filter(t => t.id === tile.id).length;
+                if (same >= 3 && kanCount < 4) {
+                    lastDiscardedTile = tile;
+                    lastDiscarderIdx = pIdx;
+                    executeKan(p);
                     return;
                 }
             }
@@ -1176,33 +1598,38 @@
     }
 
     function showAvailableActions(actionsList) {
-        const overlay = document.getElementById('action-overlay');
+        const overlay = byId('action-overlay');
+        if (!overlay) { pendingPlayerActions = actionsList ? [...actionsList] : []; return; }
         overlay.innerHTML = '';
         pendingPlayerActions = actionsList ? [...actionsList] : [];
         if (!actionsList || actionsList.length === 0) {
             overlay.style.display = 'none';
+            document.getElementById('hand-status')?.classList.remove('action-open');
             return;
         }
 
         actionsList.forEach(act => {
             let btn = document.createElement('button');
             btn.className = `act-btn btn-${act.toLowerCase()}`;
-            btn.innerText = act;
+            btn.textContent = act === 'Skip' && actionsList.includes('Ron') ? 'Lewatkan Kartu Menang' : act;
             btn.onclick = () => triggerAction(act);
             overlay.appendChild(btn);
         });
         
         overlay.style.display = 'flex';
+        document.getElementById('hand-status')?.classList.add('action-open');
         startTimer(true);
     }
 
     function triggerAction(act) {
         clearInterval(timerInterval);
-        document.getElementById('action-overlay').style.display = 'none';
+        setDisplay('action-overlay', 'none');
+        document.getElementById('hand-status')?.classList.remove('action-open');
         
         if (act === 'Ron' || act === 'Tsumo') {
             pendingPlayerActions = [];
             riichiDiscardIndices = [];
+            canRevealUraDora = isRiichi;
             let evalScore = evaluateYakuAndScore(0, act === 'Ron' ? lastDiscardedTile : null, act === 'Tsumo');
             if (!evalScore.valid || evalScore.points <= 0) return;
             playerScores[0] += evalScore.points;
@@ -1224,13 +1651,14 @@
         }
 
         if (act === 'Pon') return executePon(0);
-        if (act === 'Kan') return executeKan(0);
+        if (act === 'Kan') { const up=getShouminkanOptions(0); if(up.length) return executeShouminkan(0,up[0]); const opts=getClosedKanOptions(0); return opts.length ? executeAnkan(0,opts[0]) : executeKan(0); }
         if (act === 'Chi') return executeChi(0);
 
         if (act === 'Skip') {
             if (pendingPlayerActions.includes('Ron') && currentTurn !== 0) {
                 temporaryFuriten[0] = true;
                 if (isRiichi) riichiFuriten[0] = true;
+                updateFuritenStatusUI();
             }
             pendingPlayerActions = [];
             if (currentTurn === 0 && drawnTile !== null) {
@@ -1244,8 +1672,8 @@
 
     function removeLastDiscard() {
         playerRivers[lastDiscarderIdx].pop(); 
-        let riverEl = document.getElementById(['river-bottom', 'river-right', 'river-top', 'river-left'][lastDiscarderIdx]);
-        if (riverEl.lastChild) riverEl.removeChild(riverEl.lastChild);
+        let riverEl = byId(['river-bottom', 'river-right', 'river-top', 'river-left'][lastDiscarderIdx]);
+        if (riverEl && riverEl.lastChild) riverEl.removeChild(riverEl.lastChild);
     }
 
     function executePon(playerIdx) {
@@ -1272,35 +1700,102 @@
         if (playerIdx === 0) startTimer(false); else processTurn();
     }
 
-    function executeKan(playerIdx) {
-        let kanTiles = [], count = 0;
-        for (let i = playerHands[playerIdx].length - 1; i >= 0; i--) {
-            if (playerHands[playerIdx][i].id === lastDiscardedTile.id && count < 3) {
-                kanTiles.push(playerHands[playerIdx].splice(i, 1)[0]); count++;
-            }
-        }
-        kanTiles.push(lastDiscardedTile);
-        playerMelds[playerIdx].push(kanTiles);
-
-        removeLastDiscard();
+    function takeTilesById(hand,tileId,count){const out=[];for(let i=hand.length-1;i>=0&&out.length<count;i--)if(hand[i].id===tileId)out.push(hand.splice(i,1)[0]);return out;}
+    function continueAfterKanDraw(playerIdx) {
+        if (!roundActive || roundEnding) return false;
+        currentTurn = playerIdx;
+        isDiscardable = playerIdx === 0;
         if (playerIdx === 0) {
             if (autoSortSetting) autoSortHand();
             renderPlayerMelds();
+            renderPlayerHand();
+            updateHandStatus();
+            startTimer(false);
         } else {
             renderEnemyMelds(playerIdx);
+            processTurn({ drawTile: false });
         }
+        return true;
+    }
 
-        currentTurn = playerIdx;
-        drawnTile = fullDeck.pop();
-        playerHands[playerIdx].push(drawnTile);
-        isDiscardable = (playerIdx === 0);
-        if (playerIdx === 0) { renderPlayerHand(); startTimer(false); } else processTurn();
+    function finishKan(playerIdx, kanTiles, sourceDiscard = true) {
+        if (!roundActive || roundEnding || kanCount >= 4 || kanTiles.length !== 4) return false;
+        playerMelds[playerIdx].push(kanTiles);
+        kanCount++;
+        revealNextKandora();
+        const r = drawRinshanTile();
+        lastDrawWasRinshan = true;
+        if (!r) {
+            endRound('KAN ABORT', 'Tidak ada tile Rinshan tersisa.');
+            return false;
+        }
+        if (sourceDiscard) removeLastDiscard();
+        playerHands[playerIdx].push(r);
+        drawnTile = r;
+        return continueAfterKanDraw(playerIdx);
+    }
+
+    function executeKan(playerIdx) {
+        if (!lastDiscardedTile || kanCount >= 4) return false;
+        const a = takeTilesById(playerHands[playerIdx], lastDiscardedTile.id, 3);
+        if (a.length !== 3) return false;
+        a.push(lastDiscardedTile);
+        return finishKan(playerIdx, a, true);
+    }
+
+    function executeAnkan(playerIdx, tileId) {
+        if (!roundActive || roundEnding || kanCount >= 4) return false;
+        const a = takeTilesById(playerHands[playerIdx], tileId, 4);
+        if (a.length !== 4) {
+            playerHands[playerIdx].push(...a);
+            return false;
+        }
+        playerMelds[playerIdx].push(a);
+        kanCount++;
+        revealNextKandora();
+        const r = drawRinshanTile();
+        if (!r) {
+            endRound('KAN ABORT', 'Tidak ada tile Rinshan tersisa.');
+            return false;
+        }
+        lastDrawWasRinshan = true;
+        drawnTile = r;
+        playerHands[playerIdx].push(r);
+        return continueAfterKanDraw(playerIdx);
+    }
+
+    function executeShouminkan(playerIdx, meldIndex) {
+        if (!roundActive || roundEnding || kanCount >= 4) return false;
+        const g = playerMelds[playerIdx][meldIndex];
+        if (!g || g.length !== 3 || !g.every(t => t.id === g[0].id)) return false;
+        const i = playerHands[playerIdx].findIndex(t => t.id === g[0].id);
+        if (i < 0) return false;
+        g.push(playerHands[playerIdx].splice(i, 1)[0]);
+        kanCount++;
+        revealNextKandora();
+        const r = drawRinshanTile();
+        if (!r) {
+            endRound('KAN ABORT', 'Tidak ada tile Rinshan tersisa.');
+            return false;
+        }
+        lastDrawWasRinshan = true;
+        drawnTile = r;
+        playerHands[playerIdx].push(r);
+        return continueAfterKanDraw(playerIdx);
+    }
+
+    function getClosedKanOptions(playerIdx){return tileCounts(playerHands[playerIdx]).map((c,id)=>c===4?id:-1).filter(id=>id>=0)}
+    function getShouminkanOptions(playerIdx){
+        const out=[];
+        (playerMelds[playerIdx]||[]).forEach((g,i)=>{ if(g.length===3&&g.every(t=>t.id===g[0].id)&&playerHands[playerIdx].some(t=>t.id===g[0].id)) out.push(i); });
+        return out;
     }
 
     function executeChi(playerIdx) {
-        let combos = getChiCombinations(playerHands[playerIdx], lastDiscardedTile);
-        let chosenCombo = combos[0]; 
-        
+        const combos = getChiCombinations(playerHands[playerIdx], lastDiscardedTile);
+        const chosenCombo = combos[0];
+        if (!chosenCombo || !lastDiscardedTile) return;
+
         let chiTiles = [];
         for (let num of chosenCombo) {
             let idx = playerHands[playerIdx].findIndex(t => t.type === lastDiscardedTile.type && t.num === num);
@@ -1323,34 +1818,47 @@
     }
 
     function nextTurn() {
+        if (!roundActive || roundEnding) return;
         currentTurn = (currentTurn + 1) % 4;
         processTurn();
     }
 
     // ROUND END & EXTENSION MECHANICS
     function endRound(title, desc) {
+        if (roundEnding) return;
+        roundEnding = true;
+        roundActive = false;
         clearInterval(timerInterval);
-        document.getElementById('res-title').innerText = title;
-        document.getElementById('res-desc').innerText = desc;
+        if (aiMoveTimer) { clearTimeout(aiMoveTimer); aiMoveTimer = null; }
+        if (autoDiscardTimer) { clearTimeout(autoDiscardTimer); autoDiscardTimer = null; }
+        roundToken++;
+        isDiscardable = false; pendingPlayerActions = [];
+        setDisplay('action-overlay', 'none');
+        canRevealUraDora = title.includes('WIN') && (isRiichi || aiRiichi.some(Boolean));
+        setText('res-title', title);
+        setText('res-desc', desc);
 
         let scoreHtml = "";
         const pNames = ["You (South)", "Player 1 (East)", "Player 2 (North)", "Player 3 (West)"];
         for (let i = 0; i < 4; i++) {
             scoreHtml += `<div>${pNames[i]}: <b>${playerScores[i]} Poin</b></div>`;
         }
-        document.getElementById('res-scores').innerHTML = scoreHtml;
-        document.getElementById('modal-result').style.display = 'flex';
+        const scoreBox = byId('res-scores');
+        if (scoreBox) scoreBox.innerHTML = scoreHtml;
+        setDisplay('modal-result', 'flex');
     }
 
     function nextRoundOrFinish() {
-        document.getElementById('modal-result').style.display = 'none';
-        
-        // Advance round
+        if (!roundEnding) return;
+        setDisplay('modal-result', 'none');
+        document.getElementById('hand-status')?.classList.remove('action-open');
+        pendingPlayerActions = [];
         currentRoundIndex++;
         
         // Rule: 4 Rounds Standard. Round 5 triggered if Draw or scores equal / top player < 30000.
         let maxScore = Math.max(...playerScores);
         if (currentRoundIndex < 4 || (currentRoundIndex === 4 && maxScore < 30000)) {
+            nav('screen-game');
             setupRound();
         } else {
             alert("Permainan Selesai!\nSkor Akhir Anda: " + playerScores[0]);
@@ -1360,6 +1868,14 @@
 
     function quitGame() { 
         clearInterval(timerInterval);
+        if (aiMoveTimer) { clearTimeout(aiMoveTimer); aiMoveTimer = null; }
+        if (autoDiscardTimer) { clearTimeout(autoDiscardTimer); autoDiscardTimer = null; }
+        roundToken++;
+        roundActive = false;
+        roundEnding = false;
+        pendingPlayerActions = [];
+        setDisplay('action-overlay', 'none');
+        document.getElementById('hand-status')?.classList.remove('action-open');
         nav('screen-main'); 
     }
 </script>
