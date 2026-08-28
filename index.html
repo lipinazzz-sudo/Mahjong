@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="16.0-mahyong-dj">
+    <meta name="app-version" content="20.0-mahyong-dj">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
     <meta name="description" content="Mahyong DJ — PWA Riichi Mahjong dengan AI dan Local P2P multiplayer.">
@@ -612,13 +612,470 @@
             .river-right { right: calc(50% - clamp(160px, 32vmin, 360px)); }
         }
 
+
+        /* ===== v17: screen-relative table, larger touch-friendly tiles ===== */
+        #game-board{
+            --tile-w: clamp(34px, 6.9vw, 52px);
+            --tile-h: clamp(50px, 10vw, 74px);
+            --discard-w: clamp(20px, 3.2vw, 28px);
+            --discard-h: clamp(30px, 4.7vw, 41px);
+            --side-river-inset: clamp(135px, 22vw, 320px);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .hand-bottom-container{
+            padding-left: max(8px, env(safe-area-inset-left));
+            padding-right: max(8px, env(safe-area-inset-right));
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+        }
+        .hand-tiles{gap:3px; padding-inline:2px;}
+        .hand-bottom-container .tile .tile-helper{display:none;}
+        .tile.tile-pin .tile-char,
+        .tile.tile-sou .tile-char{
+            font-size: clamp(23px, 4.35vw, 36px);
+            transform:scale(1.18);
+            transform-origin:center;
+        }
+        .tile.tile-man .tile-number{
+            font-size: clamp(21px, 4.0vw, 30px);
+            line-height:.95;
+        }
+        .tile.tile-man .tile-suit{
+            font-size: clamp(13px, 2.3vw, 19px);
+            line-height:.95;
+        }
+        .tile.tile-honor .tile-char{
+            font-size: clamp(24px, 4.55vw, 37px);
+            transform:scale(1.1);
+        }
+        .discard-tile.tile-pin .tile-char,
+        .discard-tile.tile-sou .tile-char{
+            font-size: clamp(13px, 2.35vw, 20px);
+            transform:scale(1.18);
+        }
+        .discard-tile.tile-man .tile-number{font-size:clamp(10px,2vw,15px)}
+        .discard-tile.tile-man .tile-suit{font-size:clamp(7px,1.4vw,10px)}
+        .discard-tile.tile-honor .tile-char{font-size:clamp(12px,2.1vw,18px);transform:scale(1.08)}
+        .river-left{left:calc(50% - var(--side-river-inset));}
+        .river-right{right:calc(50% - var(--side-river-inset));}
+        .center-board{width:clamp(104px,20vmin,180px);height:clamp(104px,20vmin,180px);}
+        .turn-timer{font-size:clamp(32px,5.4vmin,48px);}
+        .hand-status{
+            bottom:calc(var(--tile-h) + clamp(18px, 3.3vh, 30px));
+            width:min(300px,72vw);
+            padding:6px 10px;
+            border-radius:12px;
+            background:rgba(4,10,16,.82);
+            border-color:rgba(244,177,58,.18);
+            box-shadow:0 8px 20px rgba(0,0,0,.18);
+        }
+        .hand-status .status-main{font-size:10px;letter-spacing:.03em}
+        .hand-status .status-sub{font-size:8px;line-height:1.25}
+        .machi-bubble{min-width:110px; font-size:9px;}
+        .topbar{padding-top:max(2px, env(safe-area-inset-top));}
+        #game-board::after{
+            content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+            background:radial-gradient(circle at 50% 47%, rgba(89,173,199,.08), transparent 38%), linear-gradient(110deg, transparent 38%, rgba(255,255,255,.018) 50%, transparent 62%);
+            animation:mahjongAmbient 10s ease-in-out infinite alternate;
+        }
+        .topbar,.player-seat,.enemy-hand-top,.enemy-hand-side,.enemy-melds,.river-container,.center-board,.hand-status,#action-overlay,.melds-container,.hand-bottom-container{z-index:10;}
+        @keyframes mahjongAmbient{from{opacity:.45;transform:translateX(-1%)}to{opacity:.8;transform:translateX(1%)}}
+        #game-board.riichi-active::after{
+            animation:riichiAtmosphere 2.4s ease-in-out infinite alternate;
+            background:radial-gradient(circle at 50% 48%, rgba(184,36,54,.06), transparent 40%), linear-gradient(110deg, transparent 35%, rgba(190,42,52,.055) 50%, transparent 65%);
+        }
+        @keyframes riichiAtmosphere{from{opacity:.38}to{opacity:.78}}
+
+        /* Compact landscape: use width for touch size, while keeping the whole safe area visible. */
+        @media (orientation:landscape) and (max-height:560px){
+            #game-board{--tile-w:clamp(36px,6.45vw,48px);--tile-h:clamp(53px,9.4vw,69px);--discard-w:clamp(19px,3.0vw,26px);--discard-h:clamp(29px,4.35vw,38px);--side-river-inset:clamp(120px,20.5vw,255px);}
+            .center-board{width:clamp(106px,26vh,145px);height:clamp(106px,26vh,145px)}
+            .player-seat.pos-bottom{bottom:calc(var(--tile-h) + 3px)}
+            .avatar-img{width:34px;height:34px}.avatar-name{font-size:8px}.time-bank-tag{font-size:8px}
+            .river-top{top:72px}.river-bottom{bottom:calc(var(--tile-h) + 42px)}
+            .hand-status{bottom:calc(var(--tile-h) + 4px);width:min(270px,46vw);padding:4px 8px}
+            .hand-status .status-main{font-size:9px}.hand-status .status-sub{font-size:7px}
+            #action-overlay{bottom:calc(var(--tile-h) + 6px)}
+            .topbar{left:max(5px,env(safe-area-inset-left));right:max(5px,env(safe-area-inset-right));}
+        }
+        @media (max-width:700px) and (orientation:landscape){
+            .top-right-btns .icon-btn{width:32px;height:32px}.dora-panel{transform:scale(.88);transform-origin:top left}.top-right-btns{transform:scale(.9);transform-origin:top right}
+            .river-left{left:calc(50% - clamp(110px,20vw,180px));}.river-right{right:calc(50% - clamp(110px,20vw,180px));}
+            .machi-bubble{min-width:94px;font-size:8px}
+        }
+        @media (orientation:portrait) and (max-width:600px){
+            #game-board{--tile-w:clamp(31px,8.15vw,44px);--tile-h:clamp(45px,11.9vw,64px);--discard-w:clamp(18px,3.9vw,25px);--discard-h:clamp(27px,5.3vw,36px);--side-river-inset:clamp(95px,28vw,165px);}
+            .center-board{width:clamp(108px,29vmin,142px);height:clamp(108px,29vmin,142px)}
+            .hand-status{width:min(300px,80vw);bottom:calc(var(--tile-h) + 12px)}
+            .river-left{left:calc(50% - var(--side-river-inset));}.river-right{right:calc(50% - var(--side-river-inset));}
+        }
+        @media (max-width:430px) and (orientation:portrait){
+            #game-board{--tile-w:clamp(30px,8.35vw,38px);--tile-h:clamp(44px,12vw,55px);}
+            .tile.tile-pin .tile-char,.tile.tile-sou .tile-char{font-size:clamp(21px,5.7vw,28px)}
+            .tile.tile-man .tile-number{font-size:clamp(19px,5.1vw,24px)}
+            .tile.tile-man .tile-suit{font-size:clamp(12px,3.2vw,15px)}
+            .tile.tile-honor .tile-char{font-size:clamp(22px,5.9vw,29px)}
+            .hand-status{width:min(280px,86vw)}
+        }
+        @media (min-width:1000px) and (min-height:650px){
+            .hand-tiles{gap:4px}.hand-status{width:320px}.machi-bubble{font-size:10px}
+        }
+        @media (prefers-reduced-motion:reduce){#game-board::after,#game-board.riichi-active::after{animation:none}}
+
+        /* ===== v17: local Chinese instrumental via Web Audio ===== */
+        .music-note-status{font-size:10px;color:var(--muted);margin-top:4px;text-align:right}
+
+/* ===== MAHYONG DJ — ELEGANT HUD v18 ===== */
+:root{
+  --hud-bg:rgba(7,16,27,.78);
+  --hud-bg-strong:rgba(8,18,29,.92);
+  --hud-line:rgba(255,255,255,.11);
+  --hud-soft:rgba(255,255,255,.055);
+  --hud-glow:rgba(255,198,78,.18);
+}
+.topbar{
+  left:max(8px,env(safe-area-inset-left));
+  right:max(8px,env(safe-area-inset-right));
+  display:grid;
+  grid-template-columns:minmax(150px,1fr) auto minmax(150px,1fr);
+  align-items:start;
+  pointer-events:none;
+}
+.topbar > *{pointer-events:auto}
+.dora-panel{
+  width:max-content;
+  min-width:clamp(150px,22vw,220px);
+  max-width:min(44vw,250px);
+  padding:9px 11px 8px;
+  border:1px solid var(--hud-line);
+  background:linear-gradient(180deg,rgba(8,19,31,.90),rgba(5,13,22,.82));
+  box-shadow:0 12px 28px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.035);
+  border-radius:14px;
+}
+.dora-panel::after{
+  content:"";display:block;height:1px;margin-top:8px;
+  background:linear-gradient(90deg,transparent,rgba(255,202,92,.30),transparent);
+}
+.hud-label{font-size:9px;letter-spacing:.15em;color:#aeb8c6}
+.dora-tiles{gap:4px}
+.dora-tile-box{
+  width:clamp(23px,3.2vw,29px);height:clamp(31px,4.3vw,39px);
+  border-radius:6px;font-size:clamp(12px,1.7vw,15px);
+  box-shadow:0 3px 8px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.14);
+}
+.stick-counters{margin-top:7px;font-size:9px}
+.kan-info{margin-top:5px;font-size:9px;color:#55dbe5}
+.top-right-btns{justify-self:end;display:flex;gap:7px}
+.top-right-btns .icon-btn{
+  width:40px;height:40px;border-radius:12px;
+  background:linear-gradient(180deg,rgba(9,20,31,.88),rgba(4,11,19,.90));
+  border-color:var(--hud-line);box-shadow:0 10px 22px rgba(0,0,0,.22);
+}
+.round-hud-shell{
+  position:absolute;left:50%;top:max(8px,env(safe-area-inset-top));transform:translateX(-50%);
+  min-width:150px;padding:8px 14px;border:1px solid rgba(255,255,255,.09);
+  border-radius:999px;background:linear-gradient(180deg,rgba(9,20,32,.88),rgba(4,10,17,.82));
+  box-shadow:0 12px 30px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.04);
+  text-align:center;pointer-events:none;z-index:12;
+}
+.round-hud-title{font-size:10px;font-weight:900;letter-spacing:.16em;color:#f4c662;text-transform:uppercase}
+.round-hud-sub{margin-top:2px;color:#92a0af;font-size:8px;font-weight:800}
+.player-seat{filter:drop-shadow(0 10px 18px rgba(0,0,0,.22))}
+.player-seat.active-seat .avatar-img{box-shadow:0 0 0 2px rgba(255,208,95,.65),0 0 24px rgba(255,193,54,.18),0 8px 22px rgba(0,0,0,.24)}
+.avatar-img{border-color:rgba(255,207,103,.78)}
+.avatar-name{
+  background:linear-gradient(180deg,rgba(8,17,27,.94),rgba(5,11,18,.88));
+  border-color:rgba(255,255,255,.10);box-shadow:0 4px 12px rgba(0,0,0,.18)
+}
+.time-bank-tag{background:rgba(7,15,24,.86);border:1px solid rgba(244,177,58,.14)}
+.center-board{
+  width:clamp(142px,20vw,188px);height:clamp(142px,20vw,188px);
+  border-radius:28px;
+  background:
+    radial-gradient(circle at 50% 30%,rgba(46,108,145,.16),transparent 42%),
+    linear-gradient(180deg,rgba(9,20,32,.97),rgba(4,10,17,.98));
+  border:2px solid rgba(255,255,255,.13);
+  box-shadow:0 22px 55px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.04), inset 0 0 34px rgba(0,0,0,.18);
+}
+.center-board::before{
+  content:"";position:absolute;inset:9px;border-radius:21px;
+  border:1px solid rgba(255,255,255,.035);pointer-events:none;
+}
+.round-info{font-size:13px;letter-spacing:.13em;text-transform:uppercase}
+.turn-timer{margin:7px 0 3px;font-size:clamp(34px,5.5vw,48px);font-variant-numeric:tabular-nums;text-shadow:0 0 22px rgba(255,255,255,.06)}
+.tiles-left{font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.score-tag{
+  min-width:62px;padding:5px 8px;border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.10);color:#d8e0e9;font-size:9px;
+  box-shadow:0 5px 12px rgba(0,0,0,.16)
+}
+.score-tag::before{font-size:7px;color:#7f8b99;letter-spacing:.12em;font-weight:900;display:block;margin-bottom:1px}
+.score-south::before{content:"YOU"}.score-east::before{content:"EAST"}.score-north::before{content:"NORTH"}.score-west::before{content:"WEST"}
+.score-south{bottom:6px;color:#55e6a2}.score-east{right:6px}.score-north{top:6px}.score-west{left:6px}
+.hand-status{
+  width:min(420px,76vw);padding:6px 12px;border-radius:13px;
+  background:linear-gradient(180deg,rgba(5,12,19,.86),rgba(5,11,18,.70));
+  border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 22px rgba(0,0,0,.18);
+  bottom:calc(var(--tile-h) + 13px)
+}
+.hand-status .status-main{font-size:10px;letter-spacing:.10em;text-transform:uppercase}
+.hand-status .status-sub{font-size:8px}
+#action-overlay{
+  background:linear-gradient(180deg,rgba(6,14,23,.96),rgba(3,9,15,.96));
+  border:1px solid rgba(255,200,83,.42);box-shadow:0 18px 40px rgba(0,0,0,.38),0 0 0 1px rgba(255,255,255,.02) inset;
+}
+.riichi-overlay{
+  background:
+    radial-gradient(circle at center,rgba(168,25,35,.08),rgba(0,0,0,.54) 68%),
+    linear-gradient(180deg,rgba(4,6,11,.18),rgba(4,6,11,.46));
+  box-shadow:inset 0 0 160px rgba(255,51,64,.14);
+  mix-blend-mode:normal;
+}
+@keyframes hudPulse{0%,100%{box-shadow:0 22px 55px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.04),0 0 0 rgba(255,190,58,0)}50%{box-shadow:0 22px 55px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.04),0 0 26px rgba(255,190,58,.10)}}
+.center-board{animation:hudPulse 3.8s ease-in-out infinite}
+@media(max-width:720px){
+  .topbar{grid-template-columns:minmax(124px,1fr) auto minmax(110px,1fr);gap:6px}
+  .dora-panel{min-width:124px;padding:7px 8px;border-radius:12px}
+  .top-right-btns .icon-btn{width:35px;height:35px}
+  .round-hud-shell{min-width:124px;padding:6px 10px}
+  .round-hud-title{font-size:8px}.round-hud-sub{font-size:7px}
+  .center-board{width:clamp(128px,24vw,166px);height:clamp(128px,24vw,166px)}
+}
+@media(max-height:560px) and (orientation:landscape){
+  .topbar{grid-template-columns:minmax(110px,1fr) auto minmax(95px,1fr)}
+  .dora-panel{min-width:108px;padding:5px 6px}
+  .dora-tiles{gap:3px}.dora-tile-box{width:18px;height:25px;font-size:10px}
+  .round-hud-shell{top:4px;padding:5px 8px;min-width:104px}
+  .round-hud-title{font-size:7px}.round-hud-sub{font-size:6px}
+  .center-board{width:122px;height:122px;border-radius:22px}.turn-timer{font-size:31px;margin:4px 0 1px}.round-info{font-size:9px}.tiles-left{font-size:8px}
+  .score-tag{min-width:52px;padding:4px 6px;font-size:8px}.score-tag::before{font-size:6px}
+  .hand-status{bottom:calc(var(--tile-h) + 8px);width:min(48vw,360px);padding:5px 9px}.hand-status .status-main{font-size:8px}.hand-status .status-sub{font-size:7px}
+}
+@media(prefers-reduced-motion:reduce){.center-board{animation:none}}
+
+
+/* ===== MAHYONG DJ v19 — FINAL RESPONSIVE PASS ===== */
+#game-board{overflow:hidden;}
+/* Scores sit around the center instead of covering the timer/round text. */
+.center-board{overflow:visible;}
+.score-tag{z-index:22;min-width:68px;padding:5px 8px;font-size:10px;line-height:1.05;white-space:nowrap;text-align:center;background:linear-gradient(180deg,rgba(13,25,38,.94),rgba(5,12,20,.92));border:1px solid rgba(255,210,105,.16);box-shadow:0 7px 16px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.04);}
+.score-tag::before{font-size:7px;margin-bottom:3px;}
+.score-south{left:50%;right:auto;bottom:-40px;transform:translateX(-50%);}
+.score-east{right:-77px;top:50%;bottom:auto;transform:translateY(-50%);}
+.score-north{left:50%;right:auto;top:-40px;transform:translateX(-50%);}
+.score-west{left:-77px;right:auto;top:50%;transform:translateY(-50%);}
+
+/* Tile faces: use CSS pip art so the symbols occupy the face instead of leaving large glyph whitespace. */
+.tile-art{position:absolute;inset:9% 11%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);align-items:center;justify-items:center;transform:scale(1.04);transform-origin:center;}
+.tile-pip{display:block;width:62%;height:62%;border-radius:50%;filter:drop-shadow(0 1px 0 rgba(255,255,255,.65));}
+.pin-pip{background:radial-gradient(circle at 35% 30%,#fff 0 12%,#58616c 13% 28%,#222c35 45% 100%);border:1px solid rgba(18,24,30,.48);}
+.sou-pip{width:40%;height:72%;border-radius:5px;background:linear-gradient(90deg,#116344 0 26%,#34a875 27% 54%,#0d553b 55% 73%,#45bd86 74% 100%);border:1px solid rgba(13,85,59,.55);}
+.tile-art .p-1-1{grid-row:1;grid-column:1}.tile-art .p-1-2{grid-row:1;grid-column:2}.tile-art .p-1-3{grid-row:1;grid-column:3}
+.tile-art .p-2-1{grid-row:2;grid-column:1}.tile-art .p-2-2{grid-row:2;grid-column:2}.tile-art .p-2-3{grid-row:2;grid-column:3}
+.tile-art .p-3-1{grid-row:3;grid-column:1}.tile-art .p-3-2{grid-row:3;grid-column:2}.tile-art .p-3-3{grid-row:3;grid-column:3}
+.tile.tile-pin .tile-char,.tile.tile-sou .tile-char{font-size:1em;}
+.tile.tile-man .tile-char{gap:1px;}
+.tile.tile-man .tile-number{font-size:clamp(23px,4.3vw,31px);font-family:"Noto Serif CJK SC","Songti SC","Hiragino Mincho ProN",serif;font-weight:900;line-height:.9;}
+.tile.tile-man .tile-suit{font-size:clamp(15px,2.6vw,20px);font-family:"Noto Serif CJK SC","Songti SC","Hiragino Mincho ProN",serif;font-weight:800;line-height:.9;}
+.tile.tile-honor .tile-char{font-size:clamp(26px,4.9vw,39px);font-family:"Noto Serif CJK SC","Songti SC","Hiragino Mincho ProN",serif;font-weight:900;line-height:.95;}
+.tile.tile-honor .tile-char.honor-wind{color:#315b82;text-shadow:0 1px 0 rgba(255,255,255,.75),0 0 8px rgba(79,140,195,.10)}
+.tile.tile-honor .tile-char.honor-dragon-red{color:#d34045;text-shadow:0 1px 0 rgba(255,255,255,.70),0 0 8px rgba(211,64,69,.10)}
+.tile.tile-honor .tile-char.honor-dragon-green{color:#149b60;text-shadow:0 1px 0 rgba(255,255,255,.70),0 0 8px rgba(20,155,96,.10)}
+.tile.tile-honor .tile-char.honor-dragon-white{color:#68747f;text-shadow:0 1px 0 rgba(255,255,255,.90),0 0 7px rgba(154,170,184,.12)}
+/* discard faces are intentionally smaller, but still use most of the face. */
+.discard-tile .tile-art{inset:8% 9%;transform:scale(1.02)}
+.discard-tile .tile-pip{width:66%;height:66%}
+.discard-tile .sou-pip{width:43%;height:74%}
+.discard-tile.tile-man .tile-number{font-size:clamp(10px,2.2vw,15px);font-weight:900}
+.discard-tile.tile-man .tile-suit{font-size:clamp(8px,1.65vw,11px);font-weight:800}
+.discard-tile.tile-honor .tile-char{font-size:clamp(12px,2.6vw,18px);}
+
+/* Centered, predictable rivers. Side rivers stay close enough to read but never touch the board. */
+.river-left{left:calc(50% - clamp(190px,29vw,360px));}
+.river-right{right:calc(50% - clamp(190px,29vw,360px));}
+
+/* Landscape phones: use width for touch size; reserve a slim HUD band top/bottom. */
+@media (orientation:landscape) and (max-height:700px){
+  #game-board{--tile-w:clamp(35px,6.4vw,50px);--tile-h:clamp(50px,9.1vw,71px);--discard-w:clamp(19px,3.05vw,27px);--discard-h:clamp(29px,4.45vw,39px);}
+  .hand-bottom-container{min-height:calc(var(--tile-h) + max(6px,env(safe-area-inset-bottom)));padding-bottom:max(5px,env(safe-area-inset-bottom));}
+  .hand-tiles{gap:2px;padding-inline:8px;}
+  .center-board{width:clamp(116px,25vh,154px);height:clamp(116px,25vh,154px);}
+  .score-tag{min-width:56px;font-size:8px;padding:4px 6px}.score-tag::before{font-size:6px}
+  .score-south{bottom:-30px}.score-north{top:-30px}.score-east{right:-63px}.score-west{left:-63px}
+  .score-tag::before{margin-bottom:2px}
+  .pos-bottom{bottom:calc(var(--tile-h) + 4px)}
+  .pos-left,.pos-right{top:50%}
+  .river-left{left:calc(50% - clamp(120px,21vw,230px));}
+  .river-right{right:calc(50% - clamp(120px,21vw,230px));}
+  .river-top{top:62px}.river-bottom{bottom:calc(var(--tile-h) + 44px)}
+  .tile-art{inset:7% 8%;transform:scale(1.03)}
+  .tile.tile-man .tile-number{font-size:clamp(21px,4vw,29px)}.tile.tile-man .tile-suit{font-size:clamp(14px,2.3vw,19px)}
+  .tile.tile-honor .tile-char{font-size:clamp(23px,4.7vw,35px)}
+  .hand-status{bottom:calc(var(--tile-h) + 7px);width:min(300px,42vw);padding:5px 9px;border-radius:10px;}
+  .hand-status .status-main{font-size:8px}.hand-status .status-sub{font-size:7px}
+}
+@media (orientation:landscape) and (max-height:460px){
+  #game-board{--tile-w:clamp(33px,6.1vw,45px);--tile-h:clamp(47px,8.8vw,64px);}
+  .center-board{width:108px;height:108px;border-radius:20px}
+  .topbar{top:max(3px,env(safe-area-inset-top));}
+  .dora-panel{min-width:102px;padding:4px 5px}.dora-tile-box{width:17px;height:24px;font-size:9px}
+  .top-right-btns .icon-btn{width:30px;height:30px}
+  .round-hud-shell{top:3px;min-width:98px;padding:4px 7px}.round-hud-title{font-size:7px}.round-hud-sub{font-size:6px}
+  .river-top{top:53px}.river-bottom{bottom:calc(var(--tile-h) + 33px)}
+  .score-south{bottom:-26px}.score-north{top:-26px}.score-east{right:-58px}.score-west{left:-58px}
+  .score-tag{min-width:52px;padding:3px 5px;font-size:7px}.score-tag::before{font-size:5px}
+  .hand-status{display:none}
+}
+
+/* Portrait phones: keep the hand touchable; center scores stay outside the board. */
+@media (orientation:portrait) and (max-width:600px){
+  #game-board{--tile-w:clamp(30px,7.8vw,43px);--tile-h:clamp(43px,11.1vw,61px);--discard-w:clamp(18px,3.6vw,25px);--discard-h:clamp(27px,5.0vw,35px);}
+  .hand-bottom-container{padding-bottom:max(6px,env(safe-area-inset-bottom));}
+  .hand-tiles{gap:2px;padding-inline:10px;min-width:max-content;}
+  .center-board{width:clamp(112px,28vmin,146px);height:clamp(112px,28vmin,146px);}
+  .score-tag{min-width:54px;padding:4px 6px;font-size:8px}.score-tag::before{font-size:5px}
+  .score-south{bottom:-31px}.score-north{top:-31px}.score-east{right:-61px}.score-west{left:-61px}
+  .river-left{left:calc(50% - clamp(105px,27vw,165px));}.river-right{right:calc(50% - clamp(105px,27vw,165px));}
+  .river-top{top:94px}.river-bottom{bottom:calc(var(--tile-h) + 48px)}
+  .tile-art{inset:7% 8%}
+  .tile.tile-man .tile-number{font-size:clamp(20px,5.1vw,28px)}.tile.tile-man .tile-suit{font-size:clamp(13px,2.9vw,18px)}
+  .tile.tile-honor .tile-char{font-size:clamp(22px,5.6vw,32px)}
+  .hand-status{width:min(286px,78vw);bottom:calc(var(--tile-h) + 10px);padding:5px 9px;border-radius:10px;}
+  .hand-status .status-main{font-size:9px}.hand-status .status-sub{font-size:7px}
+}
+@media (orientation:portrait) and (max-width:400px){
+  #game-board{--tile-w:clamp(29px,7.55vw,36px);--tile-h:clamp(42px,10.8vw,52px)}
+  .score-tag{min-width:48px;font-size:7px;padding:3px 5px}.score-tag::before{font-size:5px}
+  .score-south{bottom:-27px}.score-north{top:-27px}.score-east{right:-53px}.score-west{left:-53px}
+  .center-board{width:104px;height:104px}
+}
+
+/* Tablet/desktop: preserve an attractive amount of negative space without making the hand tiny. */
+@media (min-width:900px){
+  #game-board{--tile-w:clamp(42px,4.1vw,55px);--tile-h:clamp(60px,5.85vw,78px);--discard-w:clamp(22px,2.05vw,30px);--discard-h:clamp(33px,2.9vw,42px);}
+  .center-board{width:clamp(152px,16vw,196px);height:clamp(152px,16vw,196px)}
+  .score-south{bottom:-42px}.score-north{top:-42px}.score-east{right:-82px}.score-west{left:-82px}
+}
+@media (min-width:1200px){
+  .river-left{left:calc(50% - clamp(210px,25vw,370px));}
+  .river-right{right:calc(50% - clamp(210px,25vw,370px));}
+}
+
+/* Respect iPhone safe-area while keeping the playable area visually centered. */
+#game-board{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom);}
+.hand-bottom-container{padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right));}
+
+/* No hover-dependent movement on touch devices. */
+@media(pointer:coarse){.tile:hover{transform:none}.score-tag:hover{transform:inherit}.player-seat:hover .avatar-img{transform:none}}
+@media(prefers-reduced-motion:reduce){.center-board{animation:none}}
+
+
+/* ===== MAHYONG DJ v20 — TILE ART PASS ===== */
+.tile{
+  background:linear-gradient(180deg,#fbfaf4 0%,#f3efe4 58%,#e9e4d7 100%);
+  border:1px solid rgba(92,92,82,.20);
+  border-bottom:4px solid #3f5e3f;
+  box-shadow:0 3px 0 rgba(255,255,255,.72) inset,0 5px 10px rgba(0,0,0,.28);
+}
+.tile-art{
+  inset:3.5% 6%;
+  gap:0;
+  transform:scale(1.05);
+}
+.tile-pip{
+  width:82%;
+  height:82%;
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.8));
+}
+.pin-pip{
+  width:84%;
+  height:84%;
+  background:
+    radial-gradient(circle at 36% 32%,#fefefe 0 12%,#aeb7bd 13% 29%,#505962 30% 47%,#1f2730 48% 72%,#677078 73% 100%);
+  border:1px solid rgba(20,27,34,.55);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.45),inset 0 -1px 1px rgba(0,0,0,.32);
+}
+.sou-pip{
+  width:52%;
+  height:88%;
+  border-radius:5px;
+  background:linear-gradient(90deg,#0a573b 0%,#15935f 26%,#46bf88 49%,#15935f 70%,#07442e 100%);
+  border:1px solid rgba(8,73,48,.62);
+  box-shadow:inset 1px 0 0 rgba(255,255,255,.28),inset -1px 0 0 rgba(0,0,0,.22);
+}
+/* Red 5 center pips, matching the familiar Riichi palette. */
+.tile.tile-pin .tile-art[data-num="5"] .p-2-2,
+.tile.tile-sou .tile-art[data-num="5"] .p-2-2,
+.discard-tile.tile-pin .tile-art[data-num="5"] .p-2-2,
+.discard-tile.tile-sou .tile-art[data-num="5"] .p-2-2{
+  background:linear-gradient(145deg,#ff5f5f,#c7262e 68%,#8d1820);
+  border-color:#85171f;
+  box-shadow:inset 1px 0 0 rgba(255,255,255,.28),0 0 2px rgba(192,33,42,.30);
+}
+.tile.tile-man .tile-char{
+  gap:0;
+  transform:translateY(-1%);
+}
+.tile.tile-man .tile-number{
+  font-size:clamp(26px,4.8vw,36px);
+  font-family:"Noto Serif CJK SC","Songti SC","Hiragino Mincho ProN",serif;
+  font-weight:900;
+  line-height:.84;
+  letter-spacing:-.06em;
+}
+.tile.tile-man .tile-suit{
+  margin-top:1px;
+  font-size:clamp(17px,2.9vw,22px);
+  font-family:"Noto Serif CJK SC","Songti SC","Hiragino Mincho ProN",serif;
+  font-weight:900;
+  line-height:.82;
+}
+.tile.tile-man .tile-helper{z-index:3}
+.tile.tile-man:nth-child(5) .tile-number{color:#c3262d}
+.tile.tile-honor .tile-char{
+  font-size:clamp(28px,5.2vw,42px);
+  font-family:"Noto Serif CJK SC","Songti SC","Hiragino Mincho ProN",serif;
+  font-weight:900;
+  line-height:.9;
+  transform:translateY(-1%);
+}
+.tile.tile-honor .tile-char.honor-wind{color:#416b92;text-shadow:0 1px 0 rgba(255,255,255,.88),0 0 7px rgba(79,140,195,.12)}
+.tile.tile-honor .tile-char.honor-dragon-red{color:#c52e36;text-shadow:0 1px 0 rgba(255,255,255,.82),0 0 7px rgba(197,46,54,.12)}
+.tile.tile-honor .tile-char.honor-dragon-green{color:#168c58;text-shadow:0 1px 0 rgba(255,255,255,.84),0 0 7px rgba(22,140,88,.12)}
+.tile.tile-honor .tile-char.honor-dragon-white{color:#75808a;text-shadow:0 1px 0 rgba(255,255,255,.95),0 0 6px rgba(154,170,184,.12)}
+.discard-tile .tile-art{inset:4% 5%;transform:scale(1.03)}
+.discard-tile .tile-pip{width:82%;height:82%}
+.discard-tile .sou-pip{width:52%;height:86%}
+.discard-tile.tile-man .tile-number{font-size:clamp(10px,2.5vw,16px);line-height:.82}
+.discard-tile.tile-man .tile-suit{font-size:clamp(8px,1.8vw,12px);line-height:.82}
+.discard-tile.tile-honor .tile-char{font-size:clamp(12px,2.7vw,19px)}
+/* Make the face artwork scale from the available tile size, not from screen width. */
+@media (orientation:landscape) and (max-height:700px){
+  .tile-art{inset:3% 5%;transform:scale(1.06)}
+  .tile.tile-man .tile-number{font-size:clamp(25px,4.5vw,34px)}
+  .tile.tile-man .tile-suit{font-size:clamp(16px,2.8vw,21px)}
+  .tile.tile-honor .tile-char{font-size:clamp(26px,5vw,39px)}
+}
+@media (orientation:landscape) and (max-height:460px){
+  .tile-art{inset:3% 5%;transform:scale(1.04)}
+  .tile.tile-man .tile-number{font-size:clamp(23px,4.3vw,31px)}
+  .tile.tile-man .tile-suit{font-size:clamp(15px,2.6vw,19px)}
+  .tile.tile-honor .tile-char{font-size:clamp(24px,4.8vw,35px)}
+}
+@media (orientation:portrait) and (max-width:600px){
+  .tile-art{inset:3% 5%;transform:scale(1.04)}
+  .tile.tile-man .tile-number{font-size:clamp(23px,5.6vw,31px)}
+  .tile.tile-man .tile-suit{font-size:clamp(15px,3.2vw,20px)}
+  .tile.tile-honor .tile-char{font-size:clamp(25px,5.9vw,34px)}
+}
+
 </style>
 </head>
 <body>
 
-    <audio id="bg-music" loop preload="none">
-        <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_51a37c4493.mp3?filename=chinese-traditional-music-110072.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bg-music" loop preload="none" aria-hidden="true"></audio>
 
     <main id="screen-main" class="screen active" aria-labelledby="main-title">
         <section class="screen-card glass">
@@ -646,7 +1103,7 @@
                 <div class="settings-label"><strong>Music Volume</strong><span id="volume-value">50%</span></div>
                 <div class="range-wrap">
                     <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.5" onchange="updateVolume(this.value); setText('volume-value', Math.round(this.value * 100) + '%')">
-                    <div class="range-caption"><span>Mute</span><span>100%</span></div>
+                    <div class="range-caption"><span>Mute</span><span>100%</span></div><div class="music-note-status">Instrumen Tiongkok • dibuat lokal di browser</div>
                 </div>
             </div>
             <div class="settings-row">
@@ -786,6 +1243,11 @@
                 </div>
             </div>
 
+            <div class="round-hud-shell" aria-hidden="true">
+                <div class="round-hud-title">Mahyong DJ</div>
+                <div class="round-hud-sub">RIICHI TABLE</div>
+            </div>
+
             <div class="player-seat pos-bottom">
                 <div class="avatar-img" aria-hidden="true"></div>
                 <div class="avatar-name">You <span class="seat-direction">• South</span></div>
@@ -864,11 +1326,36 @@
         }
         return 'tile-face';
     }
+    const PIN_UNICODE = ['🀙','🀚','🀛','🀜','🀝','🀞','🀟','🀠','🀡'];
+    const SOU_UNICODE = ['🀐','🀑','🀒','🀓','🀔','🀕','🀖','🀗','🀘'];
+    const PIP_POS = {
+        1:[[2,2]],
+        2:[[1,1],[3,3]],
+        3:[[1,1],[2,2],[3,3]],
+        4:[[1,1],[1,3],[3,1],[3,3]],
+        5:[[1,1],[1,3],[2,2],[3,1],[3,3]],
+        6:[[1,1],[1,3],[2,1],[2,3],[3,1],[3,3]],
+        7:[[1,1],[1,3],[2,2],[2,1],[2,3],[3,1],[3,3]],
+        8:[[1,1],[1,3],[2,1],[2,3],[3,1],[3,3],[1,2],[3,2]],
+        9:[[1,1],[1,2],[1,3],[2,1],[2,2],[2,3],[3,1],[3,2],[3,3]]
+    };
+    function pipFaceMarkup(t){
+        const cls = t.type === 'pin' ? 'pin' : 'sou';
+        const pos = PIP_POS[t.num] || [];
+        const useCssArt = true;
+        if(!useCssArt) return `<span class="tile-char ${tileFaceClass(t)}">${t.val}</span>`;
+        const marks = pos.map(([r,c],i)=>`<i class="tile-pip ${cls}-pip p-${r}-${c}" aria-hidden="true"></i>`).join('');
+        return `<span class="tile-art tile-art-${cls}" data-num="${t.num}" aria-label="${cls} ${t.num}">${marks}</span>`;
+    }
+    const MAN_KANJI = ['', '一','二','三','四','五','六','七','八','九'];
     function tileMarkup(t){
         if(!t) return '';
-        if(t.type==='man') return `<span class="tile-char ${tileFaceClass(t)}"><span class="tile-number">${t.helper}</span><span class="tile-suit">萬</span></span><span class="tile-helper">${t.helper}</span>`;
-        if(t.type==='honor') return `<span class="tile-char ${tileFaceClass(t)}">${t.val}</span><span class="tile-helper">${t.helper}</span>`;
-        return `<span class="tile-char ${tileFaceClass(t)}">${t.val}</span><span class="tile-helper">${t.helper}</span>`;
+        if(t.type==='man') {
+            const numeral = MAN_KANJI[t.num] || t.helper;
+            return `<span class="tile-char ${tileFaceClass(t)}"><span class="tile-number">${numeral}</span><span class="tile-suit">萬</span></span>`;
+        }
+        if(t.type==='honor') return `<span class="tile-char ${tileFaceClass(t)}">${t.val}</span>`;
+        return pipFaceMarkup(t);
     }
 
 
@@ -933,22 +1420,43 @@
     function toggleAutoSortSetting() {
         autoSortSetting = !autoSortSetting;
         setText('btn-toggle-autosort', autoSortSetting ? 'ON' : 'OFF');
-        if (autoSortSetting && activeScreenId === 'screen-game') autoSortHand();
     }
 
-    function forcePlayMusic() {
-        const bgMusic = byId('bg-music');
-        const slider = byId('vol-slider');
-        if (!bgMusic) return;
-        if (slider) bgMusic.volume = Number(slider.value);
-        bgMusic.play().catch(e => console.log('Audio waiting for user click...'));
+    // Local Chinese-style pentatonic instrumental (Web Audio; no external music file required).
+    let musicCtx = null, musicMaster = null, musicTimer = null, musicStep = 0, musicEnabled = true;
+    const musicScale = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+    function ensureMusicContext(){
+        if(musicCtx) return musicCtx;
+        const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return null;
+        musicCtx=new AC(); musicMaster=musicCtx.createGain(); musicMaster.gain.value=0.14; musicMaster.connect(musicCtx.destination); return musicCtx;
     }
-    function toggleAudio() {
-        const bgMusic = byId('bg-music');
-        if (!bgMusic) return;
-        if (bgMusic.paused) bgMusic.play().catch(()=>{}); else bgMusic.pause();
+    function pluckChinese(freq, when, duration=0.9, velocity=0.8){
+        if(!musicCtx||!musicMaster) return;
+        const osc=musicCtx.createOscillator(), gain=musicCtx.createGain();
+        osc.type='triangle'; osc.frequency.setValueAtTime(freq,when); osc.detune.setValueAtTime(5,when);
+        const osc2=musicCtx.createOscillator(), gain2=musicCtx.createGain(); osc2.type='sine'; osc2.frequency.setValueAtTime(freq*2.01,when);
+        gain.gain.setValueAtTime(0.0001,when); gain.gain.exponentialRampToValueAtTime(Math.max(0.02,velocity*0.11),when+0.015); gain.gain.exponentialRampToValueAtTime(0.0001,when+duration);
+        gain2.gain.setValueAtTime(0.0001,when); gain2.gain.exponentialRampToValueAtTime(Math.max(0.006,velocity*0.025),when+0.02); gain2.gain.exponentialRampToValueAtTime(0.0001,when+duration*0.7);
+        osc.connect(gain).connect(musicMaster); osc2.connect(gain2).connect(musicMaster); osc.start(when); osc2.start(when); osc.stop(when+duration+0.05); osc2.stop(when+duration+0.05);
     }
-    function updateVolume(val) { const audio = byId('bg-music'); if (audio) audio.volume = Number(val); }
+    function musicTick(){
+        if(!musicCtx||!musicMaster||!musicEnabled)return;
+        const now=musicCtx.currentTime+0.03; const p=(musicStep%5);
+        const base=[0,2,4,2,1][p];
+        pluckChinese(musicScale[base],now,0.72,0.82);
+        if(musicStep%4===0) pluckChinese(musicScale[(base+3)%musicScale.length]/2,now+0.02,1.15,0.42);
+        if(musicStep%8===6) pluckChinese(musicScale[(base+2)%musicScale.length],now+0.16,0.58,0.5);
+        musicStep++;
+    }
+    function startChineseMusic(){
+        const ctx=ensureMusicContext(); if(!ctx||!musicEnabled)return;
+        if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+        if(musicTimer)return; musicTick(); musicTimer=setInterval(musicTick,860);
+    }
+    function stopChineseMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null;}}
+    function forcePlayMusic(){ startChineseMusic(); }
+    function toggleAudio(){ musicEnabled=!musicEnabled; if(musicEnabled){startChineseMusic()}else{stopChineseMusic()} const b=byId('audio-toggle-label'); if(b)b.textContent=musicEnabled?'ON':'OFF'; }
+    function updateVolume(val){ const v=Math.max(0,Math.min(1,Number(val))); if(musicMaster)musicMaster.gain.value=v*0.24; setText('volume-value',Math.round(v*100)+'%'); }
 
     // REAL MULTIPLAYER — CLOUDFLARE ROOM SERVER
     // One transport only: GitHub Pages frontend + Cloudflare Worker/Durable Object room.
@@ -2194,9 +2702,13 @@
         selectedTileIndex = -1;
         selectedTileId = null;
         tapState = { index:-1, time:0 };
-        if (autoSortSetting) playerHands[0].sort((a, b) => a.id - b.id);
         renderPlayerHand();
         commitDiscard(0, discarded);
+        if (autoSortSetting && roundActive && !roundEnding) {
+            playerHands[0].sort((a, b) => a.id - b.id);
+            renderPlayerHand();
+            updateHandStatus();
+        }
     }
 
     function commitDiscard(pIdx, tile) {
@@ -2756,5 +3268,42 @@
 
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js" defer></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" defer></script>
+
+<script>
+window.addEventListener('pointerdown',()=>{try{if(typeof startChineseMusic==='function' && activeScreenId==='screen-game') startChineseMusic();}catch(e){}},{once:false,passive:true});
+</script>
+
+<script>
+/* v19 responsive sizing: derive touch-safe tile size from the actual viewport width. */
+(function(){
+  function syncMahyongSizing(){
+    const b=document.getElementById('game-board');
+    if(!b) return;
+    const vv=window.visualViewport;
+    const w=Math.max(1,vv?.width||window.innerWidth);
+    const h=Math.max(1,vv?.height||window.innerHeight);
+    const landscape=w>h;
+    let tileW;
+    if(landscape){
+      tileW=Math.min(50,Math.max(33,(w-34)/14.6));
+      if(h<460) tileW=Math.min(tileW,45);
+    }else{
+      tileW=Math.min(43,Math.max(29,(w-24)/14.8));
+    }
+    b.style.setProperty('--tile-w',tileW.toFixed(2)+'px');
+    b.style.setProperty('--tile-h',(tileW*1.42).toFixed(2)+'px');
+    b.style.setProperty('--discard-w',(tileW*.57).toFixed(2)+'px');
+    b.style.setProperty('--discard-h',(tileW*.80).toFixed(2)+'px');
+    // Keep side rivers a consistent distance from the center on every aspect ratio.
+    const center=Math.max(108, Math.min(196, tileW*3.1));
+    const sideOffset=center/2 + tileW*3.15;
+    b.style.setProperty('--side-river-inset',sideOffset.toFixed(2)+'px');
+  }
+  syncMahyongSizing();
+  window.addEventListener('resize',syncMahyongSizing,{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(syncMahyongSizing,90),{passive:true});
+  window.visualViewport?.addEventListener('resize',syncMahyongSizing,{passive:true});
+})();
+</script>
 </body>
 </html>
