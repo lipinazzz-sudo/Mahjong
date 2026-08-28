@@ -92,6 +92,7 @@
             font-weight: bold; cursor: pointer; flex-shrink: 0; overflow: hidden;
         }
         .tile:hover { transform: translateY(-4px); }
+        .riichi-choice { outline: 2px solid #9b59b6; box-shadow: 0 0 8px rgba(155, 89, 182, 0.8), 0 2px 4px rgba(0,0,0,0.4); }
         .tile-helper { position: absolute; top: 1px; right: 2px; font-size: var(--tile-helper-font); font-weight: 800; color: #d63031; line-height: 1; }
         .tile-char { font-size: var(--tile-font); line-height: 1; }
 
@@ -398,161 +399,420 @@
         }, 600);
     }
 
-    // RIICHI MAHJONG SCORING ENGINE (CALCULATE HAN & FU)
-    function calculateRiichiPoints(han, fu, isDealer, isTsumo) {
-        let basePoint = 0;
-        if (han >= 13) basePoint = 8000; // Yakuman
-        else if (han >= 11) basePoint = 6000; // Sanbaiman
-        else if (han >= 8) basePoint = 4000; // Baiman
-        else if (han >= 6) basePoint = 3000; // Haneman
-        else if (han >= 5 || (han === 4 && fu >= 40) || (han === 3 && fu >= 70)) basePoint = 2000; // Mangan
-        else {
-            basePoint = fu * Math.pow(2, han + 2);
-            if (basePoint > 2000) basePoint = 2000;
+/* RIICHI ENGINE REPLACEMENT */
+    // =========================
+    // RIICHI MAHJONG RULE ENGINE
+    // =========================
+    const WIND_ORDER = ['E', 'S', 'W', 'N'];
+    const PLAYER_SEAT_WINDS = ['S', 'E', 'N', 'W']; // You, P1, P2, P3
+    let temporaryFuriten = [false, false, false, false];
+    let riichiFuriten = [false, false, false, false];
+    let pendingPlayerActions = [];
+    let riichiDiscardIndices = [];
+
+    function ceil100(v) { return Math.ceil(v / 100) * 100; }
+
+    function getDoraNext(tile) {
+        if (!tile) return null;
+        if (tile.type !== 'honor') {
+            return { ...tile, num: tile.num === 9 ? 1 : tile.num + 1 };
+        }
+        if (tile.num === 0) {
+            // honors use id 27..33: E,S,W,N,White,Green,Red
+            const nextHonorId = tile.id === 30 ? 27 : tile.id === 33 ? 31 : tile.id + 1;
+            return TILE_TYPES[nextHonorId];
+        }
+        return null;
+    }
+
+    function tileCounts(tiles) {
+        const counts = new Array(34).fill(0);
+        (tiles || []).forEach(t => { if (t && Number.isInteger(t.id)) counts[t.id]++; });
+        return counts;
+    }
+
+    function isSuitId(id) { return id >= 0 && id < 27; }
+    function suitOfId(id) { return id < 9 ? 'man' : id < 18 ? 'pin' : id < 27 ? 'sou' : 'honor'; }
+    function isTerminalOrHonor(t) { return t.type === 'honor' || t.num === 1 || t.num === 9; }
+    function isSimple(t) { return t.type !== 'honor' && t.num >= 2 && t.num <= 8; }
+
+    function cloneCounts(counts) { return counts.slice(); }
+
+    function canFormMelds(counts) {
+        const first = counts.findIndex(c => c > 0);
+        if (first === -1) return true;
+
+        if (counts[first] >= 3) {
+            counts[first] -= 3;
+            if (canFormMelds(counts)) { counts[first] += 3; return true; }
+            counts[first] += 3;
         }
 
-        const ceil100 = (v) => Math.ceil(v / 100) * 100;
+        if (first < 27 && first % 9 <= 6 && counts[first + 1] > 0 && counts[first + 2] > 0) {
+            counts[first]--; counts[first + 1]--; counts[first + 2]--;
+            if (canFormMelds(counts)) {
+                counts[first]++; counts[first + 1]++; counts[first + 2]++;
+                return true;
+            }
+            counts[first]++; counts[first + 1]++; counts[first + 2]++;
+        }
+        return false;
+    }
+
+    function decomposeStandardCounts(counts) {
+        const results = [];
+        const seen = new Set();
+
+        function recurse(c, pairId, groups) {
+            const key = `${pairId}|${c.join(',')}`;
+            if (seen.has(key)) return;
+            seen.add(key);
+
+            const first = c.findIndex(v => v > 0);
+            if (first === -1) {
+                results.push({ pairId, groups: groups.map(g => ({ ...g })) });
+                return;
+            }
+
+            if (pairId === -1 && c[first] >= 2) {
+                c[first] -= 2;
+                recurse(c, first, groups);
+                c[first] += 2;
+            }
+
+            if (c[first] >= 3) {
+                c[first] -= 3;
+                groups.push({ type: 'triplet', ids: [first, first, first] });
+                recurse(c, pairId, groups);
+                groups.pop();
+                c[first] += 3;
+            }
+
+            if (first < 27 && first % 9 <= 6 && c[first + 1] > 0 && c[first + 2] > 0) {
+                c[first]--; c[first + 1]--; c[first + 2]--;
+                groups.push({ type: 'sequence', ids: [first, first + 1, first + 2] });
+                recurse(c, pairId, groups);
+                groups.pop();
+                c[first]++; c[first + 1]++; c[first + 2]++;
+            }
+        }
+
+        recurse(cloneCounts(counts), -1, []);
+        return results;
+    }
+
+    function isChiitoitsuCounts(counts) {
+        return counts.filter(c => c === 2).length === 7 && counts.every(c => c === 0 || c === 2);
+    }
+
+    function isKokushiCounts(counts) {
+        const terminals = [0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33];
+        let pair = false;
+        for (const id of terminals) {
+            if (counts[id] === 0) return false;
+            if (counts[id] >= 2) pair = true;
+        }
+        return pair;
+    }
+
+    function checkWinningHand(tiles, meldCount = 0) {
+        const expectedConcealedTotal = 14 - (meldCount * 3);
+        if (!tiles || tiles.length !== expectedConcealedTotal) return false;
+        const counts = tileCounts(tiles);
+        if (isChiitoitsuCounts(counts) || isKokushiCounts(counts)) return true;
+        return decomposeStandardCounts(counts).length > 0;
+    }
+
+    function getWaitIds(hand13, meldCount = 0) {
+        if (!hand13 || hand13.length % 3 !== 1) return [];
+        const waits = [];
+        for (const tile of TILE_TYPES) {
+            if (tileCounts([...hand13, tile]).some(c => c > 4)) continue;
+            if (checkWinningHand([...hand13, tile], meldCount)) waits.push(tile.id);
+        }
+        return waits;
+    }
+
+    function isTenpai(hand, meldCount = 0) { return getWaitIds(hand, meldCount).length > 0; }
+
+    function getRiichiDiscardIndices() {
+        if (playerMelds[0].length !== 0 || playerHands[0].length !== 14) return [];
+        const legal = [];
+        for (let i = 0; i < playerHands[0].length; i++) {
+            const testHand = playerHands[0].filter((_, idx) => idx !== i);
+            if (isTenpai(testHand, 0)) legal.push(i);
+        }
+        return legal;
+    }
+
+    function hasAnyYaku(yaku) { return yaku.length > 0; }
+
+    function getAllTilesForHand(hand, melds) {
+        return [...hand, ...(melds || []).flat()];
+    }
+
+    function countDora(tiles) {
+        if (!deadWall[0]) return 0;
+        const indicator = deadWall[0];
+        const dora = getDoraNext(indicator);
+        if (!dora) return 0;
+        return tiles.filter(t => t.id === dora.id).length;
+    }
+
+    function countOpenMeldTriplets(melds) {
+        return (melds || []).filter(g => g.length >= 3 && g.every(t => t.id === g[0].id)).length;
+    }
+
+    function countClosedTriplets(groups, winId, isTsumo) {
+        let n = 0;
+        for (const g of groups) {
+            if (g.type !== 'triplet') continue;
+            if (!isTsumo && g.ids.includes(winId)) continue;
+            n++;
+        }
+        return n;
+    }
+
+    function isValuePair(pairId, seatWind, roundWind) {
+        return pairId >= 31 || pairId === 27 + WIND_ORDER.indexOf(seatWind) || pairId === 27 + WIND_ORDER.indexOf(roundWind);
+    }
+
+    function sequenceIsEdgeWait(seqIds, winId) {
+        if (!seqIds.includes(winId)) return false;
+        const idx = seqIds.indexOf(winId);
+        const nums = seqIds.map(id => (id % 9) + 1);
+        if (idx === 1) return false; // kanchan
+        if (nums.includes(1) && winId === seqIds[0]) return false; // 123 on 1
+        if (nums.includes(9) && winId === seqIds[2]) return false; // 789 on 9
+        return true;
+    }
+
+    function evaluateStandardYaku(hand, melds, decomposition, winTile, isTsumo, pIdx) {
+        const yaku = [];
+        const closed = (melds || []).length === 0;
+        const allTiles = getAllTilesForHand(hand, melds);
+        const groups = decomposition.groups;
+        const pairId = decomposition.pairId;
+        const roundWind = 'E';
+        const seatWind = PLAYER_SEAT_WINDS[pIdx] || 'S';
+
+        if (pIdx === 0 ? isRiichi : aiRiichi[pIdx]) yaku.push({ name: 'Riichi', han: 1 });
+        if (isTsumo && closed) yaku.push({ name: 'Menzen Tsumo', han: 1 });
+
+        if (allTiles.every(isSimple)) yaku.push({ name: 'Tanyao', han: 1 });
+
+        if (closed && groups.every(g => g.type === 'sequence') && !isValuePair(pairId, seatWind, roundWind) &&
+            sequenceIsEdgeWait(groups.find(g => g.ids.includes(winTile.id))?.ids || [], winTile.id)) {
+            yaku.push({ name: 'Pinfu', han: 1, pinfu: true });
+        }
+
+        const triplets = groups.filter(g => g.type === 'triplet');
+        const allGroups = [...groups, ...((melds || []).map(g => ({
+            type: g.every(t => t.id === g[0].id) ? 'triplet' : 'sequence',
+            ids: g.map(t => t.id)
+        })) )];
+        const allTriplets = allGroups.filter(g => g.type === 'triplet');
+
+        let yakuhai = 0;
+        for (const g of allTriplets) {
+            const id = g.ids[0];
+            if (id >= 31) yakuhai++;
+            if (id === 27 + WIND_ORDER.indexOf(roundWind)) yakuhai++;
+            if (id === 27 + WIND_ORDER.indexOf(seatWind)) yakuhai++;
+        }
+        if (yakuhai) yaku.push({ name: `Yakuhai x${yakuhai}`, han: yakuhai });
+
+        if (allTriplets.length === 4) yaku.push({ name: 'Toitoi', han: 2 });
+
+        if (closed) {
+            const seqKeys = groups.filter(g => g.type === 'sequence').map(g => g.ids.join('-'));
+            const counts = {};
+            seqKeys.forEach(k => counts[k] = (counts[k] || 0) + 1);
+            const pairsOfSeq = Object.values(counts).filter(v => v >= 2).reduce((s,v) => s + Math.floor(v / 2), 0);
+            if (pairsOfSeq > 0) yaku.push({ name: `Iipeiko x${pairsOfSeq}`, han: pairsOfSeq });
+        }
+
+        const seqSets = new Set(groups.filter(g => g.type === 'sequence').map(g => g.ids[0]));
+        const hasSanshoku = [...seqSets].some(start => [start, start + 9, start + 18].every(x => seqSets.has(x)));
+        if (hasSanshoku) yaku.push({ name: 'Sanshoku Doujun', han: closed ? 2 : 1 });
+
+        const hasItsu = [0, 9, 18].some(base => [base, base + 3, base + 6].every(start => groups.some(g => g.type === 'sequence' && g.ids[0] === start)));
+        if (hasItsu) yaku.push({ name: 'Ittsu', han: closed ? 2 : 1 });
+
+        const allTermHonor = allTiles.every(isTerminalOrHonor);
+        const allHonor = allTiles.every(t => t.type === 'honor');
+        const allTerminal = allTiles.every(t => t.type !== 'honor' && (t.num === 1 || t.num === 9));
+        if (allHonor) yaku.push({ name: 'Tsuuiisou', han: 13, yakuman: true });
+        else if (allTerminal) yaku.push({ name: 'Chinroutou', han: 13, yakuman: true });
+        else if (allTermHonor) yaku.push({ name: 'Honroutou', han: 2 });
+
+        const suits = new Set(allTiles.filter(t => t.type !== 'honor').map(t => t.type));
+        const hasHonors = allTiles.some(t => t.type === 'honor');
+        if (suits.size === 1 && hasHonors) yaku.push({ name: 'Honitsu', han: closed ? 3 : 2 });
+        if (suits.size === 1 && !hasHonors) yaku.push({ name: 'Chinitsu', han: closed ? 6 : 5 });
+
+        const junchan = allGroups.every(g => {
+            const ts = g.ids.map(id => TILE_TYPES[id]);
+            return ts.some(t => t.type === 'honor' || t.num === 1 || t.num === 9);
+        }) && allGroups.every(g => {
+            if (g.type === 'triplet') return true;
+            return g.ids.some(id => id % 9 === 0 || id % 9 === 8);
+        }) && !hasHonors && groups.some(g => g.type === 'sequence');
+        if (junchan) yaku.push({ name: 'Junchan', han: closed ? 3 : 2 });
+
+        const chanta = allGroups.every(g => {
+            const ts = g.ids.map(id => TILE_TYPES[id]);
+            return ts.some(t => t.type === 'honor' || t.num === 1 || t.num === 9);
+        }) && groups.some(g => g.type === 'sequence');
+        if (chanta && !junchan) yaku.push({ name: 'Chanta', han: closed ? 2 : 1 });
+
+        const concealedTriplets = countClosedTriplets(groups, winTile.id, isTsumo);
+        if (concealedTriplets === 4) yaku.push({ name: 'Suuankou', han: 13, yakuman: true });
+        else if (concealedTriplets >= 3) yaku.push({ name: 'Sanankou', han: 2 });
+
+        return yaku;
+    }
+
+    function evaluateChiitoitsu(hand, melds, isTsumo, pIdx) {
+        if ((melds || []).length) return [];
+        const counts = tileCounts(hand);
+        if (!isChiitoitsuCounts(counts)) return [];
+        const allTiles = hand;
+        const yaku = [{ name: 'Chiitoitsu', han: 2 }];
+        if (allTiles.every(isSimple)) yaku.push({ name: 'Tanyao', han: 1 });
+        const suits = new Set(allTiles.filter(t => t.type !== 'honor').map(t => t.type));
+        const hasHonors = allTiles.some(t => t.type === 'honor');
+        const allTH = allTiles.every(isTerminalOrHonor);
+        if (allTH) yaku.push({ name: 'Honroutou', han: 2 });
+        if (suits.size === 1 && hasHonors) yaku.push({ name: 'Honitsu', han: 3 });
+        if (suits.size === 1 && !hasHonors) yaku.push({ name: 'Chinitsu', han: 6 });
+        return yaku;
+    }
+
+    function evaluateYakumanSpecial(hand, melds) {
+        if ((melds || []).length) return [];
+        const counts = tileCounts(hand);
+        if (isKokushiCounts(counts)) return [{ name: 'Kokushi Musou', han: 13, yakuman: true }];
+        return [];
+    }
+
+    function calculateFu(decomp, hand, melds, winTile, isTsumo, pIdx, yaku) {
+        if (yaku.some(y => y.name === 'Chiitoitsu')) return 25;
+        if (yaku.some(y => y.name === 'Pinfu')) return isTsumo ? 20 : 30;
+
+        const closed = (melds || []).length === 0;
+        let fu = 20;
+        if (isTsumo) fu += 2;
+        else if (closed) fu += 10;
+
+        if (isValuePair(decomp.pairId, PLAYER_SEAT_WINDS[pIdx] || 'S', 'E')) fu += 2;
+
+        const allGroups = [
+            ...decomp.groups.map(g => ({ ...g, open: false })),
+            ...((melds || []).map(g => ({ type: g.every(t => t.id === g[0].id) ? 'triplet' : 'sequence', ids: g.map(t => t.id), open: true })))
+        ];
+        for (const g of allGroups) {
+            if (g.type !== 'triplet') continue;
+            const t = TILE_TYPES[g.ids[0]];
+            const terminalHonor = isTerminalOrHonor(t);
+            const open = g.open;
+            const isKan = g.ids.length === 4;
+            if (isKan) fu += terminalHonor ? (open ? 16 : 32) : (open ? 8 : 16);
+            else fu += terminalHonor ? (open ? 4 : 8) : (open ? 2 : 4);
+        }
+
+        if (decomp.groups.every(g => g.type === 'sequence') &&
+            sequenceIsEdgeWait(decomp.groups.find(g => g.ids.includes(winTile.id))?.ids || [], winTile.id)) {
+            fu += 0; // ryanmen has no extra fu
+        } else {
+            fu += 2; // tanki / kanchan / penchan
+        }
+
+        return Math.max(20, Math.ceil(fu / 10) * 10);
+    }
+
+    function calculateRiichiPoints(han, fu, isDealer, isTsumo) {
+        if (han >= 13) return isTsumo
+            ? (isDealer ? { total: 24000, detail: 'Semua lawan bayar 8000' } : { total: 16000, detail: 'Oya bayar 8000, Ko masing-masing 4000' })
+            : { total: isDealer ? 48000 : 32000, detail: 'Bayaran Yakuman dari lawan' };
+
+        let basePoint;
+        if (han >= 11) basePoint = 6000;
+        else if (han >= 8) basePoint = 4000;
+        else if (han >= 6) basePoint = 3000;
+        else if (han >= 5 || (han === 4 && fu >= 40) || (han === 3 && fu >= 70)) basePoint = 2000;
+        else basePoint = Math.min(fu * Math.pow(2, han + 2), 2000);
 
         if (isTsumo) {
             if (isDealer) {
-                let pay = ceil100(basePoint * 2);
+                const pay = ceil100(basePoint * 2);
                 return { total: pay * 3, detail: `Setiap Ko bayar ${pay}` };
-            } else {
-                let payDealer = ceil100(basePoint * 2);
-                let payOther = ceil100(basePoint);
-                return { total: payDealer + (payOther * 2), detail: `Oya: ${payDealer}, Ko: ${payOther}` };
             }
-        } else {
-            if (isDealer) {
-                let pay = ceil100(basePoint * 6);
-                return { total: pay, detail: `Lawan bayar ${pay}` };
-            } else {
-                let pay = ceil100(basePoint * 4);
-                return { total: pay, detail: `Lawan bayar ${pay}` };
-            }
+            const payDealer = ceil100(basePoint * 2);
+            const payOther = ceil100(basePoint);
+            return { total: payDealer + payOther * 2, detail: `Oya: ${payDealer}, Ko: ${payOther}` };
         }
+
+        const pay = ceil100(basePoint * (isDealer ? 6 : 4));
+        return { total: pay, detail: `Lawan bayar ${pay}` };
     }
 
-    // ADVANCED YAKU & HAN EVALUATOR
-    function evaluateYakuAndScore(pIdx, winningTile, isTsumo) {
-        let hand = [...playerHands[pIdx]];
-        if (winningTile && !isTsumo) hand.push(winningTile);
-        let melds = playerMelds[pIdx];
+    function evaluateRiichiHand(pIdx, winningTile, isTsumo) {
+        const hand = [...playerHands[pIdx]];
+        const melds = playerMelds[pIdx] || [];
+        if (!isTsumo && winningTile) hand.push(winningTile);
+        if (hand.length + melds.length * 3 !== 14) return null;
 
-        let han = 0;
-        let yakuList = [];
+        const isDealer = pIdx === currentDealerIdx;
+        const actualWinTile = winningTile || (pIdx === currentTurn ? drawnTile : null) || hand[hand.length - 1];
+        const candidates = [];
+        const special = evaluateYakumanSpecial(hand, melds);
+        if (special.length) candidates.push({ yaku: special, fu: 0, decomp: null });
 
-        // 1. Check Riichi
-        if (pIdx === 0 ? isRiichi : aiRiichi[pIdx]) {
-            han += 1;
-            yakuList.push("Riichi (1 Han)");
+        const chiitoi = evaluateChiitoitsu(hand, melds, isTsumo, pIdx);
+        if (chiitoi.length) candidates.push({ yaku: chiitoi, fu: 25, decomp: null });
+
+        const decomps = decomposeStandardCounts(tileCounts(hand));
+        for (const dec of decomps) {
+            const yaku = evaluateStandardYaku(hand, melds, dec, actualWinTile, isTsumo, pIdx);
+            if (!hasAnyYaku(yaku)) continue;
+            const hasYakuman = yaku.some(y => y.yakuman);
+            const dora = hasYakuman ? 0 : countDora(getAllTilesForHand(hand, melds));
+            if (dora > 0) yaku.push({ name: `Dora x${dora}`, han: dora, dora: true });
+            const han = yaku.reduce((sum, y) => sum + y.han, 0);
+            candidates.push({ yaku, fu: calculateFu(dec, hand, melds, actualWinTile, isTsumo, pIdx, yaku), decomp: dec, han });
         }
 
-        // 2. Check Fully Concealed Hand (Menzen Tsumo)
-        if (isTsumo && melds.length === 0) {
-            han += 1;
-            yakuList.push("Menzen Tsumo (1 Han)");
-        }
-
-        // 3. Check All Simples (Tanyao)
-        let allTiles = [...hand, ...melds.flat()];
-        let isTanyao = allTiles.every(t => t.type !== 'honor' && t.num > 1 && t.num < 9);
-        if (isTanyao) {
-            han += 1;
-            yakuList.push("Tanyao / All Simples (1 Han)");
-        }
-
-        // 4. Check Dora
-        let doraIndicator = deadWall[0];
-        let doraCount = 0;
-        if (doraIndicator) {
-            allTiles.forEach(t => {
-                if (t.type === doraIndicator.type && t.num === (doraIndicator.num % 9 + 1)) doraCount++;
-                else if (doraIndicator.type === 'honor' && t.type === 'honor' && t.id === (doraIndicator.id % 7 + 1)) doraCount++;
-            });
-        }
-        if (doraCount > 0) {
-            han += doraCount;
-            yakuList.push(`Dora x${doraCount} (${doraCount} Han)`);
-        }
-
-        // Base fallback Yaku to guarantee valid win
-        if (han === 0) {
-            han = 1;
-            yakuList.push("Standard Hand (1 Han)");
-        }
-
-        let fu = isTsumo ? 20 : 30;
-        let isDealer = (pIdx === currentDealerIdx);
-        let pointsObj = calculateRiichiPoints(han, fu, isDealer, isTsumo);
-
+        if (!candidates.length) return null;
+        for (const c of candidates) c.han = c.han ?? c.yaku.reduce((s, y) => s + y.han, 0);
+        candidates.sort((a, b) => (b.han * 100 + b.fu) - (a.han * 100 + a.fu));
+        const best = candidates[0];
+        const points = calculateRiichiPoints(best.han, best.fu, isDealer, isTsumo);
         return {
-            han: han,
-            fu: fu,
-            yakuStr: yakuList.join(", "),
-            points: pointsObj.total,
-            detail: pointsObj.detail
+            valid: true,
+            han: best.han,
+            fu: best.fu,
+            yaku: best.yaku,
+            yakuStr: best.yaku.map(y => `${y.name} (${y.han} Han)`).join(', '),
+            points: points.total,
+            detail: points.detail
         };
     }
 
-    function checkWinningHand(tiles) {
-        if (tiles.length < 14) return false;
-        let counts = new Array(34).fill(0);
-        tiles.forEach(t => { if (t && typeof t.id === 'number') counts[t.id]++; });
-
-        let pairs = counts.filter(c => c === 2).length;
-        if (pairs === 7) return true;
-
-        for (let i = 0; i < 34; i++) {
-            if (counts[i] >= 2) {
-                let temp = [...counts];
-                temp[i] -= 2;
-                if (canFormMelds(temp)) return true;
-            }
-        }
-        return false;
-    }
-
-    function canFormMelds(counts) {
-        let first = counts.findIndex(c => c > 0);
-        if (first === -1) return true;
-        if (counts[first] >= 3) {
-            counts[first] -= 3;
-            if (canFormMelds(counts)) return true;
-            counts[first] += 3;
-        }
-        if (first < 27 && (first % 9) <= 6) {
-            if (counts[first] > 0 && counts[first+1] > 0 && counts[first+2] > 0) {
-                counts[first]--; counts[first+1]--; counts[first+2]--;
-                if (canFormMelds(counts)) return true;
-                counts[first]++; counts[first+1]++; counts[first+2]++;
-            }
-        }
-        return false;
-    }
-
-    function isTenpai(hand) {
-        if (hand.length % 3 !== 1) return false;
-        for (let i = 0; i < 34; i++) {
-            let mockTile = TILE_TYPES.find(t => t.id === i);
-            if (checkWinningHand([...hand, mockTile])) return true;
-        }
-        return false;
+    // Compatibility wrapper used by the rest of the game.
+    function evaluateYakuAndScore(pIdx, winningTile, isTsumo) {
+        return evaluateRiichiHand(pIdx, winningTile, isTsumo) || {
+            valid: false, han: 0, fu: 0, yaku: [], yakuStr: 'Tidak ada yaku', points: 0, detail: 'Tangan tidak legal untuk menang.'
+        };
     }
 
     function checkFuriten(winningTileId) {
-        return playerRivers[0].some(t => t.id === winningTileId);
-    }
-
-    function getChiCombinations(hand, tile) {
-        if (tile.type === 'honor') return [];
-        let nums = Array.from(new Set(hand.filter(t => t.type === tile.type).map(t => t.num)));
-        let n = tile.num;
-        let combos = [];
-        if (nums.includes(n-2) && nums.includes(n-1)) combos.push([n-2, n-1]);
-        if (nums.includes(n-1) && nums.includes(n+1)) combos.push([n-1, n+1]);
-        if (nums.includes(n+1) && nums.includes(n+2)) combos.push([n+1, n+2]);
-        return combos;
+        const waits = getWaitIds(playerHands[0], playerMelds[0].length);
+        return waits.includes(winningTileId) && (
+            waits.some(id => playerRivers[0].some(t => t.id === id)) ||
+            temporaryFuriten[0] ||
+            riichiFuriten[0]
+        );
     }
 
     function updateScoresUI() {
@@ -591,6 +851,10 @@
         playerRivers = [[], [], [], []];
         playerMelds = [[], [], [], []]; 
         aiRiichi = [false, false, false, false];
+        temporaryFuriten = [false, false, false, false];
+        riichiFuriten = [false, false, false, false];
+        pendingPlayerActions = [];
+        riichiDiscardIndices = [];
         isRiichi = false; pendingRiichi = false; riichiSticks = 0;
         document.getElementById('riichi-effect').style.display = 'none';
         
@@ -659,9 +923,10 @@
     }
 
     function autoDiscard() {
-        if (isDiscardable && playerHands[0].length > 0) {
-            discardTile(playerHands[0].length - 1);
-        }
+        if (!isDiscardable || playerHands[0].length === 0) return;
+        let idx = playerHands[0].length - 1;
+        if (pendingRiichi && riichiDiscardIndices.length) idx = riichiDiscardIndices[0];
+        discardTile(idx);
     }
 
     function autoSortHand() {
@@ -674,7 +939,8 @@
         container.innerHTML = '';
         playerHands[0].forEach((t, i) => {
             let el = document.createElement('div');
-            el.className = 'tile' + (t === drawnTile ? ' drawn-tile-gap' : '');
+            const riichiClass = pendingRiichi && riichiDiscardIndices.includes(i) ? ' riichi-choice' : '';
+            el.className = 'tile' + (t === drawnTile ? ' drawn-tile-gap' : '') + riichiClass;
             el.innerHTML = `<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span>`;
             el.onclick = () => { if (isDiscardable) discardTile(i); };
             container.appendChild(el);
@@ -744,6 +1010,7 @@
         playerHands[currentTurn].push(drawnTile);
 
         if (currentTurn === 0) {
+            temporaryFuriten[0] = false;
             if (autoSortSetting) autoSortHand();
             isDiscardable = true;
             renderPlayerHand();
@@ -751,11 +1018,12 @@
             let actions = [];
             let currentTotalTiles = playerHands[0].length + (playerMelds[0].length * 3);
             
-            if (checkWinningHand(playerHands[0]) && currentTotalTiles === 14) {
-                actions.push('Tsumo');
+            if (currentTotalTiles === 14) {
+                const tsumoEval = evaluateYakuAndScore(0, null, true);
+                if (tsumoEval.valid && tsumoEval.points > 0) actions.push('Tsumo');
             }
             
-            if (!isRiichi && playerMelds[0].length === 0 && isTenpai(playerHands[0].slice(0, -1))) {
+            if (!isRiichi && playerScores[0] >= 1000 && playerMelds[0].length === 0 && getRiichiDiscardIndices().length > 0) {
                 actions.push('Riichi');
             }
             
@@ -775,12 +1043,14 @@
             startTimer(false);
 
             // Check AI TSUMO Win
-            if (checkWinningHand(playerHands[currentTurn])) {
+            if (checkWinningHand(playerHands[currentTurn], playerMelds[currentTurn].length)) {
                 let evalScore = evaluateYakuAndScore(currentTurn, null, true);
+                if (!evalScore.valid) { /* structural agari without yaku: continue play */ } else {
                 playerScores[currentTurn] += evalScore.points;
                 let pNames = ["You", "P1 (East)", "P2 (North)", "P3 (West)"];
                 endRound(`TSUMO by ${pNames[currentTurn]}!`, `${evalScore.yakuStr} - ${evalScore.points} Pts`);
                 return;
+                }
             }
 
             // Check AI Riichi Declaration
@@ -819,6 +1089,7 @@
 
     function discardTile(index) {
         if (!isDiscardable) return;
+        if (pendingRiichi && !riichiDiscardIndices.includes(index)) return;
         isDiscardable = false;
         clearInterval(timerInterval);
         
@@ -842,6 +1113,7 @@
         if (pIdx === 0 && pendingRiichi) {
             isRiichi = true;
             pendingRiichi = false;
+            riichiDiscardIndices = [];
             playerScores[0] -= 1000;
             riichiSticks++;
             updateScoresUI();
@@ -857,9 +1129,10 @@
         // Check if ANY AI Bot calls RON from discarded tile
         for (let p = 1; p < 4; p++) {
             if (p !== pIdx) {
-                let isWin = checkWinningHand([...playerHands[p], tile]);
+                let isWin = checkWinningHand([...playerHands[p], tile], playerMelds[p].length);
                 if (isWin) {
                     let evalScore = evaluateYakuAndScore(p, tile, false);
+                    if (!evalScore.valid) continue;
                     playerScores[p] += evalScore.points;
                     playerScores[pIdx] -= evalScore.points;
                     let pNames = ["You", "Player 1 (East)", "Player 2 (North)", "Player 3 (West)"];
@@ -872,10 +1145,11 @@
         // Check Player actions on AI Discard
         if (pIdx !== 0 && !isRiichi) {
             let actions = [];
-            let isWinning = checkWinningHand([...playerHands[0], tile]);
+            let isWinning = checkWinningHand([...playerHands[0], tile], playerMelds[0].length);
+            let ronEval = isWinning ? evaluateYakuAndScore(0, tile, false) : null;
             let isInFuriten = checkFuriten(tile.id);
 
-            if (isWinning && !isInFuriten) actions.push('Ron');
+            if (isWinning && ronEval && ronEval.valid && !isInFuriten) actions.push('Ron');
 
             let matchCount = playerHands[0].filter(t => t.id === tile.id).length;
             if (matchCount >= 2) actions.push('Pon');
@@ -891,9 +1165,10 @@
             }
         } 
         else if (pIdx !== 0 && isRiichi) {
-            let isWinning = checkWinningHand([...playerHands[0], tile]);
+            let isWinning = checkWinningHand([...playerHands[0], tile], playerMelds[0].length);
+            let ronEval = isWinning ? evaluateYakuAndScore(0, tile, false) : null;
             let isInFuriten = checkFuriten(tile.id);
-            if (isWinning && !isInFuriten) showAvailableActions(['Ron', 'Skip']);
+            if (isWinning && ronEval && ronEval.valid && !isInFuriten) showAvailableActions(['Ron', 'Skip']);
             else nextTurn();
         } else {
             nextTurn();
@@ -903,7 +1178,7 @@
     function showAvailableActions(actionsList) {
         const overlay = document.getElementById('action-overlay');
         overlay.innerHTML = '';
-        
+        pendingPlayerActions = actionsList ? [...actionsList] : [];
         if (!actionsList || actionsList.length === 0) {
             overlay.style.display = 'none';
             return;
@@ -926,7 +1201,10 @@
         document.getElementById('action-overlay').style.display = 'none';
         
         if (act === 'Ron' || act === 'Tsumo') {
+            pendingPlayerActions = [];
+            riichiDiscardIndices = [];
             let evalScore = evaluateYakuAndScore(0, act === 'Ron' ? lastDiscardedTile : null, act === 'Tsumo');
+            if (!evalScore.valid || evalScore.points <= 0) return;
             playerScores[0] += evalScore.points;
             if (act === 'Ron' && lastDiscarderIdx !== -1) {
                 playerScores[lastDiscarderIdx] -= evalScore.points;
@@ -936,7 +1214,11 @@
         }
         
         if (act === 'Riichi') {
+            if (playerScores[0] < 1000 || isRiichi) return;
+            riichiDiscardIndices = getRiichiDiscardIndices();
+            if (!riichiDiscardIndices.length) return;
             pendingRiichi = true;
+            renderPlayerHand();
             startTimer(false); 
             return;
         }
@@ -946,6 +1228,11 @@
         if (act === 'Chi') return executeChi(0);
 
         if (act === 'Skip') {
+            if (pendingPlayerActions.includes('Ron') && currentTurn !== 0) {
+                temporaryFuriten[0] = true;
+                if (isRiichi) riichiFuriten[0] = true;
+            }
+            pendingPlayerActions = [];
             if (currentTurn === 0 && drawnTile !== null) {
                 if (isRiichi) autoDiscard();
                 else startTimer(false);
