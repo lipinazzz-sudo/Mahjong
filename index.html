@@ -1939,7 +1939,7 @@
         if(['Ron','Pon','Kan','Chi','Skip'].includes(act)&&mpPendingCallQueue[0]?.seat!==seat)return;
         if(act==='Tsumo'){const e=evaluateYakuAndScore(seat,null,true);if(checkWinningHand(playerHands[seat],playerMelds[seat].length)&&e.valid){playerScores[seat]+=e.points;endRound(`TSUMO by ${mp.room.players?.[seat]?.name||'Player'}`,`${e.yakuStr} (+${e.points} Pts)`)}return}
         if(act==='Riichi'){if(currentTurn!==seat||aiRiichi[seat])return;aiRiichi[seat]=true;playerScores[seat]-=1000;riichiSticks++;mpPendingRiichiSeat=seat;startRemoteTurnTimer(seat);mpBroadcastState({remoteActions:{seat,actions:[]},handStatus:{seat,main:'RIICHI',sub:'Buang tile untuk mengunci tangan.'}});return}
-        if(act==='Ron'&&lastDiscardedTile){const e=evaluateYakuAndScore(seat,lastDiscardedTile,false);if(e.valid&&checkWinningHand([...playerHands[seat],lastDiscardedTile],playerMelds[seat].length)&&!checkSeatFuriten(seat,lastDiscardedTile.id)){playerScores[seat]+=e.points;playerScores[lastDiscarderIdx]-=e.points;endRound(`RON by ${mp.room.players?.[seat]?.name||'Player'}`,`${e.yakuStr} (+${e.points} Pts)`) }return}
+        if(act==='Ron'&&lastDiscardedTile){const e=evaluateYakuAndScore(seat,lastDiscardedTile,false);if(e.valid&&checkWinningHand([...playerHands[seat],lastDiscardedTile],playerMelds[seat].length)&&!checkSeatFuriten(seat,lastDiscardedTile.id)){playerScores[seat]+=e.points;playerScores[lastDiscarderIdx]-=e.points;endRound(`RON by ${mp.room.players?.[seat]?.name||'Player'}`,`${e.yakuStr} (+${e.points} Pts)`)}return}
         if(act==='Pon'){mpPendingCallQueue=[];executePon(seat);return}
         if(act==='Kan'){mpPendingCallQueue=[];executeKan(seat);return}
         if(act==='Chi'){mpPendingCallQueue=[];executeChi(seat);return}
@@ -1980,6 +1980,108 @@
     let aiMoveTimer = null, autoDiscardTimer = null, roundToken = 0;
     let roundActive = false;
     let roundEnding = false;
+
+    let honbaCount = 0;
+    let roundOutcome = null;
+    let matchFinished = false;
+    let ippatsuEligible = [false, false, false, false];
+    let doubleRiichiEligible = [false, false, false, false];
+    let lastWinMethod = null;
+
+    const SEAT_ORDER_V24 = [1, 0, 3, 2]; // East, South, West, North by canonical player index.
+    function getSeatWindForPlayer(pIdx) {
+        const di = SEAT_ORDER_V24.indexOf(currentDealerIdx);
+        const pi = SEAT_ORDER_V24.indexOf(pIdx);
+        if (di < 0 || pi < 0) return PLAYER_SEAT_WINDS[pIdx] || 'S';
+        return WIND_ORDER[(pi - di + 4) % 4];
+    }
+    function getSeatLabelForPlayer(pIdx) {
+        return getSeatWindForPlayer(pIdx);
+    }
+
+    function calculateWinPayments(han, fu, isDealer, isTsumo) {
+        let basePoint;
+        const yakuman = han >= 13;
+        if (yakuman) {
+            if (isTsumo) {
+                return isDealer
+                    ? { total: 48000, payments: [16000,16000,16000], detail: 'Yakuman tsumo • setiap Ko bayar 16000' }
+                    : { total: 32000, payments: [16000,8000,8000], detail: 'Yakuman tsumo • Oya 16000, Ko 8000' };
+            }
+            return { total: isDealer ? 48000 : 32000, ron: isDealer ? 48000 : 32000, detail: 'Yakuman ron' };
+        }
+        if (han >= 11) basePoint = 6000;
+        else if (han >= 8) basePoint = 4000;
+        else if (han >= 6) basePoint = 3000;
+        else if (han >= 5 || (han === 4 && fu >= 40) || (han === 3 && fu >= 70)) basePoint = 2000;
+        else basePoint = Math.min(fu * Math.pow(2, han + 2), 2000);
+        if (isTsumo) {
+            if (isDealer) {
+                const pay = ceil100(basePoint * 2);
+                return { total: pay * 3, payments: [pay,pay,pay], detail: `Setiap Ko bayar ${pay}` };
+            }
+            const payDealer = ceil100(basePoint * 2);
+            const payOther = ceil100(basePoint);
+            return { total: payDealer + payOther * 2, payments: [payOther,payDealer,payOther], detail: `Oya: ${payDealer}, Ko: ${payOther}` };
+        }
+        const ron = ceil100(basePoint * (isDealer ? 6 : 4));
+        return { total: ron, ron, detail: `Lawan bayar ${ron}` };
+    }
+
+    function applyWinSettlement(winner, loser, result, method, titleOverride, descExtra='') {
+        if (!result?.valid || roundEnding || !roundActive) return false;
+        const isTsumo = method === 'tsumo';
+        const isDealer = winner === currentDealerIdx;
+        const calc = calculateWinPayments(result.han, result.fu, isDealer, isTsumo);
+        const before = [...playerScores];
+        const honba = honbaCount;
+        const kyotaku = riichiSticks;
+        const delta = [0,0,0,0];
+
+        if (isTsumo) {
+            const seatOrder = [0,1,2,3].filter(p => p !== winner);
+            seatOrder.forEach((payer) => {
+                const basePay = isDealer
+                    ? (calc.payments?.[0] || Math.ceil(calc.total / 3))
+                    : (payer === currentDealerIdx ? (calc.payments?.[1] || Math.ceil(calc.total / 2)) : (calc.payments?.[0] || Math.ceil(calc.total / 4)));
+                const pay = basePay + honba * 100;
+                playerScores[payer] -= pay;
+                delta[payer] -= pay;
+            });
+            const gain = calc.total + honba * 300 + kyotaku * 1000;
+            playerScores[winner] += gain;
+            delta[winner] += gain;
+        } else {
+            const pay = (calc.ron || calc.total) + honba * 300;
+            if (loser == null || loser === winner) return false;
+            playerScores[loser] -= pay;
+            playerScores[winner] += pay + kyotaku * 1000;
+            delta[loser] -= pay;
+            delta[winner] += pay + kyotaku * 1000;
+        }
+
+        riichiSticks = 0; // winner collects all kyotaku.
+        lastWinMethod = method;
+        roundOutcome = {
+            kind: 'win', winner, loser: isTsumo ? null : loser, method,
+            dealerWon: winner === currentDealerIdx, honbaUsed: honba,
+            kyotakuClaimed: kyotaku, deltas: delta, beforeScores: before,
+            result
+        };
+        const title = titleOverride || `${method.toUpperCase()} WIN!`;
+        const paymentsText = isTsumo
+            ? `Pembayaran: ${calc.detail}${honba ? ` + ${honba} honba` : ''}${kyotaku ? ` + ${kyotaku * 1000} kyotaku` : ''}.`
+            : `Pembayaran: ${calc.total.toLocaleString('id-ID')}${honba ? ` + ${honba}×300 honba` : ''}${kyotaku ? ` + ${kyotaku * 1000} kyotaku` : ''}.`;
+        endRound(title, `${result.yakuStr} • ${result.han} Han • ${result.fu} Fu\n${paymentsText}${descExtra ? `\n${descExtra}` : ''}`);
+        return true;
+    }
+
+    // Ura-dora and ippatsu helpers.
+    function markRiichiDeclared(pIdx, isDouble=false) {
+        ippatsuEligible[pIdx] = true;
+        doubleRiichiEligible[pIdx] = !!isDouble;
+    }
+    function cancelIppatsuForAll() { ippatsuEligible = [false,false,false,false]; }
 
     function ceil100(v) { return Math.ceil(v / 100) * 100; }
 
@@ -2201,7 +2303,7 @@
         const groups = decomposition.groups;
         const pairId = decomposition.pairId;
         const roundWind = 'E';
-        const seatWind = PLAYER_SEAT_WINDS[pIdx] || 'S';
+        const seatWind = getSeatWindForPlayer(pIdx);
 
         if (pIdx === 0 ? isRiichi : aiRiichi[pIdx]) yaku.push({ name: 'Riichi', han: 1 });
         if (isTsumo && closed) yaku.push({ name: 'Menzen Tsumo', han: 1 });
@@ -2281,6 +2383,78 @@
         return yaku;
     }
 
+    // Additional yaku layer (keeps the proven base evaluator and adds common Riichi yaku).
+    const __evaluateStandardYakuV24Base = evaluateStandardYaku;
+    evaluateStandardYaku = function(hand, melds, decomposition, winTile, isTsumo, pIdx) {
+        let yaku = __evaluateStandardYakuV24Base(hand, melds, decomposition, winTile, isTsumo, pIdx);
+        const allTiles = getAllTilesForHand(hand, melds);
+        const groups = decomposition?.groups || [];
+        const allGroups = [...groups, ...((melds || []).map(g => ({
+            type: g.length === 4 || g.every(t => t.id === g[0].id) ? 'triplet' : 'sequence', ids: g.map(t=>t.id)
+        })) )];
+        const triplets = allGroups.filter(g=>g.type==='triplet');
+        const dragons = [31,32,33];
+        const winds = [27,28,29,30];
+        const closed = (melds || []).length === 0;
+
+        if (yaku.some(y=>y.name==='Riichi') && doubleRiichiEligible[pIdx]) {
+            yaku = yaku.filter(y=>y.name!=='Riichi');
+            yaku.push({name:'Double Riichi',han:2});
+        }
+        if (ippatsuEligible[pIdx]) yaku.push({name:'Ippatsu',han:1});
+        if (isTsumo && fullDeck.length === 0) yaku.push({name:'Haitei Raoyue',han:1});
+        if (!isTsumo && fullDeck.length === 0) yaku.push({name:'Houtei Raoyui',han:1});
+        if (lastWinMethod === 'chankan') yaku.push({name:'Chankan',han:1});
+
+        // Sanshoku Doukou: triplets of the same number in all three suits.
+        const tripletIds = new Set(triplets.map(g=>g.ids[0]));
+        for (let n=1;n<=9;n++) {
+            if ([n-1,9+n-1,18+n-1].every(id=>tripletIds.has(id))) { yaku.push({name:'Sanshoku Doukou',han:2}); break; }
+        }
+        // Sankantsu / Daisangen / Shousangen / wind yakuman.
+        const kanCountHere = (melds||[]).filter(g=>g.length===4).length;
+        if (kanCountHere >= 3) yaku.push({name:'Sankantsu',han:2});
+        const dragonTriplets = dragons.filter(id=>tripletIds.has(id)).length;
+        if (dragonTriplets === 3) yaku.push({name:'Daisangen',han:13,yakuman:true});
+        else if (dragonTriplets === 2 && dragons.some(id=>decomposition.pairId===id)) yaku.push({name:'Shousangen',han:2});
+        const windTriplets = winds.filter(id=>tripletIds.has(id)).length;
+        if (windTriplets === 4) yaku.push({name:'Daisuushi',han:26,yakuman:true});
+        else if (windTriplets === 3 && winds.some(id=>decomposition.pairId===id)) yaku.push({name:'Shousuushi',han:13,yakuman:true});
+
+        // Ryanpeikou supersedes two Iipeiko in a closed hand.
+        if (closed) {
+            const seqKeys = groups.filter(g=>g.type==='sequence').map(g=>g.ids.join('-'));
+            const freq = {}; seqKeys.forEach(k=>freq[k]=(freq[k]||0)+1);
+            const pairs = Object.values(freq).filter(v=>v>=2).length;
+            if (pairs>=2) {
+                yaku = yaku.filter(y=>!/^Iipeiko/.test(y.name));
+                yaku.push({name:'Ryanpeikou',han:3});
+            }
+        }
+
+        // Ryuuiisou: only green sou tiles plus green dragon.
+        if (allTiles.length === 14 && allTiles.every(t=>
+            (t.type==='sou' && [2,3,4,6,8].includes(t.num)) || t.id===32
+        )) yaku.push({name:'Ryuuiisou',han:13,yakuman:true});
+
+        // Chuuren Poutou (closed, one suit, exact 1112345678999 + one duplicate).
+        if (closed && hand.length===14) {
+            const suits=new Set(hand.map(t=>t.type));
+            if (suits.size===1 && [...suits][0] !== 'honor') {
+                const c=tileCounts(hand); const base=([1,1,1,1,1,1,1,1,1]);
+                let ok=true, extra=0;
+                for(let i=1;i<=9;i++){
+                    const id=(suits.has('man')?0:suits.has('pin')?9:18)+(i-1);
+                    const need=(i===1||i===9)?3:1;
+                    if(c[id]<need) ok=false;
+                    extra += c[id]-need;
+                }
+                if(ok && extra===1) yaku.push({name:'Chuuren Poutou',han:13,yakuman:true});
+            }
+        }
+        return yaku;
+    };
+
     function evaluateChiitoitsu(hand, melds, isTsumo, pIdx) {
         if ((melds || []).length) return [];
         const counts = tileCounts(hand);
@@ -2306,63 +2480,62 @@
 
     function calculateFu(decomp, hand, melds, winTile, isTsumo, pIdx, yaku) {
         if (yaku.some(y => y.name === 'Chiitoitsu')) return 25;
+        const winId = winTile?.id;
+        const seatWind = getSeatWindForPlayer(pIdx);
+        const roundWind = 'E';
         if (yaku.some(y => y.name === 'Pinfu')) return isTsumo ? 20 : 30;
 
-        const closed = (melds || []).length === 0;
         let fu = 20;
         if (isTsumo) fu += 2;
-        else if (closed) fu += 10;
+        else if ((melds || []).length === 0) fu += 10;
 
-        if (isValuePair(decomp.pairId, PLAYER_SEAT_WINDS[pIdx] || 'S', 'E')) fu += 2;
+        // Pair value: dragons, seat wind, round wind; double wind pair is 4 fu.
+        const pairId = decomp?.pairId;
+        const pairTile = Number.isInteger(pairId) ? TILE_TYPES[pairId] : null;
+        if (pairTile?.type === 'honor') {
+            const isDragon = pairId >= 31;
+            const isSeat = pairId === 27 + WIND_ORDER.indexOf(seatWind);
+            const isRound = pairId === 27 + WIND_ORDER.indexOf(roundWind);
+            if (isDragon || isSeat || isRound) fu += (isSeat && isRound) ? 4 : 2;
+        }
 
         const allGroups = [
-            ...decomp.groups.map(g => ({ ...g, open: false })),
-            ...((melds || []).map(g => ({ type: g.every(t => t.id === g[0].id) ? 'triplet' : 'sequence', ids: g.map(t => t.id), open: true })))
+            ...((decomp?.groups || []).map(g => ({ ...g, open: false }))),
+            ...((melds || []).map(g => ({
+                type: g.length === 4 || g.every(t => t.id === g[0].id) ? 'triplet' : 'sequence',
+                ids: g.map(t => t.id), open: true
+            })))
         ];
+
         for (const g of allGroups) {
             if (g.type !== 'triplet') continue;
             const t = TILE_TYPES[g.ids[0]];
             const terminalHonor = isTerminalOrHonor(t);
-            const open = g.open;
             const isKan = g.ids.length === 4;
-            if (isKan) fu += terminalHonor ? (open ? 16 : 32) : (open ? 8 : 16);
-            else fu += terminalHonor ? (open ? 4 : 8) : (open ? 2 : 4);
+            if (isKan) fu += terminalHonor ? (g.open ? 16 : 32) : (g.open ? 8 : 16);
+            else fu += terminalHonor ? (g.open ? 4 : 8) : (g.open ? 2 : 4);
         }
 
-        if (decomp.groups.every(g => g.type === 'sequence') &&
-            sequenceIsEdgeWait(decomp.groups.find(g => g.ids.includes(winTile.id))?.ids || [], winTile.id)) {
-            fu += 0; // ryanmen has no extra fu
-        } else {
-            fu += 2; // tanki / kanchan / penchan
+        // Wait fu: tanki / kanchan / penchan = 2 fu; ryanmen = 0.
+        if (Number.isInteger(winId) && Number.isInteger(pairId) && pairId === winId) {
+            fu += 2;
+        } else if (Number.isInteger(winId)) {
+            const seq = (decomp?.groups || []).find(g => g.type === 'sequence' && g.ids.includes(winId));
+            if (seq) {
+                const nums = seq.ids.map(id => TILE_TYPES[id].num).sort((a,b) => a-b);
+                const n = TILE_TYPES[winId].num;
+                const edgeWait = (nums[0] === 1 && n === 3) || (nums[0] === 7 && n === 7);
+                const middleWait = nums[1] === n;
+                if (edgeWait || middleWait) fu += 2;
+            }
         }
 
         return Math.max(20, Math.ceil(fu / 10) * 10);
     }
 
     function calculateRiichiPoints(han, fu, isDealer, isTsumo) {
-        if (han >= 13) return isTsumo
-            ? (isDealer ? { total: 24000, detail: 'Semua lawan bayar 8000' } : { total: 16000, detail: 'Oya bayar 8000, Ko masing-masing 4000' })
-            : { total: isDealer ? 48000 : 32000, detail: 'Bayaran Yakuman dari lawan' };
-
-        let basePoint;
-        if (han >= 11) basePoint = 6000;
-        else if (han >= 8) basePoint = 4000;
-        else if (han >= 6) basePoint = 3000;
-        else if (han >= 5 || (han === 4 && fu >= 40) || (han === 3 && fu >= 70)) basePoint = 2000;
-        else basePoint = Math.min(fu * Math.pow(2, han + 2), 2000);
-
-        if (isTsumo) {
-            if (isDealer) {
-                const pay = ceil100(basePoint * 2);
-                return { total: pay * 3, detail: `Setiap Ko bayar ${pay}` };
-            }
-            const payDealer = ceil100(basePoint * 2);
-            const payOther = ceil100(basePoint);
-            return { total: payDealer + payOther * 2, detail: `Oya: ${payDealer}, Ko: ${payOther}` };
-        }
-
-        const pay = ceil100(basePoint * (isDealer ? 6 : 4));
-        return { total: pay, detail: `Lawan bayar ${pay}` };
+        const p = calculateWinPayments(han, fu, isDealer, isTsumo);
+        return { total: p.total, detail: p.detail };
     }
 
     function evaluateRiichiHand(pIdx, winningTile, isTsumo) {
@@ -2546,7 +2719,7 @@
 
     function updateScoresUI() {
         for (let i = 0; i < 4; i++) setText(`score-${i}`, playerScores[i]);
-        setText('riichi-stick-counter', `1000 × ${riichiSticks}`);
+        setText('riichi-stick-counter', `1000 × ${riichiSticks}`); setText('kan-info', `Rinshan 4 • Kandora ${doraIndicators?.length||0} • Honba ${honbaCount}`);
     }
 
     // GAME INITIALIZATION
@@ -2557,7 +2730,12 @@
         aiDifficulty = diff;
         isMultiplayerMode = isMultiplayer;
         currentRoundIndex = 0;
+        currentDealerIdx = 1; // East starts as dealer
         playerScores = [25000, 25000, 25000, 25000];
+        honbaCount = 0;
+        riichiSticks = 0;
+        roundOutcome = null;
+        matchFinished = false;
         
         nav('screen-game');
         setupRound();
@@ -2593,11 +2771,14 @@
         playerRivers = [[], [], [], []];
         playerMelds = [[], [], [], []]; 
         aiRiichi = [false, false, false, false];
+        ippatsuEligible = [false,false,false,false];
+        doubleRiichiEligible = [false,false,false,false];
+        lastWinMethod = null;
         temporaryFuriten = [false, false, false, false];
         riichiFuriten = [false, false, false, false];
         pendingPlayerActions = [];
         riichiDiscardIndices = [];
-        isRiichi = false; pendingRiichi = false; riichiSticks = 0;
+        isRiichi = false; pendingRiichi = false;
         lastDiscardedTile = null; lastDiscarderIdx = -1;
         drawnTile = null; isDiscardable = false; isActionPhase = false;
         setDisplay('riichi-effect', 'none'); byId('game-board')?.classList.remove('riichi-active');
@@ -2624,7 +2805,7 @@
 
         renderEnemyHands();
         updateHandStatus();
-        currentTurn = 0;
+        currentTurn = currentDealerIdx;
         roundActive = true;
         roundEnding = false;
         processTurn();
@@ -2892,9 +3073,8 @@
                 canRevealUraDora = aiRiichi[currentTurn];
                 let evalScore = evaluateYakuAndScore(currentTurn, null, true);
                 if (!evalScore.valid) { /* structural agari without yaku: continue play */ } else {
-                playerScores[currentTurn] += evalScore.points;
                 let pNames = ["You", "P1 (East)", "P2 (North)", "P3 (West)"];
-                endRound(`TSUMO by ${pNames[currentTurn]}!`, `${evalScore.yakuStr} - ${evalScore.points} Pts`);
+                applyWinSettlement(currentTurn, null, evalScore, 'tsumo', `TSUMO by ${pNames[currentTurn]}!`);
                 return;
                 }
             }
@@ -2904,6 +3084,7 @@
                 aiRiichi[currentTurn] = true;
                 playerScores[currentTurn] -= 1000;
                 riichiSticks++;
+                markRiichiDeclared(currentTurn, playerRivers[currentTurn].length===0);
                 updateScoresUI();
             }
             
@@ -2921,13 +3102,7 @@
                     discardIdx = hand.indexOf(drawnTile);
                     if (discardIdx === -1) discardIdx = hand.length - 1;
                 } else {
-                    // Smart Discard: Prioritize isolated Honor tiles -> Terminals (1/9)
-                    let honorIdx = hand.findIndex(t => t.type === 'honor');
-                    let terminalIdx = hand.findIndex(t => t.num === 1 || t.num === 9);
-                    
-                    if (honorIdx !== -1) discardIdx = honorIdx;
-                    else if (terminalIdx !== -1) discardIdx = terminalIdx;
-                    else discardIdx = Math.floor(Math.random() * hand.length);
+                    discardIdx = chooseAIDiscardIndexV24(currentTurn);
                 }
 
                 let discarded = hand.splice(discardIdx, 1)[0];
@@ -2935,6 +3110,85 @@
                 commitDiscard(currentTurn, discarded);
             }, delay);
         }
+    }
+
+    // ---------- Shanten / Ukeire AI ----------
+    const __shantenMemoV24 = new Map();
+    function calculateStandardShantenV24(tiles, openMelds=0) {
+        const counts = tileCounts(tiles);
+        const key = counts.join('') + '|' + openMelds;
+        if (__shantenMemoV24.has(key)) return __shantenMemoV24.get(key);
+        let best = 8 - openMelds * 2;
+        const c = counts.slice();
+        function dfs(idx, m, t, pair) {
+            while(idx<34 && c[idx]===0) idx++;
+            if(idx>=34){
+                const mm=Math.min(4,m+openMelds), tt=Math.min(t,4-mm);
+                best=Math.min(best,8-mm*2-tt-pair);
+                return;
+            }
+            // Skip tile.
+            const saved=c[idx]; c[idx]=0; dfs(idx+1,m,t,pair); c[idx]=saved;
+            if(c[idx]>=3){c[idx]-=3;dfs(idx,m+1,t,pair);c[idx]+=3;}
+            if(pair===0 && c[idx]>=2){c[idx]-=2;dfs(idx,m,t,1);c[idx]+=2;}
+            if(c[idx]>=2){c[idx]-=2;dfs(idx,m,t+1,pair);c[idx]+=2;}
+            if(idx<27 && idx%9<=6 && c[idx+1]>0 && c[idx+2]>0){c[idx]--;c[idx+1]--;c[idx+2]--;dfs(idx,m+1,t,pair);c[idx]++;c[idx+1]++;c[idx+2]++;}
+            if(idx<27 && idx%9<=7 && c[idx+1]>0){c[idx]--;c[idx+1]--;dfs(idx,m,t+1,pair);c[idx]++;c[idx+1]++;}
+            if(idx<27 && idx%9<=6 && c[idx+2]>0){c[idx]--;c[idx+2]--;dfs(idx,m,t+1,pair);c[idx]++;c[idx+2]++;}
+        }
+        dfs(0,0,0,0);
+        return __shantenMemoV24.set(key,best).get(key);
+    }
+    function calculateShantenV24(tiles, openMelds=0){
+        const counts=tileCounts(tiles);
+        const standard=calculateStandardShantenV24(tiles,openMelds);
+        if(openMelds===0){
+            const distinct=counts.filter(c=>c>0).length;
+            const pairs=counts.filter(c=>c>=2).length;
+            const chiitoi=6-pairs+Math.max(0,7-distinct);
+            const terminals=[0,8,9,17,18,26,27,28,29,30,31,32,33];
+            const unique=terminals.filter(id=>counts[id]>0).length;
+            const hasPair=terminals.some(id=>counts[id]>=2);
+            const kokushi=13-unique-(hasPair?1:0);
+            return Math.min(standard,chiitoi,kokushi);
+        }
+        return standard;
+    }
+    function getAvailableTileCountV24(id){
+        return (fullDeck||[]).reduce((n,t)=>n+(t.id===id?1:0),0);
+    }
+    function getUkeireForDiscardV24(hand13, openMelds, baseShanten){
+        let total=0;
+        for(const t of TILE_TYPES){
+            const c=tileCounts(hand13); if(c[t.id]>=4) continue;
+            const next=calculateShantenV24([...hand13,t],openMelds);
+            if(next<baseShanten) total+=getAvailableTileCountV24(t.id);
+        }
+        return total;
+    }
+    function isSafeAgainstRiichiV24(tileId, selfIdx){
+        for(let p=0;p<4;p++) if(p!==selfIdx && (aiRiichi[p]|| (p===0&&isRiichi))) {
+            if((playerRivers[p]||[]).some(t=>t.id===tileId)) return true;
+        }
+        return false;
+    }
+    function chooseAIDiscardIndexV24(pIdx){
+        const hand=playerHands[pIdx]||[]; if(hand.length<=1)return 0;
+        if(aiRiichi[pIdx]){
+            const d=hand.indexOf(drawnTile); return d>=0?d:hand.length-1;
+        }
+        let best=null;
+        for(let i=0;i<hand.length;i++){
+            const h13=hand.filter((_,j)=>j!==i);
+            const sh=calculateShantenV24(h13,playerMelds[pIdx].length);
+            const uke=getUkeireForDiscardV24(h13,playerMelds[pIdx].length,sh);
+            const t=hand[i];
+            const isolated=(t.type==='honor'||t.num===1||t.num===9)?1:0;
+            const safe=isSafeAgainstRiichiV24(t.id,pIdx)?1:0;
+            const key=[-sh, uke, safe, isolated, -(t.type==='honor'?0:1)];
+            if(!best || key.some((v,k)=>v>(best.key[k]||-Infinity) && key.slice(0,k).every((x,j)=>x===best.key[j]))) best={i,key,sh,uke};
+        }
+        return best?.i ?? 0;
     }
 
     function discardTile(index) {
@@ -2993,10 +3247,8 @@
                 if (isWin) {
                     let evalScore = evaluateYakuAndScore(p, tile, false);
                     if (!evalScore.valid) continue;
-                    playerScores[p] += evalScore.points;
-                    playerScores[pIdx] -= evalScore.points;
                     let pNames = ["You", "Player 1 (East)", "Player 2 (North)", "Player 3 (West)"];
-                    endRound(`RON by ${pNames[p]}!`, `${evalScore.yakuStr} (+${evalScore.points} Pts paid by ${pNames[pIdx]})`);
+                    applyWinSettlement(p, pIdx, evalScore, 'ron', `RON by ${pNames[p]}!`);
                     return;
                 }
             }
@@ -3081,13 +3333,9 @@
             pendingPlayerActions = [];
             riichiDiscardIndices = [];
             canRevealUraDora = isRiichi;
-            let evalScore = evaluateYakuAndScore(0, act === 'Ron' ? lastDiscardedTile : null, act === 'Tsumo');
-            if (!evalScore.valid || evalScore.points <= 0) return;
-            playerScores[0] += evalScore.points;
-            if (act === 'Ron' && lastDiscarderIdx !== -1) {
-                playerScores[lastDiscarderIdx] -= evalScore.points;
-            }
-            endRound(`${act.toUpperCase()} WIN!`, `${evalScore.yakuStr} (+${evalScore.points} Poin)\n${evalScore.detail}`);
+            const evalScore = evaluateYakuAndScore(0, act === 'Ron' ? lastDiscardedTile : null, act === 'Tsumo');
+            if (!evalScore.valid) return;
+            applyWinSettlement(0, act === 'Ron' ? lastDiscarderIdx : null, evalScore, act === 'Tsumo' ? 'tsumo' : 'ron', `${act.toUpperCase()} WIN!`);
             return;
         }
         
@@ -3128,6 +3376,7 @@
     }
 
     function executePon(playerIdx) {
+        cancelIppatsuForAll();
         let count = 0, indicesToRemove = [];
         for (let i = playerHands[playerIdx].length - 1; i >= 0; i--) {
             if (playerHands[playerIdx][i].id === lastDiscardedTile.id && count < 2) {
@@ -3193,6 +3442,7 @@
     }
 
     function executeKan(playerIdx) {
+        cancelIppatsuForAll();
         if (!lastDiscardedTile || kanCount >= 4) return false;
         const a = takeTilesById(playerHands[playerIdx], lastDiscardedTile.id, 3);
         if (a.length !== 3) return false;
@@ -3201,6 +3451,7 @@
     }
 
     function executeAnkan(playerIdx, tileId) {
+        cancelIppatsuForAll();
         if (!roundActive || roundEnding || kanCount >= 4) return false;
         const a = takeTilesById(playerHands[playerIdx], tileId, 4);
         if (a.length !== 4) {
@@ -3221,10 +3472,30 @@
         return continueAfterKanDraw(playerIdx);
     }
 
+    function tryChankanV24(playerIdx, tile) {
+        if (!tile || !roundActive || roundEnding) return false;
+        for (let p=0;p<4;p++) {
+            if (p===playerIdx) continue;
+            const isHuman = p===0 || roomCanAct?.(p);
+            const canRon = checkWinningHand([...(playerHands[p]||[]), tile], (playerMelds[p]||[]).length);
+            if (!canRon) continue;
+            lastWinMethod='chankan';
+            const ev=evaluateYakuAndScore(p,tile,false);
+            if (!ev.valid) { lastWinMethod=null; continue; }
+            if (p===0 && checkFuriten(tile.id)) { lastWinMethod=null; continue; }
+            applyWinSettlement(p,playerIdx,ev,'ron',`CHANKAN by ${p===0?'You':`Player ${p+1}`}!`,'Kan dibatalkan karena tile Kan menjadi winning tile.');
+            return true;
+        }
+        return false;
+    }
+
     function executeShouminkan(playerIdx, meldIndex) {
+        cancelIppatsuForAll();
         if (!roundActive || roundEnding || kanCount >= 4) return false;
         const g = playerMelds[playerIdx][meldIndex];
         if (!g || g.length !== 3 || !g.every(t => t.id === g[0].id)) return false;
+        const candidate = playerHands[playerIdx].find(t => t.id === g[0].id);
+        if (candidate && tryChankanV24(playerIdx, candidate)) return true;
         const i = playerHands[playerIdx].findIndex(t => t.id === g[0].id);
         if (i < 0) return false;
         g.push(playerHands[playerIdx].splice(i, 1)[0]);
@@ -3249,6 +3520,7 @@
     }
 
     function executeChi(playerIdx) {
+        cancelIppatsuForAll();
         const combos = getChiCombinations(playerHands[playerIdx], lastDiscardedTile);
         const chosenCombo = combos[0];
         if (!chosenCombo || !lastDiscardedTile) return;
@@ -3292,33 +3564,23 @@
 
     function settleExhaustiveDraw() {
         if (!roundActive || roundEnding) return;
-
-        const tenpai = [0, 1, 2, 3].map(getPlayerTenpaiStatus);
-        const readyPlayers = tenpai.map((v, i) => v ? i : -1).filter(i => i !== -1);
-        const notenPlayers = tenpai.map((v, i) => !v ? i : -1).filter(i => i !== -1);
-
-        let description = '';
-
-        if (readyPlayers.length > 0 && readyPlayers.length < 4) {
-            const gain = 3000 / readyPlayers.length;
-            const loss = 3000 / notenPlayers.length;
-            readyPlayers.forEach(p => { playerScores[p] += gain; });
-            notenPlayers.forEach(p => { playerScores[p] -= loss; });
-
+        const tenpai = [0,1,2,3].map(getPlayerTenpaiStatus);
+        const readyPlayers = tenpai.map((v,i)=>v?i:-1).filter(i=>i!==-1);
+        const notenPlayers = tenpai.map((v,i)=>!v?i:-1).filter(i=>i!==-1);
+        const deltas=[0,0,0,0];
+        let description='';
+        if (readyPlayers.length>0 && readyPlayers.length<4) {
+            const gain=3000/readyPlayers.length, loss=3000/notenPlayers.length;
+            readyPlayers.forEach(p=>{playerScores[p]+=gain;deltas[p]+=gain;});
+            notenPlayers.forEach(p=>{playerScores[p]-=loss;deltas[p]-=loss;});
             updateScoresUI();
-
-            const names = ['You (South)', 'Player 1 (East)', 'Player 2 (North)', 'Player 3 (West)'];
-            const readyNames = readyPlayers.map(p => names[p]).join(', ');
-            description = `Tenpai: ${readyNames}. Masing-masing +${gain.toLocaleString('id-ID')} poin; Noten membayar total 3000 poin.`;
-        } else if (readyPlayers.length === 4) {
-            description = 'Semua pemain Tenpai. Tidak ada pembayaran Tenpai/Noten.';
-        } else {
-            description = 'Tidak ada pemain Tenpai. Tidak ada pembayaran Tenpai/Noten.';
-        }
-
-        const readyCount = readyPlayers.length;
-        const title = readyCount > 0 ? `RYUUKYOKU • ${readyCount} TENPAI` : 'RYUUKYOKU • SEMUA NOTEN';
-        endRound(title, description);
+            description=`Tenpai: ${readyPlayers.map(p=>['You','Player 1','Player 2','Player 3'][p]).join(', ')}. +${gain.toLocaleString('id-ID')} per Tenpai; -${loss.toLocaleString('id-ID')} per Noten.`;
+        } else if(readyPlayers.length===4) description='Semua pemain Tenpai. Tidak ada pembayaran Tenpai/Noten.';
+        else description='Tidak ada pemain Tenpai. Tidak ada pembayaran Tenpai/Noten.';
+        const dealerTenpai=tenpai[currentDealerIdx]===true;
+        roundOutcome={kind:'draw',winner:null,loser:null,method:'draw',dealerWon:false,dealerTenpai,honbaUsed:honbaCount,kyotakuClaimed:0,deltas,beforeScores:[...roundStartScores]};
+        const readyCount=readyPlayers.length;
+        endRound(readyCount>0?`RYUUKYOKU • ${readyCount} TENPAI`:'RYUUKYOKU • SEMUA NOTEN',`${description}\nDealer: ${dealerTenpai?'TENPAI → RENCHAN':'NOTEN → dealer berpindah'}.`);
     }
 
     // ROUND END & EXTENSION MECHANICS
@@ -3417,6 +3679,7 @@
         const scoreBox = byId('res-scores');
         if (scoreBox) scoreBox.innerHTML = scoreHtml;
         setDisplay('modal-result', 'flex');
+        if (!roundOutcome) roundOutcome = {kind: isDraw ? 'draw' : 'win', dealerWon:false, dealerTenpai:false};
     }
 
     function nextRoundOrFinish() {
@@ -3424,16 +3687,28 @@
         setDisplay('modal-result', 'none');
         document.getElementById('hand-status')?.classList.remove('action-open');
         pendingPlayerActions = [];
+        const outcome = roundOutcome || {};
+        const maxScore = Math.max(...playerScores);
+
+        // Every hand advances East 1 → East 2 → ...; dealer may renchan without changing seat.
         currentRoundIndex++;
-        
-        // Standard match flow: East 1-4, with East 5 extra only when the configured extension condition is met.
-        let maxScore = Math.max(...playerScores);
-        if (currentRoundIndex < 4 || (currentRoundIndex === 4 && maxScore < 30000)) {
-            nav('screen-game');
+        if (outcome.kind === 'win') {
+            if (outcome.dealerWon) honbaCount += 1;
+            else { honbaCount = 0; currentDealerIdx = SEAT_ORDER_V24[(SEAT_ORDER_V24.indexOf(currentDealerIdx)+1)%4]; }
+        } else if (outcome.kind === 'draw') {
+            honbaCount += 1;
+            if (!outcome.dealerTenpai) currentDealerIdx = SEAT_ORDER_V24[(SEAT_ORDER_V24.indexOf(currentDealerIdx)+1)%4];
+        }
+
+        // East 1-4, plus one extension hand when no player has reached 30k yet.
+        const shouldContinue = currentRoundIndex < 4 || (currentRoundIndex === 4 && maxScore < 30000);
+        if (shouldContinue) {
             nav('screen-game');
             setupRound();
         } else {
-            alert("Permainan Selesai!\nSkor Akhir Anda: " + playerScores[0]);
+            matchFinished = true;
+            const finalPlace = [...playerScores].sort((a,b)=>b-a).indexOf(playerScores[0])+1;
+            alert(`Permainan Selesai!\nPeringkat Anda: #${finalPlace}\nSkor Akhir: ${Math.round(playerScores[0]).toLocaleString('id-ID')}`);
             nav('screen-main');
         }
     }
@@ -3460,9 +3735,10 @@
         playerRivers[pIdx].push(tile);lastDiscardedTile=tile;lastDiscarderIdx=pIdx;
         const riverIds=['river-bottom','river-right','river-top','river-left'],riverEl=byId(riverIds[pIdx]);
         const d=document.createElement('div');d.className=`discard-tile tile-${tile.type}`;d.dataset.tileId=String(tile.id);d.innerHTML=tileMarkup(tile);if(riverEl)riverEl.appendChild(d);
-        if(pIdx===0&&pendingRiichi){isRiichi=true;pendingRiichi=false;riichiDiscardIndices=[];playerScores[0]-=1000;riichiSticks++;d.classList.add('riichi-tile');setDisplay('riichi-effect','block'); byId('game-board')?.classList.add('riichi-active');}
+        if(pIdx===0&&pendingRiichi){isRiichi=true;pendingRiichi=false;riichiDiscardIndices=[];playerScores[0]-=1000;riichiSticks++;markRiichiDeclared(0, playerRivers[0].length===1);d.classList.add('riichi-tile');setDisplay('riichi-effect','block'); byId('game-board')?.classList.add('riichi-active');}
         if(pIdx!==0&&aiRiichi[pIdx]&&playerRivers[pIdx].length===1)d.classList.add('riichi-tile');
         if(temporaryFuriten[pIdx])temporaryFuriten[pIdx]=false;
+        if(ippatsuEligible[pIdx] && (isRiichi || aiRiichi[pIdx]) && playerRivers[pIdx].length>1) ippatsuEligible[pIdx]=false;
         const human=mpRoomHumanSeats().filter(x=>x!==pIdx);
         const ron=human.filter(x=>checkWinningHand([...playerHands[x],tile],playerMelds[x].length)&&evaluateYakuAndScore(x,tile,false).valid&&!checkSeatFuriten(x,tile.id));
         if(ron.length){mpPendingCallQueue=ron.map(x=>({seat:x}));mpPromptNextNetworkCall();mpBroadcastState();return;}
