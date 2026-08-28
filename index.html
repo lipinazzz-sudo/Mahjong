@@ -1949,6 +1949,200 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
 }
 </style>
 
+<style id="mahjong-final-layout-override">
+
+/* ===== MAHYONG DJ v24.5 — FINAL SEAT / RIVER GEOMETRY =====
+   One clean final override placed after the legacy responsive layers.
+   It keeps the square center table, separates avatars from rivers, and
+   makes side rivers mirror each other around the center line. */
+#game-board{
+  --safe-left:env(safe-area-inset-left,0px);
+  --safe-right:env(safe-area-inset-right,0px);
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  overflow:hidden !important;
+}
+
+/* Compact square center. */
+#game-board .center-board{
+  left:50% !important;
+  top:50% !important;
+  width:clamp(104px,18vmin,148px) !important;
+  height:clamp(104px,18vmin,148px) !important;
+  aspect-ratio:1/1 !important;
+  border-radius:22px !important;
+  transform:translate(-50%,-50%) !important;
+}
+
+/* Compact scores around the square. */
+#game-board .score-tag{
+  min-width:48px !important;
+  padding:3px 5px !important;
+  font-size:8px !important;
+  line-height:1.02 !important;
+  border-radius:999px !important;
+}
+#game-board .score-tag::before{font-size:6px !important;margin-bottom:1px !important;}
+#game-board .score-south{left:50% !important;right:auto !important;bottom:-31px !important;transform:translateX(-50%) !important;}
+#game-board .score-north{left:50% !important;right:auto !important;top:-31px !important;transform:translateX(-50%) !important;}
+#game-board .score-west{left:-58px !important;right:auto !important;top:50% !important;transform:translateY(-50%) !important;}
+#game-board .score-east{right:-58px !important;left:auto !important;top:50% !important;transform:translateY(-50%) !important;}
+
+/* Top player: avatar is centered ABOVE the opponent hand, never on top of it. */
+#game-board .player-seat.pos-top{
+  left:50% !important;
+  right:auto !important;
+  top:max(4px,var(--safe-top)) !important;
+  transform:translateX(-50%) !important;
+  z-index:31 !important;
+}
+#game-board .pos-top .avatar-img{width:38px;height:38px;}
+#game-board .pos-top .avatar-name{margin-top:2px;font-size:7px;}
+#game-board .enemy-hand-top{
+  left:50% !important;
+  transform:translateX(-50%) !important;
+  top:clamp(58px,9vh,86px) !important;
+  z-index:18 !important;
+}
+
+/* Bottom player: avatar sits on the same horizontal row as the hand,
+   slightly to the LEFT of the hand center, rather than far out at the edge. */
+#game-board .player-seat.pos-bottom{
+  left:calc(50% - clamp(170px,27vw,285px)) !important;
+  right:auto !important;
+  bottom:max(4px,var(--safe-bottom)) !important;
+  transform:none !important;
+  z-index:31 !important;
+  align-items:center !important;
+}
+#game-board .pos-bottom .avatar-img{width:40px;height:40px;}
+#game-board .pos-bottom .avatar-name{font-size:7px;white-space:nowrap;}
+#game-board .pos-bottom .time-bank-tag{font-size:7px;}
+
+/* Side players: keep them between the edge and the side river, vertically centered. */
+#game-board .player-seat.pos-left{
+  left:max(8px,var(--safe-left)) !important;
+  right:auto !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+  z-index:31 !important;
+}
+#game-board .player-seat.pos-right{
+  right:max(8px,var(--safe-right)) !important;
+  left:auto !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+  z-index:31 !important;
+}
+#game-board .pos-left .avatar-img,
+#game-board .pos-right .avatar-img{width:38px;height:38px;}
+#game-board .pos-left .avatar-name,
+#game-board .pos-right .avatar-name{font-size:7px;white-space:nowrap;}
+
+/* Side rivers: exact mirror around the center, fixed 6x3 grid. */
+#game-board .river-container{
+  display:grid !important;
+  grid-template-columns:repeat(6,var(--discard-w)) !important;
+  grid-template-rows:repeat(3,var(--discard-h)) !important;
+  grid-auto-flow:row !important;
+  gap:3px !important;
+  width:calc(var(--discard-w) * 6 + 15px) !important;
+  height:calc(var(--discard-h) * 3 + 6px) !important;
+  align-content:start !important;
+  justify-content:start !important;
+  transform-origin:center center !important;
+  z-index:14 !important;
+}
+#game-board .river-left{
+  left:calc(50% - clamp(150px,22vw,235px)) !important;
+  right:auto !important;
+  top:50% !important;
+  transform:translate(-50%,-50%) rotate(90deg) !important;
+}
+#game-board .river-right{
+  right:calc(50% - clamp(150px,22vw,235px)) !important;
+  left:auto !important;
+  top:50% !important;
+  transform:translate(50%,-50%) rotate(-90deg) !important;
+}
+#game-board .river-top{
+  left:50% !important;
+  right:auto !important;
+  top:clamp(108px,15vh,150px) !important;
+  transform:translateX(-50%) rotate(180deg) !important;
+}
+#game-board .river-bottom{
+  left:50% !important;
+  right:auto !important;
+  bottom:calc(var(--tile-h) + max(42px,var(--safe-bottom) + 30px)) !important;
+  transform:translateX(-50%) !important;
+}
+
+/* Keep discard art upright inside each rotated river's own tile footprint. */
+#game-board .discard-tile{position:relative !important;flex:0 0 auto !important;}
+
+/* Keep the side avatar outside the side river by using the river's outer edge as a visual boundary. */
+@media (max-width:900px){
+  #game-board .river-left{left:calc(50% - clamp(118px,27vw,180px)) !important;}
+  #game-board .river-right{right:calc(50% - clamp(118px,27vw,180px)) !important;}
+  #game-board .score-west{left:-55px !important}.score-east{right:-55px !important}
+}
+
+@media (orientation:landscape) and (max-height:560px){
+  #game-board .center-board{width:clamp(96px,20vh,122px) !important;height:clamp(96px,20vh,122px) !important;}
+  #game-board .score-tag{min-width:44px !important;font-size:7px !important;padding:3px 4px !important;}
+  #game-board .score-tag::before{font-size:5px !important;}
+  #game-board .score-south{bottom:-27px !important}.score-north{top:-27px !important}
+  #game-board .score-west{left:-49px !important}.score-east{right:-49px !important}
+  #game-board .pos-top .avatar-img{width:34px;height:34px;}
+  #game-board .pos-top .avatar-name{font-size:6px;}
+  #game-board .enemy-hand-top{top:clamp(44px,10vh,58px) !important;}
+  #game-board .pos-bottom{left:calc(50% - clamp(145px,25vw,235px)) !important;bottom:max(2px,var(--safe-bottom)) !important;}
+  #game-board .pos-bottom .avatar-img{width:34px;height:34px;}
+  #game-board .pos-left,#game-board .pos-right{top:50% !important;}
+  #game-board .pos-left .avatar-img,#game-board .pos-right .avatar-img{width:34px;height:34px;}
+  #game-board .river-top{top:clamp(74px,16vh,92px) !important;}
+  #game-board .river-bottom{bottom:calc(var(--tile-h) + max(30px,var(--safe-bottom) + 22px)) !important;}
+}
+
+@media (orientation:portrait) and (max-width:600px){
+  #game-board .center-board{width:clamp(104px,27vmin,132px) !important;height:clamp(104px,27vmin,132px) !important;}
+  #game-board .river-left{left:calc(50% - clamp(110px,30vw,155px)) !important;}
+  #game-board .river-right{right:calc(50% - clamp(110px,30vw,155px)) !important;}
+  #game-board .pos-bottom{left:calc(50% - clamp(145px,33vw,195px)) !important;bottom:max(4px,var(--safe-bottom)) !important;}
+  #game-board .pos-bottom .avatar-img{width:36px;height:36px;}
+  #game-board .river-top{top:clamp(94px,13vh,118px) !important;}
+}
+
+@media (max-width:380px) and (orientation:portrait){
+  #game-board .pos-left{left:max(5px,var(--safe-left)) !important;}
+  #game-board .pos-right{right:max(5px,var(--safe-right)) !important;}
+  #game-board .pos-bottom{left:calc(50% - 142px) !important;}
+  #game-board .center-board{width:104px !important;height:104px !important;}
+}
+
+/* RIICHI CLEAN: no screen darkening, no red vignette, no atmosphere. */
+#game-board.riichi-active,
+#game-board.riichi-active::after,
+#game-board.riichi-active::before{
+  filter:none !important;
+  animation:none !important;
+  background:none !important;
+  box-shadow:none !important;
+}
+#game-board.riichi-active .center-board{border-color:inherit !important;box-shadow:inherit !important;}
+#game-board.riichi-active .turn-timer{color:inherit !important;text-shadow:none !important;}
+#game-board.riichi-active .riichi-overlay{display:none !important;}
+
+/* Slightly larger red corner indicators for readability. */
+#game-board .tile-helper{font-size:clamp(9px,1.55vw,13px) !important;font-weight:1000 !important;top:3px !important;right:4px !important;}
+#game-board .discard-tile .tile-helper{font-size:clamp(6px,1.05vw,10px) !important;}
+
+/* Never let the browser zoom or scroll the game board. */
+#game-board, #game-board *{touch-action:none;overscroll-behavior:none;}
+#game-board .tile{touch-action:manipulation;}
+
+</style>
 </head>
 <body>
 
@@ -2244,7 +2438,12 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
     function tileMarkup(t){
         if(!t) return '';
         const src=tileAssetPath(t);
-        return `<img class="tile-svg-img" src="${src}" alt="${escSvg(t.val||'tile')}" draggable="false" decoding="async" loading="eager">`;
+        const helper = t.type==='honor' ? t.helper : (t.helper || '');
+        const fallback = escSvg(t.val || 'tile');
+        return `<img class="tile-svg-img" src="${src}" alt="${fallback}" draggable="false" decoding="async" loading="eager"
+                    onerror="this.dataset.failed='1'; this.style.display='none'; this.nextElementSibling.hidden=false;">
+                <span class="tile-fallback" hidden>${fallback}</span>
+                <span class="tile-corner-label" aria-hidden="true">${escSvg(helper)}</span>`;
     }
 
 
