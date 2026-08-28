@@ -229,7 +229,8 @@
         .discard-tile .tile-helper { font-size:clamp(5px,1vw,7px); }
 
         .tile { width:var(--tile-w); height:var(--tile-h); flex:0 0 auto; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; cursor:pointer; color:#101214; border-radius:6px; background:linear-gradient(180deg,#fffefb 0%,#ede8dd 100%); border:1px solid rgba(72,72,62,.18); border-bottom:3px solid #3d563d; box-shadow:0 4px 8px rgba(0,0,0,.28); font-weight:900; transition:transform .12s ease, box-shadow .12s ease; }
-        .tile:hover { transform:translateY(-4px); box-shadow:0 8px 14px rgba(0,0,0,.34); }
+        .tile { touch-action:pan-y; -webkit-tap-highlight-color:transparent; }
+        .tile:hover { transform:none; box-shadow:0 2px 4px rgba(0,0,0,.28); }
         .tile-helper { position:absolute; top:2px; right:3px; color:#d52f33; font-size:var(--tile-helper-font); font-weight:900; line-height:1; }
         .tile-char { font-size:var(--tile-font); line-height:1; }
         .tile-back { background:linear-gradient(145deg,#d97528,#a73b0e); border:1px solid #784124; border-bottom:2px solid #522818; box-shadow:0 2px 4px rgba(0,0,0,.25); border-radius:4px; }
@@ -259,10 +260,10 @@
         #action-overlay { position:absolute; left:50%; bottom:calc(var(--tile-h) + 50px); transform:translateX(-50%); display:none; flex-wrap:wrap; justify-content:center; gap:7px; max-width:min(94vw,520px); padding:8px 10px; background:rgba(4,10,16,.94); border:1px solid rgba(244,177,58,.62); border-radius:15px; box-shadow:0 14px 35px rgba(0,0,0,.36); z-index:40; }
         .act-btn { min-width:58px; min-height:36px; border:0; border-radius:10px; padding:6px 11px; color:#fff; font-size:12px; font-weight:900; cursor:pointer; }
         .btn-ron { background:#c63c46; } .btn-tsumo { background:#c97a24; } .btn-riichi { background:#7a48b3; } .btn-kan { background:#168b82; } .btn-pon { background:#2d7fc3; } .btn-chi { background:#219b68; } .btn-skip { background:#5a6670; }
-        .tile.hovered-tile { transform:translateY(-7px); box-shadow:0 0 0 2px rgba(255,85,85,.78),0 10px 20px rgba(0,0,0,.38); z-index:25; }
-        .tile.hovered-tile::after { content:""; position:absolute; inset:0; border:2px solid rgba(255,75,75,.88); border-radius:6px; pointer-events:none; }
+        .tile.selected-tile { transform:translateY(-7px); box-shadow:0 0 0 2px rgba(255,85,85,.88),0 10px 20px rgba(0,0,0,.38); z-index:25; }
+        .tile.selected-tile::after { content:""; position:absolute; inset:0; border:2px solid rgba(255,75,75,.95); border-radius:6px; pointer-events:none; }
         .machi-bubble { position:absolute; left:50%; bottom:calc(100% + 8px); transform:translateX(-50%) translateY(4px); min-width:112px; padding:6px 8px; border-radius:9px; background:rgba(7,13,20,.97); border:1px solid rgba(244,177,58,.72); box-shadow:0 10px 24px rgba(0,0,0,.35); color:#fff; font-size:10px; line-height:1.25; text-align:center; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .12s ease,transform .12s ease; z-index:50; }
-        .tile.hovered-tile .machi-bubble,.tile:focus-visible .machi-bubble { opacity:1; transform:translateX(-50%) translateY(0); }
+        .tile.selected-tile .machi-bubble,.tile:focus-visible .machi-bubble { opacity:1; transform:translateX(-50%) translateY(0); }
         .machi-bubble strong { color:var(--gold-strong); display:block; margin-bottom:2px; }
         .machi-bubble.no-yaku strong { color:var(--red); }
         .discard-tile.discard-highlight { outline:2px solid rgba(255,78,78,.95); box-shadow:0 0 0 3px rgba(255,78,78,.18),0 0 12px rgba(255,78,78,.38); transform:translateY(-2px); z-index:15; }
@@ -532,6 +533,20 @@
     let currentTurn = 0, drawnTile = null, isDiscardable = false, aiDifficulty = 'Medium';
     let timerInterval = null, baseTime = 10, extraTimeBank = 20, isActionPhase = false;
 
+
+    // Safe DOM helpers: UI failures must never stop the Mahjong engine.
+    function byId(id) { return document.getElementById(id); }
+    function setText(id, value) {
+        const el = byId(id);
+        if (el) el.textContent = value == null ? '' : String(value);
+        return el;
+    }
+    function setDisplay(id, value) {
+        const el = byId(id);
+        if (el) el.style.display = value;
+        return el;
+    }
+
     // NAVIGATION SYSTEM
     function nav(id) {
         previousScreenId = activeScreenId;
@@ -556,15 +571,18 @@
     }
 
     function forcePlayMusic() {
-        const bgMusic = document.getElementById('bg-music');
-        bgMusic.volume = document.getElementById('vol-slider').value;
-        bgMusic.play().catch(e => console.log("Audio waiting for user click..."));
+        const bgMusic = byId('bg-music');
+        const slider = byId('vol-slider');
+        if (!bgMusic) return;
+        if (slider) bgMusic.volume = Number(slider.value);
+        bgMusic.play().catch(e => console.log('Audio waiting for user click...'));
     }
     function toggleAudio() {
-        const bgMusic = document.getElementById('bg-music');
-        if (bgMusic.paused) bgMusic.play(); else bgMusic.pause();
+        const bgMusic = byId('bg-music');
+        if (!bgMusic) return;
+        if (bgMusic.paused) bgMusic.play().catch(()=>{}); else bgMusic.pause();
     }
-    function updateVolume(val) { document.getElementById('bg-music').volume = val; }
+    function updateVolume(val) { const audio = byId('bg-music'); if (audio) audio.volume = Number(val); }
 
     // MULTIPLAYER LOBBY SIMULATION
     let lobbyReadyTimer = null;
@@ -1315,15 +1333,87 @@
         renderPlayerHand();
     }
 
+    let selectedTileIndex = -1;
+    let selectedTileId = null;
+    let tapState = { index:-1, time:0 };
+
+    function clearSelectedTile(){
+        selectedTileIndex = -1;
+        selectedTileId = null;
+        tapState = { index:-1, time:0 };
+        document.querySelectorAll('#player-hand-tiles .tile.selected-tile').forEach(el=>el.classList.remove('selected-tile'));
+        clearDiscardHighlights();
+    }
+
+    function selectHandTile(index, el){
+        const tile = playerHands[0]?.[index];
+        if(!tile) return;
+        document.querySelectorAll('#player-hand-tiles .tile.selected-tile').forEach(node=>node.classList.remove('selected-tile'));
+        selectedTileIndex = index;
+        selectedTileId = tile.id;
+        el.classList.add('selected-tile');
+        highlightMatchingDiscards(tile.id);
+    }
+
+    function discardSelectedTile(index){
+        if(!isDiscardable) return false;
+        if(pendingRiichi && !riichiDiscardIndices.includes(index)) return false;
+        clearSelectedTile();
+        discardTile(index);
+        return true;
+    }
+
+    function handleTileTap(index, el){
+        if(!isDiscardable) { selectHandTile(index, el); return; }
+        const now=performance.now();
+        if(selectedTileIndex===index && now-tapState.time <= 480){
+            discardSelectedTile(index);
+            return;
+        }
+        if(selectedTileIndex!==index) selectHandTile(index, el);
+        else selectHandTile(index, el);
+        tapState={index,time:now};
+    }
+
+    function handleTilePointerDown(ev, index, el){
+        if(ev.pointerType==='mouse' && ev.button!==0) return;
+        el._pointerStartX=ev.clientX;
+        el._pointerStartY=ev.clientY;
+        el._pointerStartTime=performance.now();
+        if(el.setPointerCapture) { try{el.setPointerCapture(ev.pointerId)}catch(e){} }
+    }
+
+    function handleTilePointerUp(ev, index, el){
+        if(ev.pointerType==='mouse' && ev.button!==0) return;
+        const dx=ev.clientX-(el._pointerStartX||ev.clientX);
+        const dy=ev.clientY-(el._pointerStartY||ev.clientY);
+        const dt=performance.now()-(el._pointerStartTime||performance.now());
+        const swipeUp = dy < -55 && Math.abs(dy) > Math.abs(dx)*1.15 && dt < 700;
+        if(swipeUp){
+            if(selectedTileIndex!==index) selectHandTile(index, el);
+            discardSelectedTile(index);
+            return;
+        }
+        if(Math.abs(dx)>12 || Math.abs(dy)>12) return;
+        handleTileTap(index, el);
+    }
+
     function renderPlayerHand(){
         const c=byId('player-hand-tiles'); if(!c) return; c.innerHTML=''; const waitsByDiscard={};
         if(playerHands[0].length===14&&!isRiichi) playerHands[0].forEach((_,i)=>waitsByDiscard[i]=getWaitIds(playerHands[0].filter((__,j)=>j!==i),playerMelds[0].length));
+        if(selectedTileIndex>=playerHands[0].length) clearSelectedTile();
         playerHands[0].forEach((t,i)=>{
-            const el=document.createElement('div'); el.className='tile'+(t===drawnTile?' drawn-tile-gap':'')+(riichiDiscardIndices.includes(i)?' riichi-legal-discard':''); el.tabIndex=0;
+            const el=document.createElement('div');
+            el.className='tile'+(t===drawnTile?' drawn-tile-gap':'')+(riichiDiscardIndices.includes(i)?' riichi-legal-discard':'')+(i===selectedTileIndex?' selected-tile':'');
+            el.tabIndex=0;
             const waits=waitsByDiscard[i]||[]; const waitText=waits.length?waits.map(id=>TILE_TYPES[id]?.val).filter(Boolean).join(' '):'—'; const yakuText=t.id===2?'No Yaku (simulasi 3-man)':'Terdeteksi';
             el.innerHTML=`<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span><span class="machi-bubble ${t.id===2?'no-yaku':''}"><strong>Machi: ${waitText}</strong><span>Yaku: ${yakuText}</span></span>`;
-            const on=()=>{el.classList.add('hovered-tile');highlightMatchingDiscards(t.id)},off=()=>{el.classList.remove('hovered-tile');clearDiscardHighlights()};
-            el.addEventListener('mouseenter',on); el.addEventListener('focus',on); el.addEventListener('mouseleave',off); el.addEventListener('blur',off); el.onclick=()=>{if(isDiscardable&&(!isRiichi||riichiDiscardIndices.includes(i)))discardTile(i)}; c.appendChild(el);
+            el.addEventListener('pointerdown',ev=>handleTilePointerDown(ev,i,el));
+            el.addEventListener('pointerup',ev=>handleTilePointerUp(ev,i,el));
+            el.addEventListener('focus',()=>{ selectHandTile(i,el); });
+            el.addEventListener('blur',()=>{ if(selectedTileIndex===i) clearSelectedTile(); });
+            el.addEventListener('contextmenu',ev=>ev.preventDefault());
+            c.appendChild(el);
         });
         setText('wall-count', `x ${fullDeck.length}`); updateFuritenStatusUI(); updateHandStatus();
     }
@@ -1502,6 +1592,9 @@
         
         let discarded = playerHands[0].splice(index, 1)[0];
         drawnTile = null;
+        selectedTileIndex = -1;
+        selectedTileId = null;
+        tapState = { index:-1, time:0 };
         renderPlayerHand();
         commitDiscard(0, discarded);
     }
@@ -1858,6 +1951,7 @@
         // Rule: 4 Rounds Standard. Round 5 triggered if Draw or scores equal / top player < 30000.
         let maxScore = Math.max(...playerScores);
         if (currentRoundIndex < 4 || (currentRoundIndex === 4 && maxScore < 30000)) {
+            nav('screen-game');
             nav('screen-game');
             setupRound();
         } else {
