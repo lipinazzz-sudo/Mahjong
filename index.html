@@ -735,117 +735,257 @@
     }
     function updateVolume(val) { const audio = byId('bg-music'); if (audio) audio.volume = Number(val); }
 
-    // REAL MULTIPLAYER (LAN / FRIEND ROOM)
+    // REAL MULTIPLAYER — CLOUDFLARE ROOM SERVER
+    // One transport only: GitHub Pages frontend + Cloudflare Worker/Durable Object room.
     let mp = { ws:null, connected:false, room:null, seat:null, host:false, ready:false, started:false, state:null, playerName:'Player' };
     let mpClientId = null;
     let mpPendingRiichiSeat = -1;
+    let mpReconnectTimer = null;
+    let mpAutoStartTimer = null;
 
-    // Cloudflare Worker URL used for multiplayer room coordination.
-    // Example: https://mahjong-room.your-subdomain.workers.dev
+    // IMPORTANT: this is the deployed Worker URL, NOT the GitHub Pages URL.
     const MP_WORKER_URL = 'https://mahjong-room.mahjongjong.workers.dev';
+    const MP_ROOM_PARAM = 'room';
+    const MP_SESSION_KEY = 'mahjongSoulRoomSessionV14';
 
-    function mpServerUrl(roomCode=''){
-        if (!MP_WORKER_URL || MP_WORKER_URL.includes('YOUR-WORKER')) return null;
-        const base = MP_WORKER_URL.replace(/\/$/, '');
-        return `${base.replace(/^http:/,'ws:').replace(/^https:/,'wss:')}/ws?room=${encodeURIComponent(roomCode)}`;
-    }
+    function escapeHtml(value){return String(value??'').replace(/[&<>'\"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[ch]));}
+
     function mpSetConnection(online){
         setText('mp-connection-badge', online ? 'ONLINE' : 'OFFLINE');
-        const b = byId('mp-connection-badge'); if(b) b.className = `connection-badge ${online?'online':'offline'}`;
+        const b=byId('mp-connection-badge');
+        if(b) b.className=`connection-badge ${online?'online':'offline'}`;
     }
-    function mpConnect(roomCode=''){
-        if(mp.ws && (mp.ws.readyState===WebSocket.OPEN || mp.ws.readyState===WebSocket.CONNECTING)) return;
-        const url = mpServerUrl(roomCode);
-        if(!url){ mpSetConnection(false); return; }
+
+    function mpServerUrl(roomCode=''){
+        const base=String(MP_WORKER_URL||'').replace(/\/$/,'');
+        if(!base || /YOUR[-_]?WORKER/i.test(base)) return null;
+        const wsBase=base.replace(/^https:/,'wss:').replace(/^http:/,'ws:');
+        return `${wsBase}/ws?room=${encodeURIComponent(roomCode)}`;
+    }
+
+    function mpSaveSession(extra={}){
         try{
-            mp.ws=new WebSocket(url);
-            mp.ws.onopen=()=>{mp.connected=true;mpSetConnection(true);};
-            mp.ws.onclose=()=>{mp.connected=false;mpSetConnection(false);};
-            mp.ws.onerror=()=>{mp.connected=false;mpSetConnection(false);};
-            mp.ws.onmessage=e=>mpHandle(JSON.parse(e.data));
-        }catch(e){mp.connected=false;mpSetConnection(false);}
+            localStorage.setItem(MP_SESSION_KEY,JSON.stringify({
+                room:mp.room?.code||'', seat:mp.seat??null, name:mp.playerName||'Player',
+                host:!!mp.host, ready:!!mp.ready, started:!!mp.started, updatedAt:Date.now(), ...extra
+            }));
+        }catch(e){}
     }
-    function mpSend(type,data={}){if(mp.ws&&mp.ws.readyState===WebSocket.OPEN)mp.ws.send(JSON.stringify({type,...data}));}
-    function openPlayerLobby(){isMultiplayerMode=true;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');mpSetConnection(false);}
-    function closeLobby(){mpSend('leave');setDisplay('modal-lobby','none');mp.room=null;mp.seat=null;mp.host=false;mp.ready=false;}
-    function mpCreateRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mpConnect('00000');setTimeout(()=>mpSend('createRoom',{name:mp.playerName}),250);}
-    function mpJoinRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code))return alert('Masukkan kode room 5 digit.');mpConnect(code);setTimeout(()=>mpSend('joinRoom',{code,name:mp.playerName}),250);}
-    function togglePlayerReady(){mp.ready=!mp.ready;mpSend('ready',{ready:mp.ready});}
-    function mpStartGame(){if(!mp.host)return;mpSend('start');}
-    function mpCopyRoomInfo(){const code=mp.room?.code||'';const text=`Mahjong Soul Multiplayer\nBuka alamat yang diberikan host\nKode Room: ${code}`;navigator.clipboard?.writeText(text).catch(()=>{});alert(text);}
+    function mpLoadSession(){try{return JSON.parse(localStorage.getItem(MP_SESSION_KEY)||'null')}catch(e){return null}}
+    function mpClearSession(){try{localStorage.removeItem(MP_SESSION_KEY)}catch(e){}}
+
+    function mpRoomUrl(code){
+        const u=new URL(location.href);
+        u.searchParams.set(MP_ROOM_PARAM,code);
+        u.searchParams.delete('offer');u.searchParams.delete('answer');
+        return u.href;
+    }
+
+    function mpRenderRoomQr(code){
+        const link=mpRoomUrl(code);
+        const canvas=byId('mp-offer-qr');
+        const input=byId('mp-room-link');
+        if(input) input.value=link;
+        setText('mp-host-room-code',code||'-----');
+        if(!canvas) return;
+        canvas.classList.remove('visible');
+        const draw=()=>{
+            try{
+                if(window.QRCode?.toCanvas){
+                    QRCode.toCanvas(canvas,link,{width:230,margin:2,errorCorrectionLevel:'M'},()=>canvas.classList.add('visible'));
+                    return true;
+                }
+            }catch(e){}
+            return false;
+        };
+        if(!draw()){
+            let tries=0;const t=setInterval(()=>{if(draw()||++tries>40)clearInterval(t)},150);
+        }
+    }
+
+    function mpConnect(roomCode='', role=''){
+        const code=String(roomCode||mp.room?.code||getRoomFromUrl()).trim();
+        if(!/^\d{5}$/.test(code)){mpSetConnection(false);return false;}
+        const workerUrl=mpServerUrl(code);
+        if(!workerUrl){mpSetConnection(false);setText('lobby-help','URL Cloudflare Worker belum dikonfigurasi.');return false;}
+        if(mp.ws&&(mp.ws.readyState===WebSocket.OPEN||mp.ws.readyState===WebSocket.CONNECTING))return true;
+        try{
+            const desiredRole=role||(mp.host?'host':'guest');
+            const ws=new WebSocket(`${workerUrl}&name=${encodeURIComponent(mp.playerName||'Player')}&role=${desiredRole}${mp.seat!=null?`&seat=${mp.seat}`:''}`);
+            mp.ws=ws;
+            ws.onopen=()=>{
+                mp.connected=true;mpSetConnection(true);
+                ws.send(JSON.stringify({type:desiredRole==='host'?'createRoom':'joinRoom',code,name:mp.playerName||'Player',seat:mp.seat}));
+            };
+            ws.onmessage=e=>{try{mpHandle(JSON.parse(e.data))}catch(err){console.error('MP message error',err)}};
+            ws.onerror=()=>{mp.connected=false;mpSetConnection(false)};
+            ws.onclose=()=>{
+                mp.connected=false;mpSetConnection(false);
+                clearTimeout(mpReconnectTimer);
+                if(mp.room?.code && !mp.started){
+                    mpReconnectTimer=setTimeout(()=>{if(mp.room?.code && !mp.connected)mpConnect(mp.room.code,mp.host?'host':'guest')},1400);
+                }
+            };
+            return true;
+        }catch(e){mp.connected=false;mpSetConnection(false);console.error(e);return false;}
+    }
+
+    function mpSend(type,data={}){
+        if(mp.ws?.readyState===WebSocket.OPEN) mp.ws.send(JSON.stringify({type,...data}));
+    }
+
+    function openPlayerLobby(){
+        isMultiplayerMode=true;
+        setDisplay('modal-lobby','flex');
+        setDisplay('mp-setup','grid');
+        setDisplay('mp-room-panel','none');
+        setDisplay('mp-host-invite','none');
+        setDisplay('mp-guest-invite','none');
+        mpSetConnection(false);
+        const code=getRoomFromUrl();
+        if(code){
+            setDisplay('mp-setup','none');
+            setDisplay('mp-room-panel','grid');
+            mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';
+            mp.host=false;mp.ready=true;mp.room={code,players:[null,null,null,null],started:false};
+            setText('lobby-help','Menghubungkan ke Room '+code+'…');
+            mpConnect(code,'guest');
+        }
+    }
+
+    function closeLobby(){
+        clearTimeout(mpAutoStartTimer);clearTimeout(mpReconnectTimer);
+        try{mpSend('leave')}catch(e){}
+        try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}
+        mp.ws=null;mp.connected=false;
+        mpClearSession();
+        mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,playerName:mp.playerName||'Player'};
+        isMultiplayerMode=false;
+        setDisplay('modal-lobby','none');mpSetConnection(false);
+    }
+
+    function mpCreateRoom(){
+        mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';
+        const code=String(Math.floor(10000+Math.random()*90000));
+        mp.host=true;mp.seat=0;mp.ready=true;mp.started=false;isMultiplayerMode=true;
+        mp.room={code,players:[null,null,null,null],started:false};
+        setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');
+        setText('mp-room-code-display',code);setText('mp-host-room-code',code);setText('lobby-help','Membuat room di Cloudflare…');
+        mpRenderRoomQr(code);mpSaveSession();mpConnect(code,'host');
+    }
+
+    function mpJoinRoom(){
+        mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';
+        const code=(byId('mp-room-code')?.value||'').trim();
+        if(!/^\d{5}$/.test(code)){alert('Masukkan kode room 5 digit.');return;}
+        mp.host=false;mp.seat=null;mp.ready=true;mp.started=false;mp.room={code,players:[null,null,null,null],started:false};isMultiplayerMode=true;
+        setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');
+        setText('lobby-help','Menghubungkan ke Room '+code+'…');mpSaveSession();mpConnect(code,'guest');
+    }
+
+    function mpShowJoinForm(){setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','block');}
+    function mpCopyRoomLink(){const link=byId('mp-room-link')?.value||mpRoomUrl(mp.room?.code||'');navigator.clipboard?.writeText(link).catch(()=>{});setText('mp-invite-help','Link room sudah disalin.');}
+    function mpCopyRoomInfo(){const code=mp.room?.code||'';const link=mpRoomUrl(code);navigator.clipboard?.writeText(link).catch(()=>{});alert(`Link Room:\n${link}`);}
+
+    function togglePlayerReady(){
+        if(!mp.room)return;
+        mp.ready=!mp.ready;mpSend('ready',{ready:mp.ready});mpSaveSession();
+        if(mp.host&&mp.room.players?.[0])mp.room.players[0].ready=mp.ready;
+        mpRenderLobby(mp.room);
+    }
+    function mpStartGame(){if(mp.host)mpSend('start')}
+
     function mpHandle(msg){
         if(msg.type==='hello'){mpClientId=msg.clientId;return;}
-        if(msg.type==='error'){alert(msg.message||'Multiplayer error');return;}
-        if(msg.type==='joined'){mp.room=msg.room;mp.seat=msg.seat;mp.host=!!msg.host;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('mp-room-code-display',msg.room.code);mpRenderLobby(msg.room);return;}
-        if(msg.type==='lobby'){mp.room=msg.room;mpRenderLobby(msg.room);return;}
-        if(msg.type==='startGame'){mp.started=true;if(mp.host)start4PGame('Hard',true);else nav('screen-game');return;}
+        if(msg.type==='error'){setText('lobby-help',msg.message||'Room error');mpSetConnection(false);console.warn(msg.message);return;}
+        if(msg.type==='joined'){
+            mp.room=msg.room;mp.seat=msg.seat;mp.host=!!msg.host;mp.started=!!msg.room.started;mp.ready=!!(msg.room.players?.[msg.seat]?.ready);
+            setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('mp-room-code-display',msg.room.code);
+            if(mp.host){setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('lobby-help','Bagikan QR ke teman. Saat 4 pemain READY, permainan mulai otomatis.');mpRenderRoomQr(msg.room.code);}
+            else {setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Berhasil masuk room. Kamu otomatis READY.');if(!mp.ready){mp.ready=true;mpSend('ready',{ready:true})}}
+            mpRenderLobby(msg.room);mpSaveSession();return;
+        }
+        if(msg.type==='lobby'){mp.room=msg.room;mp.started=!!msg.room.started;mpRenderLobby(msg.room);mpSaveSession();return;}
+        if(msg.type==='startGame'){
+            mp.started=true;if(mp.room)mp.room.started=true;mpSaveSession({started:true});
+            setDisplay('modal-lobby','none');nav('screen-game');
+            if(mp.host)start4PGame('Hard',true);
+            return;
+        }
         if(msg.type==='state'&&msg.state){mpApplyRemoteState(msg.state);return;}
         if(msg.type==='playerAction'&&mp.host){mpHandlePlayerAction(msg.seat,msg.action||{});return;}
     }
-    function mpRenderLobby(room){const list=byId('mp-player-list');if(!list)return;const winds=['South','East','North','West'];list.innerHTML='';winds.forEach((w,i)=>{const p=room.players[i];const row=document.createElement('div');row.className='ready-item';row.innerHTML=`<span>${p?p.name:'CPU'} <small>• ${w}</small></span><span class="${p&&p.ready?'status-ready':'status-waiting'}">${p?(p.ready?'READY':'WAITING'):'OPEN'}</span>`;list.appendChild(row);});setText('btn-lobby-ready',mp.ready?'BATAL SIAP':'SIAP');const s=byId('btn-lobby-start');if(s)s.hidden=!mp.host||room.started;}
-    function mpRoomHumanSeats(){return(mp.room?.players||[]).reduce((a,p,i)=>(p?a.concat(i):a),[]);}
+
+    function mpRenderLobby(room){
+        const list=byId('mp-player-list');if(!list||!room)return;
+        const winds=['South','East','North','West'];list.innerHTML='';
+        winds.forEach((w,i)=>{
+            const p=room.players?.[i];const row=document.createElement('div');row.className='ready-item';
+            const name=p?escapeHtml(p.name):'Kursi kosong';
+            const state=p?(p.ready?'READY':'WAITING'):'OPEN';
+            const cls=p&&p.ready?'status-ready':'status-waiting';
+            row.innerHTML=`<span>${name} <small>• ${w}</small></span><span class="${cls}">${state}</span>`;list.appendChild(row);
+        });
+        setText('btn-lobby-ready',mp.ready?'BATAL SIAP':'SIAP');
+        const joined=(room.players||[]).filter(Boolean).length;
+        const allReady=joined===4 && room.players.filter(Boolean).every(p=>p.ready);
+        const startBtn=byId('btn-lobby-start');if(startBtn){startBtn.hidden=!mp.host||room.started;startBtn.disabled=!(joined>=2&&room.players.filter(Boolean).every(p=>p.ready));}
+        if(mp.host&&joined===4&&allReady&&!room.started){
+            clearTimeout(mpAutoStartTimer);setText('lobby-help','4 pemain READY. Memulai permainan…');
+            mpAutoStartTimer=setTimeout(()=>{if(mp.host&&mp.room?.code&&!mp.room.started)mpStartGame()},500);
+        }
+    }
+
+    function mpRoomHumanSeats(){return(mp.room?.players||[]).reduce((a,p,i)=>p?a.concat(i):a,[])}
     function mpStateSnapshot(extra={}){return{currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,deadWall,playerHands,playerRivers,playerMelds,playerScores,aiRiichi,lastDiscardedTile,lastDiscarderIdx,isRiichi,pendingRiichi,riichiSticks,drawnTile,baseTime,extraTimeBank,isActionPhase,doraIndicators,uraDoraIndicators,kanCount,temporaryFuriten,riichiFuriten,roundActive,roundEnding,roomPlayers:mp.room?.players||[],roundStartScores,furitenStates:temporaryFuriten.map((v,i)=>v?'Temporary':(riichiFuriten[i]?'Permanent':null)),...extra};}
-    function mpBroadcastState(extra={}){if(isMultiplayerMode&&mp.host)mpSend('state',{state:mpStateSnapshot(extra)});}
+    function mpBroadcastState(extra={}){if(isMultiplayerMode&&mp.host)mpSend('state',{state:mpStateSnapshot(extra)})}
+
     function mpApplyRemoteState(state){
         if(mp.host)return;mp.state=state;isMultiplayerMode=true;nav('screen-game');
-        const s=mp.seat||0,map=[s,(s+1)%4,(s+2)%4,(s+3)%4],hands=state.playerHands||[[],[],[],[]],rivers=state.playerRivers||[[],[],[],[]];
-        playerScores=state.playerScores||playerScores;setText('round-title-display',['East 1','East 2','East 3','East 4','East 5 (Extra)'][state.currentRoundIndex]||'East 1');setText('wall-count',`x ${state.fullDeck?.length??0}`);setText('kan-counter',`KAN × ${state.kanCount||0}`);setText('riichi-stick-counter',`1000 × ${state.riichiSticks||0}`);
-        const drow=byId('dora-indicators-row');if(drow)(drow.querySelectorAll('.dora-tile-box')||[]).forEach((el,i)=>el.textContent=state.doraIndicators?.[i]?.val||'');
+        const s=mp.seat??0,map=[s,(s+1)%4,(s+2)%4,(s+3)%4],hands=state.playerHands||[[],[],[],[]],rivers=state.playerRivers||[[],[],[],[]];
+        playerScores=state.playerScores||playerScores;
+        setText('round-title-display',['East 1','East 2','East 3','East 4','East 5 (Extra)'][state.currentRoundIndex]||'East 1');
+        setText('wall-count',`x ${state.fullDeck?.length??0}`);setText('kan-counter',`KAN × ${state.kanCount||0}`);setText('riichi-stick-counter',`1000 × ${state.riichiSticks||0}`);
+        const drow=byId('dora-indicators-row');if(drow)drow.querySelectorAll('.dora-tile-box').forEach((el,i)=>el.textContent=state.doraIndicators?.[i]?.val||'');
         map.forEach((canon,display)=>setText(['score-0','score-1','score-2','score-3'][display],playerScores[canon]??0));
-        setText('name-left',`${state.roomPlayers?.[map[3]]?.name||'CPU'} • West`);setText('name-top',`${state.roomPlayers?.[map[2]]?.name||'CPU'} • North`);setText('name-right',`${state.roomPlayers?.[map[1]]?.name||'CPU'} • East`);
+        setText('name-left',`${state.roomPlayers?.[map[3]]?.name||'Kursi'} • West`);setText('name-top',`${state.roomPlayers?.[map[2]]?.name||'Kursi'} • North`);setText('name-right',`${state.roomPlayers?.[map[1]]?.name||'Kursi'} • East`);
         mpRenderHandAndTable(s,map,hands,rivers,state);
-        if(state.phase==='result' && state.result){
-            setText('res-title',state.result.title||'Ronde Selesai');
-            setText('res-desc',state.result.desc||'');
-            setText('res-round-label',`HASIL • ${['East 1','East 2','East 3','East 4','East 5 (Extra)'][state.currentRoundIndex]||'Ronde'}`);
-            const scoreBox=byId('res-scores'); if(scoreBox){ const names=state.roomPlayers||[]; scoreBox.innerHTML=state.playerScores.map((sc,canon)=>{const d=(sc-(state.roundStartScores?.[canon]??sc));const nm=names[canon]?.name||`CPU ${canon+1}`;return `<div class=\"score-row\"><div class=\"score-name\"><strong>${nm}${canon===s?' (Anda)':''}</strong><div class=\"score-seat\">${['South','East','North','West'][canon]}</div></div><div class=\"score-delta ${d>=0?'delta-up':'delta-down'}\">${d>0?'+':''}${d.toLocaleString('id-ID')}</div><div class=\"score-total\">${sc.toLocaleString('id-ID')}</div><div class=\"score-place\">#${[...state.playerScores].sort((a,b)=>b-a).indexOf(sc)+1}</div></div>`;}).join(''); }
-            setDisplay('modal-result','flex');
+        if(state.phase==='result'&&state.result){
+            setText('res-title',state.result.title||'Ronde Selesai');setText('res-desc',state.result.desc||'');setText('res-round-label',`HASIL • ${['East 1','East 2','East 3','East 4','East 5 (Extra)'][state.currentRoundIndex]||'Ronde'}`);setDisplay('modal-result','flex');
+            const scoreBox=byId('res-scores');if(scoreBox){scoreBox.innerHTML=state.playerScores.map((sc,canon)=>{const d=sc-(state.roundStartScores?.[canon]??sc);const nm=escapeHtml(state.roomPlayers?.[canon]?.name||`Player ${canon+1}`);return `<div class="score-row"><div class="score-name"><strong>${nm}${canon===s?' (Anda)':''}</strong><div class="score-seat">${['South','East','North','West'][canon]}</div></div><div class="score-delta ${d>=0?'delta-up':'delta-down'}">${d>0?'+':''}${d.toLocaleString('id-ID')}</div><div class="score-total">${sc.toLocaleString('id-ID')}</div><div class="score-place">#${[...state.playerScores].sort((a,b)=>b-a).indexOf(sc)+1}</div></div>`}).join('')}
         }
     }
+
     function updateFuritenIndicator(status){const panel=byId('furiten-panel'),el=byId('furiten-status');if(!panel||!el)return;const t=status?.type;if(t!=='Temporary'&&t!=='Permanent'){panel.style.display='none';el.textContent='';return;}panel.style.display='block';el.className='furiten-status '+(t==='Permanent'?'perma':'temp');el.textContent=t==='Permanent'?'Permanent Furiten — Ron dilarang':'Temporary Furiten — tunggu discard berikutnya';}
     function mpRenderHandAndTable(s,map,hands,rivers,state){
-        const b=byId('player-hand-tiles');if(b){b.innerHTML='';(hands[s]||[]).forEach((t,i)=>{const el=document.createElement('div');el.className='tile';el.innerHTML=`<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span>`;el.onclick=()=>mpTapTile(i,t);el.addEventListener('pointerdown',e=>el._sy=e.clientY);el.addEventListener('pointerup',e=>{if(el._sy-e.clientY>35)mpSendDiscard(t);});b.appendChild(el);});}
-        [['enemy-hand-top',map[2]],['enemy-hand-right',map[1]],['enemy-hand-left',map[3]]].forEach(([id,canon])=>{const el=byId(id);if(!el)return;el.innerHTML='';for(let i=0;i<(hands[canon]||[]).length;i++){const x=document.createElement('div');x.className='tile-back';el.appendChild(x);}});
-        [['river-bottom',map[0]],['river-right',map[1]],['river-top',map[2]],['river-left',map[3]]].forEach(([id,canon])=>{const el=byId(id);if(!el)return;el.innerHTML='';(rivers[canon]||[]).forEach(t=>{const d=document.createElement('div');d.className='discard-tile';d.innerHTML=`<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span>`;el.appendChild(d);});});
+        const b=byId('player-hand-tiles');if(b){b.innerHTML='';(hands[s]||[]).forEach((t,i)=>{const el=document.createElement('div');el.className='tile';el.innerHTML=`<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span>`;el.onclick=()=>mpTapTile(i,t);let sy=0;el.onpointerdown=e=>sy=e.clientY;el.onpointerup=e=>{if(sy-e.clientY>35)mpSendDiscard(t)};b.appendChild(el)})}
+        [['enemy-hand-top',map[2]],['enemy-hand-right',map[1]],['enemy-hand-left',map[3]]].forEach(([id,canon])=>{const el=byId(id);if(!el)return;el.innerHTML='';for(let i=0;i<(hands[canon]||[]).length;i++){const x=document.createElement('div');x.className='tile-back';el.appendChild(x)}});
+        [['river-bottom',map[0]],['river-right',map[1]],['river-top',map[2]],['river-left',map[3]]].forEach(([id,canon])=>{const el=byId(id);if(!el)return;el.innerHTML='';(rivers[canon]||[]).forEach(t=>{const d=document.createElement('div');d.className='discard-tile';d.innerHTML=`<span class="tile-char">${t.val}</span><span class="tile-helper">${t.helper}</span>`;el.appendChild(d)})});
         if(state.remoteActions?.seat===s)mpRenderActions(state.remoteActions.actions||[]);else setDisplay('action-overlay','none');
-        if(state.handStatus?.seat===s){setText('hand-status-main',state.handStatus.main||'STATUS');setText('hand-status-sub',state.handStatus.sub||'');}
-        const fstatus=state.furitenStates?.[s]; if(fstatus) updateFuritenIndicator({type:fstatus}); else {const f=byId('furiten-panel');if(f)f.style.display='none';}
+        if(state.handStatus?.seat===s){setText('hand-status-main',state.handStatus.main||'STATUS');setText('hand-status-sub',state.handStatus.sub||'')}
+        const fstatus=state.furitenStates?.[s];if(fstatus)updateFuritenIndicator({type:fstatus});else setDisplay('furiten-panel','none');
     }
+
     let mpTap={id:null,at:0};
-    function mpTapTile(i,t){const tiles=[...document.querySelectorAll('#player-hand-tiles .tile')];tiles.forEach(x=>x.classList.remove('selected-tile'));tiles[i]?.classList.add('selected-tile');if(mpTap.id===t.uniqueId&&Date.now()-mpTap.at<900){mpSendDiscard(t);mpTap={id:null,at:0};}else mpTap={id:t.uniqueId,at:Date.now()};}
-    function mpSendDiscard(t){mpSend('action',{action:{type:'discard',uniqueId:t.uniqueId}});}
-    function mpRenderActions(actions){const o=byId('action-overlay');if(!o)return;o.innerHTML='';if(!actions.length){o.style.display='none';return;}actions.forEach(a=>{const b=document.createElement('button');b.className=`act-btn btn-${String(a).toLowerCase()}`;b.textContent=a==='Skip'?'Lewatkan':a;b.onclick=()=>{mpSend('action',{action:{type:'call',action:a}});o.style.display='none';};o.appendChild(b);});o.style.display='flex';}
-    function getWaitIdsForSeat(seat){const h=playerHands[seat]||[],m=playerMelds[seat]?.length||0;if(h.length!==13)return [];const out=[];for(let id=0;id<34;id++){if(checkWinningHand([...h,TILE_TYPES[id]],m))out.push(id);}return out;}
-    function checkSeatFuriten(seat,id){const d=playerRivers[seat]||[];if(d.some(t=>t.id===id))return true;if(temporaryFuriten[seat]||riichiFuriten[seat])return true;const w=getWaitIdsForSeat(seat);return w.includes(id)&&d.some(t=>w.includes(t.id));}
-    function mpHandlePlayerAction(seat,action){if(!mp.host||!roomCanAct(seat)||!roundActive)return;if(action.type==='discard'){const idx=playerHands[seat].findIndex(t=>t.uniqueId===action.uniqueId);if(idx>=0)mpRemoteDiscard(seat,idx);return;}if(action.type==='call')mpRemoteCall(seat,action.action);}
-    function roomCanAct(seat){return!!mp.room?.players?.[seat];}
-    function mpRemoteDiscard(seat,idx){if(currentTurn!==seat||!roundActive)return;clearInterval(timerInterval);isDiscardable=false;const tile=playerHands[seat].splice(idx,1)[0];drawnTile=null;if(mpPendingRiichiSeat===seat){aiRiichi[seat]=true;mpPendingRiichiSeat=-1;}
-        commitDiscard(seat,tile);mpBroadcastState();}
+    function mpTapTile(i,t){const tiles=[...document.querySelectorAll('#player-hand-tiles .tile')];tiles.forEach(x=>x.classList.remove('selected-tile'));tiles[i]?.classList.add('selected-tile');if(mpTap.id===t.uniqueId&&Date.now()-mpTap.at<900){mpSendDiscard(t);mpTap={id:null,at:0}}else mpTap={id:t.uniqueId,at:Date.now()}}
+    function mpSendDiscard(t){mpSend('action',{action:{type:'discard',uniqueId:t.uniqueId}})}
+    function mpRenderActions(actions){const o=byId('action-overlay');if(!o)return;o.innerHTML='';if(!actions.length){o.style.display='none';return;}actions.forEach(a=>{const b=document.createElement('button');b.className=`act-btn btn-${String(a).toLowerCase()}`;b.textContent=a==='Skip'?'Lewatkan':a;b.onclick=()=>{mpSend('action',{action:{type:'call',action:a}});o.style.display='none'};o.appendChild(b)});o.style.display='flex'}
+
+    function getWaitIdsForSeat(seat){const h=playerHands[seat]||[],m=playerMelds[seat]?.length||0;if(h.length!==13)return [];const out=[];for(let id=0;id<34;id++){if(tileCounts([...h,TILE_TYPES[id]]).some(c=>c>4))continue;if(checkWinningHand([...h,TILE_TYPES[id]],m))out.push(id)}return out}
+    function checkSeatFuriten(seat,id){const d=playerRivers[seat]||[];if(d.some(t=>t.id===id))return true;if(temporaryFuriten[seat]||riichiFuriten[seat])return true;const w=getWaitIdsForSeat(seat);return d.some(t=>w.includes(t.id))}
+    function mpHandlePlayerAction(seat,action){if(!mp.host||!roomCanAct(seat)||!roundActive)return;if(action.type==='discard'){const idx=playerHands[seat].findIndex(t=>t.uniqueId===action.uniqueId);if(idx>=0)mpRemoteDiscard(seat,idx);return;}if(action.type==='call')mpRemoteCall(seat,action.action)}
+    function roomCanAct(seat){return!!mp.room?.players?.[seat]}
+    function mpRemoteDiscard(seat,idx){if(currentTurn!==seat||!roundActive)return;clearInterval(timerInterval);isDiscardable=false;const tile=playerHands[seat].splice(idx,1)[0];drawnTile=null;if(mpPendingRiichiSeat===seat){aiRiichi[seat]=true;mpPendingRiichiSeat=-1}commitDiscard(seat,tile);mpBroadcastState()}
     function mpRemoteCall(seat,act){
-        if(['Ron','Pon','Kan','Chi','Skip'].includes(act) && mpPendingCallQueue[0]?.seat!==seat)return;
-        if(act==='Tsumo'){
-            const e=evaluateYakuAndScore(seat,null,true);
-            if(checkWinningHand(playerHands[seat])&&e.valid){playerScores[seat]+=e.points;endRound(`TSUMO by ${mp.room.players?.[seat]?.name||'Player'}`,`${e.yakuStr} (+${e.points} Pts)`);}return;
-        }
-        if(act==='Riichi'){
-            if(currentTurn!==seat||aiRiichi[seat])return;
-            aiRiichi[seat]=true;playerScores[seat]-=1000;riichiSticks++;mpPendingRiichiSeat=seat;startRemoteTurnTimer(seat);mpBroadcastState({remoteActions:{seat,actions:[]},handStatus:{seat,main:'RIICHI',sub:'Buang tile untuk mengunci tangan.'}});return;
-        }
-        if(act==='Ron'&&lastDiscardedTile){
-            const e=evaluateYakuAndScore(seat,lastDiscardedTile,false);
-            if(e.valid&&checkWinningHand([...playerHands[seat],lastDiscardedTile],playerMelds[seat].length)&&!checkSeatFuriten(seat,lastDiscardedTile.id)){
-                playerScores[seat]+=e.points;playerScores[lastDiscarderIdx]-=e.points;endRound(`RON by ${mp.room.players?.[seat]?.name||'Player'}`,`${e.yakuStr} (+${e.points} Pts)`);
-            }return;
-        }
-        if(act==='Pon'){mpPendingCallQueue=[];executePon(seat);return;}
-        if(act==='Kan'){mpPendingCallQueue=[];executeKan(seat);return;}
-        if(act==='Chi'){mpPendingCallQueue=[];executeChi(seat);return;}
-        if(act==='Skip' && mpPendingCallQueue[0]?.seat===seat){
-            const canRon=checkWinningHand([...playerHands[seat],lastDiscardedTile],playerMelds[seat].length)&&evaluateYakuAndScore(seat,lastDiscardedTile,false).valid;
-            if(canRon){temporaryFuriten[seat]=true;if(aiRiichi[seat])riichiFuriten[seat]=true;}
-            mpPendingCallQueue.shift();mpPromptNextNetworkCall();return;
-        }
-        if(act==='nextRound'){if(byId('modal-result'))byId('modal-result').style.display='none';_networkNextRoundFromRemote();}
+        if(['Ron','Pon','Kan','Chi','Skip'].includes(act)&&mpPendingCallQueue[0]?.seat!==seat)return;
+        if(act==='Tsumo'){const e=evaluateYakuAndScore(seat,null,true);if(checkWinningHand(playerHands[seat],playerMelds[seat].length)&&e.valid){playerScores[seat]+=e.points;endRound(`TSUMO by ${mp.room.players?.[seat]?.name||'Player'}`,`${e.yakuStr} (+${e.points} Pts)`)}return}
+        if(act==='Riichi'){if(currentTurn!==seat||aiRiichi[seat])return;aiRiichi[seat]=true;playerScores[seat]-=1000;riichiSticks++;mpPendingRiichiSeat=seat;startRemoteTurnTimer(seat);mpBroadcastState({remoteActions:{seat,actions:[]},handStatus:{seat,main:'RIICHI',sub:'Buang tile untuk mengunci tangan.'}});return}
+        if(act==='Ron'&&lastDiscardedTile){const e=evaluateYakuAndScore(seat,lastDiscardedTile,false);if(e.valid&&checkWinningHand([...playerHands[seat],lastDiscardedTile],playerMelds[seat].length)&&!checkSeatFuriten(seat,lastDiscardedTile.id)){playerScores[seat]+=e.points;playerScores[lastDiscarderIdx]-=e.points;endRound(`RON by ${mp.room.players?.[seat]?.name||'Player'}`,`${e.yakuStr} (+${e.points} Pts)`) }return}
+        if(act==='Pon'){mpPendingCallQueue=[];executePon(seat);return}
+        if(act==='Kan'){mpPendingCallQueue=[];executeKan(seat);return}
+        if(act==='Chi'){mpPendingCallQueue=[];executeChi(seat);return}
+        if(act==='Skip'&&mpPendingCallQueue[0]?.seat===seat){const canRon=checkWinningHand([...playerHands[seat],lastDiscardedTile],playerMelds[seat].length)&&evaluateYakuAndScore(seat,lastDiscardedTile,false).valid;if(canRon){temporaryFuriten[seat]=true;if(aiRiichi[seat])riichiFuriten[seat]=true}mpPendingCallQueue.shift();mpPromptNextNetworkCall();return}
+        if(act==='nextRound'){setDisplay('modal-result','none');_networkNextRoundFromRemote()}
     }
 
     let mpPendingCallQueue=[];
@@ -853,13 +993,17 @@
         if(!mpPendingCallQueue.length){nextTurn();mpBroadcastState();return;}
         const q=mpPendingCallQueue[0],hand=playerHands[q.seat]||[],actions=[];
         if(checkWinningHand([...hand,lastDiscardedTile],playerMelds[q.seat].length)&&evaluateYakuAndScore(q.seat,lastDiscardedTile,false).valid&&!checkSeatFuriten(q.seat,lastDiscardedTile.id))actions.push('Ron');
-        const same=hand.filter(t=>t.id===lastDiscardedTile.id).length;if(same>=2)actions.push('Pon');if(same>=3)actions.push('Kan');
-        if(q.seat===(lastDiscarderIdx+1)%4&&getChiCombinations(hand,lastDiscardedTile).length)actions.push('Chi');
-        actions.push('Skip');
-        if(q.seat===0)showAvailableActions(actions);else mpBroadcastState({remoteActions:{seat:q.seat,actions}});
+        const same=hand.filter(t=>t.id===lastDiscardedTile.id).length;if(same>=2)actions.push('Pon');if(same>=3)actions.push('Kan');if(q.seat===(lastDiscarderIdx+1)%4&&getChiCombinations(hand,lastDiscardedTile).length)actions.push('Chi');actions.push('Skip');
+        if(q.seat===0)showAvailableActions(actions);else mpBroadcastState({remoteActions:{seat:q.seat,actions}})
     }
+    function startRemoteTurnTimer(seat){clearInterval(timerInterval);baseTime=10;extraTimeBank=20;timerInterval=setInterval(()=>{if(baseTime>0)baseTime--;else if(extraTimeBank>0)extraTimeBank--;else{clearInterval(timerInterval);const idx=playerHands[seat].length-1;if(idx>=0)mpRemoteDiscard(seat,idx)}mpBroadcastState({remoteTimer:{seat,baseTime,extraTimeBank}})},1000)}
 
-    function startRemoteTurnTimer(seat){clearInterval(timerInterval);baseTime=10;extraTimeBank=20;timerInterval=setInterval(()=>{if(baseTime>0)baseTime--;else if(extraTimeBank>0)extraTimeBank--;else{clearInterval(timerInterval);const idx=playerHands[seat].length-1;if(idx>=0)mpRemoteDiscard(seat,idx);}mpBroadcastState({remoteTimer:{seat,baseTime,extraTimeBank}});},1000);}
+    function getRoomFromUrl(){try{return new URL(location.href).searchParams.get(MP_ROOM_PARAM)||''}catch(e){return ''}}
+    function mpBootAutoJoin(){const code=getRoomFromUrl();if(!/^\d{5}$/.test(code))return;setTimeout(()=>{if(activeScreenId==='screen-main'){nav('screen-play')}openPlayerLobby()},250)}
+    window.mpConnect=mpConnect;window.mpSend=mpSend;window.openPlayerLobby=openPlayerLobby;window.mpCreateRoom=mpCreateRoom;window.mpJoinRoom=mpJoinRoom;window.mpShowJoinForm=mpShowJoinForm;window.togglePlayerReady=togglePlayerReady;window.mpStartGame=mpStartGame;window.closeLobby=closeLobby;window.mpCopyRoomLink=mpCopyRoomLink;window.mpCopyRoomInfo=mpCopyRoomInfo;
+    window.mpReconnect=function(){const saved=mpLoadSession();if(!saved?.room)return;mp.playerName=saved.name||'Player';mp.host=!!saved.host;mp.seat=saved.seat;mp.ready=true;mp.started=!!saved.started;mp.room={code:saved.room,players:[null,null,null,null],started:!!saved.started};setDisplay('modal-lobby','flex');setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');mpConnect(saved.room,mp.host?'host':'guest')};
+    window.addEventListener('DOMContentLoaded',mpBootAutoJoin);
+    window.addEventListener('pagehide',()=>mpSaveSession());
 
 /* RIICHI ENGINE REPLACEMENT */
     // =========================
@@ -2372,362 +2516,9 @@
     triggerAction=function(act){if(isMultiplayerMode&&mp.host&&mpPendingCallQueue.length&&mpPendingCallQueue[0].seat===0){clearInterval(timerInterval);setDisplay('action-overlay','none');mpRemoteCall(0,act);return;} _baseTriggerActionNetwork(act);};
     window.addEventListener('beforeunload',()=>{try{mpSend('leave');}catch(e){}});
 
-/* ===== SERVERLESS WEBRTC LOCAL P2P v11 ===== */
-(function(){
-  const RTC_CFG={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}]};
-  const seats=['South','East','North','West'];
-  const P2P={role:null, peers:new Map(), hostPeer:null, pendingSeat:null, seq:0};
-  const origMpHandle=window.mpHandle;
-  function safeParse(v){try{return JSON.parse(v)}catch(e){return null}}
-  function encode(obj){const bytes=new TextEncoder().encode(JSON.stringify(obj));let s='';for(const b of bytes)s+=String.fromCharCode(b);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
-  function decode(txt){try{let s=txt.trim().replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';const bin=atob(s);const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));return JSON.parse(new TextDecoder().decode(bytes))}catch(e){throw new Error('Kode undangan tidak valid.')}}
-  async function waitIce(pc){if(pc.iceGatheringState==='complete')return;await new Promise(resolve=>{const done=()=>{if(pc.iceGatheringState==='complete'){pc.removeEventListener('icegatheringstatechange',done);resolve()}};pc.addEventListener('icegatheringstatechange',done);setTimeout(resolve,7000)});}
-  function setBadge(online){if(typeof mpSetConnection==='function')mpSetConnection(online); else {setText('mp-connection-badge',online?'P2P':'OFFLINE');}}
-  function localPlayers(){return window.mp?.room?.players||[null,null,null,null]}
-  function broadcast(msg,exceptSeat=null){P2P.peers.forEach((p,seat)=>{if(seat===exceptSeat)return;if(p.dc?.readyState==='open')p.dc.send(JSON.stringify(msg))})}
-  function sendToHost(msg){if(P2P.hostPeer?.dc?.readyState==='open')P2P.hostPeer.dc.send(JSON.stringify(msg))}
-  function transportSend(type,data={}){const msg={type,...data};if(window.mp?.host)broadcast(msg);else sendToHost(msg)}
-
-  function attachHostPeer(seat,pc){
-    pc.onconnectionstatechange=()=>{if(['failed','closed','disconnected'].includes(pc.connectionState)){P2P.peers.delete(seat);const room=localPlayers();if(room[seat])room[seat]=null; if(window.mp?.room){window.mp.room.players=room;mpRenderLobby(window.mp.room);broadcast({type:'lobby',room:window.mp.room});}}};
-    pc.ondatachannel=e=>attachHostChannel(seat,e.channel);
-  }
-  function attachHostChannel(seat,dc){
-    const peer=P2P.peers.get(seat);if(peer)peer.dc=dc;dc.onopen=()=>{
-      setBadge(true);
-      if(window.mp?.room){window.mp.room.players[seat]={id:'p2p-'+seat,name:`Player ${seat+1}`,ready:false};
-        window.mp.room.players[0]=window.mp.room.players[0]||{id:'host',name:window.mp.playerName||'Host',ready:false};
-        mpRenderLobby(window.mp.room);broadcast({type:'joined',room:window.mp.room,seat:seat,host:false},seat);broadcast({type:'lobby',room:window.mp.room});
-      }
-    };
-    dc.onclose=()=>{if(window.mp?.room?.players?.[seat]){window.mp.room.players[seat]=null;mpRenderLobby(window.mp.room);broadcast({type:'lobby',room:window.mp.room});}};
-    dc.onerror=()=>setBadge(false);
-    dc.onmessage=e=>{const msg=safeParse(e.data);if(!msg)return; if(msg.type==='hello'){const peer=P2P.peers.get(seat);if(peer)peer.remoteName=msg.name||`Player ${seat+1}`; if(window.mp?.room?.players?.[seat])window.mp.room.players[seat].name=peer.remoteName;mpRenderLobby(window.mp.room);broadcast({type:'lobby',room:window.mp.room});return;} if(msg.type==='ready'){if(window.mp?.room?.players?.[seat]){window.mp.room.players[seat].ready=!!msg.ready;mpRenderLobby(window.mp.room);broadcast({type:'lobby',room:window.mp.room});}return;} if(msg.type==='playerAction'){ if(typeof origMpHandle==='function')origMpHandle(msg); return;} if(msg.type==='action'){ if(typeof origMpHandle==='function')origMpHandle({...msg,type:'playerAction',seat,action:msg.action||{}}); return;} if(typeof origMpHandle==='function')origMpHandle(msg);};
-  }
-
-  async function hostCreateInvite(){
-    if(!window.mp?.host)return;
-    const seat=[1,2,3].find(s=>!P2P.peers.has(s)&&!window.mp.room?.players?.[s]);if(seat==null){alert('Semua kursi pemain sudah terisi.');return;}
-    P2P.pendingSeat=seat;setText('mp-invite-seat',seats[seat]);
-    const pc=new RTCPeerConnection(RTC_CFG);const dc=pc.createDataChannel('mahjong');
-    P2P.peers.set(seat,{pc,dc});attachHostPeer(seat,pc);attachHostChannel(seat,dc);
-    const offer=await pc.createOffer();await pc.setLocalDescription(offer);await waitIce(pc);
-    byId('mp-offer-code').value=encode(pc.localDescription);byId('mp-answer-code').value='';setDisplay('mp-host-invite','grid');mpRenderOfferQr(byId('mp-offer-code').value);
-  }
-  async function hostApplyAnswer(){
-    const seat=P2P.pendingSeat;if(seat==null){alert('Buat Offer dulu.');return;}const code=byId('mp-answer-code').value.trim();if(!code)return alert('Tempel Answer dari teman.');
-    try{const ans=decode(code);const peer=P2P.peers.get(seat);if(!peer)throw new Error('Peer tidak ditemukan');await peer.pc.setRemoteDescription(ans);window.mp.room.players[seat]={id:'p2p-'+seat,name:`Player ${seat+1}`,ready:false};mpRenderLobby(window.mp.room);broadcast({type:'lobby',room:window.mp.room});}catch(e){alert(e.message||'Answer tidak valid.');}
-  }
-  async function guestAcceptOffer(){
-    const offerCode=byId('mp-offer-input').value.trim();if(!offerCode)return alert('Tempel Offer dari host.');
-    try{const offer=decode(offerCode);const pc=new RTCPeerConnection(RTC_CFG);P2P.hostPeer={pc,dc:null};pc.ondatachannel=e=>{P2P.hostPeer.dc=e.channel;attachGuestChannel(e.channel)};pc.onconnectionstatechange=()=>setBadge(pc.connectionState==='connected');await pc.setRemoteDescription(offer);const answer=await pc.createAnswer();await pc.setLocalDescription(answer);await waitIce(pc);byId('mp-answer-output').value=encode(pc.localDescription);setDisplay('mp-guest-invite','grid');}catch(e){alert(e.message||'Offer tidak valid.');}
-  }
-  function attachGuestChannel(dc){
-    setBadge(true);dc.onopen=()=>{setBadge(true);sendToHost({type:'hello',name:window.mp.playerName||'Player'});};
-    dc.onclose=()=>setBadge(false);dc.onerror=()=>setBadge(false);
-    dc.onmessage=e=>{const msg=safeParse(e.data);if(!msg)return;if(typeof window.mpHandle==='function')window.mpHandle(msg);};
-  }
-  function guestReady(ready){sendToHost({type:'ready',ready:!!ready});}
-
-  function mpRenderOfferQr(text){
-    const canvas=byId('mp-offer-qr');if(!canvas)return;
-    canvas.classList.remove('visible');
-    const draw=()=>{if(window.QRCode&&typeof window.QRCode.toCanvas==='function'){window.QRCode.toCanvas(canvas,text,{width:220,margin:1,color:{dark:'#111827',light:'#ffffff'}},err=>{if(!err)canvas.classList.add('visible')});}};
-    if(window.QRCode)draw();else setTimeout(draw,900);
-  }
-
-  // Replace the old WebSocket-oriented transport API with WebRTC while preserving the game engine hooks.
-  window.mpConnect=function(){};
-  window.mpSend=function(type,data={}){transportSend(type,data)};
-  window.openPlayerLobby=function(){isMultiplayerMode=true;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setBadge(false);};
-  window.mpShowJoinForm=function(){setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','grid');};
-  window.mpCreateRoom=function(){
-    window.mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';window.mp.host=true;window.mp.connected=true;window.mp.room={code:String(Math.floor(10000+Math.random()*90000)),players:[null,null,null,null],started:false};window.mp.seat=0;window.mp.ready=false;window.mp.room.players[0]={id:'host',name:window.mp.playerName,ready:false};setText('mp-room-code-display',window.mp.room.code);setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');mpRenderLobby(window.mp.room);setBadge(true);setText('mp-invite-help','Kirim Offer ke satu teman, lalu tempel Answer-nya di sini.');
-  };
-  window.mpGenerateInvite=hostCreateInvite;
-  window.mpApplyAnswer=hostApplyAnswer;
-  window.mpAcceptOffer=guestAcceptOffer;
-  window.mpCopySignal=function(id){const el=byId(id);if(!el)return;const text=el.value||'';if(!text)return; navigator.clipboard?.writeText(text).then(()=>{const old=el.dataset.copied||'';el.dataset.copied='1';setTimeout(()=>el.dataset.copied=old,800)}).catch(()=>{el.select();document.execCommand('copy')});};
-  window.mpCopyRoomInfo=function(){const code=window.mp.room?.code||'';const txt=`Mahjong Soul P2P\nRoom: ${code}\nGunakan Offer/Answer untuk menghubungkan pemain.`;navigator.clipboard?.writeText(txt).catch(()=>{});alert(txt);};
-  window.togglePlayerReady=function(){window.mp.ready=!window.mp.ready;if(window.mp.host){if(window.mp.room?.players?.[0])window.mp.room.players[0].ready=window.mp.ready;mpRenderLobby(window.mp.room);broadcast({type:'lobby',room:window.mp.room});}else guestReady(window.mp.ready);};
-  window.mpStartGame=function(){if(!window.mp.host)return;if(!window.mp.room?.players?.every((p,i)=>!p||p.ready)){alert('Semua pemain yang terhubung harus READY.');return;}window.mp.room.started=true;broadcast({type:'startGame'});start4PGame('Hard',true);setDisplay('modal-lobby','none');};
-  window.closeLobby=function(){P2P.peers.forEach(p=>{try{p.pc.close()}catch(e){}});P2P.peers.clear();if(P2P.hostPeer?.pc)try{P2P.hostPeer.pc.close()}catch(e){}P2P.hostPeer=null;window.mp.room=null;window.mp.seat=null;window.mp.host=false;window.mp.ready=false;window.mp.connected=false;setDisplay('modal-lobby','none');setBadge(false);};
-  // Keep lobby state rendering aligned with P2P seat information.
-  const baseRenderLobby=window.mpRenderLobby;
-  window.mpRenderLobby=function(room){if(typeof baseRenderLobby==='function')baseRenderLobby(room);const s=window.mp.seat??0;const btn=byId('btn-lobby-start');if(btn)btn.hidden=!window.mp.host||!!room?.started;setText('mp-room-code-display',room?.code||'-----');};
-  // Intercept state/result forwarding through the preserved mpHandle.
-  window.addEventListener('beforeunload',()=>{try{closeLobby()}catch(e){}});
-  /* ===== DIRECT QR SCAN + SESSION RECONNECT v12 ===== */
-  const STORAGE_KEY='mahjongSoulP2PSessionV12';
-  let scannerInstance=null;
-  let reconnectTimer=null;
-  function saveSession(extra={}){
-    try{localStorage.setItem(STORAGE_KEY,JSON.stringify({
-      role:window.mp?.host?'host':'guest', host:!!window.mp?.host, seat:window.mp?.seat??null,
-      name:window.mp?.playerName||'Player', roomCode:window.mp?.room?.code||'',
-      offer:byId('mp-offer-code')?.value||'', answer:byId('mp-answer-output')?.value||'',
-      updatedAt:Date.now(), ...extra
-    }))}catch(e){}
-  }
-  function loadSession(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')}catch(e){return null}}
-  function clearSavedSession(){try{localStorage.removeItem(STORAGE_KEY)}catch(e){}}
-  function showReconnect(show,title='Koneksi terputus',text='Sesi tersimpan. Gunakan Sambungkan Kembali untuk membuat jalur P2P baru.') {
-    const box=byId('mp-reconnect-card'); if(!box)return; box.hidden=!show; setText('mp-reconnect-title',title);setText('mp-reconnect-text',text);
-  }
-  async function startQrScanner(){
-    const modal=byId('modal-qr-scanner'), reader=byId('mp-scanner-reader'), status=byId('mp-scanner-status');
-    if(!modal||!reader)return;
-    setDisplay('modal-qr-scanner','flex'); reader.innerHTML=''; setText('mp-scanner-status','Meminta izin kamera…');
-    const onSuccess=async text=>{if(!text)return; byId('mp-offer-input').value=text; setText('mp-scanner-status','QR terbaca. Menyiapkan koneksi…'); await stopQrScanner(); setDisplay('mp-guest-invite','grid'); try{await guestAcceptOffer()}catch(e){}};
-    try{
-      if(window.Html5Qrcode){
-        scannerInstance=new Html5Qrcode('mp-scanner-reader');
-        const cams=await Html5Qrcode.getCameras();
-        const cam=(cams||[]).find(c=>/back|rear|environment/i.test(c.label||''))||cams?.[0];
-        if(!cam)throw new Error('Kamera tidak ditemukan.');
-        await scannerInstance.start(cam.id,{fps:10,qrbox:{width:Math.min(280,Math.max(180,innerWidth-90)),height:Math.min(280,Math.max(180,innerWidth-90))}},onSuccess,()=>{});
-        setText('mp-scanner-status','Arahkan QR Offer ke bingkai kamera.'); return;
-      }
-      if('BarcodeDetector' in window){
-        const formats=await BarcodeDetector.getSupportedFormats(); if(!formats.includes('qr_code'))throw new Error('QR scanner native tidak tersedia.');
-        const video=document.createElement('video'); video.setAttribute('playsinline',''); video.autoplay=true; video.muted=true; video.style.width='100%'; reader.appendChild(video);
-        const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false}); video.srcObject=stream; await video.play();
-        const detector=new BarcodeDetector({formats:['qr_code']});
-        const tick=async()=>{if(!video.srcObject)return; try{const codes=await detector.detect(video);if(codes[0]?.rawValue){byId('mp-offer-input').value=codes[0].rawValue; stream.getTracks().forEach(t=>t.stop());setDisplay('modal-qr-scanner','none');await guestAcceptOffer();return;}}catch(e){} requestAnimationFrame(tick)}; tick();
-        setText('mp-scanner-status','Arahkan QR Offer ke kamera.'); return;
-      }
-      throw new Error('Scanner QR tidak tersedia di browser ini. Gunakan tempel kode manual.');
-    }catch(e){setText('mp-scanner-status',e.message||'Kamera tidak dapat digunakan.');}
-  }
-  async function stopQrScanner(){
-    if(scannerInstance){try{await scannerInstance.stop()}catch(e){} try{scannerInstance.clear()}catch(e){} scannerInstance=null;}
-    const r=byId('mp-scanner-reader'); if(r)r.innerHTML=''; setDisplay('modal-qr-scanner','none');
-  }
-  window.mpScanOffer=startQrScanner; window.mpStopScanner=stopQrScanner;
-
-  async function recreateHostPeer(seat){
-    if(!window.mp?.host)return;
-    P2P.pendingSeat=seat; const old=P2P.peers.get(seat); try{old?.pc?.close()}catch(e){} P2P.peers.delete(seat);
-    const pc=new RTCPeerConnection(RTC_CFG), dc=pc.createDataChannel('mahjong'); P2P.peers.set(seat,{pc,dc}); attachHostPeer(seat,pc); attachHostChannel(seat,dc);
-    const offer=await pc.createOffer({iceRestart:true}); await pc.setLocalDescription(offer); await waitIce(pc);
-    const code=encode(pc.localDescription); if(byId('mp-offer-code'))byId('mp-offer-code').value=code; mpRenderOfferQr(code); setDisplay('mp-host-invite','grid'); saveSession({offer:code});
-    setText('mp-invite-help','Koneksi dibuat ulang. Scan QR Offer baru dari perangkat tamu.');
-  }
-  async function recreateGuestPeer(){
-    const saved=loadSession(); if(!saved?.offer){setDisplay('mp-guest-invite','grid');alert('Offer lama tidak tersedia. Host perlu membuat QR Offer baru.');return;}
-    if(P2P.hostPeer?.pc)try{P2P.hostPeer.pc.close()}catch(e){}
-    const pc=new RTCPeerConnection(RTC_CFG); P2P.hostPeer={pc,dc:null}; pc.ondatachannel=e=>{P2P.hostPeer.dc=e.channel;attachGuestChannel(e.channel)};
-    pc.onconnectionstatechange=()=>{const st=pc.connectionState;if(st==='connected'){setBadge(true);showReconnect(false)}else if(['failed','closed','disconnected'].includes(st)){setBadge(false);showReconnect(true);}};
-    await pc.setRemoteDescription(decode(saved.offer)); const answer=await pc.createAnswer(); await pc.setLocalDescription(answer); await waitIce(pc);
-    const code=encode(pc.localDescription); byId('mp-offer-input').value=saved.offer; byId('mp-answer-output').value=code; saveSession({answer:code}); setDisplay('mp-guest-invite','grid');
-    setText('mp-scanner-status','Answer baru dibuat. Kirim kembali ke host.');
-  }
-  window.mpReconnect=async function(){
-    const saved=loadSession();
-    if(window.mp?.host){ const seat=P2P.pendingSeat??[1,2,3].find(s=>window.mp.room?.players?.[s]); if(seat==null){alert('Tidak ada kursi pemain untuk reconnect.');return;} await recreateHostPeer(seat); }
-    else { if(saved?.answer && P2P.hostPeer?.pc?.remoteDescription){showReconnect(false);return;} await recreateGuestPeer(); }
-  };
-
-  // Save a durable session and expose a gentle reconnect hint on disconnect.
-  const originalHostCreateInvite=window.mpGenerateInvite; window.mpGenerateInvite=async function(){await originalHostCreateInvite();saveSession();};
-  const originalHostApplyAnswer=window.mpApplyAnswer; window.mpApplyAnswer=async function(){await originalHostApplyAnswer();saveSession();};
-  const originalGuestAcceptOffer=window.mpAcceptOffer; window.mpAcceptOffer=async function(){await originalGuestAcceptOffer();saveSession();};
-  window.addEventListener('pagehide',()=>saveSession()); window.addEventListener('pageshow',()=>{const saved=loadSession();if(saved){if(saved.role==='guest'&&!window.mp?.host)setTimeout(()=>showReconnect(true,'Sesi P2P tersimpan','Perangkat ini memiliki sesi P2P sebelumnya.'),350);}});
-
-  const origHostPeer=attachHostPeer;
-  attachHostPeer=function(seat,pc){origHostPeer(seat,pc); const base=pc.onconnectionstatechange; pc.onconnectionstatechange=()=>{base?.(); const st=pc.connectionState; if(st==='connected'){saveSession({connectedAt:Date.now()});showReconnect(false)} else if(['failed','closed','disconnected'].includes(st)){showReconnect(true);clearTimeout(reconnectTimer);reconnectTimer=setTimeout(()=>{if(window.mp?.host&&window.mp?.room?.players?.[seat])mpReconnect()},2500);}};};
-
-  // Keep responsive scale synced with actual viewport and orientation changes.
-  function syncTableUnit(){const vv=window.visualViewport;const w=Math.max(1,vv?.width||innerWidth),h=Math.max(1,vv?.height||innerHeight);const unit=Math.min(w,h)/100;document.documentElement.style.setProperty('--table-unit',unit+'px');}
-  syncTableUnit();window.addEventListener('resize',syncTableUnit,{passive:true});window.addEventListener('orientationchange',()=>setTimeout(syncTableUnit,80),{passive:true});window.visualViewport?.addEventListener('resize',syncTableUnit,{passive:true});
-})();
 
 </script>
 
-<script>
-/* ===== MULTIPLAYER v13: QR AUTO-JOIN + CLOUD ROOM SERVER =====
-   The game engine remains client-side; the room service only coordinates players,
-   relays commands/state, and makes QR-based joining automatic. */
-(function(){
-  const MP_CFG = {
-    // SET ONCE after deploying the Cloudflare Worker.
-    // Example: https://mahjong-room.your-subdomain.workers.dev
-    signalingBase: 'https://YOUR-MAHJONG-ROOM-WORKER.workers.dev',
-    roomParam: 'room'
-  };
-  const SESSION_KEY = 'mahjongSoulRoomV13';
-  let autoStartTimer = null;
-  let joiningFromUrl = false;
-
-  function mpUrl(){
-    const base=MP_CFG.signalingBase.replace(/\/$/,'');
-    return base;
-  }
-  function mpWsUrl(code,name,role){
-    const base=mpUrl().replace(/^http/,'ws');
-    return base + '/ws?room=' + encodeURIComponent(code) + '&name=' + encodeURIComponent(name) + '&role=' + role;
-  }
-  function saveRoomSession(extra={}){
-    try{localStorage.setItem(SESSION_KEY,JSON.stringify({
-      room:mp.room?.code||'', seat:mp.seat??null, name:mp.playerName||'Player', host:!!mp.host,
-      updatedAt:Date.now(), ...extra
-    }))}catch(e){}
-  }
-  function loadRoomSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch(e){return null}}
-  function clearRoomSession(){try{localStorage.removeItem(SESSION_KEY)}catch(e){}}
-
-  function getRoomFromUrl(){
-    try{
-      const u=new URL(location.href);return (u.searchParams.get(MP_CFG.roomParam)||'').trim();
-    }catch(e){return '';}
-  }
-  function roomUrl(code){
-    const u=new URL(location.href);u.searchParams.set(MP_CFG.roomParam,code);u.searchParams.delete('offer');u.searchParams.delete('answer');
-    return u.href;
-  }
-  function renderRoomQr(code){
-    const link=roomUrl(code); const canvas=byId('mp-offer-qr'); const input=byId('mp-room-link');
-    if(input) input.value=link;
-    setText('mp-host-room-code',code||'-----');
-    const draw=()=>{
-      try{
-        if(window.QRCode?.toCanvas&&canvas){
-          QRCode.toCanvas(canvas,link,{width:230,margin:2,errorCorrectionLevel:'M'},()=>{});
-          return true;
-        }
-      }catch(e){}
-      return false;
-    };
-    if(!draw()){
-      let tries=0; const t=setInterval(()=>{tries++; if(draw()||tries>30)clearInterval(t)},150);
-    }
-  }
-  async function copyText(text){try{await navigator.clipboard.writeText(text);return true}catch(e){return false}}
-
-  function closeMpSocket(){
-    try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}
-    mp.ws=null;mp.connected=false;mpSetConnection(false);
-  }
-
-  // Replace transport functions used by the existing game engine.
-  mpServerUrl = function(){ return mpWsUrl(mp.room?.code||'',mp.playerName||'Player',mp.host?'host':'guest'); };
-  mpConnect = function(code,role){
-    const roomCode=code||mp.room?.code||getRoomFromUrl();
-    const r=role||(mp.host?'host':'guest');
-    if(!roomCode)return false;
-    if(mp.ws&&(mp.ws.readyState===WebSocket.OPEN||mp.ws.readyState===WebSocket.CONNECTING))return true;
-    if(location.protocol==='file:'){mpSetConnection(false);return false;}
-    try{
-      const ws=new WebSocket(mpWsUrl(roomCode,mp.playerName||'Player',r)); mp.ws=ws;
-      ws.onopen=()=>{
-        mp.connected=true;mpSetConnection(true);
-        ws.send(JSON.stringify({type:r==='host'?'createRoom':'joinRoom',code:roomCode,name:mp.playerName||'Player',clientId:mpClientId||''}));
-      };
-      ws.onclose=()=>{mp.connected=false;mpSetConnection(false); if(mp.room&&!mp.started) setTimeout(()=>mpReconnect(),1200);};
-      ws.onerror=()=>{mp.connected=false;mpSetConnection(false);};
-      ws.onmessage=e=>{try{mpHandle(JSON.parse(e.data))}catch(err){console.error('MP message error',err)}};
-      return true;
-    }catch(e){mp.connected=false;mpSetConnection(false);console.error(e);return false;}
-  };
-  mpSend = function(type,data={}){
-    if(mp.ws?.readyState===WebSocket.OPEN) mp.ws.send(JSON.stringify({type,...data}));
-  };
-
-  window.openPlayerLobby=function(){
-    isMultiplayerMode=true; setDisplay('modal-lobby','flex'); setDisplay('mp-setup','grid'); setDisplay('mp-room-panel','none');
-    const code=getRoomFromUrl();
-    if(code){ joiningFromUrl=true; setDisplay('mp-setup','none'); setDisplay('mp-guest-invite','none'); mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player'; mpConnect(code,'guest'); }
-    else { setText('lobby-help','Buat room sekali. Teman cukup scan QR untuk otomatis masuk, siap, dan saat 4 pemain siap game dimulai.'); }
-  };
-
-  window.mpCreateRoom=function(){
-    mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';
-    const code=String(Math.floor(10000+Math.random()*90000));
-    mp.room={code,players:[null,null,null,null],started:false};mp.seat=0;mp.host=true;mp.ready=true;mp.started=false;isMultiplayerMode=true;
-    mp.room.players[0]={id:'host-local',name:mp.playerName,ready:true};
-    setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setText('mp-room-code-display',code);renderRoomQr(code);mpRenderLobby(mp.room);saveRoomSession();mpConnect(code,'host');
-  };
-
-  window.mpJoinRoom=function(){
-    mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';
-    const code=(byId('mp-room-code')?.value||'').trim();
-    if(!/^\d{5}$/.test(code)){alert('Masukkan kode room 5 digit.');return;}
-    joiningFromUrl=false;mp.host=false;mp.ready=false;mp.seat=null;isMultiplayerMode=true;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-guest-invite','none');mpConnect(code,'guest');
-  };
-  window.mpShowJoinForm=function(){setDisplay('mp-setup','grid');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','block');};
-  window.mpCopyRoomLink=function(){const link=byId('mp-room-link')?.value||roomUrl(mp.room?.code||'');copyText(link).then(()=>{setText('mp-invite-help','Link room sudah disalin.');});};
-  window.mpCopyRoomInfo=function(){const code=mp.room?.code||'';const link=roomUrl(code);copyText(link).then(()=>alert('Link Room:\n'+link));};
-
-  window.togglePlayerReady=function(){
-    if(!mp.room)return; mp.ready=!mp.ready; mpSend('ready',{ready:mp.ready});
-  };
-  window.mpStartGame=function(){
-    if(!mp.host||!mp.room)return;
-    const humans=(mp.room.players||[]).filter(Boolean);
-    if(humans.length<2){alert('Butuh minimal 2 pemain.');return;}
-    if(!humans.every(p=>p.ready)){alert('Semua pemain yang terhubung harus READY.');return;}
-    mpSend('start');
-  };
-  window.closeLobby=function(){
-    try{mpSend('leave')}catch(e){} closeMpSocket(); clearRoomSession(); mp.room=null;mp.seat=null;mp.host=false;mp.ready=false;mp.started=false;isMultiplayerMode=false;
-    setDisplay('modal-lobby','none');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');
-  };
-  window.mpReconnect=function(){
-    const saved=loadRoomSession(); if(!saved?.room)return;
-    mp.playerName=saved.name||'Player';mp.room=mp.room||{code:saved.room,players:[null,null,null,null],started:false};mp.host=!!saved.host;mp.seat=saved.seat;mp.ready=true;isMultiplayerMode=true;
-    setDisplay('modal-lobby','flex');setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');
-    mpConnect(saved.room,mp.host?'host':'guest');
-  };
-
-  // Lobby rendering: host is auto-ready. Guests are auto-ready on join.
-  const priorLobbyRender=mpRenderLobby;
-  mpRenderLobby=function(room){
-    if(typeof priorLobbyRender==='function')priorLobbyRender(room);
-    if(room?.code) {setText('mp-room-code-display',room.code);setText('mp-host-room-code',room.code);if(mp.host)renderRoomQr(room.code);}
-    const humanCount=(room?.players||[]).filter(Boolean).length;
-    const allReady=humanCount>=2&&(room.players.filter(Boolean).every(p=>p.ready));
-    const startBtn=byId('btn-lobby-start'); if(startBtn){startBtn.hidden=!mp.host||!!room?.started;startBtn.disabled=!allReady;}
-    if(mp.host&&humanCount===4&&allReady&&!room.started){
-      clearTimeout(autoStartTimer);
-      setText('lobby-help','4 pemain READY. Permainan akan dimulai otomatis…');
-      autoStartTimer=setTimeout(()=>{if(mp.host&&mp.room&&!mp.room.started)mpStartGame()},1200);
-    }
-  };
-
-  // Auto-ready after joined. Also auto-join URL room as soon as the page loads.
-  const previousMpHandle=mpHandle;
-  mpHandle=function(msg){
-    if(msg.type==='joined'){
-      mp.room=msg.room;mp.seat=msg.seat;mp.host=!!msg.host;mp.started=!!msg.room.started;
-      mp.ready=!!(msg.room.players?.[msg.seat]?.ready);
-      if(!mp.host&&!mp.ready){mp.ready=true;setTimeout(()=>mpSend('ready',{ready:true}),50);}
-      if(mp.host&&!mp.ready){mp.ready=true;setTimeout(()=>mpSend('ready',{ready:true}),50);}
-      setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('mp-room-code-display',msg.room.code);mpRenderLobby(msg.room);saveRoomSession();
-      if(mp.host){setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');renderRoomQr(msg.room.code);}
-      else {setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');}
-      return;
-    }
-    if(msg.type==='lobby'){
-      mp.room=msg.room; mpRenderLobby(msg.room); saveRoomSession(); return;
-    }
-    if(msg.type==='startGame'){
-      mp.started=true; mp.room&&(mp.room.started=true);saveRoomSession({started:true}); if(mp.host)start4PGame('Hard',true); else nav('screen-game'); return;
-    }
-    if(msg.type==='error'){console.warn('room error',msg.message);alert(msg.message||'Room error');return;}
-    if(typeof previousMpHandle==='function') return previousMpHandle(msg);
-  };
-
-  // Query auto-join and session resume.
-  function bootAutoJoin(){
-    const code=getRoomFromUrl(); const name=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';
-    if(!code)return;
-    mp.playerName=name;isMultiplayerMode=true;setDisplay('modal-lobby','flex');setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');
-    setText('lobby-help','Menghubungkan ke Room '+code+'…'); joiningFromUrl=true; mpConnect(code,'guest');
-  }
-  window.addEventListener('DOMContentLoaded',()=>setTimeout(bootAutoJoin,250));
-  window.addEventListener('pagehide',()=>saveRoomSession());
-})();
-</script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js" defer></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" defer></script>
 </body>

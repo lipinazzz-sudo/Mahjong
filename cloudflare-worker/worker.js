@@ -157,8 +157,20 @@ export class MahjongRoom extends DurableObject {
     meta.seat = seat; meta.role = "guest"; meta.name = name;
     this.sendJoined(ws, false);
     this.broadcastLobby();
+    this.maybeAutoStart();
     if (this.lastState) this.send(ws, { type: "state", state: this.lastState });
     if (this.started) this.send(ws, { type: "startGame" });
+  }
+
+  maybeAutoStart() {
+    if (this.started) return false;
+    const players = this.players.filter(Boolean);
+    if (players.length !== MAX_PLAYERS) return false;
+    if (!players.every(p => p.ready)) return false;
+    this.started = true;
+    this.broadcast({ type: "startGame" });
+    if (this.lastState) this.broadcast({ type: "state", state: this.lastState });
+    return true;
   }
 
   sendJoined(ws, host) {
@@ -175,6 +187,7 @@ export class MahjongRoom extends DurableObject {
     const p = this.players[meta.seat]; if (!p) return;
     p.ready = ready;
     this.broadcastLobby();
+    this.maybeAutoStart();
   }
 
   startGame(ws) {
