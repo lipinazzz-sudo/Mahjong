@@ -8,6 +8,211 @@
     <meta name="description" content="Mahyong DJ — PWA Riichi Mahjong dengan AI dan Local P2P multiplayer.">
     <title>Mahyong DJ — Riichi Mahjong Local P2P</title>
     <style>
+        <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Web Mahjong - Auto Scale & M-Soul Layout</title>
+    <style>
+        /* =========================================
+           1. RESET & BASE STYLE
+        ========================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            touch-action: manipulation; /* Mencegah delay tap di mobile */
+            user-select: none;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* =========================================
+           2. MAIN CONTAINER & AUTO-SCALE (PORTRAIT)
+        ========================================= */
+        #screen-game {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-board {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            max-width: 177.78vh; /* Rasio 16:9 Landscape */
+            max-height: 56.25vw; /* Rasio 16:9 Landscape */
+            background: radial-gradient(circle, #2e7d32, #1b5e20); /* Warna meja hijau */
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        /* Mode Portrait: Papan di-scale agar muat di HP */
+        #game-board.is-portrait {
+            transform: scale(var(--portrait-scale, 1));
+            transform-origin: center center;
+        }
+
+        /* Hapus overlay peringatan jika sebelumnya ada */
+        .landscape-required-overlay { display: none !important; }
+
+        /* =========================================
+           3. UI TENGAH (CENTER BOARD)
+        ========================================= */
+        .center-board {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 220px;
+            height: 220px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            border: 2px solid #555;
+            z-index: 10;
+        }
+        .round-info { font-size: 24px; font-weight: bold; margin-bottom: 10px; color: #ffeb3b; }
+        .score-info { font-size: 16px; margin: 5px 0; }
+        .tiles-left { margin-top: 15px; font-size: 14px; color: #aaa; }
+
+        /* =========================================
+           4. PEMAIN & SUSUNAN UBIN
+        ========================================= */
+        .avatar {
+            width: 60px;
+            height: 60px;
+            background: #444;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            position: absolute;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            z-index: 20;
+        }
+
+        /* Desain Ubin (Tile) Umum */
+        .tile {
+            width: 36px;
+            height: 52px;
+            background: linear-gradient(to bottom, #fff, #ddd);
+            border: 1px solid #999;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.4), inset -1px -1px 2px rgba(0,0,0,0.2);
+            color: #d32f2f; /* Warna teks ubin dummy */
+            position: relative;
+        }
+        .tile.back { background: #ff9800; border-color: #e65100; color: transparent; }
+
+        /* A. Pemain Utama (Bawah) */
+        .player-bottom { position: absolute; bottom: 2%; left: 0; right: 0; height: 90px; }
+        .player-bottom .avatar { bottom: 10px; left: 5%; width: 80px; height: 80px; }
+        .player-bottom .hand-tiles {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%) scale(1.1); /* Ubin sendiri lebih besar */
+            display: flex;
+            gap: 2px;
+            transform-origin: bottom center;
+        }
+        .player-bottom .tile { cursor: pointer; transition: transform 0.15s ease-out; }
+        .player-bottom .tile:hover, .player-bottom .tile:active { transform: translateY(-15px); }
+        .player-bottom .tile.tsumo { margin-left: 12px; } /* Jarak ubin tarik (ke-14) */
+
+        /* B. Lawan Kanan */
+        .player-right { position: absolute; top: 0; right: 2%; bottom: 0; width: 60px; }
+        .player-right .avatar { top: 10%; right: 10px; }
+        .player-right .hand-tiles {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%) scale(0.7);
+            display: flex;
+            flex-direction: column;
+            gap: -20px; /* Overlap gaya 3D (Opsional) */
+        }
+        .player-right .tile { transform: rotate(-90deg); margin: 5px 0; }
+
+        /* C. Lawan Atas */
+        .player-top { position: absolute; top: 2%; left: 0; right: 0; height: 60px; }
+        .player-top .avatar { top: 10px; right: 15%; }
+        .player-top .hand-tiles {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.7) rotate(180deg);
+            display: flex;
+            gap: 2px;
+        }
+
+        /* D. Lawan Kiri */
+        .player-left { position: absolute; top: 0; left: 2%; bottom: 0; width: 60px; }
+        .player-left .avatar { bottom: 10%; left: 10px; }
+        .player-left .hand-tiles {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%) scale(0.7);
+            display: flex;
+            flex-direction: column;
+        }
+        .player-left .tile { transform: rotate(90deg); margin: 5px 0; }
+
+        /* =========================================
+           5. KOLAM BUANGAN (RIVER)
+        ========================================= */
+        .discard-pile { position: absolute; display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; }
+        .discard-pile .tile { width: 26px; height: 38px; font-size: 18px; transform: scale(0.85); }
+        
+        .discard-bottom { top: 62%; left: 50%; transform: translateX(-50%); }
+        .discard-top { bottom: 62%; left: 50%; transform: translateX(-50%) rotate(180deg); }
+        .discard-left { left: 60%; top: 50%; transform: translateY(-50%) rotate(90deg); margin-left: -50px;}
+        .discard-right { right: 60%; top: 50%; transform: translateY(-50%) rotate(-90deg); margin-right: -50px; }
+
+        /* =========================================
+           6. TOMBOL AKSI (CHI, PON, KAN, RON)
+        ========================================= */
+        .action-buttons {
+            position: absolute;
+            bottom: 22%;
+            right: 15%;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            padding: 10px 25px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 30px;
+            background: linear-gradient(to bottom, #fff176, #f57f17);
+            border: 2px solid #fff;
+            color: #d84315;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .action-buttons button:active { transform: scale(0.9); }
+    </style>
         :root {
             color-scheme: dark;
             --bg: #06101a;
@@ -4285,40 +4490,52 @@ window.addEventListener('pointerdown',()=>{try{if(typeof startChineseMusic==='fu
 </script>
 
 <script>
-/* FINAL LANDSCAPE GUARD — gameplay uses one geometry on phone/iPad/iPad mini. */
-(function(){
-  const game=document.getElementById('screen-game');
-  if(!game) return;
-  function sync(){
-    const vv=window.visualViewport;
-    const w=Math.max(1,vv?.width||window.innerWidth);
-    const h=Math.max(1,vv?.height||window.innerHeight);
-    const portrait=h>w;
-    game.classList.toggle('landscape-required',portrait);
-    const b=document.getElementById('game-board');
-    if(b){
-      b.style.setProperty('--landscape-width',w+'px');
-      b.style.setProperty('--landscape-height',h+'px');
-      /* Safe mode for short landscape viewports: iPhone landscape,
-         iPad mini split view, browser chrome, or Stage Manager. */
-      const shortLandscape = !portrait && (h < 430 || (w / Math.max(h,1)) > 2.65 || w < 620);
-      b.classList.toggle('safe-mode', !!shortLandscape);
-    }
-  }
-  sync();
-  window.addEventListener('resize',sync,{passive:true});
-  window.addEventListener('orientationchange',()=>setTimeout(sync,80),{passive:true});
-  if(window.visualViewport) window.visualViewport.addEventListener('resize',sync,{passive:true});
+    /* =========================================
+       SISTEM AUTO-SCALE PORTRAIT & LANDSCAPE
+    ========================================= */
+    (function(){
+        const board = document.getElementById('game-board');
+        
+        function syncLayout(){
+            const vv = window.visualViewport;
+            const w = Math.max(1, vv?.width || window.innerWidth);
+            const h = Math.max(1, vv?.height || window.innerHeight);
+            const isPortrait = h > w;
 
-  /* Prevent accidental browser zoom/double-tap while a round is running. */
-  let lastTouch=0;
-  document.addEventListener('touchend',function(e){
-    const now=Date.now();
-    if(now-lastTouch<320 && document.getElementById('screen-game')?.classList.contains('active')) e.preventDefault();
-    lastTouch=now;
-  },{passive:false});
-})();
+            if(isPortrait){
+                board.classList.add('is-portrait');
+                // Hitung skala berdasarkan lebar layar HP, dengan max-width virtual 177.78vh
+                // Angka 900 adalah perkiraan lebar render 16:9 yang aman.
+                const scale = Math.min(w / 900, h / 500); 
+                board.style.setProperty('--portrait-scale', scale * 1.5); // Diperbesar 1.5x agar pas di layar HP
+            } else {
+                board.classList.remove('is-portrait');
+                board.style.removeProperty('--portrait-scale');
+            }
+        }
+
+        // Panggil saat awal dimuat
+        syncLayout();
+
+        // Panggil saat layar diputar atau di-resize
+        window.addEventListener('resize', syncLayout, {passive: true});
+        window.addEventListener('orientationchange', () => setTimeout(syncLayout, 100), {passive: true});
+        if(window.visualViewport) {
+            window.visualViewport.addEventListener('resize', syncLayout, {passive: true});
+        }
+
+        // Mencegah double tap to zoom di mobile
+        let lastTouch = 0;
+        document.addEventListener('touchend', function(e){
+            const now = Date.now();
+            if(now - lastTouch <= 300) {
+                if (e.target.tagName !== 'BUTTON' && !e.target.classList.contains('tile')) {
+                    e.preventDefault();
+                }
+            }
+            lastTouch = now;
+        }, {passive: false});
+    })();
 </script>
-
 </body>
 </html>
