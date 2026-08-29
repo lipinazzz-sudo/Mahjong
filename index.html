@@ -2241,7 +2241,1043 @@
   #game-board .player-seat.pos-left{left:5px;top:34%}
   #game-board .player-seat.pos-right{right:5px;top:34%}
 }
+<!-- =========================================================
+     MAHYONG DJ — FINAL VISUAL FIX
+     Tempelkan BLOK INI tepat sebelum </head>
+     pada index.html kamu.
+     ========================================================= -->
 
+<style>
+/* =========================================================
+   1. MEJA — PERSPEKTIF SEPERTI SCREENSHOT
+   ========================================================= */
+
+#game-board{
+    --fix-center:124px;
+    --fix-river-w:136px;
+    --fix-side-x:214px;
+
+    isolation:isolate;
+
+    background:
+        radial-gradient(
+            ellipse at 50% 48%,
+            rgba(220,160,90,.18),
+            transparent 55%
+        ),
+        linear-gradient(
+            135deg,
+            #28252b 0%,
+            #4b3d38 30%,
+            #685247 55%,
+            #30292d 100%
+        ) !important;
+}
+
+/* Papan meja berbentuk trapesium */
+#game-board::before{
+    content:"";
+    position:absolute;
+
+    left:7%;
+    right:7%;
+    top:6%;
+    bottom:10%;
+
+    z-index:0;
+    pointer-events:none;
+
+    background:
+        radial-gradient(
+            ellipse at 50% 55%,
+            rgba(255,193,104,.12),
+            transparent 48%
+        ),
+        linear-gradient(
+            180deg,
+            rgba(100,72,60,.55),
+            rgba(45,40,43,.35)
+        );
+
+    clip-path:polygon(
+        17% 0,
+        83% 0,
+        100% 100%,
+        0 100%
+    );
+
+    border:1px solid rgba(229,191,123,.25);
+
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.025),
+        inset 0 -50px 100px rgba(0,0,0,.16),
+        0 0 0 1px rgba(0,0,0,.2);
+}
+
+#game-board::after{
+    content:"";
+    position:absolute;
+
+    left:7.5%;
+    right:7.5%;
+    top:7%;
+    bottom:11%;
+
+    z-index:0;
+    pointer-events:none;
+
+    clip-path:polygon(
+        18% 0,
+        82% 0,
+        98.5% 100%,
+        1.5% 100%
+    );
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent 49.8%,
+            rgba(255,255,255,.025) 50%,
+            transparent 50.2%
+        ),
+        linear-gradient(
+            0deg,
+            transparent 49.8%,
+            rgba(255,255,255,.02) 50%,
+            transparent 50.2%
+        );
+
+    box-shadow:
+        inset 0 0 35px rgba(0,0,0,.18);
+
+    animation:none !important;
+}
+
+
+/* =========================================================
+   2. CENTER
+   ========================================================= */
+
+#game-board .center-board{
+    left:var(--safe-mid-x) !important;
+    top:45% !important;
+
+    width:var(--fix-center) !important;
+    height:var(--fix-center) !important;
+
+    border-radius:14px;
+
+    border:1px solid rgba(236,192,116,.42);
+
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            rgba(74,112,136,.2),
+            transparent 50%
+        ),
+        linear-gradient(
+            180deg,
+            #1b2029,
+            #080a0f
+        );
+
+    box-shadow:
+        0 12px 28px rgba(0,0,0,.5),
+        inset 0 0 25px rgba(0,0,0,.25);
+}
+
+
+/* =========================================================
+   3. SCORE DI CENTER — DIPERKECIL AGAR RIVER TIDAK MENABRAK
+   ========================================================= */
+
+#game-board .score-tag{
+    min-width:50px !important;
+    padding:3px 5px !important;
+    font-size:7px !important;
+
+    border-radius:6px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(25,31,39,.98),
+            rgba(7,11,17,.98)
+        );
+}
+
+#game-board .score-south{
+    bottom:-27px !important;
+}
+
+#game-board .score-north{
+    top:-27px !important;
+}
+
+#game-board .score-east{
+    right:-56px !important;
+}
+
+#game-board .score-west{
+    left:-56px !important;
+}
+
+
+/* =========================================================
+   4. RIVER ATAS / BAWAH
+   DIPERSEMPIT KHUSUS YOU + P2
+   ========================================================= */
+
+#game-board .river-top,
+#game-board .river-bottom{
+    width:var(--fix-river-w) !important;
+
+    grid-template-columns:
+        repeat(6,var(--discard-w)) !important;
+
+    gap:1px !important;
+
+    justify-content:center;
+}
+
+
+/* P2 / NORTH */
+#game-board .river-top{
+    left:var(--safe-mid-x) !important;
+
+    top:
+        calc(
+            45%
+            - var(--fix-center)/2
+            - 12px
+            - (var(--discard-h)*1.5)
+        ) !important;
+
+    transform:
+        translate(-50%,-50%)
+        rotate(180deg) !important;
+}
+
+
+/* YOU / SOUTH */
+#game-board .river-bottom{
+    left:var(--safe-mid-x) !important;
+
+    top:
+        calc(
+            45%
+            + var(--fix-center)/2
+            + 12px
+            + (var(--discard-h)*1.5)
+        ) !important;
+
+    transform:
+        translate(-50%,-50%) !important;
+}
+
+
+/* Tile buangan */
+#game-board .discard-tile{
+    border-radius:2px !important;
+
+    box-shadow:
+        0 2px 4px rgba(0,0,0,.35) !important;
+}
+
+
+/* =========================================================
+   5. RIVER KIRI / KANAN
+   ========================================================= */
+
+#game-board .river-left,
+#game-board .river-right{
+    height:var(--fix-river-w) !important;
+
+    width:
+        calc(
+            var(--discard-h)*3 + 5px
+        ) !important;
+
+    grid-template-columns:
+        repeat(6,var(--discard-w)) !important;
+
+    gap:1px !important;
+
+    top:45% !important;
+}
+
+
+/* Player 3 */
+#game-board .river-left{
+    left:
+        calc(
+            var(--safe-mid-x)
+            - var(--fix-side-x)
+        ) !important;
+
+    transform:
+        translate(-50%,-50%)
+        rotate(90deg) !important;
+}
+
+
+/* Player 1 */
+#game-board .river-right{
+    left:
+        calc(
+            var(--safe-mid-x)
+            + var(--fix-side-x)
+        ) !important;
+
+    transform:
+        translate(-50%,-50%)
+        rotate(-90deg) !important;
+}
+
+
+/* =========================================================
+   6. WALL — GESER KE LUAR AGAR AVATAR TIDAK TERTUTUP
+   ========================================================= */
+
+#game-board .enemy-hand-top{
+    left:var(--safe-mid-x) !important;
+
+    top:
+        calc(
+            var(--safe-t) + 6px
+        ) !important;
+
+    transform:
+        translateX(-50%) !important;
+
+    gap:1px !important;
+}
+
+
+/* WALL KIRI — lebih maju ke luar */
+#game-board .side-left{
+    left:
+        clamp(
+            18px,
+            4.8vw,
+            52px
+        ) !important;
+
+    transform:
+        translateY(-50%)
+        rotate(13deg) !important;
+}
+
+
+/* WALL KANAN — lebih maju ke luar */
+#game-board .side-right{
+    right:
+        clamp(
+            18px,
+            4.8vw,
+            52px
+        ) !important;
+
+    transform:
+        translateY(-50%)
+        rotate(-13deg) !important;
+}
+
+
+/* =========================================================
+   7. AVATAR PLAYER 3 & PLAYER 1
+   ========================================================= */
+
+#game-board .player-seat.pos-left{
+    left:
+        clamp(
+            4px,
+            1vw,
+            18px
+        ) !important;
+
+    top:37% !important;
+
+    z-index:50 !important;
+}
+
+
+#game-board .player-seat.pos-right{
+    right:
+        clamp(
+            4px,
+            1vw,
+            18px
+        ) !important;
+
+    top:37% !important;
+
+    z-index:50 !important;
+}
+
+
+/* Player 2 */
+#game-board .player-seat.pos-top{
+    right:
+        clamp(
+            60px,
+            13vw,
+            140px
+        ) !important;
+
+    top:
+        clamp(
+            6px,
+            1.5vw,
+            15px
+        ) !important;
+
+    z-index:50 !important;
+}
+
+
+/* You */
+#game-board .player-seat.pos-bottom{
+    left:
+        clamp(
+            145px,
+            21vw,
+            225px
+        ) !important;
+
+    bottom:
+        calc(
+            var(--tile-h)
+            + var(--safe-b)
+            + 8px
+        ) !important;
+
+    z-index:50 !important;
+}
+
+
+/* Avatar */
+#game-board .avatar-img{
+    width:
+        clamp(
+            38px,
+            4.5vw,
+            49px
+        ) !important;
+
+    height:
+        clamp(
+            38px,
+            4.5vw,
+            49px
+        ) !important;
+
+    border-radius:8px !important;
+}
+
+
+/* =========================================================
+   8. HAND PEMAIN — SEPERTI SCREENSHOT
+   ========================================================= */
+
+#game-board .hand-bottom-container{
+    left:var(--safe-l) !important;
+    right:var(--safe-r) !important;
+
+    bottom:var(--safe-b) !important;
+
+    min-height:
+        calc(
+            var(--tile-h)
+            + var(--safe-b)
+            + 7px
+        ) !important;
+
+    padding:
+        0
+        max(10px,var(--safe-l))
+        max(3px,var(--safe-b)) !important;
+
+    display:flex !important;
+
+    align-items:flex-end !important;
+    justify-content:center !important;
+
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+
+    background:
+        linear-gradient(
+            180deg,
+            transparent,
+            rgba(10,8,12,.22)
+        ) !important;
+}
+
+
+#game-board .hand-tiles{
+    gap:2px !important;
+
+    padding:
+        2px 3px 0 !important;
+
+    min-width:max-content !important;
+
+    justify-content:center !important;
+}
+
+
+#game-board .hand-bottom-container .tile{
+    border-radius:5px !important;
+
+    box-shadow:
+        0 3px 7px rgba(0,0,0,.38) !important;
+}
+
+
+/* =========================================================
+   9. MELD — JANGAN MENUTUP RIVER
+   ========================================================= */
+
+#game-board .melds-container{
+    right:
+        clamp(
+            10px,
+            2vw,
+            25px
+        ) !important;
+
+    bottom:
+        calc(
+            var(--tile-h)
+            + var(--safe-b)
+            + 8px
+        ) !important;
+
+    z-index:40 !important;
+}
+
+
+/* =========================================================
+   10. HASIL RONDE
+   TOMBOL LANJUT HARUS SELALU TERLIHAT
+   ========================================================= */
+
+#modal-result{
+    align-items:center !important;
+
+    padding:
+        max(8px,env(safe-area-inset-top))
+        max(8px,env(safe-area-inset-right))
+        max(8px,env(safe-area-inset-bottom))
+        max(8px,env(safe-area-inset-left)) !important;
+
+    overflow:hidden !important;
+}
+
+
+#modal-result .result-modal-box{
+    width:
+        min(
+            94vw,
+            900px
+        ) !important;
+
+    max-height:
+        calc(
+            100dvh - 16px
+        ) !important;
+
+    overflow-y:auto !important;
+
+    padding:14px !important;
+
+    box-sizing:border-box !important;
+}
+
+
+/* Ringkasan */
+#modal-result .result-summary{
+    gap:8px !important;
+
+    margin:
+        8px 0 10px !important;
+}
+
+
+#modal-result .result-summary-card{
+    min-height:58px !important;
+
+    padding:
+        8px 10px !important;
+}
+
+
+/* Score */
+#modal-result .result-score-list{
+    margin:
+        6px 0 8px !important;
+
+    padding:6px !important;
+}
+
+
+#modal-result .result-score-list .score-row{
+    min-height:40px !important;
+
+    padding:
+        4px 3px !important;
+}
+
+
+/* =========================================================
+   TOMBOL ROUND
+   ========================================================= */
+
+#modal-result .btn-wide{
+    position:sticky !important;
+
+    bottom:0 !important;
+
+    z-index:100 !important;
+
+    display:block !important;
+
+    width:
+        min(
+            100%,
+            360px
+        ) !important;
+
+    height:42px !important;
+
+    min-height:42px !important;
+
+    margin:
+        8px auto
+        0 !important;
+
+    box-shadow:
+        0 -8px 18px rgba(4,8,13,.55),
+        0 7px 16px rgba(0,0,0,.25) !important;
+}
+
+
+/* =========================================================
+   11. iPHONE 12 LANDSCAPE
+   1024 × 542 / 844 × 390
+   ========================================================= */
+
+@media
+(orientation:landscape)
+and (max-height:620px){
+
+    #game-board{
+        --fix-center:112px;
+        --fix-river-w:126px;
+        --fix-side-x:205px;
+    }
+
+    #game-board .center-board{
+        top:45% !important;
+    }
+
+    #game-board .river-top{
+        top:
+            calc(
+                45%
+                - var(--fix-center)/2
+                - 10px
+                - (var(--discard-h)*1.5)
+            ) !important;
+    }
+
+    #game-board .river-bottom{
+        top:
+            calc(
+                45%
+                + var(--fix-center)/2
+                + 10px
+                + (var(--discard-h)*1.5)
+            ) !important;
+    }
+
+    #game-board .river-left,
+    #game-board .river-right{
+        top:45% !important;
+    }
+
+    #game-board .player-seat.pos-left,
+    #game-board .player-seat.pos-right{
+        top:36% !important;
+    }
+
+    #game-board .player-seat.pos-bottom{
+        left:
+            clamp(
+                120px,
+                20vw,
+                210px
+            ) !important;
+    }
+
+    #game-board .dora-panel{
+        transform:scale(.92);
+        transform-origin:top left;
+    }
+
+    #game-board .top-right-btns{
+        transform:scale(.92);
+        transform-origin:top right;
+    }
+
+    #game-board .result-modal-box{
+        max-height:
+            calc(
+                100dvh - 8px
+            ) !important;
+
+        padding:10px !important;
+    }
+
+    #modal-result .result-summary{
+        grid-template-columns:
+            repeat(3,1fr) !important;
+
+        gap:6px !important;
+
+        margin:
+            5px 0 7px !important;
+    }
+
+    #modal-result .result-summary-card{
+        min-height:50px !important;
+
+        padding:
+            6px 8px !important;
+    }
+
+    #modal-result .result-summary-label{
+        font-size:8px !important;
+    }
+
+    #modal-result .result-summary-value{
+        font-size:12px !important;
+    }
+
+    #modal-result .result-summary-sub{
+        font-size:8px !important;
+    }
+
+    #modal-result .result-section-title{
+        font-size:9px !important;
+
+        margin-bottom:4px !important;
+    }
+
+    #modal-result .result-score-list{
+        margin:
+            4px 0 5px !important;
+
+        padding:4px !important;
+    }
+
+    #modal-result .result-score-list .score-row{
+        min-height:34px !important;
+
+        padding:
+            3px !important;
+    }
+
+    #modal-result .btn-wide{
+        height:40px !important;
+
+        min-height:40px !important;
+
+        margin-top:5px !important;
+
+        font-size:12px !important;
+    }
+}
+
+
+/* =========================================================
+   12. UPDATE TEXT TOMBOL ROUND SECARA OTOMATIS
+   ========================================================= */
+
+#next-round-btn{
+    font-weight:800 !important;
+
+    letter-spacing:.04em !important;
+
+    white-space:nowrap !important;
+
+    overflow:hidden !important;
+
+    text-overflow:ellipsis !important;
+}
+
+
+/* =========================================================
+   13. Z-INDEX FINAL
+   ========================================================= */
+
+#game-board .player-seat{
+    z-index:50 !important;
+}
+
+#game-board .score-tag{
+    z-index:45 !important;
+}
+
+#game-board .river-container{
+    z-index:20 !important;
+}
+
+#game-board .enemy-hand-top,
+#game-board .enemy-hand-side{
+    z-index:15 !important;
+}
+
+#game-board .center-board{
+    z-index:25 !important;
+}
+
+#game-board .hand-bottom-container{
+    z-index:60 !important;
+}
+</style>
+
+
+<script>
+/* =========================================================
+   FINAL ROUND BUTTON FIX
+   ========================================================= */
+
+(function(){
+
+    function updateNextRoundButton(){
+
+        const btn =
+            document.getElementById("next-round-btn");
+
+        if(!btn) return;
+
+        const round =
+            typeof currentRoundIndex === "number"
+                ? currentRoundIndex
+                : 0;
+
+        const scores =
+            Array.isArray(window.playerScores)
+                ? window.playerScores
+                : [];
+
+        const maxScore =
+            scores.length
+                ? Math.max(...scores)
+                : 0;
+
+        const continueGame =
+            round < 4 ||
+            (
+                round === 4 &&
+                maxScore < 30000
+            );
+
+        const nextRound =
+            round + 2;
+
+        btn.textContent =
+            continueGame
+                ? "LANJUT KE ROUND KE-" + nextRound + "  ›"
+                : "SELESAIKAN PERMAINAN  ›";
+    }
+
+
+    /*
+     * Pantau ketika modal hasil dibuka.
+     */
+    const observer =
+        new MutationObserver(function(){
+
+            const modal =
+                document.getElementById("modal-result");
+
+            if(
+                modal &&
+                getComputedStyle(modal).display !== "none"
+            ){
+                setTimeout(
+                    updateNextRoundButton,
+                    30
+                );
+            }
+        });
+
+
+    const modal =
+        document.getElementById("modal-result");
+
+    if(modal){
+
+        observer.observe(
+            modal,
+            {
+                attributes:true,
+                childList:true,
+                subtree:true
+            }
+        );
+    }
+
+
+    /*
+     * Jalankan juga ketika halaman selesai dimuat.
+     */
+    window.addEventListener(
+        "load",
+        function(){
+            setTimeout(
+                updateNextRoundButton,
+                200
+            );
+        }
+    );
+
+
+    /*
+     * Responsive sizing terakhir.
+     */
+    function finalMahjongSizing(){
+
+        const board =
+            document.getElementById("game-board");
+
+        if(!board) return;
+
+        const vv =
+            window.visualViewport;
+
+        const width =
+            vv?.width ||
+            window.innerWidth;
+
+        const height =
+            vv?.height ||
+            window.innerHeight;
+
+
+        if(width > height){
+
+            /*
+             * iPhone / tablet landscape
+             */
+            let tileW =
+                Math.min(
+                    44,
+                    Math.max(
+                        34,
+                        (width - 90) / 17
+                    )
+                );
+
+            if(height < 430){
+                tileW =
+                    Math.min(
+                        tileW,
+                        41
+                    );
+            }
+
+            board.style.setProperty(
+                "--tile-w",
+                tileW + "px"
+            );
+
+            board.style.setProperty(
+                "--tile-h",
+                (tileW * 1.42) + "px"
+            );
+
+            board.style.setProperty(
+                "--discard-w",
+                (tileW * .55) + "px"
+            );
+
+            board.style.setProperty(
+                "--discard-h",
+                (tileW * .78) + "px"
+            );
+
+        }else{
+
+            /*
+             * Portrait
+             */
+            let tileW =
+                Math.min(
+                    41,
+                    Math.max(
+                        29,
+                        (width - 24) / 15
+                    )
+                );
+
+            board.style.setProperty(
+                "--tile-w",
+                tileW + "px"
+            );
+
+            board.style.setProperty(
+                "--tile-h",
+                (tileW * 1.42) + "px"
+            );
+
+            board.style.setProperty(
+                "--discard-w",
+                (tileW * .55) + "px"
+            );
+
+            board.style.setProperty(
+                "--discard-h",
+                (tileW * .78) + "px"
+            );
+        }
+    }
+
+
+    finalMahjongSizing();
+
+    window.addEventListener(
+        "resize",
+        finalMahjongSizing,
+        {passive:true}
+    );
+
+    window.addEventListener(
+        "orientationchange",
+        function(){
+            setTimeout(
+                finalMahjongSizing,
+                100
+            );
+        },
+        {passive:true}
+    );
+
+    if(window.visualViewport){
+
+        window.visualViewport.addEventListener(
+            "resize",
+            finalMahjongSizing,
+            {passive:true}
+        );
+    }
+
+})();
+</script>
+    
 </style>
 </head>
 <body>
