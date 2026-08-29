@@ -5,8 +5,8 @@
     <meta name="app-version" content="24.0-mahyong-dj-responsive">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
-    <meta name="description" content="Mahyong DJ — PWA Riichi Mahjong dengan AI dan Local P2P multiplayer.">
-    <title>Mahyong DJ — Riichi Mahjong Local P2P</title>
+    <meta name="description" content="Mahyong DJ — Multiplayer.">
+    <title>Mahyong DJ — Multiplayer</title>
     
 
 
@@ -648,6 +648,382 @@ h1{margin-bottom:8px;font-size:clamp(2rem,6vw,4rem);line-height:.98;letter-spaci
     animation:none!important;
   }
 }
+
+/* ================================================================
+   FINAL iPHONE 12+ PRECISION PASS v2
+   Requested geometry:
+   - center board ~50% smaller
+   - side scores move above/below center, never left/right
+   - rivers: uniform compact 5-column grid
+   - Dora ~50% smaller and tighter to corner
+   - enemy wall tiles ~50% smaller, beside their wall sides
+   - single pause control; music/settings/quit appear only after pause
+   - tenpai/advisor notifications ~30% smaller and above hand
+   ================================================================ */
+
+@media (min-width:780px) and (max-width:932px) and (orientation:landscape){
+
+  /* ---------- 1. Corner HUD ---------- */
+  #game-board .topbar{
+    inset:var(--safe-t,4px) var(--safe-r,5px) auto var(--safe-l,5px);
+    height:42px;
+  }
+
+  #game-board .dora-panel{
+    left:0;
+    top:0;
+    width:96px;
+    height:50px;
+    padding:3px 4px;
+    border-width:1px;
+    border-radius:8px;
+  }
+  #game-board .hud-label{
+    font-size:5.5px;
+    letter-spacing:.14em;
+    margin-bottom:1px;
+  }
+  #game-board .dora-tiles{
+    height:20px;
+    gap:1px;
+  }
+  #game-board .dora-tile-box{
+    flex-basis:15px;
+    width:15px;
+    height:20px;
+    border-radius:2px;
+    font-size:8px;
+  }
+  #game-board .stick-counters{
+    font-size:4.5px;
+    margin-top:1px;
+  }
+  #game-board .kan-info{
+    font-size:4.5px;
+    margin-top:0;
+  }
+
+  /* ---------- 2. One pause button ---------- */
+  #game-board .top-right-btns{
+    top:0;
+    right:0;
+    display:block;
+  }
+  #game-board .pause-game-btn{
+    width:31px;
+    height:31px;
+    min-width:31px;
+    padding:0;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:950;
+    line-height:1;
+  }
+  #game-board .pause-menu{
+    position:absolute;
+    top:35px;
+    right:0;
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+    padding:3px;
+    border-radius:8px;
+    background:rgba(5,10,14,.95);
+    border:1px solid rgba(223,196,129,.42);
+    box-shadow:0 8px 18px rgba(0,0,0,.36);
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(-3px) scale(.96);
+    transform-origin:top right;
+    pointer-events:none;
+    transition:opacity .12s ease,transform .12s ease,visibility .12s ease;
+  }
+  #game-board .pause-menu.is-open{
+    opacity:1;
+    visibility:visible;
+    transform:translateY(0) scale(1);
+    pointer-events:auto;
+  }
+  #game-board .pause-menu-btn{
+    width:30px;
+    height:30px;
+    min-width:30px;
+    padding:0;
+    border:0;
+    border-radius:6px;
+    display:grid;
+    place-items:center;
+    background:rgba(24,31,36,.98);
+    color:#f4f5f6;
+    font-size:13px;
+  }
+
+  /* ---------- 3. Center board: approximately half ---------- */
+  #game-board .center-board{
+    width:86px;
+    height:86px;
+    border-radius:13px;
+    border-width:1px;
+    box-shadow:0 9px 20px rgba(0,0,0,.38),
+      inset 0 0 0 4px rgba(104,100,117,.20),
+      inset 0 0 0 7px rgba(13,13,18,.36);
+  }
+  #game-board .center-board::before{
+    inset:8px;
+    border-radius:8px;
+  }
+  #game-board .round-info{font-size:8px}
+  #game-board .turn-timer{
+    font-size:25px;
+    margin:1px 0;
+  }
+  #game-board .tiles-left{font-size:6px}
+
+  /* ---------- 4. ALL four score tags use vertical axis.
+     East and West are moved above/below the center rather than
+     sitting beside it. They remain semantically labeled. ---------- */
+  #game-board .score-tag{
+    min-width:43px;
+    padding:3px 4px;
+    border-radius:5px;
+    font-size:6px;
+    line-height:1.05;
+    text-align:center;
+  }
+  #game-board .score-tag::before{
+    font-size:4.5px;
+    margin-bottom:1px;
+  }
+  #game-board .score-north{
+    left:50%;
+    top:-24px;
+    right:auto;
+    bottom:auto;
+    transform:translateX(-50%);
+  }
+  #game-board .score-south{
+    left:50%;
+    bottom:-24px;
+    top:auto;
+    right:auto;
+    transform:translateX(-50%);
+  }
+  #game-board .score-east{
+    left:50%;
+    top:-49px;
+    right:auto;
+    bottom:auto;
+    transform:translateX(-50%);
+  }
+  #game-board .score-west{
+    left:50%;
+    bottom:-49px;
+    right:auto;
+    top:auto;
+    transform:translateX(-50%);
+  }
+
+  /* ---------- 5. Rivers: equal compact 5-column blocks ---------- */
+  #game-board .river-container{
+    --discard-w:clamp(16px,2.05vw,19px);
+    --discard-h:clamp(23px,3.0vw,27px);
+    grid-template-columns:repeat(5,var(--discard-w));
+    grid-auto-rows:var(--discard-h);
+    gap:2px;
+    width:calc(var(--discard-w)*5 + 8px);
+    height:calc(var(--discard-h)*5 + 8px);
+  }
+
+  #game-board .river-top{
+    left:50%;
+    top:48px;
+    transform:translateX(-50%) rotate(180deg);
+  }
+  #game-board .river-bottom{
+    left:50%;
+    bottom:calc(var(--phone-tile-h) + 12px);
+    transform:translateX(-50%);
+  }
+  #game-board .river-left{
+    left:calc(50% - 28vw);
+    top:49%;
+    transform:translateY(-50%) rotate(90deg);
+  }
+  #game-board .river-right{
+    right:calc(50% - 28vw);
+    top:49%;
+    transform:translateY(-50%) rotate(-90deg);
+  }
+  #game-board .discard-tile{
+    width:var(--discard-w);
+    height:var(--discard-h);
+    border-radius:2px;
+    border-bottom-width:1.5px;
+    box-shadow:0 2px 4px rgba(0,0,0,.25);
+  }
+
+  /* ---------- 6. Enemy walls: 50% smaller and directly beside
+     their respective left/right wall edge ---------- */
+  #game-board .enemy-hand-top{
+    top:25px;
+    left:50%;
+    gap:1px;
+  }
+  #game-board .enemy-hand-top .tile-back{
+    width:13px;
+    height:19px;
+    border-bottom-width:1.5px;
+    border-radius:2px;
+  }
+  #game-board .enemy-hand-side{
+    top:21%;
+    gap:1px;
+  }
+  #game-board .enemy-hand-side.side-left{
+    left:5.8%;
+  }
+  #game-board .enemy-hand-side.side-right{
+    right:5.8%;
+  }
+  #game-board .enemy-hand-side .tile-back{
+    width:19px;
+    height:13px;
+    border-bottom-width:1.5px;
+    border-radius:2px;
+  }
+
+  /* ---------- 7. Player seats ---------- */
+  #game-board .player-seat .avatar-img{
+    width:39px;
+    height:39px;
+    border-width:2px;
+    border-radius:8px;
+  }
+  #game-board .avatar-name{
+    margin-top:1px;
+    padding:2px 4px;
+    border-radius:5px;
+    font-size:6px;
+  }
+  #game-board .time-bank-tag{
+    margin-top:1px;
+    padding:2px 4px;
+    font-size:5px;
+  }
+  #game-board .pos-top{
+    top:2px;
+    right:15%;
+  }
+  #game-board .pos-left{
+    left:1.5%;
+    top:42%;
+  }
+  #game-board .pos-right{
+    right:1.5%;
+    top:42%;
+  }
+  #game-board .pos-bottom{
+    left:13%;
+    bottom:calc(var(--phone-tile-h) + 2px);
+  }
+
+  /* ---------- 8. Melds tucked near right wall ---------- */
+  #game-board .melds-container{
+    right:2.2%;
+    bottom:calc(var(--phone-tile-h) + 2px);
+    gap:2px;
+  }
+  #game-board .meld-group{
+    gap:1px;
+    padding:1px;
+    border-radius:3px;
+  }
+  #game-board .meld-group .tile{
+    width:16px;
+    height:23px;
+  }
+
+  /* ---------- 9. Bottom hand: preserve 14-tile fit ---------- */
+  #game-board .hand-bottom-container{
+    bottom:var(--safe-b,4px);
+    min-height:calc(var(--phone-tile-h) + 2px);
+  }
+  #game-board .hand-tiles{
+    gap:1px;
+    padding:0;
+  }
+  #game-board .tile{
+    width:var(--phone-tile-w);
+    height:var(--phone-tile-h);
+    border-radius:4px;
+    border-bottom-width:2px;
+  }
+  #game-board .tile.selected-tile{
+    transform:translateY(-5px);
+  }
+  #game-board .drawn-tile-gap{
+    margin-left:5px;
+  }
+  #game-board .tile-char{font-size:clamp(16px,3.0vw,20px)}
+  #game-board .tile-helper{font-size:5px;top:2px;right:2px}
+
+  /* ---------- 10. Tenpai / advisor notification ~30% size.
+     It sits immediately above the hand, never over tile faces. ---------- */
+  #game-board .hand-status{
+    bottom:calc(var(--phone-tile-h) + 2px);
+    width:min(215px,34vw);
+    padding:3px 5px;
+    border-radius:999px;
+    box-shadow:0 4px 10px rgba(0,0,0,.20);
+  }
+  #game-board .hand-status .status-main{font-size:5.5px}
+  #game-board .hand-status .status-sub{font-size:4.5px;margin-top:1px}
+  #game-board .advisor-line{font-size:5px;margin-top:1px}
+
+  #game-board .furiten-panel{
+    bottom:calc(var(--phone-tile-h) + 23px);
+    width:min(170px,31vw);
+    padding:3px 5px;
+  }
+  #game-board .furiten-status{font-size:5px}
+
+  /* Keep action buttons clear of hand and status. */
+  #game-board #action-overlay{
+    right:2%;
+    bottom:calc(var(--phone-tile-h) + 2px);
+    max-width:34vw;
+    gap:2px;
+    padding:3px;
+    border-radius:6px;
+  }
+  #game-board .act-btn{
+    min-width:37px;
+    min-height:25px;
+    padding:3px 4px;
+    border-radius:5px;
+    font-size:7px;
+  }
+}
+
+/* Small modern landscape phone */
+@media (max-width:819px) and (orientation:landscape){
+  #game-board .dora-panel{
+    width:90px;
+    height:47px;
+  }
+  #game-board .center-board{
+    width:80px;
+    height:80px;
+  }
+  #game-board .score-tag{min-width:40px}
+  #game-board .score-east{top:-47px}
+  #game-board .score-west{bottom:-47px}
+}
+
+/* Do not let pause controls become another overlay on the table. */
+#game-board .pause-menu button,
+#game-board .pause-game-btn{touch-action:manipulation}
+
 </style>
 </head>
 <body>
@@ -816,9 +1192,12 @@ h1{margin-bottom:8px;font-size:clamp(2rem,6vw,4rem);line-height:.98;letter-spaci
                     <div class="furiten-status" id="furiten-status"></div>
                 </div>
                 <div class="top-right-btns">
-                    <button class="icon-btn" onclick="toggleAudio()" title="Toggle music" aria-label="Toggle music">🎵</button>
-                    <button class="icon-btn" onclick="openSettingsFromGame()" title="Settings" aria-label="Settings">⚙️</button>
-                    <button class="icon-btn" onclick="quitGame()" title="Quit game" aria-label="Quit game">🚪</button>
+                    <button class="icon-btn pause-game-btn" onclick="toggleGamePauseMenu()" title="Pause" aria-label="Pause">Ⅱ</button>
+                    <div class="pause-menu" id="pause-menu" aria-hidden="true">
+                        <button class="pause-menu-btn" onclick="toggleAudio()" title="Toggle music" aria-label="Toggle music">🎵</button>
+                        <button class="pause-menu-btn" onclick="openSettingsFromGame(); closeGamePauseMenu()" title="Settings" aria-label="Settings">⚙️</button>
+                        <button class="pause-menu-btn" onclick="quitGame()" title="Quit game" aria-label="Quit game">🚪</button>
+                    </div>
                 </div>
             </div>
 
@@ -1000,6 +1379,23 @@ h1{margin-bottom:8px;font-size:clamp(2rem,6vw,4rem);line-height:.98;letter-spaci
 
     function openSettingsFromGame() {
         nav('screen-settings');
+    }
+
+    function closeGamePauseMenu(){
+        const m = document.getElementById('pause-menu');
+        const b = document.querySelector('.pause-game-btn');
+        if(m) { m.classList.remove('is-open'); m.setAttribute('aria-hidden','true'); }
+        if(b) b.setAttribute('aria-expanded','false');
+    }
+
+    function toggleGamePauseMenu(){
+        const m = document.getElementById('pause-menu');
+        const b = document.querySelector('.pause-game-btn');
+        if(!m) return;
+        const open = !m.classList.contains('is-open');
+        m.classList.toggle('is-open', open);
+        m.setAttribute('aria-hidden', String(!open));
+        if(b) b.setAttribute('aria-expanded', String(open));
     }
 
     function exitSettings() {
