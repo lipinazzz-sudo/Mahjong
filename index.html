@@ -1297,6 +1297,951 @@
   #game-board .river-right{left:calc(var(--safe-mid-x) + clamp(150px,18vw,310px))}
 }
 
+
+        /* =========================================================
+           MAHYONG DJ v25 — CLEAN TABLE GEOMETRY
+           One final geometry layer overrides the older responsive
+           passes without touching the game engine.
+           ========================================================= */
+        #game-board{
+            --safe-l: env(safe-area-inset-left, 0px);
+            --safe-r: env(safe-area-inset-right, 0px);
+            --safe-t: env(safe-area-inset-top, 0px);
+            --safe-b: env(safe-area-inset-bottom, 0px);
+            --safe-mid-x: calc((100% + var(--safe-l) - var(--safe-r)) / 2);
+            --safe-mid-y: calc((100% + var(--safe-t) - var(--safe-b)) / 2);
+
+            /* Keep one stable center size and derive the four rivers from it. */
+            --table-center: clamp(108px, 26vmin, 188px);
+            --river-block-h: calc((var(--discard-h) * 3) + 5px);
+            --river-gap: clamp(18px, 2.2vmin, 30px);
+            --side-river-distance: calc(
+                (var(--table-center) / 2) +
+                (var(--river-block-h) / 2) +
+                var(--river-gap)
+            );
+
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            padding: 0;
+        }
+
+        /* Stable, symmetric center. */
+        #game-board .center-board{
+            left: var(--safe-mid-x);
+            top: var(--safe-mid-y);
+            width: var(--table-center);
+            height: var(--table-center);
+            margin: 0;
+            transform: translate(-50%, -50%);
+            overflow: visible;
+        }
+
+        /* Four discard rivers form a consistent ring around the center. */
+        #game-board .river-container{
+            position: absolute;
+            z-index: 11;
+            will-change: transform;
+        }
+
+        #game-board .river-top{
+            left: var(--safe-mid-x);
+            top: calc(
+                var(--safe-mid-y) -
+                (var(--table-center) / 2) -
+                (var(--river-block-h) / 2) -
+                var(--river-gap)
+            );
+            right: auto;
+            bottom: auto;
+            transform: translate(-50%, -50%) rotate(180deg);
+        }
+
+        #game-board .river-bottom{
+            left: var(--safe-mid-x);
+            top: calc(
+                var(--safe-mid-y) +
+                (var(--table-center) / 2) +
+                (var(--river-block-h) / 2) +
+                var(--river-gap)
+            );
+            right: auto;
+            bottom: auto;
+            transform: translate(-50%, -50%);
+        }
+
+        #game-board .river-left{
+            left: calc(var(--safe-mid-x) - var(--side-river-distance));
+            top: var(--safe-mid-y);
+            right: auto;
+            bottom: auto;
+            transform: translate(-50%, -50%) rotate(90deg);
+        }
+
+        #game-board .river-right{
+            left: calc(var(--safe-mid-x) + var(--side-river-distance));
+            top: var(--safe-mid-y);
+            right: auto;
+            bottom: auto;
+            transform: translate(-50%, -50%) rotate(-90deg);
+        }
+
+        /* Player seats align to the same safe center line. */
+        #game-board .player-seat.pos-bottom{
+            left: var(--safe-mid-x);
+            right: auto;
+            bottom: calc(var(--tile-h) + var(--safe-b) + 7px);
+            top: auto;
+            transform: translateX(-50%);
+        }
+
+        #game-board .player-seat.pos-top{
+            left: var(--safe-mid-x);
+            right: auto;
+            top: calc(var(--safe-t) + 7px);
+            bottom: auto;
+            transform: translateX(-50%);
+        }
+
+        #game-board .player-seat.pos-left{
+            left: calc(var(--safe-l) + 7px);
+            top: var(--safe-mid-y);
+            right: auto;
+            bottom: auto;
+            transform: translateY(-50%);
+        }
+
+        #game-board .player-seat.pos-right{
+            right: calc(var(--safe-r) + 7px);
+            left: auto;
+            top: var(--safe-mid-y);
+            bottom: auto;
+            transform: translateY(-50%);
+        }
+
+        /* Keep enemy concealed hands between seats and their rivers. */
+        #game-board .enemy-hand-top{
+            left: var(--safe-mid-x);
+            top: calc(var(--safe-t) + 58px);
+            transform: translateX(-50%);
+        }
+
+        #game-board .enemy-hand-side{
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        #game-board .side-left{
+            left: calc(var(--safe-l) + 8px);
+        }
+
+        #game-board .side-right{
+            right: calc(var(--safe-r) + 8px);
+        }
+
+        /* Melds stay attached to the player's lower-right zone. */
+        #game-board .melds-container{
+            right: calc(var(--safe-r) + 8px);
+            bottom: calc(var(--tile-h) + var(--safe-b) + 8px);
+        }
+
+        /* Hand occupies a clean, dedicated bottom rail. */
+        #game-board .hand-bottom-container{
+            left: var(--safe-l);
+            right: var(--safe-r);
+            bottom: var(--safe-b);
+            width: auto;
+            min-height: calc(var(--tile-h) + 12px);
+            padding:
+                0
+                max(10px, var(--safe-r))
+                max(6px, var(--safe-b))
+                max(10px, var(--safe-l));
+            justify-content: center;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        #game-board .hand-tiles{
+            flex: 0 0 auto;
+            width: max-content;
+            max-width: none;
+            gap: clamp(2px, .28vw, 4px);
+            padding: 2px 4px 1px;
+        }
+
+        /* Status/action UI lives above the hand instead of drifting toward the board. */
+        #game-board .hand-status{
+            left: var(--safe-mid-x);
+            bottom: calc(var(--tile-h) + var(--safe-b) + 12px);
+            width: min(430px, 82vw);
+            z-index: 35;
+        }
+
+        #game-board #action-overlay{
+            left: var(--safe-mid-x);
+            bottom: calc(var(--tile-h) + var(--safe-b) + 52px);
+            max-width: min(560px, 92vw);
+            z-index: 40;
+        }
+
+        #game-board .beginner-tip{
+            left: var(--safe-mid-x);
+            bottom: calc(var(--tile-h) + var(--safe-b) + 50px);
+        }
+
+        #game-board .furiten-panel{
+            left: var(--safe-mid-x);
+            bottom: calc(var(--tile-h) + var(--safe-b) + 86px);
+        }
+
+        /* Slightly tighter geometry on short landscape screens. */
+        @media (orientation: landscape) and (max-height: 620px){
+            #game-board{
+                --table-center: clamp(104px, 23vmin, 154px);
+                --river-gap: clamp(12px, 1.8vmin, 22px);
+            }
+
+            #game-board .enemy-hand-top{
+                top: calc(var(--safe-t) + 44px);
+            }
+
+            #game-board .player-seat.pos-bottom{
+                bottom: calc(var(--tile-h) + var(--safe-b) + 4px);
+            }
+
+            #game-board .hand-status{
+                width: min(340px, 54vw);
+                bottom: calc(var(--tile-h) + var(--safe-b) + 5px);
+            }
+
+            #game-board #action-overlay{
+                bottom: calc(var(--tile-h) + var(--safe-b) + 8px);
+                max-width: 88vw;
+            }
+
+            #game-board .beginner-tip,
+            #game-board .furiten-panel{
+                display: none;
+            }
+        }
+
+        /* Tall portrait phones: give side rivers a little more breathing room. */
+        @media (orientation: portrait) and (max-width: 600px){
+            #game-board{
+                --table-center: clamp(106px, 27vmin, 146px);
+                --river-gap: clamp(16px, 2.2vmin, 24px);
+            }
+
+            #game-board .enemy-hand-top{
+                top: calc(var(--safe-t) + 82px);
+            }
+
+            #game-board .river-top{
+                /* Keep the upper river below the opponent's hand. */
+                margin-top: 2px;
+            }
+
+            #game-board .hand-status{
+                width: min(360px, 82vw);
+            }
+        }
+
+        /* Very narrow portrait: preserve touchable tiles and avoid side crowding. */
+        @media (orientation: portrait) and (max-width: 380px){
+            #game-board{
+                --table-center: 104px;
+                --river-gap: 18px;
+            }
+
+            #game-board .player-seat.pos-left,
+            #game-board .player-seat.pos-right{
+                top: 49%;
+            }
+
+            #game-board .hand-bottom-container{
+                justify-content: flex-start;
+            }
+        }
+
+
+
+        /* =========================================================
+           MAHYONG DJ v26 — REFERENCE TABLE LAYOUT
+           Match the compact, symmetrical composition of the supplied
+           Riichi reference image while preserving the existing engine.
+           ========================================================= */
+        #game-board{
+            --ref-center: clamp(106px, 15vw, 156px);
+            --ref-river-w: clamp(136px, 22vw, 220px);
+            --ref-river-gap: clamp(12px, 1.7vw, 22px);
+            --ref-side-offset: clamp(178px, 27vw, 330px);
+            background:
+                radial-gradient(circle at 50% 48%, rgba(255,255,255,.055), transparent 42%),
+                linear-gradient(135deg,#4b4750 0%,#403d46 46%,#302f38 100%);
+            box-shadow: inset 0 0 120px rgba(0,0,0,.34);
+        }
+
+        /* Subtle physical-table frame. */
+        #game-board::before{
+            inset: clamp(24px, 4.2vw, 58px);
+            background: none;
+            border: 1px solid rgba(255,255,255,.10);
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,.16), 0 0 0 1px rgba(0,0,0,.08);
+            border-radius: 3px;
+            opacity: 1;
+            z-index: 0;
+        }
+        #game-board::after{
+            inset: clamp(25px, 4.3vw, 59px);
+            background:
+                linear-gradient(90deg, transparent 49.8%, rgba(255,255,255,.022) 50%, transparent 50.2%),
+                linear-gradient(0deg, transparent 49.8%, rgba(255,255,255,.018) 50%, transparent 50.2%);
+            border-radius: 3px;
+            animation: none;
+            z-index: 0;
+        }
+
+        /* Keep the central information compact like the reference. */
+        #game-board .center-board{
+            width: var(--ref-center);
+            height: var(--ref-center);
+            border-radius: 18px;
+            background:
+                radial-gradient(circle at 50% 34%, rgba(75,116,151,.12), transparent 48%),
+                linear-gradient(180deg, rgba(18,27,38,.98), rgba(7,12,19,.98));
+            border: 1px solid rgba(255,255,255,.16);
+            box-shadow: 0 14px 34px rgba(0,0,0,.42), inset 0 0 0 1px rgba(255,255,255,.025);
+            animation: none;
+        }
+        #game-board .center-board::after{ display:none; }
+        #game-board .center-board::before{ inset:7px; border-radius:13px; }
+        #game-board .turn-timer{font-size:clamp(27px,4.2vw,41px);margin:4px 0 2px;}
+        #game-board .round-info{font-size:10px;letter-spacing:.10em;}
+        #game-board .tiles-left{font-size:9px;}
+
+        /* Score tags hover just outside the center box. */
+        #game-board .score-tag{min-width:52px;padding:4px 7px;font-size:8px;border-radius:7px;}
+        #game-board .score-tag::before{font-size:6px;margin-bottom:2px;}
+        #game-board .score-south{bottom:-31px;}
+        #game-board .score-north{top:-31px;}
+        #game-board .score-east{right:-61px;}
+        #game-board .score-west{left:-61px;}
+
+        /* Discard rivers: 3 rows x 6 columns around the center. */
+        #game-board .river-top,
+        #game-board .river-bottom{
+            width: var(--ref-river-w);
+            height: auto;
+            grid-template-columns: repeat(6, var(--discard-w));
+            justify-content: center;
+            column-gap: 3px;
+            row-gap: 3px;
+        }
+        #game-board .river-top{
+            top: calc(var(--safe-mid-y) - var(--ref-center)/2 - var(--ref-river-gap) - 4px);
+        }
+        #game-board .river-bottom{
+            top: calc(var(--safe-mid-y) + var(--ref-center)/2 + var(--ref-river-gap) + 4px);
+        }
+        #game-board .river-left,
+        #game-board .river-right{
+            height: var(--ref-river-w);
+            width: auto;
+            grid-template-columns: repeat(6, var(--discard-w));
+            justify-content: center;
+            column-gap: 3px;
+            row-gap: 3px;
+        }
+        #game-board .river-left{left:calc(var(--safe-mid-x) - var(--ref-side-offset));}
+        #game-board .river-right{left:calc(var(--safe-mid-x) + var(--ref-side-offset));}
+
+        /* Make discard tiles closer to the compact reference scale. */
+        #game-board .discard-tile{
+            border-radius:2px;
+            box-shadow:0 2px 4px rgba(0,0,0,.30);
+        }
+
+        /* Opponent hands become tight wall-like rows/columns. */
+        #game-board .enemy-hand-top{
+            top:calc(var(--safe-t) + clamp(42px, 5vw, 60px));
+            gap:1px;
+        }
+        #game-board .enemy-hand-top .tile-back{
+            width:clamp(13px,1.65vw,20px);
+            height:clamp(20px,2.45vw,29px);
+        }
+        #game-board .enemy-hand-side{
+            top:50%;
+            gap:1px;
+        }
+        #game-board .enemy-hand-side .tile-back{
+            width:clamp(20px,2.45vw,29px);
+            height:clamp(13px,1.65vw,20px);
+        }
+        #game-board .side-left{left:clamp(22px,3vw,44px);transform:translateY(-50%) rotate(0deg);}
+        #game-board .side-right{right:clamp(22px,3vw,44px);transform:translateY(-50%) rotate(0deg);}
+
+        /* Seat cards sit in the outer zones, not on top of the hand/river. */
+        #game-board .player-seat{z-index:16;}
+        #game-board .player-seat.pos-top{
+            top:calc(var(--safe-t) + 4px);
+        }
+        #game-board .player-seat.pos-left{
+            left:clamp(6px,1.8vw,28px);
+            top:33%;
+        }
+        #game-board .player-seat.pos-right{
+            right:clamp(6px,1.8vw,28px);
+            top:33%;
+        }
+        #game-board .player-seat.pos-bottom{
+            left:clamp(44px,10vw,150px);
+            bottom:calc(var(--tile-h) + var(--safe-b) + 18px);
+            transform:none;
+        }
+        #game-board .avatar-img{width:clamp(34px,4.8vw,46px);height:clamp(34px,4.8vw,46px);border-radius:10px;}
+        #game-board .avatar-name{font-size:8px;padding:3px 6px;}
+        #game-board .time-bank-tag{font-size:8px;padding:2px 5px;}
+
+        /* Bottom hand is the visual focal point, centered like the reference. */
+        #game-board .hand-bottom-container{
+            min-height:calc(var(--tile-h) + var(--safe-b) + 10px);
+            padding-left:max(14px,var(--safe-l));
+            padding-right:max(14px,var(--safe-r));
+            padding-bottom:max(6px,var(--safe-b));
+            background:linear-gradient(180deg, transparent 0%, rgba(0,0,0,.09) 100%);
+        }
+        #game-board .hand-tiles{
+            gap:2px;
+            padding:2px 4px 0;
+            justify-content:center;
+        }
+        #game-board .hand-bottom-container .tile{
+            box-shadow:0 4px 8px rgba(0,0,0,.28);
+        }
+
+        /* Melds sit immediately above the hand on the right. */
+        #game-board .melds-container{
+            right:clamp(9px,2vw,24px);
+            bottom:calc(var(--tile-h) + var(--safe-b) + 7px);
+        }
+        #game-board .meld-group{gap:1px;padding:2px;border-radius:5px;}
+        #game-board .meld-group .tile{width:clamp(18px,2.5vw,28px);height:clamp(26px,3.5vw,39px);}
+
+        /* Keep status/action elements from consuming the center play area. */
+        #game-board .hand-status{
+            width:min(310px,58vw);
+            bottom:calc(var(--tile-h) + var(--safe-b) + 6px);
+            padding:5px 9px;
+            border-radius:8px;
+        }
+        #game-board #action-overlay{
+            bottom:calc(var(--tile-h) + var(--safe-b) + 47px);
+            max-width:min(500px,82vw);
+            border-radius:10px;
+            padding:6px 8px;
+        }
+        #game-board .furiten-panel{bottom:calc(var(--tile-h) + var(--safe-b) + 75px);}
+        #game-board .beginner-tip{bottom:calc(var(--tile-h) + var(--safe-b) + 45px);}
+
+        /* Desktop/tablet. */
+        @media (min-width:900px){
+            #game-board{
+                --ref-center:clamp(126px,13.2vw,164px);
+                --ref-river-w:clamp(156px,18vw,230px);
+                --ref-side-offset:clamp(196px,27vw,345px);
+            }
+            #game-board .river-top,
+            #game-board .river-bottom{column-gap:4px;row-gap:4px;}
+            #game-board .player-seat.pos-bottom{left:clamp(62px,8vw,125px);}
+        }
+
+        /* Portrait phones: use the same composition, scaled inward. */
+        @media (orientation:portrait) and (max-width:600px){
+            #game-board{
+                --ref-center:clamp(104px,24vmin,136px);
+                --ref-river-w:clamp(130px,45vw,180px);
+                --ref-side-offset:clamp(128px,36vw,190px);
+            }
+            #game-board .river-top{top:calc(var(--safe-mid-y) - var(--ref-center)/2 - 24px);}
+            #game-board .river-bottom{top:calc(var(--safe-mid-y) + var(--ref-center)/2 + 24px);}
+            #game-board .river-left,
+            #game-board .river-right{height:var(--ref-river-w);}
+            #game-board .player-seat.pos-bottom{left:10px;bottom:calc(var(--tile-h) + var(--safe-b) + 11px);}
+            #game-board .player-seat.pos-left{top:31%;}
+            #game-board .player-seat.pos-right{top:31%;}
+            #game-board .enemy-hand-top{top:calc(var(--safe-t) + 65px);}
+            #game-board .side-left{left:6px;}
+            #game-board .side-right{right:6px;}
+            #game-board .score-east{right:-53px;}
+            #game-board .score-west{left:-53px;}
+            #game-board .score-south{bottom:-26px;}
+            #game-board .score-north{top:-26px;}
+        }
+
+        /* Landscape phones: match the wide reference composition. */
+        @media (orientation:landscape) and (max-height:700px){
+            #game-board{
+                --ref-center:clamp(100px,21vh,136px);
+                --ref-river-w:clamp(132px,21vw,190px);
+                --ref-side-offset:clamp(140px,25vw,225px);
+            }
+            #game-board .river-top{top:calc(var(--safe-mid-y) - var(--ref-center)/2 - 14px);}
+            #game-board .river-bottom{top:calc(var(--safe-mid-y) + var(--ref-center)/2 + 14px);}
+            #game-board .player-seat.pos-bottom{left:8px;bottom:calc(var(--tile-h) + var(--safe-b) + 8px);}
+            #game-board .player-seat.pos-left{top:50%;}
+            #game-board .player-seat.pos-right{top:50%;}
+            #game-board .enemy-hand-top{top:calc(var(--safe-t) + 36px);}
+            #game-board .hand-status{display:none;}
+            #game-board .beginner-tip,#game-board .furiten-panel{display:none;}
+            #game-board #action-overlay{bottom:calc(var(--tile-h) + var(--safe-b) + 7px);}
+        }
+
+        @media (orientation:landscape) and (max-width:420px){
+            #game-board{
+                --ref-center:94px;
+                --ref-river-w:118px;
+                --ref-side-offset:118px;
+            }
+            #game-board .enemy-hand-top{top:calc(var(--safe-t) + 30px);}
+            #game-board .side-left{left:3px;}
+            #game-board .side-right{right:3px;}
+            #game-board .player-seat.pos-bottom{left:4px;}
+        }
+
+
+
+        /* ===== MAHYONG DJ v27 — 90% REFERENCE COMPOSITION ===== */
+        #game-board{
+            --ref-center:clamp(96px,13vw,142px);
+            --ref-river-w:clamp(138px,20vw,218px);
+            --ref-river-gap:clamp(10px,1.5vw,18px);
+            --ref-side-offset:clamp(165px,25vw,305px);
+            --table-inset:clamp(26px,5vw,72px);
+            background:
+                radial-gradient(ellipse at 50% 48%,rgba(255,255,255,.08),transparent 48%),
+                linear-gradient(135deg,#4f4b53 0%,#454149 48%,#37343c 100%);
+        }
+        #game-board::before{
+            inset:var(--table-inset) clamp(24px,7vw,90px);
+            border:1px solid rgba(255,255,255,.17);
+            border-radius:2px;
+            background:rgba(0,0,0,.035);
+            clip-path:polygon(4% 0,96% 0,100% 100%,0 100%);
+            box-shadow:inset 0 0 0 1px rgba(0,0,0,.15),inset 0 0 50px rgba(0,0,0,.10),0 0 0 1px rgba(0,0,0,.06);
+            z-index:0;
+        }
+        #game-board::after{
+            inset:var(--table-inset) clamp(24px,7vw,90px);
+            background:
+                linear-gradient(90deg,transparent 49.8%,rgba(255,255,255,.027) 50%,transparent 50.2%),
+                linear-gradient(0deg,transparent 49.8%,rgba(255,255,255,.020) 50%,transparent 50.2%);
+            clip-path:polygon(4% 0,96% 0,100% 100%,0 100%);
+            animation:none;
+            z-index:0;
+        }
+        #game-board .center-board{
+            width:var(--ref-center);height:var(--ref-center);
+            border-radius:15px;
+            background:linear-gradient(180deg,rgba(25,29,38,.98),rgba(8,11,17,.99));
+            border:1px solid rgba(255,255,255,.18);
+            box-shadow:0 12px 28px rgba(0,0,0,.46),inset 0 0 24px rgba(0,0,0,.25);
+        }
+        #game-board .center-board::before{inset:6px;border-radius:11px;border-color:rgba(255,255,255,.045)}
+        #game-board .round-info{font-size:9px;letter-spacing:.13em}
+        #game-board .turn-timer{font-size:clamp(25px,4vw,38px);margin:3px 0 1px}
+        #game-board .tiles-left{font-size:8px}
+        #game-board .score-tag{min-width:49px;padding:3px 6px;font-size:7px;border-radius:6px;line-height:1.02}
+        #game-board .score-tag::before{font-size:5px;margin-bottom:2px}
+        #game-board .score-south{bottom:-27px}
+        #game-board .score-north{top:-27px}
+        #game-board .score-east{right:-57px}
+        #game-board .score-west{left:-57px}
+
+        /* Tight 3 x 6 discard blocks around the center. */
+        #game-board .river-top,#game-board .river-bottom{
+            width:var(--ref-river-w);height:auto;
+            grid-template-columns:repeat(6,var(--discard-w));
+            gap:2px;
+            justify-content:center;
+        }
+        #game-board .river-top{top:calc(var(--safe-mid-y) - var(--ref-center)/2 - var(--ref-river-gap));}
+        #game-board .river-bottom{top:calc(var(--safe-mid-y) + var(--ref-center)/2 + var(--ref-river-gap));}
+        #game-board .river-left,#game-board .river-right{
+            height:var(--ref-river-w);width:auto;
+            grid-template-columns:repeat(6,var(--discard-w));
+            gap:2px;
+        }
+        #game-board .river-left{left:calc(var(--safe-mid-x) - var(--ref-side-offset));}
+        #game-board .river-right{left:calc(var(--safe-mid-x) + var(--ref-side-offset));}
+        #game-board .discard-tile{border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,.32)}
+
+        /* Enemy walls match the red-back walls of the reference. */
+        #game-board .enemy-hand-top{top:calc(var(--safe-t) + 10px);gap:1px;transform:translateX(-50%);}
+        #game-board .enemy-hand-top .tile-back{width:clamp(15px,1.8vw,22px);height:clamp(22px,2.7vw,31px);}
+        #game-board .enemy-hand-side{top:50%;gap:1px;transform-origin:center;}
+        #game-board .enemy-hand-side .tile-back{width:clamp(22px,2.7vw,31px);height:clamp(15px,1.8vw,22px);}
+        #game-board .side-left{left:clamp(19px,3.5vw,48px);transform:translateY(-50%) rotate(14deg)}
+        #game-board .side-right{right:clamp(19px,3.5vw,48px);transform:translateY(-50%) rotate(-14deg)}
+
+        /* Player portraits mirror the reference zones. */
+        #game-board .player-seat.pos-top{left:auto;right:clamp(86px,10vw,150px);top:clamp(10px,2vw,26px);transform:none}
+        #game-board .player-seat.pos-left{left:clamp(8px,2.2vw,30px);top:34%;transform:none}
+        #game-board .player-seat.pos-right{right:clamp(8px,2.2vw,30px);top:34%;transform:none}
+        #game-board .player-seat.pos-bottom{left:clamp(58px,11vw,150px);bottom:calc(var(--tile-h) + var(--safe-b) + 6px);transform:none}
+        #game-board .avatar-img{width:clamp(36px,4.6vw,48px);height:clamp(36px,4.6vw,48px);border-radius:8px}
+        #game-board .avatar-name{font-size:7px;padding:2px 5px}
+        #game-board .time-bank-tag{font-size:7px;padding:1px 5px}
+
+        /* Hand occupies the bottom band, centered like the screenshot. */
+        #game-board .hand-bottom-container{
+            min-height:calc(var(--tile-h) + var(--safe-b) + 8px);
+            padding:0 max(12px,var(--safe-l)) max(5px,var(--safe-b));
+            background:linear-gradient(180deg,transparent,rgba(22,20,25,.18));
+        }
+        #game-board .hand-tiles{gap:2px;padding:1px 5px 0;justify-content:center}
+        #game-board .hand-bottom-container .tile{box-shadow:0 3px 7px rgba(0,0,0,.32)}
+        #game-board .melds-container{right:clamp(7px,2vw,24px);bottom:calc(var(--tile-h) + var(--safe-b) + 4px)}
+        #game-board .meld-group{gap:1px;padding:2px;border-radius:4px}
+
+        #game-board .hand-status{width:min(300px,56vw);bottom:calc(var(--tile-h) + var(--safe-b) + 5px);padding:4px 8px;border-radius:7px;}
+        #game-board #action-overlay{bottom:calc(var(--tile-h) + var(--safe-b) + 40px);max-width:min(470px,80vw);padding:5px 7px;border-radius:9px}
+
+        /* Tablet/desktop stays wide and airy. */
+        @media (min-width:900px){
+            #game-board{--ref-center:clamp(108px,12vw,150px);--ref-river-w:clamp(150px,18vw,228px);--ref-side-offset:clamp(185px,25vw,320px)}
+            #game-board .river-top,#game-board .river-bottom{gap:3px}
+            #game-board .river-left,#game-board .river-right{gap:3px}
+        }
+
+        /* Portrait: pull the whole composition inward. */
+        @media (orientation:portrait) and (max-width:600px){
+            #game-board{--ref-center:clamp(94px,23vmin,132px);--ref-river-w:clamp(126px,43vw,178px);--ref-side-offset:clamp(118px,35vw,182px)}
+            #game-board .river-top{top:calc(var(--safe-mid-y) - var(--ref-center)/2 - 20px)}
+            #game-board .river-bottom{top:calc(var(--safe-mid-y) + var(--ref-center)/2 + 20px)}
+            #game-board .river-left,#game-board .river-right{height:var(--ref-river-w)}
+            #game-board .player-seat.pos-top{right:52px;top:calc(var(--safe-t) + 7px)}
+            #game-board .player-seat.pos-left{left:4px;top:33%}
+            #game-board .player-seat.pos-right{right:4px;top:33%}
+            #game-board .player-seat.pos-bottom{left:9px;bottom:calc(var(--tile-h) + var(--safe-b) + 6px)}
+            #game-board .enemy-hand-top{top:calc(var(--safe-t) + 7px)}
+            #game-board .side-left{left:2px}.side-right{right:2px}
+        }
+
+        /* Landscape phones: preserve the reference's wide table silhouette. */
+        @media (orientation:landscape) and (max-height:700px){
+            #game-board{--ref-center:clamp(86px,20vh,120px);--ref-river-w:clamp(120px,21vw,180px);--ref-side-offset:clamp(110px,22vw,205px)}
+            #game-board .river-top{top:calc(var(--safe-mid-y) - var(--ref-center)/2 - 11px)}
+            #game-board .river-bottom{top:calc(var(--safe-mid-y) + var(--ref-center)/2 + 11px)}
+            #game-board .player-seat.pos-top{right:70px;top:calc(var(--safe-t) + 4px)}
+            #game-board .player-seat.pos-bottom{left:6px;bottom:calc(var(--tile-h) + var(--safe-b) + 4px)}
+            #game-board .enemy-hand-top{top:calc(var(--safe-t) + 5px)}
+            #game-board .hand-status,#game-board .beginner-tip,#game-board .furiten-panel{display:none!important}
+            #game-board #action-overlay{bottom:calc(var(--tile-h) + var(--safe-b) + 5px)}
+        }
+        @media (orientation:landscape) and (max-width:420px){
+            #game-board{--ref-center:82px;--ref-river-w:112px;--ref-side-offset:104px}
+            #game-board .player-seat.pos-top{right:45px}
+            #game-board .avatar-img{width:32px;height:32px}
+        }
+
+
+
+/* =========================================================
+   MAHYONG DJ v28 — 95% REFERENCE + TABLE PERSPECTIVE
+   Landscape-first composition inspired by the supplied
+   mobile Riichi screenshot. Engine/DOM remain unchanged.
+   ========================================================= */
+#game-board{
+  --ref95-center: clamp(104px, 20vmin, 138px);
+  --ref95-river-w: clamp(132px, 15vw, 168px);
+  --ref95-side-x: clamp(184px, 21vw, 226px);
+  --ref95-gap: clamp(12px, 1.8vw, 22px);
+  background:
+    radial-gradient(ellipse at 50% 46%, rgba(216,156,82,.17) 0%, rgba(122,82,44,.10) 28%, transparent 58%),
+    linear-gradient(135deg, #2f2a31 0%, #4a3b36 28%, #665146 53%, #382e32 100%);
+  isolation:isolate;
+}
+
+/* Perspective table mat: broad trapezoid with a thin inset frame. */
+#game-board::before{
+  content:"";
+  position:absolute;
+  left:9%; right:9%; top:7%; bottom:12%;
+  z-index:0;
+  background:
+    radial-gradient(ellipse at 50% 56%, rgba(255,193,104,.13), transparent 43%),
+    linear-gradient(180deg, rgba(84,58,50,.46), rgba(53,47,50,.30));
+  clip-path:polygon(16% 0,84% 0,100% 100%,0 100%);
+  border:1px solid rgba(229,191,123,.26);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.025),
+    inset 0 -40px 90px rgba(16,13,18,.14),
+    0 0 0 1px rgba(9,7,11,.15);
+  pointer-events:none;
+}
+#game-board::after{
+  content:"";
+  position:absolute;
+  left:9.5%; right:9.5%; top:8%; bottom:13%;
+  z-index:0;
+  clip-path:polygon(17% 0,83% 0,98.5% 100%,1.5% 100%);
+  background:
+    linear-gradient(90deg, transparent 49.85%, rgba(255,255,255,.025) 50%, transparent 50.15%),
+    linear-gradient(0deg, transparent 49.85%, rgba(255,255,255,.02) 50%, transparent 50.15%),
+    radial-gradient(ellipse at 50% 55%, rgba(255,192,111,.06), transparent 47%);
+  box-shadow: inset 0 0 34px rgba(0,0,0,.15);
+  pointer-events:none;
+  animation:none!important;
+}
+
+/* Keep all gameplay layers above the perspective mat. */
+#game-board .topbar,
+#game-board .round-hud-shell,
+#game-board .player-seat,
+#game-board .enemy-hand-top,
+#game-board .enemy-hand-side,
+#game-board .enemy-melds,
+#game-board .river-container,
+#game-board .center-board,
+#game-board .hand-status,
+#game-board #action-overlay,
+#game-board .melds-container,
+#game-board .hand-bottom-container{z-index:10;}
+
+/* Screenshot-like HUD: compact and unobtrusive. */
+#game-board .topbar{
+  top:max(8px,var(--safe-t));
+  left:max(8px,var(--safe-l));
+  right:max(8px,var(--safe-r));
+  grid-template-columns:1fr auto;
+  pointer-events:none;
+}
+#game-board .dora-panel{
+  min-width:146px;
+  width:max-content;
+  max-width:260px;
+  padding:7px 9px 6px;
+  border-radius:9px;
+  background:linear-gradient(180deg,rgba(13,15,20,.90),rgba(32,24,24,.78));
+  border:1px solid rgba(244,194,114,.28);
+  box-shadow:0 7px 18px rgba(0,0,0,.32);
+}
+#game-board .hud-label{font-size:8px;letter-spacing:.12em}
+#game-board .dora-tiles{gap:3px}
+#game-board .dora-tile-box{width:24px;height:31px;border-radius:4px;font-size:12px}
+#game-board .stick-counters{font-size:8px;margin-top:5px}
+#game-board .kan-info{font-size:8px;margin-top:4px}
+#game-board .top-right-btns{gap:6px}
+#game-board .top-right-btns .icon-btn{
+  width:34px;height:34px;border-radius:9px;
+  background:rgba(10,13,20,.76);
+  border-color:rgba(255,255,255,.13);
+  box-shadow:0 6px 15px rgba(0,0,0,.25);
+}
+#game-board .round-hud-shell{display:none!important}
+
+/* Center board: small, dense and visually embedded into the mat. */
+#game-board .center-board{
+  left:var(--safe-mid-x);
+  top:46%;
+  width:var(--ref95-center);
+  height:var(--ref95-center);
+  border-radius:14px;
+  border:1px solid rgba(236,192,116,.42);
+  background:
+    radial-gradient(circle at 50% 36%,rgba(74,112,136,.19),transparent 48%),
+    linear-gradient(180deg,rgba(26,30,39,.98),rgba(8,10,15,.99));
+  box-shadow:0 12px 26px rgba(0,0,0,.48), inset 0 0 24px rgba(0,0,0,.20), 0 0 0 1px rgba(255,255,255,.02);
+}
+#game-board .center-board::before{inset:5px;border-radius:10px;border-color:rgba(255,255,255,.05)}
+#game-board .round-info{font-size:9px;letter-spacing:.10em}
+#game-board .turn-timer{font-size:clamp(25px,4.8vw,37px);margin:2px 0 0}
+#game-board .tiles-left{font-size:8px}
+#game-board .score-tag{
+  min-width:51px;padding:3px 5px;font-size:7px;border-radius:6px;
+  background:linear-gradient(180deg,rgba(25,31,39,.97),rgba(7,11,17,.97));
+  border-color:rgba(255,255,255,.11);
+}
+#game-board .score-tag::before{font-size:5px;margin-bottom:2px}
+#game-board .score-south{bottom:-28px}
+#game-board .score-north{top:-28px}
+#game-board .score-east{right:-58px}
+#game-board .score-west{left:-58px}
+
+/* Discard blocks: compact 3×6 groups hugging the center. */
+#game-board .river-container{
+  width:var(--ref95-river-w);
+  height:calc(var(--discard-h)*3 + 5px);
+  gap:2px;
+  align-content:start;
+}
+#game-board .river-top,
+#game-board .river-bottom{
+  left:var(--safe-mid-x);
+  width:var(--ref95-river-w);
+  grid-template-columns:repeat(6,var(--discard-w));
+  justify-content:center;
+}
+#game-board .river-top{
+  top:calc(46% - var(--ref95-center)/2 - var(--ref95-gap) - (var(--discard-h)*1.5));
+  transform:translate(-50%,-50%) rotate(180deg);
+}
+#game-board .river-bottom{
+  top:calc(46% + var(--ref95-center)/2 + var(--ref95-gap) + (var(--discard-h)*1.5));
+  transform:translate(-50%,-50%);
+}
+#game-board .river-left,
+#game-board .river-right{
+  height:var(--ref95-river-w);
+  width:calc(var(--discard-h)*3 + 5px);
+  grid-template-columns:repeat(6,var(--discard-w));
+  gap:2px;
+  top:46%;
+}
+#game-board .river-left{
+  left:calc(var(--safe-mid-x) - var(--ref95-side-x));
+  transform:translate(-50%,-50%) rotate(90deg);
+}
+#game-board .river-right{
+  left:calc(var(--safe-mid-x) + var(--ref95-side-x));
+  transform:translate(-50%,-50%) rotate(-90deg);
+}
+#game-board .discard-tile{border-radius:2px;box-shadow:0 2px 3px rgba(0,0,0,.34)}
+
+/* Red wall stacks around the perimeter. */
+#game-board .enemy-hand-top{
+  left:var(--safe-mid-x);
+  top:calc(var(--safe-t) + 8px);
+  gap:1px;
+  transform:translateX(-50%);
+}
+#game-board .enemy-hand-top .tile-back{
+  width:clamp(15px,1.95vw,21px);
+  height:clamp(22px,2.8vw,30px);
+  border-radius:3px;
+}
+#game-board .enemy-hand-side{
+  top:46%;
+  gap:1px;
+}
+#game-board .enemy-hand-side .tile-back{
+  width:clamp(21px,2.75vw,30px);
+  height:clamp(15px,1.8vw,21px);
+}
+#game-board .side-left{left:clamp(20px,5.3vw,54px);transform:translateY(-50%) rotate(13deg)}
+#game-board .side-right{right:clamp(20px,5.3vw,54px);transform:translateY(-50%) rotate(-13deg)}
+
+/* Player seats follow the screenshot: top-right, mid-left, mid-right, lower-left. */
+#game-board .player-seat{filter:drop-shadow(0 8px 14px rgba(0,0,0,.30))}
+#game-board .player-seat.pos-top{left:auto;right:clamp(74px,16vw,170px);top:clamp(8px,1.7vw,18px);transform:none}
+#game-board .player-seat.pos-left{left:clamp(10px,2.2vw,26px);top:39%;transform:none}
+#game-board .player-seat.pos-right{right:clamp(10px,2.2vw,26px);top:39%;transform:none}
+#game-board .player-seat.pos-bottom{left:clamp(165px,22vw,245px);bottom:calc(var(--tile-h) + var(--safe-b) + 12px);transform:none}
+#game-board .avatar-img{width:clamp(38px,4.5vw,49px);height:clamp(38px,4.5vw,49px);border-radius:7px;border-width:2px}
+#game-board .avatar-name{font-size:7px;padding:2px 5px;border-radius:5px}
+#game-board .time-bank-tag{font-size:7px;padding:1px 4px;border-radius:5px}
+
+/* Melds sit just above the hand rather than covering the discard ring. */
+#game-board .melds-container{
+  right:clamp(12px,2vw,26px);
+  bottom:calc(var(--tile-h) + var(--safe-b) + 8px);
+  gap:4px;
+}
+#game-board .meld-group{padding:2px;gap:1px;border-radius:4px}
+#game-board .meld-group .tile{width:clamp(18px,2.9vw,27px);height:clamp(26px,4.1vw,39px)}
+
+/* Bottom hand: one continuous, centered rail like the reference. */
+#game-board .hand-bottom-container{
+  left:var(--safe-l);right:var(--safe-r);bottom:var(--safe-b);
+  min-height:calc(var(--tile-h) + var(--safe-b) + 7px);
+  padding:0 max(10px,var(--safe-l)) max(3px,var(--safe-b));
+  background:linear-gradient(180deg,transparent 0%,rgba(15,12,17,.08) 60%,rgba(9,8,12,.22) 100%);
+  align-items:flex-end;justify-content:center;
+  overflow-x:auto;overflow-y:hidden;
+}
+#game-board .hand-tiles{gap:2px;padding:2px 3px 0;min-width:max-content}
+#game-board .hand-bottom-container .tile{
+  border-radius:5px;
+  box-shadow:0 3px 7px rgba(0,0,0,.34);
+}
+#game-board .drawn-tile-gap{margin-left:9px}
+
+/* UI above the hand stays subtle in landscape. */
+@media (orientation:landscape){
+  #game-board .hand-status{display:none!important}
+  #game-board .beginner-tip{display:none!important}
+  #game-board .furiten-panel{bottom:calc(var(--tile-h) + var(--safe-b) + 44px)}
+  #game-board #action-overlay{bottom:calc(var(--tile-h) + var(--safe-b) + 6px);max-width:min(480px,78vw)}
+}
+
+/* iPhone-like landscape geometry. */
+@media (orientation:landscape) and (max-height:620px){
+  #game-board{
+    --ref95-center:clamp(100px,23vh,128px);
+    --ref95-river-w:clamp(124px,18vw,154px);
+    --ref95-side-x:clamp(176px,21vw,214px);
+    --ref95-gap:clamp(9px,1.5vw,17px);
+  }
+  #game-board::before{left:7%;right:7%;top:6%;bottom:10%;clip-path:polygon(17% 0,83% 0,100% 100%,0 100%)}
+  #game-board::after{left:7.5%;right:7.5%;top:7%;bottom:11%;clip-path:polygon(18% 0,82% 0,98.5% 100%,1.5% 100%)}
+  #game-board .topbar{top:max(5px,var(--safe-t))}
+  #game-board .dora-panel{min-width:128px;padding:5px 7px 5px}
+  #game-board .dora-tile-box{width:20px;height:27px;font-size:10px}
+  #game-board .top-right-btns .icon-btn{width:31px;height:31px;font-size:12px}
+  #game-board .center-board{top:45.5%}
+  #game-board .river-top,#game-board .river-bottom{top:auto}
+  #game-board .river-top{top:calc(45.5% - var(--ref95-center)/2 - 12px - (var(--discard-h)*1.5))}
+  #game-board .river-bottom{top:calc(45.5% + var(--ref95-center)/2 + 12px + (var(--discard-h)*1.5))}
+  #game-board .river-left,#game-board .river-right{top:45.5%}
+  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 7px)}
+  #game-board .player-seat.pos-top{right:clamp(64px,14vw,142px);top:clamp(7px,1.4vw,14px)}
+  #game-board .player-seat.pos-left,#game-board .player-seat.pos-right{top:37%}
+  #game-board .player-seat.pos-bottom{left:clamp(150px,22vw,224px);bottom:calc(var(--tile-h) + var(--safe-b) + 8px)}
+}
+
+/* Very close to the supplied 1024×542 reference composition. */
+@media (orientation:landscape) and (min-width:800px) and (max-width:1200px){
+  #game-board{
+    --ref95-center:124px;
+    --ref95-river-w:150px;
+    --ref95-side-x:214px;
+    --ref95-gap:14px;
+  }
+  #game-board .center-board{top:45%}
+  #game-board .river-top{top:calc(45% - 124px/2 - 14px - (var(--discard-h)*1.5))}
+  #game-board .river-bottom{top:calc(45% + 124px/2 + 14px + (var(--discard-h)*1.5))}
+  #game-board .river-left,#game-board .river-right{top:45%}
+  #game-board .player-seat.pos-left,#game-board .player-seat.pos-right{top:37%}
+}
+
+/* Narrow landscape: retain readability and let the hand scroll rather than shrink excessively. */
+@media (orientation:landscape) and (max-width:700px){
+  #game-board{
+    --ref95-center:104px;
+    --ref95-river-w:124px;
+    --ref95-side-x:178px;
+  }
+  #game-board .dora-panel{transform:scale(.92);transform-origin:top left}
+  #game-board .top-right-btns{transform:scale(.92);transform-origin:top right}
+  #game-board .player-seat.pos-left{left:4px}
+  #game-board .player-seat.pos-right{right:4px}
+  #game-board .player-seat.pos-bottom{left:clamp(92px,19vw,150px)}
+}
+
+/* Portrait stays usable instead of inheriting the landscape perspective blindly. */
+@media (orientation:portrait){
+  #game-board::before{left:5%;right:5%;top:5%;bottom:13%;clip-path:polygon(7% 0,93% 0,100% 100%,0 100%)}
+  #game-board::after{left:5.5%;right:5.5%;top:6%;bottom:14%;clip-path:polygon(8% 0,92% 0,98% 100%,2% 100%)}
+  #game-board .center-board{top:44%;}
+  #game-board .player-seat.pos-bottom{left:50%;bottom:calc(var(--tile-h) + var(--safe-b) + 10px);transform:translateX(-50%)}
+  #game-board .player-seat.pos-top{left:50%;right:auto;top:calc(var(--safe-t) + 4px);transform:translateX(-50%)}
+  #game-board .player-seat.pos-left{left:5px;top:34%}
+  #game-board .player-seat.pos-right{right:5px;top:34%}
+}
+
 </style>
 </head>
 <body>
@@ -3826,6 +4771,37 @@ window.addEventListener('pointerdown',()=>{try{if(typeof startChineseMusic==='fu
   window.addEventListener('resize',syncMahyongSizing,{passive:true});
   window.addEventListener('orientationchange',()=>setTimeout(syncMahyongSizing,90),{passive:true});
   window.visualViewport?.addEventListener('resize',syncMahyongSizing,{passive:true});
+})();
+</script>
+
+<script>
+/* v28 final sizing shim — tuned for the reference-style table. */
+(function(){
+  function syncReferenceSizing(){
+    const b=document.getElementById('game-board');
+    if(!b) return;
+    const vv=window.visualViewport;
+    const w=Math.max(1,vv?.width||window.innerWidth);
+    const h=Math.max(1,vv?.height||window.innerHeight);
+    if(w>h){
+      let tileW=Math.min(46,Math.max(40,(w-92)/16.1));
+      if(h<430) tileW=Math.min(tileW,43);
+      b.style.setProperty('--tile-w',tileW.toFixed(2)+'px');
+      b.style.setProperty('--tile-h',(tileW*1.42).toFixed(2)+'px');
+      b.style.setProperty('--discard-w',(tileW*.56).toFixed(2)+'px');
+      b.style.setProperty('--discard-h',(tileW*.79).toFixed(2)+'px');
+    }else{
+      let tileW=Math.min(42,Math.max(30,(w-24)/15.0));
+      b.style.setProperty('--tile-w',tileW.toFixed(2)+'px');
+      b.style.setProperty('--tile-h',(tileW*1.42).toFixed(2)+'px');
+      b.style.setProperty('--discard-w',(tileW*.56).toFixed(2)+'px');
+      b.style.setProperty('--discard-h',(tileW*.79).toFixed(2)+'px');
+    }
+  }
+  syncReferenceSizing();
+  window.addEventListener('resize',syncReferenceSizing,{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(syncReferenceSizing,80),{passive:true});
+  window.visualViewport?.addEventListener('resize',syncReferenceSizing,{passive:true});
 })();
 </script>
 </body>
