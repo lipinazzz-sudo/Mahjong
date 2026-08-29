@@ -1024,7 +1024,654 @@ h1{margin-bottom:8px;font-size:clamp(2rem,6vw,4rem);line-height:.98;letter-spaci
 #game-board .pause-menu button,
 #game-board .pause-game-btn{touch-action:manipulation}
 
+
+
+/* ================================================================
+   LAYOUT MAP — DIAGRAM REFERENCE
+   Only geometry/position overrides. Game logic is untouched.
+   Reference:
+   - Dora: upper-left
+   - Top wall: centered, upper area
+   - P2: upper-right
+   - P1: right side below P2
+   - P3: lower-left
+   - You: bottom-left beside hand
+   - Hand: lower-center
+   - Tenpai: directly below hand
+   - Score + timer: fixed center
+   - Rivers: left / right only, mirrored around center
+   - Top/bottom rivers hidden to preserve the requested composition
+   ================================================================ */
+
+#game-board .dora-panel{
+  left:12.5%;
+  right:auto;
+  top:2%;
+  width:16%;
+  height:14%;
+}
+
+#game-board .enemy-hand-top{
+  left:39.2%;
+  right:auto;
+  top:2%;
+  width:29.6%;
+  justify-content:center;
+  transform:none;
+}
+
+#game-board .enemy-hand-side.side-left{
+  left:12.5%;
+  right:auto;
+  top:13.5%;
+  transform:none;
+}
+
+#game-board .enemy-hand-side.side-right{
+  right:15.2%;
+  left:auto;
+  top:27%;
+  transform:none;
+}
+
+/* Players — positions taken directly from the supplied diagram. */
+#game-board .pos-top{
+  left:68.8%;
+  right:auto;
+  top:2%;
+  bottom:auto;
+  transform:none;
+}
+
+#game-board .pos-right{
+  left:76.8%;
+  right:auto;
+  top:13.3%;
+  bottom:auto;
+  transform:none;
+}
+
+#game-board .pos-left{
+  left:12.5%;
+  right:auto;
+  top:70.8%;
+  bottom:auto;
+  transform:none;
+}
+
+#game-board .pos-bottom{
+  left:20.5%;
+  right:auto;
+  top:84%;
+  bottom:auto;
+  transform:none;
+}
+
+/* Center board remains exactly in the middle. */
+#game-board .center-board{
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+}
+
+/* Side rivers: same distance from the center = true mirror. */
+#game-board .river-left{
+  left:30%;
+  right:auto;
+  top:50%;
+  transform:translate(-50%,-50%) rotate(90deg);
+}
+
+#game-board .river-right{
+  right:30%;
+  left:auto;
+  top:50%;
+  transform:translate(50%,-50%) rotate(-90deg);
+}
+
+#game-board .river-top,
+#game-board .river-bottom{
+  display:none;
+}
+
+/* Enemy melds remain dynamic and follow the same player-side geometry. */
+#game-board .enemy-melds-top{
+  left:50%;
+  right:auto;
+  top:11.5%;
+  transform:translateX(-50%);
+  flex-direction:row;
+}
+
+#game-board .enemy-melds-left{
+  left:20.5%;
+  right:auto;
+  top:68%;
+  transform:none;
+  flex-direction:column;
+}
+
+#game-board .enemy-melds-right{
+  right:15.2%;
+  left:auto;
+  top:50%;
+  transform:none;
+  flex-direction:column;
+}
+
+/* Your open melds: bottom-right, above the hand area. */
+#game-board .melds-container{
+  left:68.8%;
+  right:auto;
+  top:84%;
+  bottom:auto;
+  transform:none;
+  display:flex;
+  gap:4px;
+}
+
+/* Hand block occupies the diagram's lower-center rectangle. */
+#game-board .hand-bottom-container{
+  left:49.2%;
+  right:auto;
+  top:auto;
+  bottom:7.5%;
+  width:40.5%;
+  min-height:10%;
+  transform:translateX(-50%);
+  overflow:visible;
+}
+
+#game-board .hand-tiles{
+  width:100%;
+  max-width:100%;
+  justify-content:center;
+  overflow:visible;
+}
+
+/* Tenpai information directly below the hand. */
+#game-board .hand-status{
+  left:49.2%;
+  top:auto;
+  bottom:1.2%;
+  width:24%;
+  transform:translateX(-50%);
+}
+
+/* Keep the lower-right action area away from the hand. */
+#game-board #action-overlay{
+  left:auto;
+  right:2.5%;
+  bottom:10%;
+  transform:none;
+}
+
+/* --------------------------
+   Smaller landscape phones
+   Keep the same relative diagram, simply scaled by viewport.
+   -------------------------- */
+@media (max-width:932px) and (orientation:landscape){
+  #game-board .dora-panel{left:1.8%;top:1.5%;width:17%;height:13%;}
+  #game-board .enemy-hand-top{left:38.5%;top:2%;width:30%;}
+  #game-board .enemy-hand-side.side-left{left:8%;top:13.5%;}
+  #game-board .enemy-hand-side.side-right{right:8%;top:27%;}
+
+  #game-board .pos-top{left:68%;top:1.5%;}
+  #game-board .pos-right{left:auto;right:7.5%;top:13.5%;}
+  #game-board .pos-left{left:7.5%;top:70%;}
+  #game-board .pos-bottom{left:20%;top:82%;}
+
+  #game-board .river-left{left:29%;top:50%;}
+  #game-board .river-right{right:29%;top:50%;}
+
+  #game-board .enemy-melds-top{top:11%;}
+  #game-board .enemy-melds-left{left:19%;top:68%;}
+  #game-board .enemy-melds-right{right:8%;top:50%;}
+  #game-board .melds-container{left:auto;right:8%;top:82%;}
+
+  #game-board .hand-bottom-container{left:50%;bottom:2%;width:58%;min-height:15%;}
+  #game-board .hand-status{left:50%;bottom:18%;width:38%;}
+  #game-board #action-overlay{right:2%;bottom:20%;}
+}
+
 </style>
+<style id="layout-reference-final">
+/* ===== FINAL LAYOUT: MATCH THE SUPPLIED REFERENCE ===== */
+@media (min-width:933px), (min-width:780px) and (orientation:landscape){
+  /* Player mapping: P2 = top, P1 = right, P3 = left, You = lower-left. */
+  #game-board .pos-top{
+    top:12px;
+    right:17%;
+    left:auto;
+  }
+  #game-board .pos-left{
+    left:4.8%;
+    right:auto;
+    top:40%;
+    transform:translateY(-50%);
+  }
+  #game-board .pos-right{
+    right:4.8%;
+    left:auto;
+    top:40%;
+    transform:translateY(-50%);
+  }
+  #game-board .pos-bottom{
+    left:13.5%;
+    right:auto;
+    bottom:118px;
+  }
+
+  /* Side concealed walls are strict left/right mirrors. */
+  #game-board .enemy-hand-side.side-left{
+    left:11%;
+    right:auto;
+    top:23%;
+  }
+  #game-board .enemy-hand-side.side-right{
+    right:11%;
+    left:auto;
+    top:23%;
+  }
+
+  /* Each player's open meld area is tied to that player's seat. */
+  #game-board .enemy-melds-top{
+    top:76px;
+    left:50%;
+    right:auto;
+    transform:translateX(-50%);
+  }
+  #game-board .enemy-melds-left{
+    left:14%;
+    right:auto;
+    top:59%;
+    transform:none;
+    flex-direction:column;
+  }
+  #game-board .enemy-melds-right{
+    right:14%;
+    left:auto;
+    top:59%;
+    transform:none;
+    flex-direction:column;
+  }
+
+  /* Player melds remain at the lower-right, as in the reference. */
+  #game-board .melds-container{
+    right:14%;
+    left:auto;
+    bottom:117px;
+  }
+}
+
+/* The HTML/JS already creates these containers dynamically, so they stay hidden
+   until Chi / Pon / Kan data is actually rendered. */
+.enemy-melds:empty,
+.melds-container:empty{display:none;}
+</style>
+<style id="layout-reference-correction">
+/* ===== REFERENCE IMAGE GEOMETRY CORRECTION =====
+   Only layout/positioning is changed here.
+   Player mapping remains: P2=top, P1=right, P3=left, You=bottom-left.
+*/
+@media (min-width:933px) {
+  /* --- Player seats --- */
+  #game-board .pos-top{
+    top:12px;
+    right:17%;
+    left:auto;
+    transform:none;
+  }
+  #game-board .pos-left{
+    left:4.8%;
+    right:auto;
+    top:58%;
+    transform:translateY(-50%);
+  }
+  #game-board .pos-right{
+    right:4.8%;
+    left:auto;
+    top:58%;
+    transform:translateY(-50%);
+  }
+  #game-board .pos-bottom{
+    left:13.5%;
+    right:auto;
+    bottom:118px;
+  }
+
+  /* --- Concealed hands / walls --- */
+  #game-board .enemy-hand-top{
+    top:29px;
+    left:50%;
+    right:auto;
+    transform:translateX(-50%);
+    gap:3px;
+  }
+  #game-board .enemy-hand-top .tile-back{
+    width:34px;
+    height:52px;
+  }
+  #game-board .enemy-hand-side{
+    gap:3px;
+  }
+  #game-board .enemy-hand-side.side-left{
+    left:5.3%;
+    right:auto;
+    top:17.3%;
+  }
+  #game-board .enemy-hand-side.side-right{
+    right:5.3%;
+    left:auto;
+    top:17.3%;
+  }
+  #game-board .enemy-hand-side .tile-back{
+    width:52px;
+    height:34px;
+  }
+
+  /* --- Dynamic open melds: tied to the correct player's side --- */
+  #game-board .enemy-melds-top{
+    top:89px;
+    left:30%;
+    right:auto;
+    transform:none;
+    flex-direction:row;
+  }
+  #game-board .enemy-melds-left{
+    left:8.1%;
+    right:auto;
+    top:18%;
+    transform:none;
+    flex-direction:column;
+  }
+  #game-board .enemy-melds-right{
+    right:8.1%;
+    left:auto;
+    top:36%;
+    transform:none;
+    flex-direction:column;
+  }
+  #game-board .enemy-melds .meld-group{
+    gap:1px;
+    padding:2px;
+  }
+  #game-board .enemy-melds .meld-group .tile{
+    width:30px;
+    height:43px;
+  }
+
+  /* Player's own open melds: lower-right, above the hand. */
+  #game-board .melds-container{
+    right:12.2%;
+    left:auto;
+    bottom:177px;
+    gap:4px;
+  }
+  #game-board .melds-container .meld-group .tile{
+    width:33px;
+    height:47px;
+  }
+
+  /* Keep left/right geometry mathematically mirrored. */
+  #game-board .river-left{
+    left:calc(50% - 335px);
+  }
+  #game-board .river-right{
+    right:calc(50% - 335px);
+  }
+}
+
+@media (min-width:780px) and (max-width:932px) and (orientation:landscape){
+  /* Same seat geometry on phone landscape, scaled to the existing phone layer. */
+  #game-board .pos-top{
+    top:2px;
+    right:15%;
+    left:auto;
+    transform:none;
+  }
+  #game-board .pos-left,
+  #game-board .pos-right{
+    top:55%;
+    transform:translateY(-50%);
+  }
+  #game-board .pos-left{left:1.5%;right:auto}
+  #game-board .pos-right{right:1.5%;left:auto}
+
+  #game-board .enemy-melds-top{
+    top:42px;
+    left:31%;
+    right:auto;
+    transform:none;
+    flex-direction:row;
+  }
+  #game-board .enemy-melds-left{
+    left:5.8%;
+    right:auto;
+    top:18%;
+    transform:none;
+    flex-direction:column;
+  }
+  #game-board .enemy-melds-right{
+    right:5.8%;
+    left:auto;
+    top:35%;
+    transform:none;
+    flex-direction:column;
+  }
+}
+</style>
+<style id="layout-user-grid-reference">
+/* USER REFERENCE LAYOUT
+   Center score/timer; side rivers; top wall + P2; right P1; left P3;
+   You + hand at lower-left/lower-center; dynamic melds stay tied to seats.
+*/
+@media (min-width:933px){
+  #game-board{
+    /* The reference composition uses the full board as the coordinate plane. */
+  }
+
+  /* ---------- players ---------- */
+  #game-board .pos-top{
+    top:1.8%;
+    right:20.5%;
+    left:auto;
+    transform:none;
+  }
+  #game-board .pos-right{
+    right:1.8%;
+    left:auto;
+    top:31.5%;
+    transform:none;
+  }
+  #game-board .pos-left{
+    left:1.8%;
+    right:auto;
+    top:73%;
+    transform:none;
+  }
+  #game-board .pos-bottom{
+    left:8.2%;
+    right:auto;
+    bottom:7.0%;
+  }
+
+  /* ---------- walls / concealed hands ---------- */
+  #game-board .enemy-hand-top{
+    left:50%;
+    top:3.8%;
+    right:auto;
+    transform:translateX(-50%);
+    gap:3px;
+  }
+  #game-board .enemy-hand-top .tile-back{
+    width:34px;
+    height:52px;
+  }
+  #game-board .enemy-hand-side{
+    gap:3px;
+    top:23%;
+  }
+  #game-board .enemy-hand-side.side-left{
+    left:5.2%;
+    right:auto;
+  }
+  #game-board .enemy-hand-side.side-right{
+    right:5.2%;
+    left:auto;
+  }
+  #game-board .enemy-hand-side .tile-back{
+    width:52px;
+    height:34px;
+  }
+
+  /* ---------- CENTER: score + timer stay exactly in the middle ---------- */
+  #game-board .center-board{
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+  }
+
+  /* Keep all four scores associated with the center board. */
+  #game-board .score-north{
+    left:50%; top:-48px; right:auto; bottom:auto;
+    transform:translateX(-50%);
+  }
+  #game-board .score-south{
+    left:50%; bottom:-48px; right:auto; top:auto;
+    transform:translateX(-50%);
+  }
+  #game-board .score-west{
+    left:-91px; top:50%; right:auto; bottom:auto;
+    transform:translateY(-50%);
+  }
+  #game-board .score-east{
+    right:-91px; top:50%; left:auto; bottom:auto;
+    transform:translateY(-50%);
+  }
+
+  /* ---------- RIVERS: left/right only, mirrored around the center ---------- */
+  #game-board .river-left{
+    left:24.0%;
+    right:auto;
+    top:50%;
+    transform:translate(-50%,-50%) rotate(90deg);
+  }
+  #game-board .river-right{
+    right:24.0%;
+    left:auto;
+    top:50%;
+    transform:translate(50%,-50%) rotate(-90deg);
+  }
+  #game-board .river-top,
+  #game-board .river-bottom{
+    /* The reference puts the discard fields at the sides. Keep their
+       DOM/state intact but do not display the top/bottom rivers. */
+    display:none;
+  }
+  #game-board .river-container{
+    grid-template-columns:repeat(5,var(--discard-w,29px));
+    grid-auto-rows:var(--discard-h,41px);
+    gap:3px;
+    width:calc(var(--discard-w,29px)*5 + 12px);
+    height:calc(var(--discard-h,41px)*5 + 12px);
+  }
+
+  /* ---------- dynamic open melds by player ---------- */
+  #game-board .enemy-melds-top{
+    top:15%; left:50%; right:auto;
+    transform:translateX(-50%);
+    flex-direction:row;
+  }
+  #game-board .enemy-melds-left{
+    left:10.5%; right:auto; top:57%;
+    transform:none;
+    flex-direction:column;
+  }
+  #game-board .enemy-melds-right{
+    right:10.5%; left:auto; top:57%;
+    transform:none;
+    flex-direction:column;
+  }
+  #game-board .enemy-melds .meld-group,
+  #game-board .melds-container .meld-group{
+    gap:1px;
+    padding:2px;
+  }
+  #game-board .enemy-melds .meld-group .tile,
+  #game-board .melds-container .meld-group .tile{
+    width:30px;
+    height:43px;
+  }
+
+  /* You's meld area: lower-right, above the action/status region. */
+  #game-board .melds-container{
+    right:12.5%;
+    left:auto;
+    bottom:17%;
+    gap:4px;
+  }
+
+  /* ---------- player hand + tenpai + machi ---------- */
+  #game-board .hand-bottom-container{
+    left:50%;
+    bottom:2.8%;
+    width:100vw;
+    transform:translateX(-50%);
+  }
+  #game-board .hand-status{
+    left:50%;
+    bottom:11.5%;
+    transform:translateX(-50%);
+  }
+
+  /* Keep the advisor / Machi notification at lower-right. */
+  #game-board .beginner-tip{
+    left:auto;
+    right:2.5%;
+    bottom:5.8%;
+    transform:none;
+  }
+
+  /* Action controls remain independent from the player hand. */
+  #game-board #action-overlay{
+    right:2.2%;
+    left:auto;
+    bottom:10.2%;
+  }
+}
+
+@media (min-width:780px) and (max-width:932px) and (orientation:landscape){
+  /* Phone-landscape version preserves the same composition at smaller scale. */
+  #game-board .pos-top{top:1.5%;right:17%;left:auto;transform:none}
+  #game-board .pos-left{left:1.8%;right:auto;top:73%;transform:none}
+  #game-board .pos-right{right:1.8%;left:auto;top:31.5%;transform:none}
+  #game-board .pos-bottom{left:8.5%;right:auto;bottom:calc(var(--phone-tile-h) + 2px)}
+
+  #game-board .enemy-hand-top{top:3.5%;left:50%;transform:translateX(-50%)}
+  #game-board .enemy-hand-top .tile-back{width:20px;height:29px}
+  #game-board .enemy-hand-side{top:23%;gap:1.5px}
+  #game-board .enemy-hand-side.side-left{left:4.8%;right:auto}
+  #game-board .enemy-hand-side.side-right{right:4.8%;left:auto}
+  #game-board .enemy-hand-side .tile-back{width:29px;height:20px}
+
+  #game-board .center-board{left:50%;top:50%;transform:translate(-50%,-50%)}
+  #game-board .river-left{left:23%;right:auto;top:50%;transform:translate(-50%,-50%) rotate(90deg)}
+  #game-board .river-right{right:23%;left:auto;top:50%;transform:translate(50%,-50%) rotate(-90deg)}
+  #game-board .river-top,#game-board .river-bottom{display:none}
+
+  #game-board .enemy-melds-top{top:14%;left:50%;right:auto;transform:translateX(-50%);flex-direction:row}
+  #game-board .enemy-melds-left{left:8%;right:auto;top:57%;transform:none;flex-direction:column}
+  #game-board .enemy-melds-right{right:8%;left:auto;top:57%;transform:none;flex-direction:column}
+  #game-board .enemy-melds .meld-group .tile,#game-board .melds-container .meld-group .tile{width:20px;height:29px}
+  #game-board .melds-container{right:8%;left:auto;bottom:calc(var(--phone-tile-h) + 4px);gap:2px}
+
+  #game-board .hand-bottom-container{left:50%;bottom:var(--safe-b);width:100vw;transform:translateX(-50%)}
+  #game-board .hand-status{left:50%;bottom:calc(var(--phone-tile-h) + 6px);transform:translateX(-50%)}
+  #game-board #action-overlay{right:2%;left:auto;bottom:calc(var(--phone-tile-h) + 5px)}
+}
+</style>
+
 </head>
 <body>
 
