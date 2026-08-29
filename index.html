@@ -1672,6 +1672,225 @@ h1{margin-bottom:8px;font-size:clamp(2rem,6vw,4rem);line-height:.98;letter-spaci
 }
 </style>
 
+
+<style id="layout-final-responsive-table">
+/* ================================================================
+   FINAL TABLE LAYOUT
+   One 16:9 coordinate plane, scaled as a single unit on every device.
+   Portrait phones/tablets show the complete table reduced to fit.
+   Gameplay JavaScript is untouched.
+   ================================================================ */
+#screen-game{
+  padding:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  overflow:hidden!important;
+  background:#02060a!important;
+}
+
+#game-board{
+  position:relative!important;
+  width:min(100vw, calc(100dvh * 16 / 9))!important;
+  height:min(100dvh, calc(100vw * 9 / 16))!important;
+  aspect-ratio:16/9!important;
+  flex:0 0 auto!important;
+  overflow:hidden!important;
+  --u:min(1vw, 1.7777778dvh);
+}
+
+/* ---------- fixed 16:9 coordinate map ---------- */
+#game-board .topbar{
+  top:calc(var(--u)*1.2)!important;
+  left:calc(var(--u)*1.8)!important;
+  right:calc(var(--u)*1.8)!important;
+  height:calc(var(--u)*7)!important;
+}
+#game-board .dora-panel{
+  left:0!important; top:0!important;
+  width:calc(var(--u)*15.5)!important;
+  height:calc(var(--u)*7.7)!important;
+  padding:calc(var(--u)*.65)!important;
+  border-radius:calc(var(--u)*.8)!important;
+}
+#game-board .hud-label{font-size:calc(var(--u)*.7)!important}
+#game-board .dora-tiles{height:calc(var(--u)*3)!important;gap:calc(var(--u)*.15)!important}
+#game-board .dora-tile-box{width:calc(var(--u)*2.25)!important;height:calc(var(--u)*3)!important}
+#game-board .stick-counters,#game-board .kan-info{font-size:calc(var(--u)*.58)!important}
+#game-board .top-right-btns{right:0!important;top:0!important;gap:calc(var(--u)*.3)!important}
+#game-board .top-right-btns .icon-btn{width:calc(var(--u)*2.5)!important;height:calc(var(--u)*2.5)!important;font-size:calc(var(--u)*1.05)!important}
+
+/* ---------- players: P2 top-right, P1 right, P3 left, You lower-left ---------- */
+#game-board .player-seat .avatar-img{
+  width:calc(var(--u)*4.7)!important;
+  height:calc(var(--u)*4.7)!important;
+  border-width:calc(var(--u)*.16)!important;
+  border-radius:calc(var(--u)*.75)!important;
+}
+#game-board .avatar-name{
+  margin-top:calc(var(--u)*.25)!important;
+  padding:calc(var(--u)*.25) calc(var(--u)*.7)!important;
+  border-radius:calc(var(--u)*.4)!important;
+  font-size:calc(var(--u)*.82)!important;
+}
+#game-board .time-bank-tag{font-size:calc(var(--u)*.62)!important;padding:calc(var(--u)*.18) calc(var(--u)*.5)!important}
+
+#game-board .pos-top{
+  top:calc(var(--u)*1.0)!important;
+  right:calc(var(--u)*10.8)!important;
+  left:auto!important; transform:none!important;
+}
+#game-board .pos-right{
+  right:calc(var(--u)*1.2)!important;
+  top:31.5%!important;
+  left:auto!important; transform:none!important;
+}
+#game-board .pos-left{
+  left:calc(var(--u)*1.2)!important;
+  top:73%!important;
+  right:auto!important; transform:none!important;
+}
+#game-board .pos-bottom{
+  left:8.2%!important;
+  right:auto!important;
+  bottom:7.2%!important;
+}
+
+/* ---------- concealed walls ---------- */
+#game-board .enemy-hand-top{
+  left:50%!important; top:4.0%!important; transform:translateX(-50%)!important;
+  gap:calc(var(--u)*.18)!important;
+}
+#game-board .enemy-hand-top .tile-back{
+  width:calc(var(--u)*2.15)!important;
+  height:calc(var(--u)*3.25)!important;
+}
+#game-board .enemy-hand-side{
+  top:23%!important; gap:calc(var(--u)*.18)!important;
+}
+#game-board .enemy-hand-side.side-left{left:5.2%!important;right:auto!important}
+#game-board .enemy-hand-side.side-right{right:5.2%!important;left:auto!important}
+#game-board .enemy-hand-side .tile-back{
+  width:calc(var(--u)*3.25)!important;
+  height:calc(var(--u)*2.15)!important;
+}
+
+/* ---------- center: score + timer never move away from center ---------- */
+#game-board .center-board{
+  left:50%!important; top:50%!important;
+  transform:translate(-50%,-50%)!important;
+  width:calc(var(--u)*10.7)!important;
+  height:calc(var(--u)*10.7)!important;
+  border-radius:calc(var(--u)*1.45)!important;
+}
+#game-board .round-info{font-size:calc(var(--u)*1.2)!important}
+#game-board .turn-timer{font-size:calc(var(--u)*3.2)!important;margin:calc(var(--u)*.3) 0 0!important}
+#game-board .tiles-left{font-size:calc(var(--u)*.8)!important}
+#game-board .score-tag{
+  min-width:calc(var(--u)*4.9)!important;
+  padding:calc(var(--u)*.4) calc(var(--u)*.55)!important;
+  font-size:calc(var(--u)*.75)!important;
+}
+#game-board .score-tag::before{font-size:calc(var(--u)*.5)!important;margin-bottom:calc(var(--u)*.18)!important}
+#game-board .score-north{left:50%!important;top:calc(var(--u)*-3)!important;transform:translateX(-50%)!important}
+#game-board .score-south{left:50%!important;bottom:calc(var(--u)*-3)!important;transform:translateX(-50%)!important}
+#game-board .score-west{left:calc(var(--u)*-5.7)!important;top:50%!important;transform:translateY(-50%)!important}
+#game-board .score-east{right:calc(var(--u)*-5.7)!important;top:50%!important;transform:translateY(-50%)!important}
+
+/* ---------- rivers: LEFT + RIGHT only, mathematically mirrored ---------- */
+#game-board .river-top,#game-board .river-bottom{display:none!important}
+#game-board .river-container{
+  grid-template-columns:repeat(5,calc(var(--u)*1.85))!important;
+  grid-auto-rows:calc(var(--u)*2.6)!important;
+  gap:calc(var(--u)*.18)!important;
+  width:calc(var(--u)*10.1)!important;
+  height:calc(var(--u)*13.2)!important;
+}
+#game-board .river-left{
+  left:24%!important; right:auto!important; top:50%!important;
+  transform:translate(-50%,-50%) rotate(90deg)!important;
+}
+#game-board .river-right{
+  right:24%!important; left:auto!important; top:50%!important;
+  transform:translate(50%,-50%) rotate(-90deg)!important;
+}
+#game-board .discard-tile{
+  width:calc(var(--u)*1.85)!important;
+  height:calc(var(--u)*2.6)!important;
+  border-radius:calc(var(--u)*.28)!important;
+  border-bottom-width:calc(var(--u)*.16)!important;
+}
+
+/* ---------- dynamic melds: tied to each seat ---------- */
+#game-board .enemy-melds-top{
+  top:15%!important; left:50%!important; right:auto!important;
+  transform:translateX(-50%)!important; flex-direction:row!important;
+}
+#game-board .enemy-melds-left{
+  left:10.5%!important; right:auto!important; top:57%!important;
+  transform:none!important; flex-direction:column!important;
+}
+#game-board .enemy-melds-right{
+  right:10.5%!important; left:auto!important; top:57%!important;
+  transform:none!important; flex-direction:column!important;
+}
+#game-board .enemy-melds .meld-group,#game-board .melds-container .meld-group{
+  gap:calc(var(--u)*.06)!important;
+  padding:calc(var(--u)*.12)!important;
+}
+#game-board .enemy-melds .meld-group .tile,#game-board .melds-container .meld-group .tile{
+  width:calc(var(--u)*1.9)!important;
+  height:calc(var(--u)*2.7)!important;
+}
+#game-board .melds-container{
+  right:12.5%!important; left:auto!important;
+  bottom:17%!important; gap:calc(var(--u)*.25)!important;
+}
+
+/* ---------- player hand / tenpai / machi ---------- */
+#game-board .hand-bottom-container{
+  left:50%!important; bottom:2.8%!important;
+  width:100%!important; transform:translateX(-50%)!important;
+  min-height:calc(var(--u)*5.2)!important;
+}
+#game-board .hand-tiles{gap:calc(var(--u)*.25)!important;padding:calc(var(--u)*.12) calc(var(--u)*.25) 0!important}
+#game-board .hand-tiles .tile{
+  width:calc(var(--u)*3.25)!important;
+  height:calc(var(--u)*4.65)!important;
+  border-radius:calc(var(--u)*.4)!important;
+  border-bottom-width:calc(var(--u)*.22)!important;
+}
+#game-board .hand-status{
+  left:50%!important; bottom:11.5%!important;
+  width:calc(var(--u)*42)!important;
+  padding:calc(var(--u)*.45) calc(var(--u)*.7)!important;
+  transform:translateX(-50%)!important;
+}
+#game-board .hand-status .status-main{font-size:calc(var(--u)*.65)!important}
+#game-board .hand-status .status-sub{font-size:calc(var(--u)*.52)!important}
+#game-board .beginner-tip{
+  left:auto!important; right:2.5%!important; bottom:5.8%!important;
+  transform:none!important; font-size:calc(var(--u)*.55)!important;
+}
+#game-board #action-overlay{
+  right:2.2%!important; left:auto!important;
+  bottom:10.2%!important; max-width:calc(var(--u)*22.5)!important;
+  gap:calc(var(--u)*.5)!important; padding:calc(var(--u)*.55) calc(var(--u)*.65)!important;
+}
+#game-board #action-overlay .act-btn{
+  min-width:calc(var(--u)*4.3)!important;
+  min-height:calc(var(--u)*2.5)!important;
+  padding:calc(var(--u)*.45) calc(var(--u)*.75)!important;
+  font-size:calc(var(--u)*.8)!important;
+}
+
+/* Portrait: keep the entire 16:9 table visible and centered. */
+@media (orientation:portrait){
+  #screen-game{overflow:hidden!important}
+  #game-board{width:100vw!important;height:56.25vw!important}
+}
+</style>
+
 </head>
 <body>
 
