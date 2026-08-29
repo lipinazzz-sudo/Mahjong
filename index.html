@@ -1949,6 +1949,329 @@ body{touch-action:manipulation!important;-webkit-user-select:none!important;user
 }
 </style>
 
+
+<style id="mahyong-dj-reference-layout-final">
+/* ================================================================
+   MAHYONG DJ — REFERENCE TABLE LAYOUT
+   Landscape-first composition inspired by the supplied reference.
+   Layout only: game logic, worker, multiplayer and tile assets untouched.
+   ================================================================ */
+
+/* --- Hide the decorative game title: the table itself is the focus. --- */
+#game-board .round-hud-shell{display:none!important;}
+
+/* --- Landscape game area is one centered table; use safe-area edges. --- */
+#screen-game{padding:0!important;}
+#game-board{
+  --table-cx:50%;
+  --table-cy:50%;
+  --safe-top:max(8px,env(safe-area-inset-top));
+  --safe-bottom:max(8px,env(safe-area-inset-bottom));
+  position:relative!important;
+  width:100vw!important;
+  height:100dvh!important;
+  overflow:hidden!important;
+  padding:0!important;
+}
+
+/* --- top utility bar: Dora at left, controls at right --- */
+#game-board .topbar{
+  position:absolute!important;
+  inset:var(--safe-top) max(12px,env(safe-area-inset-right)) auto max(12px,env(safe-area-inset-left))!important;
+  display:block!important;
+  height:56px!important;
+  z-index:80!important;
+  pointer-events:none!important;
+}
+#game-board .topbar > *{pointer-events:auto!important;}
+#game-board .dora-panel{
+  position:absolute!important;
+  left:0!important;top:0!important;
+  width:176px!important;min-width:176px!important;max-width:176px!important;
+  height:118px!important;
+  padding:8px 10px!important;
+  overflow:hidden!important;
+  border-radius:14px!important;
+}
+#game-board .dora-tiles{gap:4px!important;align-items:center!important;height:45px!important;}
+#game-board .dora-tile-box{
+  position:relative!important;
+  flex:0 0 29px!important;
+  width:29px!important;height:40px!important;
+  min-width:29px!important;max-width:29px!important;
+  min-height:40px!important;max-height:40px!important;
+  overflow:hidden!important;
+}
+#game-board .dora-tile-box > *{
+  max-width:100%!important;max-height:100%!important;
+}
+#game-board .dora-tile-box .tile-svg,
+#game-board .dora-tile-box .tile-svg-img{
+  position:absolute!important;inset:0!important;
+  width:100%!important;height:100%!important;
+  object-fit:fill!important;
+}
+#game-board .top-right-btns{
+  position:absolute!important;
+  right:0!important;top:0!important;
+  display:flex!important;gap:8px!important;
+  align-items:center!important;
+  z-index:90!important;
+}
+#game-board .top-right-btns .icon-btn{
+  width:42px!important;height:42px!important;min-width:42px!important;
+  border-radius:12px!important;
+}
+
+/* --- NORTH PLAYER: avatar floats in the upper gap between Dora and wall. --- */
+#game-board .player-seat.pos-top{
+  position:absolute!important;
+  top:12px!important;
+  left:calc(50% + clamp(150px,17vw,240px))!important;
+  right:auto!important;
+  transform:none!important;
+  width:58px!important;
+  z-index:75!important;
+}
+#game-board .pos-top .avatar-img{
+  width:48px!important;height:48px!important;
+  margin:0 auto!important;
+  border-radius:13px!important;
+}
+#game-board .pos-top .avatar-name{
+  margin-top:2px!important;
+  font-size:8px!important;
+  padding:2px 5px!important;
+  white-space:nowrap!important;
+}
+
+/* --- NORTH hand / wall: centered horizontally, below top avatar. --- */
+#game-board .enemy-hand-top{
+  position:absolute!important;
+  left:50%!important;
+  top:78px!important;
+  transform:translateX(-50%)!important;
+  display:flex!important;
+  gap:3px!important;
+  z-index:24!important;
+}
+#game-board .enemy-hand-top .tile-back{
+  width:clamp(22px,3.1vh,32px)!important;
+  height:clamp(31px,4.4vh,43px)!important;
+}
+#game-board .enemy-melds-top{
+  top:112px!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+}
+
+/* --- CENTER: square, compact, visually subordinate to the tiles. --- */
+#game-board .center-board{
+  position:absolute!important;
+  left:50%!important;top:50%!important;
+  width:clamp(126px,22vh,168px)!important;
+  height:clamp(126px,22vh,168px)!important;
+  aspect-ratio:1/1!important;
+  border-radius:22px!important;
+  z-index:50!important;
+  animation:none!important;
+}
+#game-board .center-board::before{inset:8px!important;border-radius:16px!important;}
+#game-board .turn-timer{font-size:clamp(30px,5.2vh,44px)!important;margin:5px 0 2px!important;}
+#game-board .round-info{font-size:11px!important;}
+#game-board .tiles-left{font-size:9px!important;}
+#game-board .score-tag{
+  min-width:54px!important;
+  padding:4px 6px!important;
+  font-size:8px!important;
+  line-height:1.05!important;
+}
+#game-board .score-tag::before{font-size:6px!important;margin-bottom:2px!important;}
+#game-board .score-north{top:-30px!important;left:50%!important;transform:translateX(-50%)!important;}
+#game-board .score-south{bottom:-30px!important;left:50%!important;transform:translateX(-50%)!important;}
+#game-board .score-west{left:-62px!important;top:50%!important;transform:translateY(-50%)!important;}
+#game-board .score-east{right:-62px!important;top:50%!important;transform:translateY(-50%)!important;}
+
+/* --- EAST / WEST player avatars: outside rivers, mirror-symmetric. --- */
+#game-board .player-seat.pos-left,
+#game-board .player-seat.pos-right{
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  width:58px!important;
+  z-index:28!important;
+}
+#game-board .player-seat.pos-left{left:max(18px,env(safe-area-inset-left))!important;}
+#game-board .player-seat.pos-right{right:max(18px,env(safe-area-inset-right))!important;}
+#game-board .pos-left .avatar-img,
+#game-board .pos-right .avatar-img{width:46px!important;height:46px!important;}
+#game-board .pos-left .avatar-name,
+#game-board .pos-right .avatar-name{font-size:8px!important;white-space:nowrap!important;}
+
+/* --- SIDE WALLS: stay outside the rivers. --- */
+#game-board .enemy-hand-side.side-left{
+  left:max(72px,calc(env(safe-area-inset-left) + 64px))!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+}
+#game-board .enemy-hand-side.side-right{
+  right:max(72px,calc(env(safe-area-inset-right) + 64px))!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+}
+
+/* --- RIVERS: same box geometry on every side; only orientation changes. --- */
+#game-board .river-container{
+  display:grid!important;
+  gap:3px!important;
+  padding:2px!important;
+  overflow:visible!important;
+  align-content:start!important;
+  justify-content:center!important;
+  z-index:32!important;
+}
+#game-board .river-top,
+#game-board .river-bottom{
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  grid-template-columns:repeat(6,var(--discard-w))!important;
+  grid-template-rows:repeat(3,var(--discard-h))!important;
+  width:calc(var(--discard-w)*6 + 18px)!important;
+  height:calc(var(--discard-h)*3 + 10px)!important;
+}
+#game-board .river-top{top:145px!important;}
+#game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-bottom) + 94px)!important;}
+#game-board .river-left,
+#game-board .river-right{
+  top:50%!important;
+  grid-template-columns:repeat(3,var(--discard-w))!important;
+  grid-template-rows:repeat(6,var(--discard-h))!important;
+  width:calc(var(--discard-w)*3 + 9px)!important;
+  height:calc(var(--discard-h)*6 + 15px)!important;
+}
+#game-board .river-left{
+  left:calc(50% - clamp(235px,28vw,410px))!important;
+  transform:translateY(-50%) rotate(90deg)!important;
+}
+#game-board .river-right{
+  right:calc(50% - clamp(235px,28vw,410px))!important;
+  transform:translateY(-50%) rotate(-90deg)!important;
+}
+#game-board .river-container .discard-tile{
+  margin:0!important;
+  width:var(--discard-w)!important;height:var(--discard-h)!important;
+  min-width:0!important;min-height:0!important;
+}
+
+/* Keep discard art readable without becoming oversized. */
+#game-board .discard-tile .tile-art{transform:scale(1.10)!important;}
+#game-board .discard-tile.tile-honor .tile-char{font-size:clamp(11px,2.25vh,17px)!important;}
+#game-board .discard-tile.tile-man .tile-number{font-size:clamp(9px,1.95vh,14px)!important;}
+
+/* --- YOUR PLAYER: avatar beside the hand; hand remains centered. --- */
+#game-board .player-seat.pos-bottom{
+  left:clamp(120px,calc(50% - 32vw),360px)!important;
+  bottom:calc(var(--tile-h) + var(--safe-bottom) + 3px)!important;
+  width:66px!important;
+  z-index:45!important;
+}
+#game-board .pos-bottom .avatar-img{width:48px!important;height:48px!important;}
+#game-board .pos-bottom .avatar-name{font-size:8px!important;white-space:nowrap!important;}
+#game-board .time-bank-tag{font-size:8px!important;}
+
+/* --- YOUR HAND: large enough to touch, centered, no horizontal drift. --- */
+#game-board .hand-bottom-container{
+  position:absolute!important;
+  left:0!important;right:0!important;bottom:0!important;
+  min-height:calc(var(--tile-h) + var(--safe-bottom) + 8px)!important;
+  padding:0 max(10px,env(safe-area-inset-left)) max(7px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-right))!important;
+  display:flex!important;justify-content:center!important;align-items:flex-end!important;
+  overflow-x:auto!important;overflow-y:visible!important;
+  z-index:44!important;
+}
+#game-board .hand-tiles{gap:4px!important;padding:2px 6px 0!important;max-width:none!important;}
+
+/* Status/advisor sits just above the hand, not in the table center. */
+#game-board .hand-status{
+  bottom:calc(var(--tile-h) + var(--safe-bottom) + 18px)!important;
+  width:min(360px,38vw)!important;
+  z-index:46!important;
+}
+#game-board .beginner-tip{display:none!important;}
+#game-board #action-overlay{bottom:calc(var(--tile-h) + var(--safe-bottom) + 60px)!important;z-index:60!important;}
+#game-board .melds-container{right:clamp(120px,10vw,220px)!important;bottom:calc(var(--tile-h) + var(--safe-bottom) + 5px)!important;z-index:47!important;}
+
+/* No dramatic Riichi screen dimming. */
+#game-board.riichi-active,
+#game-board.riichi-active::after,
+#game-board.riichi-active .riichi-overlay{
+  filter:none!important;
+  animation:none!important;
+  background:none!important;
+  box-shadow:none!important;
+}
+#game-board.riichi-active::after{content:none!important;}
+#game-board.riichi-active .riichi-overlay{display:none!important;}
+#game-board.riichi-active .center-board{border-color:rgba(255,255,255,.13)!important;box-shadow:0 18px 44px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.04)!important;}
+
+/* Strong anti-zoom / anti-scroll while playing. */
+html,body,#screen-game,#game-board,#game-board *{
+  -webkit-user-select:none!important;
+  user-select:none!important;
+  -webkit-touch-callout:none!important;
+}
+#game-board,#game-board *{touch-action:manipulation!important;}
+
+/* Small landscape phone: reduce the outer spacing, not the playable hand. */
+@media (orientation:landscape) and (max-height:520px){
+  #game-board .dora-panel{width:154px!important;min-width:154px!important;max-width:154px!important;height:104px!important;}
+  #game-board .dora-tile-box{flex-basis:24px!important;width:24px!important;min-width:24px!important;max-width:24px!important;height:34px!important;min-height:34px!important;max-height:34px!important;}
+  #game-board .top-right-btns .icon-btn{width:36px!important;height:36px!important;min-width:36px!important;}
+  #game-board .player-seat.pos-top{left:calc(50% + clamp(125px,16vw,180px))!important;top:6px!important;}
+  #game-board .enemy-hand-top{top:66px!important;}
+  #game-board .river-top{top:122px!important;}
+  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-bottom) + 76px)!important;}
+  #game-board .center-board{width:116px!important;height:116px!important;border-radius:20px!important;}
+  #game-board .score-north{top:-27px!important}.score-south{bottom:-27px!important}
+  #game-board .score-east{right:-58px!important}.score-west{left:-58px!important}
+  #game-board .player-seat.pos-left{left:12px!important}.player-seat.pos-right{right:12px!important}
+  #game-board .enemy-hand-side.side-left{left:60px!important}.enemy-hand-side.side-right{right:60px!important}
+  #game-board .river-left{left:calc(50% - clamp(185px,26vw,255px))!important;}
+  #game-board .river-right{right:calc(50% - clamp(185px,26vw,255px))!important;}
+  #game-board .player-seat.pos-bottom{left:clamp(74px,calc(50% - 30vw),240px)!important;bottom:calc(var(--tile-h) + var(--safe-bottom) + 2px)!important;}
+}
+
+/* iPad / iPad mini landscape: same geometry, more breathing room. */
+@media (orientation:landscape) and (min-width:700px) and (min-height:480px){
+  #game-board .player-seat.pos-top{left:calc(50% + clamp(180px,18vw,270px))!important;}
+  #game-board .player-seat.pos-left{left:max(30px,env(safe-area-inset-left))!important;}
+  #game-board .player-seat.pos-right{right:max(30px,env(safe-area-inset-right))!important;}
+  #game-board .enemy-hand-side.side-left{left:max(92px,calc(env(safe-area-inset-left) + 82px))!important;}
+  #game-board .enemy-hand-side.side-right{right:max(92px,calc(env(safe-area-inset-right) + 82px))!important;}
+  #game-board .river-left{left:calc(50% - clamp(280px,29vw,430px))!important;}
+  #game-board .river-right{right:calc(50% - clamp(280px,29vw,430px))!important;}
+  #game-board .player-seat.pos-bottom{left:clamp(150px,calc(50% - 30vw),420px)!important;}
+}
+
+/* Portrait: gameplay is intentionally locked to landscape. */
+@media (orientation:portrait){
+  #screen-game::before{
+    content:"PUTAR PERANGKAT KE LANDSCAPE";
+    position:absolute;inset:0;z-index:9999;
+    display:grid;place-items:center;
+    padding:32px;text-align:center;
+    background:#07121c;color:#f4c662;
+    font-size:clamp(18px,6vw,30px);font-weight:900;letter-spacing:.08em;
+  }
+  #screen-game::after{
+    content:"Mahyong DJ hanya dimainkan dalam mode landscape";
+    position:absolute;left:50%;top:56%;transform:translate(-50%,-50%);
+    z-index:10000;width:min(86vw,460px);text-align:center;
+    color:#9eaab8;font-size:13px;font-weight:700;line-height:1.5;
+  }
+  #game-board{visibility:hidden!important;}
+}
+</style>
+
 </head>
 <body>
 
