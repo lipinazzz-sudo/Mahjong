@@ -1235,659 +1235,78 @@ h1{margin-bottom:8px;font-size:clamp(2rem,6vw,4rem);line-height:.98;letter-spaci
 }
 
 </style>
-<style id="layout-reference-final">
-/* ===== FINAL LAYOUT: MATCH THE SUPPLIED REFERENCE ===== */
-@media (min-width:933px), (min-width:780px) and (orientation:landscape){
-  /* Player mapping: P2 = top, P1 = right, P3 = left, You = lower-left. */
-  #game-board .pos-top{
-    top:12px;
-    right:17%;
-    left:auto;
-  }
-  #game-board .pos-left{
-    left:4.8%;
-    right:auto;
-    top:40%;
-    transform:translateY(-50%);
-  }
-  #game-board .pos-right{
-    right:4.8%;
-    left:auto;
-    top:40%;
-    transform:translateY(-50%);
-  }
-  #game-board .pos-bottom{
-    left:13.5%;
-    right:auto;
-    bottom:118px;
-  }
 
-  /* Side concealed walls are strict left/right mirrors. */
-  #game-board .enemy-hand-side.side-left{
-    left:11%;
-    right:auto;
-    top:23%;
-  }
-  #game-board .enemy-hand-side.side-right{
-    right:11%;
-    left:auto;
-    top:23%;
-  }
-
-  /* Each player's open meld area is tied to that player's seat. */
-  #game-board .enemy-melds-top{
-    top:76px;
-    left:50%;
-    right:auto;
-    transform:translateX(-50%);
-  }
-  #game-board .enemy-melds-left{
-    left:14%;
-    right:auto;
-    top:59%;
-    transform:none;
-    flex-direction:column;
-  }
-  #game-board .enemy-melds-right{
-    right:14%;
-    left:auto;
-    top:59%;
-    transform:none;
-    flex-direction:column;
-  }
-
-  /* Player melds remain at the lower-right, as in the reference. */
-  #game-board .melds-container{
-    right:14%;
-    left:auto;
-    bottom:117px;
-  }
-}
-
-/* The HTML/JS already creates these containers dynamically, so they stay hidden
-   until Chi / Pon / Kan data is actually rendered. */
-.enemy-melds:empty,
-.melds-container:empty{display:none;}
-</style>
-<style id="layout-reference-correction">
-/* ===== REFERENCE IMAGE GEOMETRY CORRECTION =====
-   Only layout/positioning is changed here.
-   Player mapping remains: P2=top, P1=right, P3=left, You=bottom-left.
-*/
-@media (min-width:933px) {
-  /* --- Player seats --- */
-  #game-board .pos-top{
-    top:12px;
-    right:17%;
-    left:auto;
-    transform:none;
-  }
-  #game-board .pos-left{
-    left:4.8%;
-    right:auto;
-    top:58%;
-    transform:translateY(-50%);
-  }
-  #game-board .pos-right{
-    right:4.8%;
-    left:auto;
-    top:58%;
-    transform:translateY(-50%);
-  }
-  #game-board .pos-bottom{
-    left:13.5%;
-    right:auto;
-    bottom:118px;
-  }
-
-  /* --- Concealed hands / walls --- */
-  #game-board .enemy-hand-top{
-    top:29px;
-    left:50%;
-    right:auto;
-    transform:translateX(-50%);
-    gap:3px;
-  }
-  #game-board .enemy-hand-top .tile-back{
-    width:34px;
-    height:52px;
-  }
-  #game-board .enemy-hand-side{
-    gap:3px;
-  }
-  #game-board .enemy-hand-side.side-left{
-    left:5.3%;
-    right:auto;
-    top:17.3%;
-  }
-  #game-board .enemy-hand-side.side-right{
-    right:5.3%;
-    left:auto;
-    top:17.3%;
-  }
-  #game-board .enemy-hand-side .tile-back{
-    width:52px;
-    height:34px;
-  }
-
-  /* --- Dynamic open melds: tied to the correct player's side --- */
-  #game-board .enemy-melds-top{
-    top:89px;
-    left:30%;
-    right:auto;
-    transform:none;
-    flex-direction:row;
-  }
-  #game-board .enemy-melds-left{
-    left:8.1%;
-    right:auto;
-    top:18%;
-    transform:none;
-    flex-direction:column;
-  }
-  #game-board .enemy-melds-right{
-    right:8.1%;
-    left:auto;
-    top:36%;
-    transform:none;
-    flex-direction:column;
-  }
-  #game-board .enemy-melds .meld-group{
-    gap:1px;
-    padding:2px;
-  }
-  #game-board .enemy-melds .meld-group .tile{
-    width:30px;
-    height:43px;
-  }
-
-  /* Player's own open melds: lower-right, above the hand. */
-  #game-board .melds-container{
-    right:12.2%;
-    left:auto;
-    bottom:177px;
-    gap:4px;
-  }
-  #game-board .melds-container .meld-group .tile{
-    width:33px;
-    height:47px;
-  }
-
-  /* Keep left/right geometry mathematically mirrored. */
-  #game-board .river-left{
-    left:calc(50% - 335px);
-  }
-  #game-board .river-right{
-    right:calc(50% - 335px);
-  }
-}
-
-@media (min-width:780px) and (max-width:932px) and (orientation:landscape){
-  /* Same seat geometry on phone landscape, scaled to the existing phone layer. */
-  #game-board .pos-top{
-    top:2px;
-    right:15%;
-    left:auto;
-    transform:none;
-  }
-  #game-board .pos-left,
-  #game-board .pos-right{
-    top:55%;
-    transform:translateY(-50%);
-  }
-  #game-board .pos-left{left:1.5%;right:auto}
-  #game-board .pos-right{right:1.5%;left:auto}
-
-  #game-board .enemy-melds-top{
-    top:42px;
-    left:31%;
-    right:auto;
-    transform:none;
-    flex-direction:row;
-  }
-  #game-board .enemy-melds-left{
-    left:5.8%;
-    right:auto;
-    top:18%;
-    transform:none;
-    flex-direction:column;
-  }
-  #game-board .enemy-melds-right{
-    right:5.8%;
-    left:auto;
-    top:35%;
-    transform:none;
-    flex-direction:column;
-  }
-}
-</style>
-<style id="layout-user-grid-reference">
-/* USER REFERENCE LAYOUT
-   Center score/timer; side rivers; top wall + P2; right P1; left P3;
-   You + hand at lower-left/lower-center; dynamic melds stay tied to seats.
-*/
-@media (min-width:933px){
-  #game-board{
-    /* The reference composition uses the full board as the coordinate plane. */
-  }
-
-  /* ---------- players ---------- */
-  #game-board .pos-top{
-    top:1.8%;
-    right:20.5%;
-    left:auto;
-    transform:none;
-  }
-  #game-board .pos-right{
-    right:1.8%;
-    left:auto;
-    top:31.5%;
-    transform:none;
-  }
-  #game-board .pos-left{
-    left:1.8%;
-    right:auto;
-    top:73%;
-    transform:none;
-  }
-  #game-board .pos-bottom{
-    left:8.2%;
-    right:auto;
-    bottom:7.0%;
-  }
-
-  /* ---------- walls / concealed hands ---------- */
-  #game-board .enemy-hand-top{
-    left:50%;
-    top:3.8%;
-    right:auto;
-    transform:translateX(-50%);
-    gap:3px;
-  }
-  #game-board .enemy-hand-top .tile-back{
-    width:34px;
-    height:52px;
-  }
-  #game-board .enemy-hand-side{
-    gap:3px;
-    top:23%;
-  }
-  #game-board .enemy-hand-side.side-left{
-    left:5.2%;
-    right:auto;
-  }
-  #game-board .enemy-hand-side.side-right{
-    right:5.2%;
-    left:auto;
-  }
-  #game-board .enemy-hand-side .tile-back{
-    width:52px;
-    height:34px;
-  }
-
-  /* ---------- CENTER: score + timer stay exactly in the middle ---------- */
-  #game-board .center-board{
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-  }
-
-  /* Keep all four scores associated with the center board. */
-  #game-board .score-north{
-    left:50%; top:-48px; right:auto; bottom:auto;
-    transform:translateX(-50%);
-  }
-  #game-board .score-south{
-    left:50%; bottom:-48px; right:auto; top:auto;
-    transform:translateX(-50%);
-  }
-  #game-board .score-west{
-    left:-91px; top:50%; right:auto; bottom:auto;
-    transform:translateY(-50%);
-  }
-  #game-board .score-east{
-    right:-91px; top:50%; left:auto; bottom:auto;
-    transform:translateY(-50%);
-  }
-
-  /* ---------- RIVERS: left/right only, mirrored around the center ---------- */
-  #game-board .river-left{
-    left:24.0%;
-    right:auto;
-    top:50%;
-    transform:translate(-50%,-50%) rotate(90deg);
-  }
-  #game-board .river-right{
-    right:24.0%;
-    left:auto;
-    top:50%;
-    transform:translate(50%,-50%) rotate(-90deg);
-  }
-  #game-board .river-top,
-  #game-board .river-bottom{
-    /* The reference puts the discard fields at the sides. Keep their
-       DOM/state intact but do not display the top/bottom rivers. */
-    display:none;
-  }
-  #game-board .river-container{
-    grid-template-columns:repeat(5,var(--discard-w,29px));
-    grid-auto-rows:var(--discard-h,41px);
-    gap:3px;
-    width:calc(var(--discard-w,29px)*5 + 12px);
-    height:calc(var(--discard-h,41px)*5 + 12px);
-  }
-
-  /* ---------- dynamic open melds by player ---------- */
-  #game-board .enemy-melds-top{
-    top:15%; left:50%; right:auto;
-    transform:translateX(-50%);
-    flex-direction:row;
-  }
-  #game-board .enemy-melds-left{
-    left:10.5%; right:auto; top:57%;
-    transform:none;
-    flex-direction:column;
-  }
-  #game-board .enemy-melds-right{
-    right:10.5%; left:auto; top:57%;
-    transform:none;
-    flex-direction:column;
-  }
-  #game-board .enemy-melds .meld-group,
-  #game-board .melds-container .meld-group{
-    gap:1px;
-    padding:2px;
-  }
-  #game-board .enemy-melds .meld-group .tile,
-  #game-board .melds-container .meld-group .tile{
-    width:30px;
-    height:43px;
-  }
-
-  /* You's meld area: lower-right, above the action/status region. */
-  #game-board .melds-container{
-    right:12.5%;
-    left:auto;
-    bottom:17%;
-    gap:4px;
-  }
-
-  /* ---------- player hand + tenpai + machi ---------- */
-  #game-board .hand-bottom-container{
-    left:50%;
-    bottom:2.8%;
-    width:100vw;
-    transform:translateX(-50%);
-  }
-  #game-board .hand-status{
-    left:50%;
-    bottom:11.5%;
-    transform:translateX(-50%);
-  }
-
-  /* Keep the advisor / Machi notification at lower-right. */
-  #game-board .beginner-tip{
-    left:auto;
-    right:2.5%;
-    bottom:5.8%;
-    transform:none;
-  }
-
-  /* Action controls remain independent from the player hand. */
-  #game-board #action-overlay{
-    right:2.2%;
-    left:auto;
-    bottom:10.2%;
-  }
-}
-
-@media (min-width:780px) and (max-width:932px) and (orientation:landscape){
-  /* Phone-landscape version preserves the same composition at smaller scale. */
-  #game-board .pos-top{top:1.5%;right:17%;left:auto;transform:none}
-  #game-board .pos-left{left:1.8%;right:auto;top:73%;transform:none}
-  #game-board .pos-right{right:1.8%;left:auto;top:31.5%;transform:none}
-  #game-board .pos-bottom{left:8.5%;right:auto;bottom:calc(var(--phone-tile-h) + 2px)}
-
-  #game-board .enemy-hand-top{top:3.5%;left:50%;transform:translateX(-50%)}
-  #game-board .enemy-hand-top .tile-back{width:20px;height:29px}
-  #game-board .enemy-hand-side{top:23%;gap:1.5px}
-  #game-board .enemy-hand-side.side-left{left:4.8%;right:auto}
-  #game-board .enemy-hand-side.side-right{right:4.8%;left:auto}
-  #game-board .enemy-hand-side .tile-back{width:29px;height:20px}
-
-  #game-board .center-board{left:50%;top:50%;transform:translate(-50%,-50%)}
-  #game-board .river-left{left:23%;right:auto;top:50%;transform:translate(-50%,-50%) rotate(90deg)}
-  #game-board .river-right{right:23%;left:auto;top:50%;transform:translate(50%,-50%) rotate(-90deg)}
-  #game-board .river-top,#game-board .river-bottom{display:none}
-
-  #game-board .enemy-melds-top{top:14%;left:50%;right:auto;transform:translateX(-50%);flex-direction:row}
-  #game-board .enemy-melds-left{left:8%;right:auto;top:57%;transform:none;flex-direction:column}
-  #game-board .enemy-melds-right{right:8%;left:auto;top:57%;transform:none;flex-direction:column}
-  #game-board .enemy-melds .meld-group .tile,#game-board .melds-container .meld-group .tile{width:20px;height:29px}
-  #game-board .melds-container{right:8%;left:auto;bottom:calc(var(--phone-tile-h) + 4px);gap:2px}
-
-  #game-board .hand-bottom-container{left:50%;bottom:var(--safe-b);width:100vw;transform:translateX(-50%)}
-  #game-board .hand-status{left:50%;bottom:calc(var(--phone-tile-h) + 6px);transform:translateX(-50%)}
-  #game-board #action-overlay{right:2%;left:auto;bottom:calc(var(--phone-tile-h) + 5px)}
-}
-</style>
-
-
-<style id="layout-final-responsive-table">
-/* ================================================================
-   FINAL TABLE LAYOUT
-   One 16:9 coordinate plane, scaled as a single unit on every device.
-   Portrait phones/tablets show the complete table reduced to fit.
-   Gameplay JavaScript is untouched.
-   ================================================================ */
-#screen-game{
-  padding:0!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  overflow:hidden!important;
-  background:#02060a!important;
-}
-
+<style id="fresh-rectangle-layout">
+/* =============================================================
+   FRESH RECTANGULAR TABLE LAYOUT
+   One 16:9 coordinate plane for every device.
+   Only geometry is controlled here; game logic/DOM IDs stay intact.
+   ============================================================= */
+html,body{width:100%;height:100%;overflow:hidden}
+#screen-game{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;background:#02060a!important}
 #game-board{
   position:relative!important;
-  width:min(100vw, calc(100dvh * 16 / 9))!important;
-  height:min(100dvh, calc(100vw * 9 / 16))!important;
+  width:min(100vw,177.7777778dvh)!important;
+  height:min(56.25vw,100dvh)!important;
   aspect-ratio:16/9!important;
-  flex:0 0 auto!important;
+  left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;
+  transform:none!important;
+  margin:0!important;
   overflow:hidden!important;
-  --u:min(1vw, 1.7777778dvh);
 }
 
-/* ---------- fixed 16:9 coordinate map ---------- */
-#game-board .topbar{
-  top:calc(var(--u)*1.2)!important;
-  left:calc(var(--u)*1.8)!important;
-  right:calc(var(--u)*1.8)!important;
-  height:calc(var(--u)*7)!important;
-}
+/* ----- top information ----- */
+#game-board .topbar{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;pointer-events:none!important;z-index:80!important}
 #game-board .dora-panel{
-  left:0!important; top:0!important;
-  width:calc(var(--u)*15.5)!important;
-  height:calc(var(--u)*7.7)!important;
-  padding:calc(var(--u)*.65)!important;
-  border-radius:calc(var(--u)*.8)!important;
+  position:absolute!important;left:2%!important;top:2%!important;right:auto!important;bottom:auto!important;
+  width:16%!important;height:auto!important;min-width:0!important;max-width:none!important;
+  z-index:90!important;overflow:visible!important;
 }
-#game-board .hud-label{font-size:calc(var(--u)*.7)!important}
-#game-board .dora-tiles{height:calc(var(--u)*3)!important;gap:calc(var(--u)*.15)!important}
-#game-board .dora-tile-box{width:calc(var(--u)*2.25)!important;height:calc(var(--u)*3)!important}
-#game-board .stick-counters,#game-board .kan-info{font-size:calc(var(--u)*.58)!important}
-#game-board .top-right-btns{right:0!important;top:0!important;gap:calc(var(--u)*.3)!important}
-#game-board .top-right-btns .icon-btn{width:calc(var(--u)*2.5)!important;height:calc(var(--u)*2.5)!important;font-size:calc(var(--u)*1.05)!important}
+#game-board .top-right-btns{position:absolute!important;right:2%!important;top:2%!important;left:auto!important;bottom:auto!important;z-index:95!important;pointer-events:auto!important}
+#game-board .pos-top{position:absolute!important;left:auto!important;right:9%!important;top:2%!important;bottom:auto!important;transform:none!important;z-index:70!important}
+#game-board .pos-right{position:absolute!important;left:auto!important;right:2%!important;top:22%!important;bottom:auto!important;transform:none!important;z-index:70!important}
+#game-board .pos-left{position:absolute!important;left:2%!important;right:auto!important;top:70%!important;bottom:auto!important;transform:none!important;z-index:70!important}
+#game-board .pos-bottom{position:absolute!important;left:10%!important;right:auto!important;top:auto!important;bottom:7%!important;transform:none!important;z-index:70!important}
 
-/* ---------- players: P2 top-right, P1 right, P3 left, You lower-left ---------- */
-#game-board .player-seat .avatar-img{
-  width:calc(var(--u)*4.7)!important;
-  height:calc(var(--u)*4.7)!important;
-  border-width:calc(var(--u)*.16)!important;
-  border-radius:calc(var(--u)*.75)!important;
-}
-#game-board .avatar-name{
-  margin-top:calc(var(--u)*.25)!important;
-  padding:calc(var(--u)*.25) calc(var(--u)*.7)!important;
-  border-radius:calc(var(--u)*.4)!important;
-  font-size:calc(var(--u)*.82)!important;
-}
-#game-board .time-bank-tag{font-size:calc(var(--u)*.62)!important;padding:calc(var(--u)*.18) calc(var(--u)*.5)!important}
+/* ----- concealed wall tiles ----- */
+#game-board .enemy-hand-top{position:absolute!important;left:50%!important;top:5%!important;right:auto!important;bottom:auto!important;transform:translateX(-50%)!important;display:flex!important;flex-direction:row!important;z-index:30!important}
+#game-board .enemy-hand-top .tile-back{width:3.1%!important;min-width:0!important;height:auto!important;aspect-ratio:34/52!important}
+#game-board .enemy-hand-side{position:absolute!important;top:25%!important;bottom:auto!important;display:flex!important;flex-direction:column!important;gap:3px!important;z-index:30!important}
+#game-board .enemy-hand-side.side-left{left:6%!important;right:auto!important}
+#game-board .enemy-hand-side.side-right{right:6%!important;left:auto!important}
+#game-board .enemy-hand-side .tile-back{width:auto!important;height:5.2%!important;aspect-ratio:52/34!important}
 
-#game-board .pos-top{
-  top:calc(var(--u)*1.0)!important;
-  right:calc(var(--u)*10.8)!important;
-  left:auto!important; transform:none!important;
-}
-#game-board .pos-right{
-  right:calc(var(--u)*1.2)!important;
-  top:31.5%!important;
-  left:auto!important; transform:none!important;
-}
-#game-board .pos-left{
-  left:calc(var(--u)*1.2)!important;
-  top:73%!important;
-  right:auto!important; transform:none!important;
-}
-#game-board .pos-bottom{
-  left:8.2%!important;
-  right:auto!important;
-  bottom:7.2%!important;
-}
-
-/* ---------- concealed walls ---------- */
-#game-board .enemy-hand-top{
-  left:50%!important; top:4.0%!important; transform:translateX(-50%)!important;
-  gap:calc(var(--u)*.18)!important;
-}
-#game-board .enemy-hand-top .tile-back{
-  width:calc(var(--u)*2.15)!important;
-  height:calc(var(--u)*3.25)!important;
-}
-#game-board .enemy-hand-side{
-  top:23%!important; gap:calc(var(--u)*.18)!important;
-}
-#game-board .enemy-hand-side.side-left{left:5.2%!important;right:auto!important}
-#game-board .enemy-hand-side.side-right{right:5.2%!important;left:auto!important}
-#game-board .enemy-hand-side .tile-back{
-  width:calc(var(--u)*3.25)!important;
-  height:calc(var(--u)*2.15)!important;
-}
-
-/* ---------- center: score + timer never move away from center ---------- */
-#game-board .center-board{
-  left:50%!important; top:50%!important;
-  transform:translate(-50%,-50%)!important;
-  width:calc(var(--u)*10.7)!important;
-  height:calc(var(--u)*10.7)!important;
-  border-radius:calc(var(--u)*1.45)!important;
-}
-#game-board .round-info{font-size:calc(var(--u)*1.2)!important}
-#game-board .turn-timer{font-size:calc(var(--u)*3.2)!important;margin:calc(var(--u)*.3) 0 0!important}
-#game-board .tiles-left{font-size:calc(var(--u)*.8)!important}
-#game-board .score-tag{
-  min-width:calc(var(--u)*4.9)!important;
-  padding:calc(var(--u)*.4) calc(var(--u)*.55)!important;
-  font-size:calc(var(--u)*.75)!important;
-}
-#game-board .score-tag::before{font-size:calc(var(--u)*.5)!important;margin-bottom:calc(var(--u)*.18)!important}
-#game-board .score-north{left:50%!important;top:calc(var(--u)*-3)!important;transform:translateX(-50%)!important}
-#game-board .score-south{left:50%!important;bottom:calc(var(--u)*-3)!important;transform:translateX(-50%)!important}
-#game-board .score-west{left:calc(var(--u)*-5.7)!important;top:50%!important;transform:translateY(-50%)!important}
-#game-board .score-east{right:calc(var(--u)*-5.7)!important;top:50%!important;transform:translateY(-50%)!important}
-
-/* ---------- rivers: LEFT + RIGHT only, mathematically mirrored ---------- */
+/* ----- rivers: only left/right, perfectly mirrored ----- */
 #game-board .river-top,#game-board .river-bottom{display:none!important}
-#game-board .river-container{
-  grid-template-columns:repeat(5,calc(var(--u)*1.85))!important;
-  grid-auto-rows:calc(var(--u)*2.6)!important;
-  gap:calc(var(--u)*.18)!important;
-  width:calc(var(--u)*10.1)!important;
-  height:calc(var(--u)*13.2)!important;
-}
-#game-board .river-left{
-  left:24%!important; right:auto!important; top:50%!important;
-  transform:translate(-50%,-50%) rotate(90deg)!important;
-}
-#game-board .river-right{
-  right:24%!important; left:auto!important; top:50%!important;
-  transform:translate(50%,-50%) rotate(-90deg)!important;
-}
-#game-board .discard-tile{
-  width:calc(var(--u)*1.85)!important;
-  height:calc(var(--u)*2.6)!important;
-  border-radius:calc(var(--u)*.28)!important;
-  border-bottom-width:calc(var(--u)*.16)!important;
-}
+#game-board .river-container{position:absolute!important;z-index:25!important}
+#game-board .river-left{left:25%!important;right:auto!important;top:50%!important;transform:translate(-50%,-50%) rotate(90deg)!important}
+#game-board .river-right{right:25%!important;left:auto!important;top:50%!important;transform:translate(50%,-50%) rotate(-90deg)!important}
 
-/* ---------- dynamic melds: tied to each seat ---------- */
-#game-board .enemy-melds-top{
-  top:15%!important; left:50%!important; right:auto!important;
-  transform:translateX(-50%)!important; flex-direction:row!important;
-}
-#game-board .enemy-melds-left{
-  left:10.5%!important; right:auto!important; top:57%!important;
-  transform:none!important; flex-direction:column!important;
-}
-#game-board .enemy-melds-right{
-  right:10.5%!important; left:auto!important; top:57%!important;
-  transform:none!important; flex-direction:column!important;
-}
-#game-board .enemy-melds .meld-group,#game-board .melds-container .meld-group{
-  gap:calc(var(--u)*.06)!important;
-  padding:calc(var(--u)*.12)!important;
-}
-#game-board .enemy-melds .meld-group .tile,#game-board .melds-container .meld-group .tile{
-  width:calc(var(--u)*1.9)!important;
-  height:calc(var(--u)*2.7)!important;
-}
-#game-board .melds-container{
-  right:12.5%!important; left:auto!important;
-  bottom:17%!important; gap:calc(var(--u)*.25)!important;
-}
+/* ----- center score/timer ----- */
+#game-board .center-board{position:absolute!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;z-index:60!important}
+#game-board .score-north{left:50%!important;right:auto!important;top:-48px!important;bottom:auto!important;transform:translateX(-50%)!important}
+#game-board .score-south{left:50%!important;right:auto!important;bottom:-48px!important;top:auto!important;transform:translateX(-50%)!important}
+#game-board .score-west{left:-91px!important;right:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+#game-board .score-east{right:-91px!important;left:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
 
-/* ---------- player hand / tenpai / machi ---------- */
-#game-board .hand-bottom-container{
-  left:50%!important; bottom:2.8%!important;
-  width:100%!important; transform:translateX(-50%)!important;
-  min-height:calc(var(--u)*5.2)!important;
-}
-#game-board .hand-tiles{gap:calc(var(--u)*.25)!important;padding:calc(var(--u)*.12) calc(var(--u)*.25) 0!important}
-#game-board .hand-tiles .tile{
-  width:calc(var(--u)*3.25)!important;
-  height:calc(var(--u)*4.65)!important;
-  border-radius:calc(var(--u)*.4)!important;
-  border-bottom-width:calc(var(--u)*.22)!important;
-}
-#game-board .hand-status{
-  left:50%!important; bottom:11.5%!important;
-  width:calc(var(--u)*42)!important;
-  padding:calc(var(--u)*.45) calc(var(--u)*.7)!important;
-  transform:translateX(-50%)!important;
-}
-#game-board .hand-status .status-main{font-size:calc(var(--u)*.65)!important}
-#game-board .hand-status .status-sub{font-size:calc(var(--u)*.52)!important}
-#game-board .beginner-tip{
-  left:auto!important; right:2.5%!important; bottom:5.8%!important;
-  transform:none!important; font-size:calc(var(--u)*.55)!important;
-}
-#game-board #action-overlay{
-  right:2.2%!important; left:auto!important;
-  bottom:10.2%!important; max-width:calc(var(--u)*22.5)!important;
-  gap:calc(var(--u)*.5)!important; padding:calc(var(--u)*.55) calc(var(--u)*.65)!important;
-}
-#game-board #action-overlay .act-btn{
-  min-width:calc(var(--u)*4.3)!important;
-  min-height:calc(var(--u)*2.5)!important;
-  padding:calc(var(--u)*.45) calc(var(--u)*.75)!important;
-  font-size:calc(var(--u)*.8)!important;
-}
+/* ----- dynamic melds, tied to the same four seats ----- */
+#game-board .enemy-melds-top{position:absolute!important;left:50%!important;right:auto!important;top:15%!important;bottom:auto!important;transform:translateX(-50%)!important;flex-direction:row!important;z-index:45!important}
+#game-board .enemy-melds-left{position:absolute!important;left:17%!important;right:auto!important;top:54%!important;bottom:auto!important;transform:none!important;flex-direction:column!important;z-index:45!important}
+#game-board .enemy-melds-right{position:absolute!important;right:17%!important;left:auto!important;top:54%!important;bottom:auto!important;transform:none!important;flex-direction:column!important;z-index:45!important}
+#game-board .melds-container{position:absolute!important;right:17%!important;left:auto!important;top:auto!important;bottom:14%!important;z-index:55!important}
 
-/* Portrait: keep the entire 16:9 table visible and centered. */
-@media (orientation:portrait){
-  #screen-game{overflow:hidden!important}
+/* ----- player's hand + status ----- */
+#game-board .hand-bottom-container{position:absolute!important;left:50%!important;right:auto!important;top:auto!important;bottom:1.5%!important;width:50%!important;min-height:0!important;transform:translateX(-50%)!important;z-index:50!important}
+#game-board .hand-tiles{width:100%!important;justify-content:center!important}
+#game-board .hand-status{left:50%!important;top:auto!important;bottom:13%!important;transform:translateX(-50%)!important;width:34%!important;z-index:58!important}
+#game-board #action-overlay{right:2%!important;left:auto!important;bottom:8%!important;z-index:75!important}
+
+/* Keep the same 16:9 board on phones/tablets; never rearrange individual seats. */
+@media (max-aspect-ratio:16/9){
   #game-board{width:100vw!important;height:56.25vw!important}
+}
+@media (min-aspect-ratio:16/9){
+  #game-board{width:177.7777778dvh!important;height:100dvh!important}
 }
 </style>
 
@@ -4569,3 +3988,285 @@ window.addEventListener('pointerdown',()=>{try{if(typeof startChineseMusic==='fu
 
 </body>
 </html>
+<style id="locked-dora-and-wall-preview-v4">
+/* =============================================================
+   LOCKED DORA + WALL PREVIEW
+   Dora is reduced by 20% from the current locked size.
+   Walls are forced visible so their geometry can be inspected.
+   No game logic is changed.
+   ============================================================= */
+#game-board .dora-panel{
+  left:12.5% !important;
+  right:auto !important;
+  top:2% !important;
+  width:12.8% !important;
+  height:11.2% !important;
+  box-sizing:border-box !important;
+  overflow:visible !important;
+  z-index:100 !important;
+}
+
+#game-board .enemy-hand-top{
+  display:flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  left:50% !important;
+  right:auto !important;
+  top:5% !important;
+  width:auto !important;
+  transform:translateX(-50%) !important;
+  z-index:40 !important;
+}
+
+#game-board .enemy-hand-side{
+  display:flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  z-index:40 !important;
+}
+#game-board .enemy-hand-side.side-left{
+  left:6% !important;
+  right:auto !important;
+  top:28% !important;
+}
+#game-board .enemy-hand-side.side-right{
+  right:6% !important;
+  left:auto !important;
+  top:28% !important;
+}
+
+#game-board .enemy-hand-top .tile-back{
+  width:3.1% !important;
+  min-width:0 !important;
+  height:auto !important;
+  aspect-ratio:34/52 !important;
+}
+#game-board .enemy-hand-side .tile-back{
+  width:auto !important;
+  height:5.2% !important;
+  aspect-ratio:52/34 !important;
+}
+</style>
+
+
+<style id="locked-river-center-layout">
+/* =============================================================
+   LOCKED CORE POSITIONS — RIVERS + SCORE/TIMER
+   The rectangular board remains the single 16:9 coordinate plane.
+   These positions are intentionally isolated so later layout work
+   cannot accidentally move the rivers or center board.
+   ============================================================= */
+#game-board .river-top,
+#game-board .river-bottom{
+  display:none !important;
+}
+
+/* Left/right rivers: exact mirror around the board's 50% center line. */
+#game-board .river-left{
+  left:25% !important;
+  right:auto !important;
+  top:50% !important;
+  bottom:auto !important;
+  transform:translate(-50%,-50%) rotate(90deg) !important;
+}
+
+#game-board .river-right{
+  right:25% !important;
+  left:auto !important;
+  top:50% !important;
+  bottom:auto !important;
+  transform:translate(50%,-50%) rotate(-90deg) !important;
+}
+
+/* Score + timer: one fixed center point for every device. */
+#game-board .center-board{
+  left:50% !important;
+  top:50% !important;
+  right:auto !important;
+  bottom:auto !important;
+  transform:translate(-50%,-50%) !important;
+}
+
+#game-board .score-north{
+  left:50% !important;
+  right:auto !important;
+  top:-48px !important;
+  bottom:auto !important;
+  transform:translateX(-50%) !important;
+}
+#game-board .score-south{
+  left:50% !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:-48px !important;
+  transform:translateX(-50%) !important;
+}
+#game-board .score-west{
+  left:-91px !important;
+  right:auto !important;
+  top:50% !important;
+  bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+#game-board .score-east{
+  right:-91px !important;
+  left:auto !important;
+  top:50% !important;
+  bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+</style>
+
+<style id="locked-player-symmetry-v2">
+/* =============================================================
+   LOCKED PLAYER SYMMETRY V2
+   P2 <-> YOU and P1 <-> P3 are mirror pairs through the center.
+   Only geometry is changed.
+   ============================================================= */
+#game-board .top-right-btns{
+  position:absolute!important;
+  top:2%!important;
+  right:2%!important;
+  left:auto!important;
+  bottom:auto!important;
+  display:block!important;
+  z-index:120!important;
+}
+
+/* Exactly one pause control is visible before interaction. */
+#game-board .pause-game-btn{
+  display:grid!important;
+  place-items:center!important;
+}
+#game-board .pause-menu{
+  display:none!important;
+}
+
+/* Diagonal/180-degree mirrored player arrangement. */
+#game-board .pos-top{
+  top:2%!important;
+  right:9%!important;
+  left:auto!important;
+  bottom:auto!important;
+  transform:none!important;
+}
+#game-board .pos-right{
+  top:22%!important;
+  right:2%!important;
+  left:auto!important;
+  bottom:auto!important;
+  transform:none!important;
+}
+#game-board .pos-left{
+  top:auto!important;
+  right:auto!important;
+  left:2%!important;
+  bottom:22%!important;
+  transform:none!important;
+}
+#game-board .pos-bottom{
+  top:auto!important;
+  right:9%!important;
+  left:auto!important;
+  bottom:2%!important;
+  transform:none!important;
+}
+</style>
+<style id="locked-player-symmetry-v3">
+#game-board .pos-left{left:2%!important;right:auto!important;top:auto!important;bottom:22%!important;}
+#game-board .pos-bottom{left:9%!important;right:auto!important;top:auto!important;bottom:2%!important;}
+</style>
+
+<style id="locked-dora-wall-v5">
+/* =============================================================
+   LOCKED DORA + VISIBLE WALL — V5
+   Dora is reduced 20% from the previous 16% x 14% panel.
+   Wall tiles are intentionally visible for position locking.
+   No game logic is changed.
+   ============================================================= */
+#game-board .dora-panel{
+  position:absolute !important;
+  left:2% !important;
+  top:2% !important;
+  right:auto !important;
+  bottom:auto !important;
+  width:12.8% !important;
+  height:11.2% !important;
+  min-width:0 !important;
+  box-sizing:border-box !important;
+  overflow:visible !important;
+  z-index:100 !important;
+}
+
+#game-board .dora-tiles{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:2px !important;
+  max-width:100% !important;
+  overflow:visible !important;
+}
+
+#game-board .dora-tile-box{
+  flex:0 0 auto !important;
+  width:calc((100% - 8px) / 5) !important;
+  aspect-ratio:34/52 !important;
+  height:auto !important;
+  box-sizing:border-box !important;
+}
+
+/* TOP WALL — visible and centered */
+#game-board .enemy-hand-top{
+  display:flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  position:absolute !important;
+  left:50% !important;
+  right:auto !important;
+  top:5% !important;
+  bottom:auto !important;
+  width:31% !important;
+  transform:translateX(-50%) !important;
+  justify-content:center !important;
+  align-items:center !important;
+  gap:3px !important;
+  z-index:40 !important;
+}
+
+#game-board .enemy-hand-top .tile-back{
+  flex:0 0 auto !important;
+  width:3.1% !important;
+  min-width:0 !important;
+  height:auto !important;
+  aspect-ratio:34/52 !important;
+}
+
+/* LEFT / RIGHT WALLS — exact mirror */
+#game-board .enemy-hand-side{
+  display:flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  position:absolute !important;
+  top:28% !important;
+  bottom:auto !important;
+  gap:3px !important;
+  z-index:40 !important;
+}
+
+#game-board .enemy-hand-side.side-left{
+  left:6% !important;
+  right:auto !important;
+}
+
+#game-board .enemy-hand-side.side-right{
+  right:6% !important;
+  left:auto !important;
+}
+
+#game-board .enemy-hand-side .tile-back{
+  flex:0 0 auto !important;
+  width:auto !important;
+  height:5.2% !important;
+  aspect-ratio:52/34 !important;
+}
+</style>
