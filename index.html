@@ -184,509 +184,173 @@
             .score-place { display:none; }
         }
 
-        
-/* =========================================================
-   MAHYONG DJ — MOBILE MAHJONG TABLE
-   Reference: supplied 1170×404 gameplay screenshot.
-   The gameplay scene uses one coordinate system and a
-   trapezoid table surface. Legacy gameplay layout rules
-   are intentionally replaced here.
+        /* =========================================================
+   MAHYONG DJ — MOBILE & IPAD LAYOUT (REVAMPED)
    ========================================================= */
-#screen-game{
-  padding:0 !important;
-  align-items:stretch !important;
-  justify-content:stretch !important;
+#screen-game {
+    padding: 0 !important;
 }
 
-#game-board{
-  --safe-l:env(safe-area-inset-left,0px);
-  --safe-r:env(safe-area-inset-right,0px);
-  --safe-t:env(safe-area-inset-top,0px);
-  --safe-b:env(safe-area-inset-bottom,0px);
-
-  --cx:50%;
-  --cy:49%;
-
-  /* Slightly larger than the reference, but still mobile-sized. */
-  --tile-w:clamp(39px,3.0vw,46px);
-  --tile-h:clamp(56px,4.25vw,65px);
-  --discard-w:clamp(20px,1.72vw,25px);
-  --discard-h:clamp(29px,2.50vw,35px);
-
-  position:relative !important;
-  width:100% !important;
-  height:100% !important;
-  overflow:hidden !important;
-  isolation:isolate;
-  background:
-    radial-gradient(ellipse at 50% 48%,rgba(191,143,106,.20),transparent 48%),
-    linear-gradient(135deg,#242124 0%,#3c3030 34%,#5e4941 57%,#282326 100%) !important;
-  box-shadow:inset 0 0 120px rgba(0,0,0,.58);
+#game-board {
+    --safe-b: env(safe-area-inset-bottom, 10px);
+    --tile-w: clamp(28px, 4vw, 42px);
+    --tile-h: clamp(42px, 6vw, 60px);
+    --discard-w: clamp(18px, 2.5vw, 26px);
+    --discard-h: clamp(26px, 3.5vw, 38px);
+    
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    background: radial-gradient(ellipse at 50% 50%, #2a3a47 0%, #0d161e 100%) !important;
 }
 
-/* Physical table.  This is the only perspective surface. */
-#game-board::before{
-  content:"";
-  position:absolute;
-  z-index:0;
-  pointer-events:none;
-  left:8.8%;
-  right:8.8%;
-  top:6.5%;
-  bottom:8.2%;
-  clip-path:polygon(15.5% 0,84.5% 0,100% 100%,0 100%);
-  background:
-    linear-gradient(180deg,rgba(255,223,189,.08),transparent 18%),
-    radial-gradient(ellipse at 50% 48%,rgba(244,188,140,.12),transparent 54%),
-    linear-gradient(180deg,#6a5148 0%,#5b4740 52%,#665048 100%);
-  border:1px solid rgba(239,205,165,.28);
-  box-shadow:
-    inset 0 0 80px rgba(0,0,0,.25),
-    0 18px 42px rgba(0,0,0,.34);
+/* ---------- Top HUD ---------- */
+#game-board .topbar {
+    position: absolute;
+    z-index: 70;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
 }
 
-#game-board::after{
-  content:"";
-  position:absolute;
-  z-index:0;
-  pointer-events:none;
-  left:9.7%;
-  right:9.7%;
-  top:7.7%;
-  bottom:9.4%;
-  clip-path:polygon(16.7% 0,83.3% 0,98.5% 100%,1.5% 100%);
-  border:1px solid rgba(255,229,198,.18);
-  box-shadow:
-    inset 0 0 35px rgba(0,0,0,.12),
-    inset 0 1px 0 rgba(255,255,255,.035);
+#game-board .topbar > * {
+    pointer-events: auto;
 }
 
-/* ---------- top HUD ---------- */
-#game-board .topbar{
-  position:absolute;
-  z-index:70;
-  top:max(10px,var(--safe-t));
-  left:max(14px,var(--safe-l));
-  right:max(14px,var(--safe-r));
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  pointer-events:none;
-}
-#game-board .topbar>*{pointer-events:auto;}
-
-#game-board .dora-panel{
-  min-width:174px;
-  max-width:196px;
-  padding:7px 9px 6px;
-  border-radius:10px;
-  background:rgba(10,10,13,.82);
-  border:1px solid rgba(238,193,115,.40);
-  box-shadow:0 8px 20px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,255,255,.04);
-  backdrop-filter:blur(7px);
-}
-#game-board .hud-label{font-size:8px;letter-spacing:.16em;margin-bottom:4px;}
-#game-board .dora-tiles{display:flex;gap:3px;}
-#game-board .dora-tile-box{width:22px;height:30px;border-radius:4px;font-size:10px;}
-#game-board .stick-counters{margin-top:4px;font-size:8px;}
-#game-board .kan-info{margin-top:3px;font-size:8px;color:#4ed7df;}
-#game-board .top-right-btns{display:flex;gap:8px;}
-#game-board .top-right-btns .icon-btn{
-  width:37px;
-  height:37px;
-  border-radius:10px;
-  background:rgba(8,11,16,.82);
-  border:1px solid rgba(255,255,255,.12);
-  box-shadow:0 7px 16px rgba(0,0,0,.28);
-}
-#game-board .top-right-btns .icon-btn:first-child{display:none !important;}
-#game-board .round-hud-shell,
-#game-board .furiten-panel,
-#game-board .hand-status,
-#game-board .beginner-tip{display:none !important;}
-
-/* ---------- player seats ---------- */
-#game-board .player-seat{
-  position:absolute;
-  z-index:62;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  text-align:center;
-  filter:drop-shadow(0 6px 12px rgba(0,0,0,.30));
-}
-#game-board .avatar-img{
-  width:46px;
-  height:46px;
-  border-radius:10px;
-  border:2px solid rgba(255,207,103,.92);
-  background:#22364a url('https://cdn-icons-png.flaticon.com/512/4140/4140048.png') center/cover;
-  box-shadow:0 5px 15px rgba(0,0,0,.30);
-}
-#game-board .avatar-name{
-  margin-top:4px;
-  padding:3px 7px;
-  border-radius:6px;
-  background:rgba(4,8,13,.88);
-  border:1px solid rgba(255,255,255,.10);
-  font-size:8px;
-  font-weight:800;
-  white-space:nowrap;
-}
-#game-board .time-bank-tag{
-  margin-top:3px;
-  padding:2px 6px;
-  border-radius:6px;
-  background:rgba(4,8,13,.88);
-  color:#ffd166;
-  font-size:8px;
-  font-weight:900;
+/* ---------- Center Board & Rivers ---------- */
+#game-board .center-board {
+    position: absolute;
+    z-index: 35;
+    left: 50%;
+    top: 45%;
+    transform: translate(-50%, -50%);
+    width: clamp(100px, 15vw, 130px);
+    height: clamp(100px, 15vw, 130px);
+    border-radius: 12px;
+    background: #0b131b;
+    border: 2px solid rgba(83, 190, 125, .8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Seats live outside the four river zones, like the reference. */
-#game-board .pos-top{
-  top:max(12px,var(--safe-t));
-  right:14.8%;
-}
-#game-board .pos-left{
-  left:5.7%;
-  top:56%;
-  transform:translateY(-50%);
-}
-#game-board .pos-right{
-  right:5.7%;
-  top:56%;
-  transform:translateY(-50%);
-}
-#game-board .pos-bottom{
-  left:27.7%;
-  bottom:calc(var(--tile-h) + var(--safe-b) + 7px);
+#game-board .river-container {
+    position: absolute;
+    z-index: 28;
+    display: grid;
+    grid-template-columns: repeat(6, var(--discard-w));
+    gap: 1px;
 }
 
-/* ---------- walls ---------- */
-#game-board .enemy-hand-top{
-  position:absolute;
-  z-index:18;
-  left:50%;
-  top:2.4%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:1px;
-}
-#game-board .enemy-hand-top .tile-back{
-  width:22px;
-  height:32px;
-  border-radius:3px;
-}
-#game-board .enemy-hand-side{
-  position:absolute;
-  z-index:18;
-  display:flex;
-  flex-direction:column;
-  gap:1px;
-}
-#game-board .enemy-hand-side .tile-back{
-  width:31px;
-  height:21px;
-  border-radius:3px;
+#game-board .river-bottom { left: 50%; top: calc(45% + 75px); transform: translateX(-50%); }
+#game-board .river-top { left: 50%; top: calc(45% - 75px); transform: translateX(-50%) rotate(180deg); }
+#game-board .river-left { left: calc(50% - 75px); top: 45%; transform: translateY(-50%) rotate(90deg); }
+#game-board .river-right { left: calc(50% + 75px); top: 45%; transform: translateY(-50%) rotate(-90deg); }
+
+/* ---------- Player Hands ---------- */
+#game-board .hand-bottom-container {
+    position: absolute;
+    z-index: 60;
+    left: 0;
+    right: 0;
+    bottom: var(--safe-b);
+    display: flex;
+    justify-content: center;
 }
 
-/* Side walls sit farther outward than the river. */
-#game-board .side-left{
-  left:18.8%;
-  top:13.5%;
-  transform:rotate(9deg);
-  transform-origin:center top;
-}
-#game-board .side-right{
-  right:18.8%;
-  top:13.5%;
-  transform:rotate(-9deg);
-  transform-origin:center top;
+#game-board .enemy-hand-top {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 1px;
 }
 
-/* ---------- rivers ---------- */
-#game-board .river-container{
-  position:absolute;
-  z-index:28;
-  display:grid;
-  grid-template-columns:repeat(6,var(--discard-w));
-  gap:1px;
-  width:calc(var(--discard-w)*6 + 5px);
-  height:calc(var(--discard-h)*3 + 3px);
-  align-content:start;
-  justify-items:center;
+#game-board .side-left {
+    position: absolute;
+    left: 20px;
+    top: 45%;
+    transform: translateY(-50%) rotate(90deg);
 }
 
-/* Four compact discard zones around center. */
-#game-board .river-top{
-  left:50%;
-  top:29%;
-  transform:translate(-50%,-50%) rotate(180deg);
+#game-board .side-right {
+    position: absolute;
+    right: 20px;
+    top: 45%;
+    transform: translateY(-50%) rotate(-90deg);
 }
-#game-board .river-bottom{
-  left:50%;
-  top:69%;
-  transform:translate(-50%,-50%);
-}
-#game-board .river-left{
-  left:35.2%;
-  top:49%;
-  transform:translate(-50%,-50%) rotate(90deg);
-}
-#game-board .river-right{
-  left:64.8%;
-  top:49%;
-  transform:translate(-50%,-50%) rotate(-90deg);
-}
-#game-board .discard-tile{
-  width:var(--discard-w);
-  height:var(--discard-h);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  position:relative;
-  overflow:hidden;
-  border-radius:3px;
-  background:transparent;
-  border:0;
-  box-shadow:none;
-}
-#game-board .discard-tile::before,
-#game-board .discard-tile::after{display:none !important;}
 
-/* ---------- center ---------- */
-#game-board .center-board{
-  position:absolute;
-  z-index:35;
-  left:var(--cx);
-  top:var(--cy);
-  transform:translate(-50%,-50%);
-  width:116px;
-  height:116px;
-  border-radius:15px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  background:
-    radial-gradient(circle at 50% 34%,rgba(61,102,134,.20),transparent 50%),
-    linear-gradient(180deg,#17202a,#070b10);
-  border:2px solid rgba(83,190,125,.78);
-  box-shadow:
-    0 13px 28px rgba(0,0,0,.48),
-    inset 0 0 26px rgba(0,0,0,.25),
-    0 0 0 1px rgba(255,255,255,.025);
-  overflow:visible;
+/* ---------- Avatars ---------- */
+#game-board .player-seat {
+    position: absolute;
+    z-index: 62;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-#game-board .center-board::before{
-  content:"";
-  position:absolute;
-  inset:7px;
-  border:1px solid rgba(255,255,255,.055);
-  border-radius:10px;
-  pointer-events:none;
-}
-#game-board .round-info{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#67a8ff;}
-#game-board .turn-timer{margin:4px 0 1px;font-size:40px;line-height:1;font-weight:900;font-variant-numeric:tabular-nums;}
-#game-board .tiles-left{font-size:8px;color:#ffd166;letter-spacing:.08em;}
-#game-board .score-tag{
-  position:absolute;
-  min-width:55px;
-  padding:4px 6px;
-  border-radius:7px;
-  background:linear-gradient(180deg,rgba(15,24,34,.97),rgba(5,10,16,.97));
-  border:1px solid rgba(255,255,255,.10);
-  box-shadow:0 5px 12px rgba(0,0,0,.25);
-  font-size:8px;
-  font-weight:900;
-  text-align:center;
-  white-space:nowrap;
-}
-#game-board .score-south{left:50%;bottom:-39px;transform:translateX(-50%);color:#63e6ac;}
-#game-board .score-north{left:50%;top:-39px;transform:translateX(-50%);color:#8fc7ff;}
-#game-board .score-west{left:-63px;top:50%;transform:translateY(-50%);color:#d0a3ff;}
-#game-board .score-east{right:-63px;top:50%;transform:translateY(-50%);color:#ffd166;}
-#game-board .score-tag::before{display:block;font-size:6px;letter-spacing:.10em;margin-bottom:1px;color:#8793a0;}
-#game-board .score-south::before{content:"YOU"}
-#game-board .score-north::before{content:"NORTH"}
-#game-board .score-west::before{content:"WEST"}
-#game-board .score-east::before{content:"EAST"}
 
-/* ---------- melds ---------- */
-#game-board .enemy-melds{
-  position:absolute;
-  z-index:29;
-  display:flex;
-  gap:3px;
-}
-#game-board .enemy-melds-top{top:24%;left:42%;}
-#game-board .enemy-melds-left{left:31%;top:42%;flex-direction:column;}
-#game-board .enemy-melds-right{right:31%;top:42%;flex-direction:column;}
-#game-board .melds-container{
-  position:absolute;
-  z-index:40;
-  right:11px;
-  bottom:calc(var(--tile-h) + var(--safe-b) + 5px);
-  display:flex;
-  gap:4px;
-}
-#game-board .meld-group{
-  display:flex;
-  gap:1px;
-  padding:2px;
-  border-radius:5px;
-  background:rgba(2,7,11,.45);
-  border:1px solid rgba(255,255,255,.08);
-}
-#game-board .meld-group .tile{width:22px;height:32px;}
+#game-board .pos-bottom { left: 15%; bottom: 85px; }
+#game-board .pos-top { left: 25%; top: 15px; }
+#game-board .pos-left { left: 10px; top: 25%; }
+#game-board .pos-right { right: 10px; top: 25%; }
 
-/* ---------- player hand ---------- */
-#game-board .hand-bottom-container{
-  position:absolute;
-  z-index:60;
-  left:0;
-  right:0;
-  bottom:var(--safe-b);
-  min-height:calc(var(--tile-h) + 7px);
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
-  padding:0 8px 1px;
-  overflow-x:auto;
-  overflow-y:visible;
-  scrollbar-width:none;
+@media (orientation: portrait) {
+    #game-board {
+        --tile-w: clamp(24px, 7vw, 36px);
+        --tile-h: clamp(36px, 10vw, 54px);
+    }
+    #game-board .river-left { left: calc(50% - 60px); }
+    #game-board .river-right { left: calc(50% + 60px); }
+    #game-board .pos-bottom { left: 50%; bottom: 70px; transform: translateX(-50%); }
 }
-#game-board .hand-bottom-container::-webkit-scrollbar{display:none;}
-#game-board .hand-tiles{
-  display:flex;
-  gap:2px;
-  padding:2px 3px 0;
-  min-width:max-content;
-  justify-content:center;
+/* ---------- Action Buttons (Pon, Chi, Kan, Ron) ---------- */
+#game-board .action-container {
+    position: absolute;
+    z-index: 100;
+    /* Menempatkan tombol tepat di atas deretan tile pemain */
+    bottom: calc(var(--safe-b) + var(--tile-h) + 20px);
+    right: 20px; 
+    display: flex;
+    gap: clamp(8px, 2vw, 12px);
+    pointer-events: auto;
 }
-#game-board .hand-bottom-container .tile{width:var(--tile-w);height:var(--tile-h);}
-#game-board .hand-bottom-container .tile .tile-helper{display:none;}
 
-/* ---------- actual tiles ---------- */
-#game-board .tile{
-  width:var(--tile-w);
-  height:var(--tile-h);
-  flex:0 0 auto;
-  position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  cursor:pointer;
-  background:transparent;
-  border:0;
-  box-shadow:none;
-  border-radius:5px;
-  color:#111;
-  touch-action:pan-y;
-  -webkit-tap-highlight-color:transparent;
+#game-board .action-btn {
+    padding: clamp(6px, 2vw, 10px) clamp(12px, 3vw, 20px);
+    font-size: clamp(14px, 3.5vw, 18px);
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(180deg, #ffb347 0%, #ff7b00 100%);
+    border: 2px solid #ffe8cc;
+    border-radius: 24px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+    text-transform: uppercase;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+    transition: transform 0.1s ease;
 }
-#game-board .tile::before,#game-board .tile::after{display:none !important;}
-#game-board .tile-svg-img{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  display:block;
-  object-fit:fill;
-  pointer-events:none;
-  user-select:none;
-  -webkit-user-drag:none;
-}
-#game-board .tile.selected-tile{transform:translateY(-7px) scale(1.02);filter:drop-shadow(0 7px 12px rgba(0,0,0,.30));z-index:70;}
-#game-board .tile.swipe-arming{transform:translateY(-10px) scale(1.015);filter:drop-shadow(0 9px 15px rgba(0,0,0,.32));}
-#game-board .drawn-tile-gap{margin-left:8px;outline:2px solid rgba(247,189,65,.88);outline-offset:2px;border-radius:7px;}
-#game-board .riichi-legal-discard{outline:1px solid rgba(184,126,255,.48);outline-offset:1px;border-radius:6px;}
-#game-board .discard-highlight{outline:2px solid rgba(255,78,78,.95);outline-offset:1px;filter:drop-shadow(0 0 5px rgba(255,78,78,.42));z-index:35;}
 
-/* Vector assets are used by the existing game renderer. */
-.tile-svg{position:absolute;inset:4% 4%;width:92%;height:92%;display:block;overflow:visible;shape-rendering:geometricPrecision;}
-.tile-pip-circle{filter:drop-shadow(0 1px 0 rgba(255,255,255,.8));}
-.tile-pip-pin{fill:url(#pinGrad);stroke:#5b5651;stroke-width:1.15;}
-.tile-pip-pin-inner{fill:url(#pinInner);}
-.tile-pip-sou{fill:none;stroke:url(#souGrad);stroke-width:8;stroke-linecap:round;}
-.tile-pip-sou-core{fill:none;stroke:#f5fff0;stroke-width:2;stroke-linecap:round;opacity:.72;}
-.tile-pip-sou-node{fill:#197844;stroke:#0e5b32;stroke-width:1;}
-.tile-man-main{font-family:"Noto Serif CJK JP","Hiragino Mincho ProN","Yu Mincho","Songti SC",serif;font-weight:900;fill:#171717;}
-.tile-man-red{fill:#b4232b;}
-.tile-honor-main{font-family:"Noto Serif CJK JP","Hiragino Mincho ProN","Yu Mincho","Songti SC",serif;font-weight:900;}
-.tile-honor-wind{fill:#26384d;}.tile-honor-white{fill:#59636c;}.tile-honor-green{fill:#16824c;}.tile-honor-red{fill:#bf2830;}
-.tile-honor-shadow{fill:none;stroke:rgba(255,255,255,.78);stroke-width:1.2;}
-#game-board .dora-tile-box.has-tile{padding:0;overflow:hidden;background:linear-gradient(145deg,#fffef8,#eee8db);}
-#game-board .dora-tile-box.has-tile .tile-svg{inset:0;width:100%;height:100%;}
+#game-board .action-btn:active {
+    transform: scale(0.92);
+}
 
-/* ---------- action UI only when the game actually opens it ---------- */
-#game-board #action-overlay{
-  position:absolute;
-  left:50%;
-  bottom:calc(var(--tile-h) + var(--safe-b) + 8px);
-  transform:translateX(-50%);
-  display:none;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:6px;
-  max-width:min(90vw,500px);
-  padding:7px 8px;
-  background:rgba(5,11,18,.96);
-  border:1px solid rgba(244,177,58,.58);
-  border-radius:12px;
-  box-shadow:0 14px 30px rgba(0,0,0,.38);
-  z-index:80;
+/* Penyesuaian khusus mode Portrait (Ponsel) */
+@media (orientation: portrait) {
+    #game-board .action-container {
+        /* Memindah tombol ke tengah layar agar mudah dijangkau jempol */
+        right: 50%;
+        transform: translateX(50%);
+        bottom: calc(var(--safe-b) + var(--tile-h) + 40px);
+        width: max-content;
+    }
 }
-#game-board .act-btn{min-width:58px;min-height:35px;border:0;border-radius:9px;padding:6px 10px;color:#fff;font-size:11px;font-weight:900;}
-#game-board .btn-ron{background:#c63c46}.btn-tsumo{background:#c97a24}.btn-riichi{background:#7a48b3}.btn-kan{background:#168b82}.btn-pon{background:#2d7fc3}.btn-chi{background:#219b68}.btn-skip{background:#5a6670}
-#game-board .riichi-overlay{position:absolute;inset:0;z-index:75;display:none;pointer-events:none;background:radial-gradient(circle at center,rgba(168,25,35,.05),rgba(0,0,0,.48));box-shadow:inset 0 0 150px rgba(255,51,64,.12);}
-#game-board.riichi-active .riichi-overlay{display:block;}
 
-/* ---------- responsive: only four gameplay breakpoints ---------- */
-@media (orientation:landscape){
-  #game-board{
-    --tile-w:clamp(39px,3.0vw,46px);
-    --tile-h:clamp(56px,4.25vw,65px);
-    --discard-w:clamp(20px,1.72vw,25px);
-    --discard-h:clamp(29px,2.50vw,35px);
-  }
-}
-@media (orientation:landscape) and (max-height:430px){
-  #game-board{
-    --tile-w:clamp(35px,3.15vw,43px);
-    --tile-h:clamp(50px,4.45vw,61px);
-    --discard-w:clamp(18px,1.95vw,23px);
-    --discard-h:clamp(27px,2.90vw,33px);
-  }
-  #game-board .avatar-img{width:42px;height:42px;}
-  #game-board .dora-panel{min-width:156px;padding:6px 8px 5px;}
-  #game-board .center-board{width:108px;height:108px;}
-  #game-board .turn-timer{font-size:37px;}
-  #game-board .pos-bottom{left:27%;}
-}
-@media (orientation:portrait){
-  #game-board::before{left:5%;right:5%;top:5%;bottom:12%;clip-path:polygon(8% 0,92% 0,100% 100%,0 100%);}
-  #game-board::after{left:5.5%;right:5.5%;top:6%;bottom:13%;clip-path:polygon(9% 0,91% 0,98% 100%,2% 100%);}
-  #game-board .pos-top{left:50%;right:auto;transform:translateX(-50%);}
-  #game-board .pos-bottom{left:50%;transform:translateX(-50%);}
-  #game-board .river-left{left:27%;}
-  #game-board .river-right{left:73%;}
-}
-@media (pointer:coarse){#game-board .tile:hover{filter:none;transform:none;}}
-
-/* Multiplayer/scanner support — retained because JS uses these classes. */
-.music-note-status{font-size:10px;color:var(--muted);margin-top:4px;text-align:right;}
-.mp-scan-row{align-items:center;margin-bottom:8px;}
-.reconnect-card{display:flex;flex-direction:column;gap:7px;margin-top:10px;padding:10px 12px;border:1px solid rgba(243,156,18,.45);background:rgba(243,156,18,.08);border-radius:10px}
-.reconnect-card strong{color:#f6c96d}
-.scanner-box{max-width:480px}
-.scanner-reader{width:100%;min-height:280px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:14px;background:#050b11;border:1px solid rgba(255,255,255,.12)}
-.scanner-reader video{width:100%!important;height:auto!important;border-radius:12px}
-.scanner-reader__scan-region{width:100%!important}
-.scanner-reader__dashboard{padding:8px!important}
-.scanner-reader__dashboard_section{margin:0!important}
 </style>
 </head>
 <body>
