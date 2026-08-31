@@ -157,8 +157,20 @@ h1{margin-bottom:8px;font-size:clamp(2rem,6vw,4rem);line-height:.98;letter-spaci
   .hand-status{width:min(285px,80vw);bottom:calc(var(--tile-h) + 8px)}#action-overlay{bottom:calc(var(--tile-h) + 36px);max-width:94vw}.beginner-tip{display:none}
 }
 
-@media (min-width:1100px){#game-board{--tile-w:clamp(42px,4.05vw,54px);--tile-h:clamp(60px,5.75vw,77px);--discard-w:clamp(22px,2.0vw,30px);--discard-h:clamp(33px,2.8vw,42px)}.dora-panel{width:194px}.pos-bottom{left:25%}.river-left{left:24%}.river-right{right:24%}}
-@media (min-width:1400px){.river-left{left:27%}.river-right{right:27%}.pos-left{left:7%}.pos-right{right:7%}}
+/* Fine-tune: stable large-landscape composition; no game-state impact. */
+@media (min-width:1100px){
+  #game-board{--tile-w:clamp(42px,4.05vw,54px);--tile-h:clamp(60px,5.75vw,77px);--discard-w:clamp(22px,2.0vw,30px);--discard-h:clamp(33px,2.8vw,42px)}
+  .dora-panel{width:194px}.pos-bottom{left:25%;bottom:calc(var(--tile-h) + 4px)}
+  .river-top{top:22%;left:50%;transform:translateX(-50%) rotate(180deg)}
+  .river-bottom{bottom:calc(var(--tile-h) + 20%);left:50%;transform:translateX(-50%)}
+  .river-left{left:22%;top:50%;transform:translate(-50%,-50%) rotate(90deg)}
+  .river-right{right:22%;top:50%;transform:translate(50%,-50%) rotate(-90deg)}
+  .center-board{width:clamp(150px,12vw,172px);height:clamp(112px,9.5vw,132px)}
+  .score-south{bottom:-28px}.score-north{top:-28px}.score-east{right:-68px}.score-west{left:-68px}
+  .pos-left{left:6%}.pos-right{right:6%}
+  .wall-top{top:2.8%}.wall-left{left:8.2%;top:18%}.wall-right{right:8.2%;top:18%}
+}
+
 @media (pointer:coarse){.tile:hover{transform:none}.player-seat:hover .avatar-img{transform:none}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 @media (max-width:560px){.result-summary{grid-template-columns:1fr}.score-row{grid-template-columns:1fr .8fr .9fr}.score-place{display:none}.mp-p2p-choice{grid-template-columns:1fr}.modal-box{max-height:92dvh;overflow:auto}.scanner-box{width:min(94vw,480px);padding:14px}.scanner-reader{min-height:240px}.mp-scan-row{flex-direction:column;align-items:stretch}.mp-scan-row .btn{width:100%}}
@@ -172,17 +184,17 @@ h1{margin-bottom:8px;font-size:clamp(2rem,6vw,4rem);line-height:.98;letter-spaci
   html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
   body{-webkit-text-size-adjust:100%;touch-action:manipulation}
   #screen-game{width:100vw;height:100dvh;min-height:0;padding:0!important;overflow:hidden}
+
   #game-board{
     width:100vw;height:100dvh;min-height:0;overflow:hidden;
-    --tile-w:clamp(33px,4.45vw,39px);
-    --tile-h:clamp(47px,6.32vw,55px);
-    --discard-w:clamp(19px,2.35vw,21px);
-    --discard-h:clamp(28px,3.35vw,31px);
-    --wall-tile-w:clamp(13px,1.65vw,15px);
-    --wall-tile-h:clamp(19px,2.15vw,23px);
+    --tile-w:clamp(33px,4.45vw,38px);
+    --tile-h:clamp(47px,6.15vw,53px);
+    --discard-w:clamp(18px,2.25vw,21px);
+    --discard-h:clamp(27px,3.2vw,31px);
+    --wall-tile-w:clamp(12px,1.55vw,15px);
+    --wall-tile-h:clamp(18px,2.05vw,22px);
   }
 
-  /* Keep the wooden surface inside the screen and visually close to the reference. */
   #game-board::before{
     left:5.5%;right:5.5%;top:6%;bottom:-5%;
     clip-path:polygon(10% 0,90% 0,100% 100%,0 100%);
@@ -190,109 +202,69 @@ h1{margin-bottom:8px;font-size:clamp(2rem,6vw,4rem);line-height:.98;letter-spaci
   }
   #game-board::after{background:radial-gradient(ellipse at 50% 48%,transparent 0 42%,rgba(0,0,0,.16) 76%,rgba(0,0,0,.44) 100%)}
 
-  /* ---------- Compact HUD ---------- */
-  .topbar{
-    top:max(5px,env(safe-area-inset-top));
-    left:max(6px,env(safe-area-inset-left));
-    right:max(6px,env(safe-area-inset-right));
-  }
-  .dora-panel{
-    width:clamp(122px,16vw,132px);min-width:0;padding:5px 6px;border-radius:10px;
-  }
+  /* HUD */
+  .topbar{top:max(5px,env(safe-area-inset-top));left:max(6px,env(safe-area-inset-left));right:max(6px,env(safe-area-inset-right))}
+  .dora-panel{width:clamp(122px,16vw,132px);min-width:0;padding:5px 6px;border-radius:10px}
   .dora-panel .hud-label{font-size:7px;letter-spacing:.13em;margin-bottom:2px}
   .dora-tile-box{width:17px;height:23px;font-size:9px;border-radius:3px}
-  .dora-tiles{gap:2px}
-  .stick-counters{gap:5px;margin-top:3px;font-size:7px}
-  .kan-info{margin-top:2px;font-size:7px}
-  .top-right-btns{gap:4px}
-  .top-right-btns .icon-btn{width:clamp(27px,3.2vw,29px);height:clamp(27px,3.2vw,29px);min-width:clamp(27px,3.2vw,29px);font-size:11px;border-radius:8px}
+  .dora-tiles{gap:2px}.stick-counters{gap:5px;margin-top:3px;font-size:7px}.kan-info{margin-top:2px;font-size:7px}
+  .top-right-btns{gap:4px}.top-right-btns .icon-btn{width:clamp(27px,3.2vw,29px);height:clamp(27px,3.2vw,29px);min-width:clamp(27px,3.2vw,29px);font-size:11px;border-radius:8px}
 
-  /* ---------- Player seats ---------- */
+  /* Seats: keep avatars outside the hand and away from the side walls. */
   .avatar-img{width:clamp(31px,4vw,34px);height:clamp(31px,4vw,34px);border-radius:9px;border-width:1.5px}
   .avatar-name{margin-top:2px;padding:2px 5px;border-radius:5px;font-size:7px;line-height:1.1}
   .time-bank-tag{margin-top:2px;padding:2px 5px;border-radius:5px;font-size:7px}
-  .pos-left{left:2.4%;top:49%;transform:translateY(-50%)}
-  .pos-right{right:2.4%;top:49%;transform:translateY(-50%)}
-  .pos-top{top:4px;right:12%}
-  .pos-bottom{left:17%;bottom:calc(var(--tile-h) + 2px);transform:translateX(-50%)}
+  .pos-left{left:3.4%;top:48%;transform:translateY(-50%)}
+  .pos-right{right:3.4%;top:48%;transform:translateY(-50%)}
+  .pos-top{top:4px;right:11%}
+  .pos-bottom{left:22%;bottom:calc(var(--tile-h) + 5px);transform:translateX(-50%)}
 
-  /* ---------- Physical walls ---------- */
+  /* Physical walls: one perimeter wall only. */
   .wall{gap:1px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.38))}
-  .wall-top{top:3.2%;left:50%}
-  .wall-left{left:8.4%;top:17.5%}
-  .wall-right{right:8.4%;top:17.5%}
+  .wall-top{top:2.8%;left:50%}
+  .wall-left{left:8.5%;top:15.5%}
+  .wall-right{right:8.5%;top:15.5%}
   .wall .wall-tile{border-radius:2px;border-bottom-width:1px}
-/* ---------- Rivers ---------- */
-  .river-container{gap:1px;width:calc(var(--discard-w)*6 + 5px);height:calc(var(--discard-h)*3 + 3px);grid-template-columns:repeat(6,var(--discard-w));grid-template-rows:repeat(3,var(--discard-h))}
-  /* Rivers occupy four dedicated lanes around the center; they never share the center-board footprint. */
-  .river-top{top:15%;left:50%;transform:translateX(-50%) rotate(180deg)}
-  .river-bottom{bottom:calc(var(--tile-h) + 14.5%);left:50%;transform:translateX(-50%)}
-  .river-left{left:18.5%;top:50%;transform:translate(-50%,-50%) rotate(90deg)}
-  .river-right{right:18.5%;top:50%;transform:translate(50%,-50%) rotate(-90deg)}
+
+  /* Rivers: fixed 6×3 lanes, with a clear exclusion zone around center. */
+  .river-container{gap:1px;width:calc(var(--discard-w)*6 + 5px);height:calc(var(--discard-h)*3 + 3px);grid-template-columns:repeat(6,var(--discard-w));grid-template-rows:repeat(3,var(--discard-h));overflow:visible}
+  .river-top{top:16.5%;left:50%;transform:translateX(-50%) rotate(180deg)}
+  .river-bottom{bottom:calc(var(--tile-h) + 16.5%);left:50%;transform:translateX(-50%)}
+  .river-left{left:20%;top:50%;transform:translate(-50%,-50%) rotate(90deg)}
+  .river-right{right:20%;top:50%;transform:translate(50%,-50%) rotate(-90deg)}
   .discard-tile{border-radius:2px;border-bottom-width:1px;box-shadow:0 1px 3px rgba(0,0,0,.35)}
-  .discard-tile .tile-char{font-size:clamp(8px,1.55vw,11px)}
-  .discard-tile.tile-man .tile-number{font-size:clamp(8px,1.55vw,11px)}
-  .discard-tile.tile-man .tile-suit{font-size:clamp(6px,1.05vw,8px)}
   .discard-tile.tile-honor .tile-char{font-size:clamp(9px,1.6vw,12px)}
 
-  /* ---------- Center panel ---------- */
-  .center-board{
-    width:clamp(102px,12vw,108px);height:clamp(76px,9vw,82px);border-radius:12px;border-width:2px;
-    box-shadow:0 10px 24px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.04);
-  }
-  .center-board::before{inset:5px;border-radius:8px}
-  .round-info{font-size:8px;letter-spacing:.10em}
-  .turn-timer{font-size:clamp(28px,3.5vw,30px);margin:1px 0 0}
-  .tiles-left{font-size:7px}
-  .score-tag{min-width:48px;padding:3px 5px;border-radius:5px;font-size:7px}
-  .score-tag::before{font-size:5px;margin-bottom:1px}
-  .score-south{bottom:-25px}
-  .score-north{top:-25px}
-  .score-east{right:-57px}
-  .score-west{left:-57px}
+  /* Center: compact enough to leave a stable river corridor. */
+  .center-board{width:clamp(94px,10.4vw,102px);height:clamp(71px,7.7vw,77px);border-radius:10px;border-width:2px;box-shadow:0 9px 22px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.04)}
+  .center-board::before{inset:5px;border-radius:7px}
+  .round-info{font-size:8px;letter-spacing:.10em}.turn-timer{font-size:clamp(27px,3.35vw,30px);margin:1px 0 0}.tiles-left{font-size:7px}
+  .score-tag{min-width:46px;padding:3px 5px;border-radius:5px;font-size:7px}.score-tag::before{font-size:5px;margin-bottom:1px}
+  .score-south{bottom:-24px}.score-north{top:-24px}.score-east{right:-55px}.score-west{left:-55px}
 
-  /* ---------- Melds ---------- */
-  .enemy-melds{gap:2px}
-  .enemy-melds-top{top:13%;left:22%}
-  .enemy-melds-left{left:12.8%;top:59%}
-  .enemy-melds-right{right:12.8%;top:21%}
-  .melds-container{right:14%;bottom:calc(var(--tile-h) + 3px);gap:3px}
-  .meld-group{gap:1px;padding:2px;border-radius:4px}
-  .meld-group .tile{width:20px;height:29px}
+  /* Melds: anchor them just above the hand, never behind the river. */
+  .enemy-melds{gap:2px}.enemy-melds-top{top:12.5%;left:22%}.enemy-melds-left{left:12.5%;top:59%}.enemy-melds-right{right:12.5%;top:20%}
+  .melds-container{right:17%;bottom:calc(var(--tile-h) + 3px);gap:3px}
+  .meld-group{gap:1px;padding:2px;border-radius:4px}.meld-group .tile{width:19px;height:28px}
 
-  /* ---------- Player hand ---------- */
-  .hand-bottom-container{
-    left:0;right:0;bottom:0;
-    min-height:calc(var(--tile-h) + 7px);
-    padding:0 max(6px,env(safe-area-inset-left)) max(4px,env(safe-area-inset-bottom));
-    overflow:hidden;
-  }
-  .hand-tiles{gap:2px;padding:1px 2px 0;max-width:none}
+  /* Player hand */
+  .hand-bottom-container{left:0;right:0;bottom:0;min-height:calc(var(--tile-h) + 7px);padding:0 max(6px,env(safe-area-inset-left)) max(4px,env(safe-area-inset-bottom));overflow:hidden}
+  .hand-tiles{gap:2px;padding:1px 2px 0;max-width:none}.hand-bottom-container .tile-helper{display:none}
   .tile{border-radius:4px;border-bottom-width:2px;box-shadow:0 3px 6px rgba(0,0,0,.34);touch-action:pan-y}
-  .tile.selected-tile{transform:translateY(-6px);box-shadow:0 0 0 2px rgba(255,85,85,.88),0 7px 13px rgba(0,0,0,.38)}
+  .tile.selected-tile{transform:translateY(-5px);box-shadow:0 0 0 2px rgba(255,85,85,.88),0 7px 13px rgba(0,0,0,.38)}
   .drawn-tile-gap{margin-left:4px}
 
-  /* Never let instructional/status UI cover the discard area on a short iPhone. */
-  .hand-status{display:none!important}
-  .beginner-tip{display:none!important}
-  .furiten-panel{bottom:calc(var(--tile-h) + 34px);width:min(250px,42vw);padding:4px 7px}
-  .furiten-status{font-size:7px}
-  #action-overlay{
-    bottom:calc(var(--tile-h) + 5px);
-    max-width:82vw;padding:5px 6px;gap:4px;border-radius:9px;
-  }
+  /* Short-screen UI must never cover the river. */
+  .hand-status,.beginner-tip{display:none!important}
+  .furiten-panel{bottom:calc(var(--tile-h) + 32px);width:min(240px,42vw);padding:4px 7px}.furiten-status{font-size:7px}
+  #action-overlay{bottom:calc(var(--tile-h) + 4px);max-width:82vw;padding:5px 6px;gap:4px;border-radius:9px}
   .act-btn{min-width:48px;min-height:31px;padding:5px 8px;border-radius:7px;font-size:10px}
+
 
   /* ---------- Touch behavior / iOS ---------- */
   .tile,.act-btn,.icon-btn,button{ -webkit-user-select:none;user-select:none }
   button{-webkit-tap-highlight-color:transparent}
 
-  /* ---------- River safety zone ---------- */
-  .river-container{max-width:calc(100vw - 280px);overflow:visible}
-  .river-top,.river-bottom{max-width:calc(100vw - 300px)}
-  .river-left,.river-right{max-height:calc(100dvh - 150px)}
-  .river-left{left:max(118px,18.5%)}
-  .river-right{right:max(118px,18.5%)}
 }
 
 </style>
