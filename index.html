@@ -175,81 +175,267 @@ h1{margin-bottom:8px;font-size:clamp(2rem,6vw,4rem);line-height:.98;letter-spaci
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 @media (max-width:560px){.result-summary{grid-template-columns:1fr}.score-row{grid-template-columns:1fr .8fr .9fr}.score-place{display:none}.mp-p2p-choice{grid-template-columns:1fr}.modal-box{max-height:92dvh;overflow:auto}.scanner-box{width:min(94vw,480px);padding:14px}.scanner-reader{min-height:240px}.mp-scan-row{flex-direction:column;align-items:stretch}.mp-scan-row .btn{width:100%}}
 /* =========================================================
-   iPHONE LANDSCAPE OPTIMIZATION
-   Target: Safari landscape ~812–932px wide / 375–430px high.
-   This block is intentionally last so it is the single responsive
-   authority for compact iPhone landscape; game logic is untouched.
+   iPHONE LANDSCAPE — LOCKED 844×390
+   This is the only compact-landscape layout authority.
+   Desktop/tablet landscape uses the normal desktop rules.
    ========================================================= */
-@media screen and (orientation:landscape) and (max-width:1600px) and (max-height:850px){
-  /* SINGLE LANDSCAPE LAYOUT AUTHORITY.
-     Applies to iPhone/iPad-sized landscape captures as well as compact desktop windows.
-     No second landscape override is used. */
-  html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
-  body{-webkit-text-size-adjust:100%;touch-action:manipulation}
-  #screen-game{width:100vw;height:100dvh;min-height:0;padding:0!important;overflow:hidden}
-  #game-board{width:100vw;height:100dvh;min-height:0;overflow:hidden;
-    --tile-w:clamp(34px,3.25vw,50px);--tile-h:clamp(48px,4.62vw,71px);
-    --discard-w:clamp(20px,1.85vw,29px);--discard-h:clamp(30px,2.65vw,41px);
-    --wall-tile-w:clamp(12px,1.15vw,18px);--wall-tile-h:clamp(18px,1.55vw,24px)}
-  #game-board::before{left:5%;right:5%;top:5%;bottom:-4%;clip-path:polygon(10% 0,90% 0,100% 100%,0 100%);transform:perspective(1000px) rotateX(.8deg)}
+@media screen and (orientation:landscape)
+       and (min-width:800px) and (max-width:900px)
+       and (min-height:360px) and (max-height:420px){
+
+  html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
+  body{
+    -webkit-text-size-adjust:100%;
+    touch-action:manipulation;
+  }
+
+  #screen-game{
+    width:100vw;
+    height:100dvh;
+    min-height:0;
+    padding:0!important;
+    overflow:hidden;
+  }
+
+  /* One source of truth for the 844×390 table scale. */
+  #game-board{
+    width:100vw;
+    height:100dvh;
+    min-height:0;
+    overflow:hidden;
+    --tile-w:34px;
+    --tile-h:48px;
+    --discard-w:18px;
+    --discard-h:26px;
+    --wall-tile-w:12px;
+    --wall-tile-h:18px;
+  }
+
+  #game-board::before{
+    left:4.5%;
+    right:4.5%;
+    top:5%;
+    bottom:-3%;
+    clip-path:polygon(10% 0,90% 0,100% 100%,0 100%);
+  }
 
   /* HUD */
-  .topbar{top:max(8px,env(safe-area-inset-top));left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right))}
-  .dora-panel{width:clamp(150px,15vw,194px);padding:7px 9px}
-  .dora-panel .hud-label{font-size:clamp(7px,.7vw,9px)}
-  .dora-tile-box{width:clamp(20px,1.65vw,25px);height:clamp(28px,2.25vw,34px);font-size:12px}
-  .top-right-btns{gap:6px}.top-right-btns .icon-btn{width:clamp(30px,2.2vw,34px);height:clamp(30px,2.2vw,34px);min-width:clamp(30px,2.2vw,34px)}
+  .topbar{
+    top:max(7px,env(safe-area-inset-top));
+    left:max(7px,env(safe-area-inset-left));
+    right:max(7px,env(safe-area-inset-right));
+  }
+  .dora-panel{
+    width:150px;
+    padding:6px 8px;
+  }
+  .dora-panel .hud-label{font-size:8px}
+  .dora-tile-box{
+    width:20px;
+    height:28px;
+    font-size:11px;
+  }
+  .stick-counters,.kan-info{font-size:8px}
+  .top-right-btns{gap:5px}
+  .top-right-btns .icon-btn{
+    width:32px;
+    height:32px;
+    min-width:32px;
+    font-size:12px;
+  }
 
-  /* Seats */
-  .avatar-img{width:clamp(38px,3.2vw,50px);height:clamp(38px,3.2vw,50px);border-radius:12px}
-  .avatar-name{font-size:clamp(8px,.65vw,9px);padding:3px 6px;margin-top:3px}
-  .time-bank-tag{font-size:clamp(8px,.65vw,9px);margin-top:2px}
-  .pos-left{left:7%;top:49%;transform:translateY(-50%)}
-  .pos-right{right:7%;top:49%;transform:translateY(-50%)}
-  .pos-top{top:4.5%;right:14%}
-  .pos-bottom{left:24%;bottom:calc(var(--tile-h) + 8px);transform:translateX(-50%)}
+  /* Seats: keep every avatar outside the river lanes. */
+  .avatar-img{
+    width:40px;
+    height:40px;
+    border-radius:11px;
+  }
+  .avatar-name{
+    margin-top:3px;
+    padding:3px 6px;
+    font-size:8px;
+  }
+  .time-bank-tag{
+    margin-top:2px;
+    font-size:8px;
+  }
+  .pos-left{
+    left:8%;
+    top:48%;
+    transform:translateY(-50%);
+  }
+  .pos-right{
+    right:8%;
+    top:48%;
+    transform:translateY(-50%);
+  }
+  .pos-top{
+    top:4%;
+    right:12%;
+  }
+  .pos-bottom{
+    left:24%;
+    bottom:calc(var(--tile-h) + 3px);
+    transform:translateX(-50%);
+  }
 
-  /* One perimeter wall. */
-  .wall{gap:1px;filter:drop-shadow(0 5px 7px rgba(0,0,0,.38))}
-  .wall-top{top:3.4%;left:50%;transform:translateX(-50%)}
-  .wall-left{left:8.5%;top:16%;transform:rotate(90deg);transform-origin:left top}
-  .wall-right{right:8.5%;top:16%;transform:rotate(90deg);transform-origin:right top}
-  .wall .wall-tile{border-radius:2px;border-bottom-width:1px}
+  /* Physical perimeter wall only. */
+  .wall{gap:1px}
+  .wall-top{
+    top:3.5%;
+    left:50%;
+    transform:translateX(-50%);
+  }
+  .wall-left{
+    left:8.5%;
+    top:18%;
+    transform:rotate(90deg);
+    transform-origin:left top;
+  }
+  .wall-right{
+    right:8.5%;
+    top:18%;
+    transform:rotate(90deg);
+    transform-origin:right top;
+  }
+  .wall .wall-tile{
+    border-radius:2px;
+    border-bottom-width:1px;
+  }
 
-  /* Rivers: each lane has a fixed 6×3 footprint and stays outside the center. */
-  .river-container{z-index:13;gap:2px;width:calc(var(--discard-w)*6 + 10px);height:calc(var(--discard-h)*3 + 5px);grid-template-columns:repeat(6,var(--discard-w));grid-template-rows:repeat(3,var(--discard-h));overflow:visible}
-  .river-top{left:50%;top:20%;transform:translateX(-50%) rotate(180deg)}
-  .river-bottom{left:50%;bottom:calc(var(--tile-h) + 20%);transform:translateX(-50%)}
-  .river-left{left:27%;top:50%;transform:translate(-50%,-50%) rotate(90deg)}
-  .river-right{right:27%;top:50%;transform:translate(50%,-50%) rotate(-90deg)}
-  .discard-tile{border-radius:3px;border-bottom-width:1px;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+  /* Rivers: fixed 6×3 footprint, with a clear center exclusion zone. */
+  .river-container{
+    z-index:13;
+    gap:2px;
+    width:118px;
+    height:82px;
+    grid-template-columns:repeat(6,18px);
+    grid-template-rows:repeat(3,26px);
+    overflow:visible;
+  }
+  .river-top{
+    left:50%;
+    top:13%;
+    transform:translateX(-50%) rotate(180deg);
+  }
+  .river-bottom{
+    left:50%;
+    bottom:calc(var(--tile-h) + 11%);
+    transform:translateX(-50%);
+  }
+  .river-left{
+    left:27%;
+    top:50%;
+    transform:translate(-50%,-50%) rotate(90deg);
+  }
+  .river-right{
+    right:27%;
+    top:50%;
+    transform:translate(50%,-50%) rotate(-90deg);
+  }
+  .discard-tile{
+    border-radius:3px;
+    border-bottom-width:1px;
+    box-shadow:0 1px 3px rgba(0,0,0,.35);
+  }
+  .discard-tile .tile-char{font-size:10px}
 
-  /* Center is deliberately compact, but never allowed to sit over a river. */
-  .center-board{z-index:16;width:clamp(128px,10.5vw,164px);height:clamp(92px,8vw,124px);border-radius:13px}
-  .round-info{font-size:clamp(8px,.75vw,10px)}
-  .turn-timer{font-size:clamp(30px,3.0vw,44px)}
-  .tiles-left{font-size:clamp(7px,.55vw,9px)}
-  .score-tag{min-width:48px;padding:3px 5px;font-size:8px}
-  .score-south{bottom:-25px}.score-north{top:-25px}.score-east{right:-58px}.score-west{left:-58px}
+  /* Compact center, with score tags kept inside the safe middle. */
+  .center-board{
+    z-index:16;
+    width:104px;
+    height:76px;
+    border-radius:11px;
+  }
+  .round-info{
+    font-size:8px;
+    letter-spacing:.11em;
+  }
+  .turn-timer{font-size:30px}
+  .tiles-left{font-size:7px}
+  .score-tag{
+    min-width:46px;
+    padding:3px 4px;
+    font-size:7px;
+  }
+  .score-south{bottom:-20px}
+  .score-north{top:-20px}
+  .score-east{right:-48px}
+  .score-west{left:-48px}
 
-  /* Enemy melds and player's open melds remain distinct from rivers. */
-  .enemy-melds{z-index:14;gap:2px}.enemy-melds-top{top:13%;left:23%}.enemy-melds-left{left:12%;top:58%;flex-direction:column}.enemy-melds-right{right:12%;top:21%;flex-direction:column}
-  .melds-container{z-index:21;right:13%;bottom:calc(var(--tile-h) + 8px);gap:3px}
-  .meld-group{gap:1px;padding:2px;border-radius:5px}.meld-group .tile{width:clamp(18px,1.8vw,28px);height:clamp(27px,2.55vw,40px)}
+  /* Enemy/open melds remain independent of the four rivers. */
+  .enemy-melds{z-index:14;gap:2px}
+  .enemy-melds-top{top:15%;left:28%}
+  .enemy-melds-left{left:15%;top:57%}
+  .enemy-melds-right{right:15%;top:21%}
+  .melds-container{
+    z-index:21;
+    right:13%;
+    bottom:calc(var(--tile-h) + 5px);
+    gap:3px;
+  }
+  .meld-group{
+    gap:1px;
+    padding:2px;
+    border-radius:5px;
+  }
+  .meld-group .tile{
+    width:20px;
+    height:29px;
+  }
 
-  /* Player hand */
-  .hand-bottom-container{left:0;right:0;bottom:0;z-index:28;min-height:calc(var(--tile-h) + 10px);padding:0 max(8px,env(safe-area-inset-left)) max(5px,env(safe-area-inset-bottom));overflow:hidden}
-  .hand-tiles{gap:2px;padding:1px 2px 0;max-width:none}
-  .tile{border-radius:4px;border-bottom-width:2px;box-shadow:0 3px 6px rgba(0,0,0,.34);touch-action:pan-y}
-  .tile.selected-tile{transform:translateY(-5px)}
+  /* Player hand: 14 tiles fit with comfortable touch targets. */
+  .hand-bottom-container{
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:28;
+    min-height:58px;
+    padding:0 max(6px,env(safe-area-inset-left)) max(4px,env(safe-area-inset-bottom));
+    overflow:hidden;
+  }
+  .hand-tiles{
+    gap:2px;
+    padding:1px 2px 0;
+    max-width:none;
+  }
+  .tile{
+    width:34px;
+    height:48px;
+    border-radius:4px;
+    border-bottom-width:2px;
+    box-shadow:0 3px 6px rgba(0,0,0,.34);
+    touch-action:pan-y;
+  }
+  .tile.selected-tile{transform:translateY(-4px)}
   .drawn-tile-gap{margin-left:4px}
 
-  /* Never let transient UI obscure the rivers. */
+  /* Transient controls stay above the hand and below the center. */
   .hand-status,.beginner-tip{display:none!important}
-  #action-overlay{bottom:calc(var(--tile-h) + 10px);max-width:82vw;padding:6px 8px;gap:5px;border-radius:9px}
-  .act-btn{min-width:52px;min-height:32px;padding:5px 9px;font-size:10px}
-  .tile,.act-btn,.icon-btn,button{-webkit-user-select:none;user-select:none}
-  button{-webkit-tap-highlight-color:transparent}
+  #action-overlay{
+    bottom:60px;
+    max-width:82vw;
+    padding:6px 8px;
+    gap:5px;
+    border-radius:9px;
+  }
+  .act-btn{
+    min-width:52px;
+    min-height:32px;
+    padding:5px 9px;
+    font-size:10px;
+  }
+
+  .tile,.act-btn,.icon-btn,button{
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+  }
 }
 
 </style>
