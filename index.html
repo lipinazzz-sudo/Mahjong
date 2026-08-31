@@ -214,38 +214,38 @@ h1{margin-bottom:8px;font-size:clamp(2rem,6vw,4rem);line-height:.98;letter-spaci
   .avatar-img{width:clamp(31px,4vw,34px);height:clamp(31px,4vw,34px);border-radius:9px;border-width:1.5px}
   .avatar-name{margin-top:2px;padding:2px 5px;border-radius:5px;font-size:7px;line-height:1.1}
   .time-bank-tag{margin-top:2px;padding:2px 5px;border-radius:5px;font-size:7px}
-  .pos-left{left:3.4%;top:48%;transform:translateY(-50%)}
-  .pos-right{right:3.4%;top:48%;transform:translateY(-50%)}
-  .pos-top{top:4px;right:11%}
-  .pos-bottom{left:22%;bottom:calc(var(--tile-h) + 5px);transform:translateX(-50%)}
+  .pos-left{left:5.5%;top:48%;transform:translateY(-50%)}
+  .pos-right{right:5.5%;top:48%;transform:translateY(-50%)}
+  .pos-top{top:5px;right:13%}
+  .pos-bottom{left:24%;bottom:calc(var(--tile-h) + 5px);transform:translateX(-50%)}
 
   /* Physical walls: one perimeter wall only. */
   .wall{gap:1px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.38))}
-  .wall-top{top:2.8%;left:50%}
-  .wall-left{left:8.5%;top:15.5%}
-  .wall-right{right:8.5%;top:15.5%}
+  .wall-top{top:3.6%;left:50%}
+  .wall-left{left:12.5%;top:17%}
+  .wall-right{right:12.5%;top:17%}
   .wall .wall-tile{border-radius:2px;border-bottom-width:1px}
 
   /* Rivers: fixed 6×3 lanes, with a clear exclusion zone around center. */
   .river-container{gap:1px;width:calc(var(--discard-w)*6 + 5px);height:calc(var(--discard-h)*3 + 3px);grid-template-columns:repeat(6,var(--discard-w));grid-template-rows:repeat(3,var(--discard-h));overflow:visible}
-  .river-top{top:16.5%;left:50%;transform:translateX(-50%) rotate(180deg)}
-  .river-bottom{bottom:calc(var(--tile-h) + 16.5%);left:50%;transform:translateX(-50%)}
-  .river-left{left:20%;top:50%;transform:translate(-50%,-50%) rotate(90deg)}
-  .river-right{right:20%;top:50%;transform:translate(50%,-50%) rotate(-90deg)}
+  .river-top{top:17.5%;left:50%;transform:translateX(-50%) rotate(180deg)}
+  .river-bottom{bottom:calc(var(--tile-h) + 17.5%);left:50%;transform:translateX(-50%)}
+  .river-left{left:24%;top:50%;transform:translate(-50%,-50%) rotate(90deg)}
+  .river-right{right:24%;top:50%;transform:translate(50%,-50%) rotate(-90deg)}
   .discard-tile{border-radius:2px;border-bottom-width:1px;box-shadow:0 1px 3px rgba(0,0,0,.35)}
   .discard-tile.tile-honor .tile-char{font-size:clamp(9px,1.6vw,12px)}
 
   /* Center: compact enough to leave a stable river corridor. */
-  .center-board{width:clamp(94px,10.4vw,102px);height:clamp(71px,7.7vw,77px);border-radius:10px;border-width:2px;box-shadow:0 9px 22px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.04)}
+  .center-board{width:clamp(82px,9vw,88px);height:clamp(63px,6.8vw,68px);border-radius:10px;border-width:2px;box-shadow:0 9px 22px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.04)}
   .center-board::before{inset:5px;border-radius:7px}
   .round-info{font-size:8px;letter-spacing:.10em}.turn-timer{font-size:clamp(27px,3.35vw,30px);margin:1px 0 0}.tiles-left{font-size:7px}
   .score-tag{min-width:46px;padding:3px 5px;border-radius:5px;font-size:7px}.score-tag::before{font-size:5px;margin-bottom:1px}
-  .score-south{bottom:-24px}.score-north{top:-24px}.score-east{right:-55px}.score-west{left:-55px}
+  .score-south{bottom:-21px}.score-north{top:-21px}.score-east{right:-50px}.score-west{left:-50px}
 
   /* Melds: anchor them just above the hand, never behind the river. */
   .enemy-melds{gap:2px}.enemy-melds-top{top:12.5%;left:22%}.enemy-melds-left{left:12.5%;top:59%}.enemy-melds-right{right:12.5%;top:20%}
-  .melds-container{right:17%;bottom:calc(var(--tile-h) + 3px);gap:3px}
-  .meld-group{gap:1px;padding:2px;border-radius:4px}.meld-group .tile{width:19px;height:28px}
+  .melds-container{right:14%;bottom:calc(var(--tile-h) + 4px);gap:3px}
+  .meld-group{gap:1px;padding:2px;border-radius:4px}.meld-group .tile{width:18px;height:27px}
 
   /* Player hand */
   .hand-bottom-container{left:0;right:0;bottom:0;min-height:calc(var(--tile-h) + 7px);padding:0 max(6px,env(safe-area-inset-left)) max(4px,env(safe-area-inset-bottom));overflow:hidden}
