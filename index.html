@@ -178,7 +178,11 @@
         .delta-down { color:var(--red); }
         .delta-flat { color:var(--muted); }
         .score-head { color:var(--muted); font-size:9px; text-transform:uppercase; letter-spacing:.07em; }
-        
+        @media (max-width: 520px) {
+            .result-summary { grid-template-columns: 1fr; }
+            .score-row { grid-template-columns: 1fr .8fr .9fr; }
+            .score-place { display:none; }
+        }
 
         /* ---------- Game board ---------- */
         #screen-game { padding: 0; }
@@ -296,7 +300,7 @@
         .furiten-row button { margin:0; flex:1; padding:6px 7px; font-size:9px; border-radius:8px; }
         .furiten-status { margin-top:0; font-size:10px; font-weight:850; min-height:14px; color:var(--muted); text-align:center; }
         .furiten-status.temp { color:#ffbd59; } .furiten-status.perma { color:#ff7676; } .furiten-status.clean { color:#48e6a0; }
-        
+        @media (max-width:680px){ .furiten-panel{bottom:calc(var(--tile-h) + 72px);width:min(290px,88vw)}.machi-bubble{min-width:96px;font-size:9px} }
 
 
         .hand-bottom-container { position:absolute; left:0; right:0; bottom:0; z-index:20; display:flex; align-items:flex-end; justify-content:center; padding:0 6px max(7px,env(safe-area-inset-bottom)); min-height:calc(var(--tile-h) + 16px); overflow-x:auto; overflow-y:visible; scrollbar-width:none; }
@@ -306,11 +310,43 @@
         .riichi-overlay { position:absolute; inset:0; z-index:95; display:none; pointer-events:none; background:radial-gradient(circle at center, rgba(231,76,60,.04), rgba(231,76,60,.17)); box-shadow:inset 0 0 120px rgba(231,76,60,.14); }
 
         /* ---------- Responsive ---------- */
-        
-        
-        
+        @media (max-width: 720px) {
+            .topbar { gap:6px; }
+            .dora-panel { min-width: 140px; }
+            .dora-tile-box { width:21px; height:29px; font-size:12px; }
+            .pos-top { right:104px; }
+            .river-left { left:93px; }
+            .river-right { right:93px; }
+            .enemy-melds-left { left:36px; }
+            .enemy-melds-right { right:36px; }
+            .center-board { border-radius:20px; }
+        }
+        @media (max-width: 520px) {
+            .dora-panel { padding:6px 7px; min-width:0; }
+            .hud-label { display:none; }
+            .stick-counters { font-size:8px; }
+            .top-right-btns .icon-btn { width:34px; height:34px; }
+            .pos-left { left:4px; }
+            .pos-right { right:4px; }
+            .river-left { left:55px; }
+            .river-right { right:55px; }
+            .enemy-melds-left { left:24px; }
+            .enemy-melds-right { right:24px; }
+            .action-overlay { max-width:96vw; }
+        }
+        @media (max-height: 520px) and (orientation: landscape) {
+            :root { --tile-h: clamp(32px, 9vh, 52px); --tile-w: clamp(22px, 7vh, 38px); }
+            .pos-bottom { bottom:calc(var(--tile-h) + 9px); }
+            .river-bottom { bottom:calc(var(--tile-h) + 48px); }
+            #action-overlay { bottom:calc(var(--tile-h) + 10px); }
+            .center-board { width:130px; height:130px; }
+            .avatar-img { width:34px; height:34px; }
+            .avatar-name, .time-bank-tag { font-size:8px; }
+        }
 
-        
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior:auto !important; transition:none !important; animation:none !important; }
+        }
     .round-ready-tag{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.04em}.round-ready-tag.ready{background:rgba(46,204,113,.16);color:#5ee79a;border:1px solid rgba(46,204,113,.35)}.round-ready-tag.noten{background:rgba(231,76,60,.12);color:#ff8b80;border:1px solid rgba(231,76,60,.3)}
 
         .lobby-box{max-width:520px}.mp-setup{display:grid;gap:10px}.field-label{font-size:12px;color:#9ca3af;text-align:left}.field-input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #34404f;background:#0e1722;color:#fff;font-size:15px;outline:none}.field-input:focus{border-color:#58a6ff;box-shadow:0 0 0 3px rgba(88,166,255,.12)}.mp-join-row{display:grid;grid-template-columns:1.2fr 1fr .9fr;gap:8px;align-items:center}.room-code-input{text-align:center;letter-spacing:3px}.mp-hint{font-size:12px;line-height:1.5;color:#8b949e;text-align:left;padding:10px 12px;background:rgba(255,255,255,.035);border-radius:9px}.connection-badge{font-size:10px;font-weight:800;letter-spacing:.08em;padding:5px 8px;border-radius:999px;border:1px solid #334155}.connection-badge.online{color:#86efac;border-color:#166534;background:#052e16}.connection-badge.offline{color:#fca5a5;border-color:#7f1d1d;background:#2b0b0b}.mp-room-panel{display:grid;gap:12px}.room-share-card{display:flex;justify-content:space-between;align-items:center;padding:13px 14px;border-radius:12px;background:#0b1320;border:1px solid #263244}.room-share-card strong{display:block;font-size:30px;letter-spacing:5px;color:#f6c453;margin-top:2px}.lobby-actions{display:grid;gap:8px}
@@ -319,7 +355,7 @@
 /* ===== P2P + Responsive v11 (superseded by Cloud Room v13 transport below) ===== */
 :root{--table-unit:1vw}
 .mp-p2p-choice{display:grid;grid-template-columns:1fr 1fr;gap:8px}.p2p-card{display:grid;gap:8px;padding:12px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.035);border-radius:12px;text-align:left}.p2p-card-title{font-size:12px;font-weight:900;color:#f6c453;letter-spacing:.08em;text-transform:uppercase}.p2p-row{display:flex;align-items:center;justify-content:space-between;gap:8px}.p2p-seat-label{font-size:12px;font-weight:900;color:#dce5ef}.p2p-mini{font-size:10px;line-height:1.4;color:#8995a3}.signal-box{min-height:90px;resize:none;font:11px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all}.p2p-card[hidden]{display:none!important}.signal-qr{display:none;justify-self:center;width:min(220px,70vw);height:auto;background:#fff;border-radius:10px;padding:6px}.signal-qr.visible{display:block}
-
+@media(max-width:560px){.mp-p2p-choice{grid-template-columns:1fr}.modal-box{max-height:92dvh;overflow:auto}}
 
 /* Dynamic table scale: one unit follows the smaller viewport axis. */
 #game-board{--u:var(--table-unit)}
@@ -335,17 +371,50 @@
 .enemy-hand-side .tile-back{width:clamp(17px,calc(var(--u)*4.5),29px);height:clamp(12px,calc(var(--u)*3),20px)}
 .meld-group .tile{width:clamp(17px,calc(var(--u)*4),31px);height:clamp(25px,calc(var(--u)*6),45px)}
 
+@media(max-width:600px) and (orientation:portrait){
+  #game-board{--table-unit:min(1vw,1.05vh)}
+  .topbar{top:max(6px,env(safe-area-inset-top));left:6px;right:6px}
+  .dora-panel{min-width:124px;padding:5px 6px}.dora-tile-box{width:19px;height:27px;font-size:11px}.stick-counters{font-size:8px}.kan-info{font-size:8px}
+  .top-right-btns{gap:4px}.icon-btn{width:32px;height:32px;font-size:13px}
+  .pos-bottom{left:50%;transform:translateX(-50%);bottom:calc(clamp(32px,calc(var(--u)*9.8),63px) + 8px)}
+  .pos-left{left:3px;top:44%;transform:translateY(-50%)} .pos-right{right:3px;top:44%;transform:translateY(-50%)}
+  .pos-top{top:58px;right:92px}
+  .enemy-hand-top{top:88px}.side-left{left:5px;top:30%}.side-right{right:5px;top:30%}
+  .river-top{top:122px}.river-left{left:62px}.river-right{right:62px}.river-bottom{bottom:calc(clamp(32px,calc(var(--u)*9.8),63px) + 52px)}
+  .enemy-melds-top{top:110px;left:18%}.enemy-melds-left{left:22px}.enemy-melds-right{right:22px}
+  .melds-container{right:6px;bottom:calc(clamp(32px,calc(var(--u)*9.8),63px) + 7px)}
+  #action-overlay{bottom:calc(clamp(32px,calc(var(--u)*9.8),63px) + 48px);max-width:95vw;padding:6px 7px}.act-btn{min-width:52px;min-height:34px;padding:6px 8px;font-size:11px}
+  .hand-status{width:min(92vw,460px);bottom:calc(clamp(32px,calc(var(--u)*9.8),63px) + 2px);padding:6px 9px}.hand-status .status-main{font-size:10px}.hand-status .status-sub{font-size:8px}
+  .beginner-tip{bottom:calc(clamp(32px,calc(var(--u)*9.8),63px) + 44px);font-size:7px}
+  .hand-bottom-container{padding-bottom:max(4px,env(safe-area-inset-bottom));overflow-x:auto;overflow-y:hidden}.hand-tiles{gap:2px;padding:2px 8px;min-width:max-content}
+}
+@media(max-width:420px) and (orientation:portrait){
+  #game-board{--table-unit:min(1vw,.95vh)}
+  .dora-panel{transform:scale(.9);transform-origin:top left}.top-right-btns{transform:scale(.9);transform-origin:top right}
+  .center-board{width:106px;height:106px;border-radius:18px}.round-info{font-size:10px}.turn-timer{font-size:28px}.tiles-left{font-size:10px}.score-tag{min-width:48px;font-size:8px;padding:3px 4px}
+  .pos-left,.pos-right{top:46%}.side-left{left:2px}.side-right{right:2px}.river-left{left:48px}.river-right{right:48px}
+}
+@media(max-height:560px) and (orientation:landscape){
+  #game-board{--table-unit:min(1vw,1.0vh)}
+  .topbar{top:max(5px,env(safe-area-inset-top));left:6px;right:6px}.dora-panel{min-width:118px;padding:4px 6px}.dora-tile-box{width:18px;height:25px;font-size:10px}
+  .pos-bottom{left:50%;transform:translateX(-50%);bottom:calc(clamp(32px,calc(var(--u)*9.8),54px) + 6px)}
+  .pos-top{top:5px;right:88px}.pos-left{left:3px;top:50%}.pos-right{right:3px;top:50%}
+  .enemy-hand-top{top:44px}.side-left,.side-right{top:25%}
+  .river-top{top:76px}.river-bottom{bottom:calc(clamp(32px,calc(var(--u)*9.8),54px) + 36px)}.river-left{left:50px}.river-right{right:50px}
+  .enemy-melds-top{top:46px}.enemy-melds-left{left:18px}.enemy-melds-right{right:18px}.melds-container{right:6px;bottom:calc(clamp(32px,calc(var(--u)*9.8),54px) + 4px)}
+  #action-overlay{bottom:calc(clamp(32px,calc(var(--u)*9.8),54px) + 7px);max-width:88vw}.hand-status{bottom:calc(clamp(32px,calc(var(--u)*9.8),54px) + 1px);width:min(58vw,450px)}.beginner-tip{display:none}
+  .hand-bottom-container{padding-bottom:2px}.hand-tiles{gap:2px}
+}
+@media(min-width:900px) and (min-height:600px){
+  #game-board{--table-unit:min(.95vw,.95vh)}
+}
 
-
-
-
-
-
+@supports(height:100svh){html,body,.screen,#game-board{height:100svh}}
 
 /* ===== QR SCANNER + RECONNECT v12 ===== */
 .mp-scan-row{align-items:center;margin-bottom:8px}.reconnect-card{display:flex;flex-direction:column;gap:7px;margin-top:10px;padding:10px 12px;border:1px solid rgba(243,156,18,.45);background:rgba(243,156,18,.08);border-radius:10px}.reconnect-card strong{color:#f6c96d}.scanner-box{max-width:480px}.scanner-reader{width:100%;min-height:280px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:14px;background:#050b11;border:1px solid rgba(255,255,255,.12)}
 .scanner-reader video{width:100%!important;height:auto!important;border-radius:12px}.scanner-reader__scan-region{width:100%!important}.scanner-reader__dashboard{padding:8px!important}.scanner-reader__dashboard_section{margin:0!important}
-
+@media(max-width:600px){.scanner-box{width:min(94vw,480px);padding:14px}.scanner-reader{min-height:240px}.mp-scan-row{flex-direction:column;align-items:stretch}.mp-scan-row .btn{width:100%}}
 
         /* ===== v15 visual polish: clearer tiles, calmer HUD, responsive table ===== */
         .tile, .discard-tile { -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
@@ -405,546 +474,827 @@
         @keyframes riichiPulse { 0%,100%{opacity:.82} 50%{opacity:1} }
         .riichi-overlay::before { content:"RIICHI"; position:absolute; top:14%; left:50%; transform:translateX(-50%); padding:5px 12px; border-radius:999px; border:1px solid rgba(255,112,112,.28); background:rgba(36,4,10,.52); color:rgba(255,176,176,.92); font-size:clamp(9px,1.8vw,12px); font-weight:900; letter-spacing:.32em; text-indent:.32em; box-shadow:0 0 28px rgba(255,76,88,.12); }
 
-/* =========================================================
-   FINAL TABLE LAYOUT — iPhone 12 landscape / touch friendly
-   One geometry system; no stacked legacy layout patches.
-   ========================================================= */
+        /* Smaller landscape footprint for compact phones and tablets. */
+        @media (orientation:landscape) and (max-height:680px){
+            #game-board { --table-unit:min(1vw,1vh); }
+            .tile { width:clamp(20px,calc(var(--u)*4.75),38px); height:clamp(29px,calc(var(--u)*8.3),54px); }
+            .tile-char { font-size:clamp(12px,calc(var(--u)*2.8),21px); }
+            .tile-helper { font-size:clamp(6px,calc(var(--u)*1.2),9px); }
+            .discard-tile { width:clamp(14px,calc(var(--u)*3.15),23px); height:clamp(21px,calc(var(--u)*4.75),32px); }
+            .center-board { width:clamp(104px,calc(var(--u)*25),168px); height:clamp(104px,calc(var(--u)*25),168px); border-radius:20px; }
+            .turn-timer { font-size:clamp(25px,calc(var(--u)*5),40px); }
+            .enemy-hand-top { top:50px; }
+            .river-top { top:82px; }
+            .river-left { left:44px; }
+            .river-right { right:44px; }
+            .enemy-melds-left { left:16px; }
+            .enemy-melds-right { right:16px; }
+            .pos-left { left:2px; }
+            .pos-right { right:2px; }
+            .hand-status { width:min(340px,54vw); bottom:calc(var(--tile-h) + 16px); padding:4px 9px; }
+            .beginner-tip { display:none; }
+            #action-overlay { bottom:calc(var(--tile-h) + 10px); }
+        }
+        @media (orientation:landscape) and (max-height:430px){
+            .topbar { top:4px; left:5px; right:5px; }
+            .dora-panel { min-width:108px; padding:4px 5px; }
+            .dora-tile-box { width:17px; height:23px; font-size:9px; }
+            .icon-btn { width:30px; height:30px; font-size:12px; }
+            .pos-top { top:4px; right:74px; }
+            .enemy-hand-top { top:35px; }
+            .river-top { top:60px; }
+            .river-bottom { bottom:calc(var(--tile-h) + 30px); }
+            .center-board { width:96px; height:96px; }
+            .hand-status { display:none; }
+            #action-overlay { bottom:calc(var(--tile-h) + 3px); max-width:86vw; }
+        }
+        @media (orientation:portrait) and (max-width:600px){
+            #game-board { --table-unit:min(1vw,1.0vh); }
+            .tile { width:clamp(21px,calc(var(--u)*5.0),40px); height:clamp(31px,calc(var(--u)*8.9),56px); }
+            .tile-char { font-size:clamp(12px,calc(var(--u)*2.9),22px); }
+            .center-board { width:clamp(108px,calc(var(--u)*26),164px); height:clamp(108px,calc(var(--u)*26),164px); }
+            .river-left { left:48px; }
+            .river-right { right:48px; }
+            .hand-status { width:min(88vw,360px); bottom:calc(var(--tile-h) + 18px); }
+        }
+        @media (min-width:700px) and (max-width:1100px) and (orientation:portrait){
+            #game-board { --table-unit:min(1vw,.92vh); }
+            .tile { width:clamp(24px,calc(var(--u)*4.8),41px); height:clamp(36px,calc(var(--u)*8.6),58px); }
+            .center-board { width:clamp(130px,calc(var(--u)*26),180px); height:clamp(130px,calc(var(--u)*26),180px); }
+        }
+        @media (min-width:1200px) and (min-height:700px){
+            #game-board { --table-unit:min(.78vw,.78vh); }
+        }
+        @media (pointer:coarse){
+            .tile:hover { box-shadow:0 4px 8px rgba(0,0,0,.28); }
+            .player-seat:hover .avatar-img { transform:none; }
+        }
+
+    
+        #game-board.riichi-active::after { content:""; position:absolute; inset:0; pointer-events:none; z-index:94; box-shadow:inset 0 0 90px rgba(230,40,55,.10), inset 0 0 220px rgba(0,0,0,.18); }
+        #game-board.riichi-active .center-board { box-shadow:0 20px 55px rgba(0,0,0,.52), 0 0 34px rgba(231,76,60,.20), inset 0 0 0 1px rgba(255,255,255,.025); }
+
+    
+        #game-board.table-win::before { animation:tableWinFlash .85s ease-out both; background-image:radial-gradient(rgba(255,215,120,.14) 1px, transparent 1px); opacity:.35; }
+        #game-board.table-draw::before { animation:tableDrawFlash .75s ease-out both; }
+        @keyframes tableWinFlash { 0%{opacity:.1;filter:brightness(.9)} 35%{opacity:.75;filter:brightness(1.16)} 100%{opacity:.18;filter:brightness(1)} }
+        @keyframes tableDrawFlash { 0%{opacity:.12} 40%{opacity:.44} 100%{opacity:.18} }
+
+    
+
+        /* ===== v16: centered discards + readable tile faces + cleaner draw sorting ===== */
+        .river-left { left: calc(50% - clamp(140px, 36vmin, 430px)); }
+        .river-right { right: calc(50% - clamp(140px, 36vmin, 430px)); }
+        .river-top, .river-bottom { justify-items:center; }
+
+        /* Make Mahjong tile artwork occupy more of the face. */
+        .tile.tile-pin .tile-char,
+        .tile.tile-sou .tile-char {
+            font-size: clamp(18px, calc(var(--u) * 3.8), 31px);
+            transform: scale(1.10);
+            transform-origin: center;
+            text-shadow: 0 1px 0 rgba(255,255,255,.7);
+        }
+        .tile.tile-man .tile-number {
+            font-size: clamp(17px, calc(var(--u) * 3.55), 25px);
+            font-weight: 800;
+        }
+        .tile.tile-man .tile-suit {
+            font-size: clamp(11px, calc(var(--u) * 2.5), 17px);
+            font-weight: 700;
+        }
+        .tile.tile-honor .tile-char {
+            font-size: clamp(19px, calc(var(--u) * 3.9), 30px);
+            transform: scale(1.06);
+        }
+        .discard-tile.tile-pin .tile-char,
+        .discard-tile.tile-sou .tile-char {
+            font-size: clamp(11px, calc(var(--u) * 2.8), 18px);
+            transform: scale(1.08);
+        }
+        .discard-tile.tile-man .tile-number {
+            font-size: clamp(9px, calc(var(--u) * 2.2), 14px);
+            font-weight: 800;
+        }
+        .discard-tile.tile-man .tile-suit {
+            font-size: clamp(6px, calc(var(--u) * 1.5), 9px);
+            font-weight: 700;
+        }
+        .discard-tile.tile-honor .tile-char {
+            font-size: clamp(10px, calc(var(--u) * 2.55), 17px);
+            transform: scale(1.05);
+        }
+
+        /* Keep the just-drawn tile visibly separated on the far right. */
+        .drawn-tile-gap {
+            margin-left: clamp(6px, calc(var(--u) * 1.0), 10px);
+            border: 2px solid rgba(244,177,58,.90);
+            box-shadow: 0 0 0 2px rgba(244,177,58,.12), 0 8px 15px rgba(0,0,0,.28);
+        }
+        .drawn-tile-gap .tile-char { transform: scale(1.02); }
+
+        /* Compact phone landscape: bring all rivers closer to the center. */
+        @media (orientation:landscape) and (max-height:680px){
+            .river-left { left: calc(50% - clamp(96px, 28vmin, 250px)); }
+            .river-right { right: calc(50% - clamp(96px, 28vmin, 250px)); }
+            .river-top, .river-bottom { grid-template-columns: repeat(6, var(--discard-w)); }
+        }
+        @media (orientation:landscape) and (max-height:430px){
+            .river-left { left: calc(50% - clamp(82px, 25vmin, 190px)); }
+            .river-right { right: calc(50% - clamp(82px, 25vmin, 190px)); }
+        }
+        @media (orientation:portrait) and (max-width:600px){
+            .river-left { left: calc(50% - clamp(90px, 31vmin, 190px)); }
+            .river-right { right: calc(50% - clamp(90px, 31vmin, 190px)); }
+        }
+        @media (min-width:700px) and (min-height:600px){
+            .river-left { left: calc(50% - clamp(160px, 32vmin, 360px)); }
+            .river-right { right: calc(50% - clamp(160px, 32vmin, 360px)); }
+        }
+
+
+        /* ===== v17: screen-relative table, larger touch-friendly tiles ===== */
+        #game-board{
+            --tile-w: clamp(34px, 6.9vw, 52px);
+            --tile-h: clamp(50px, 10vw, 74px);
+            --discard-w: clamp(20px, 3.2vw, 28px);
+            --discard-h: clamp(30px, 4.7vw, 41px);
+            --side-river-inset: clamp(135px, 22vw, 320px);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .hand-bottom-container{
+            padding-left: max(8px, env(safe-area-inset-left));
+            padding-right: max(8px, env(safe-area-inset-right));
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+        }
+        .hand-tiles{gap:3px; padding-inline:2px;}
+        .hand-bottom-container .tile .tile-helper{display:none;}
+        .tile.tile-pin .tile-char,
+        .tile.tile-sou .tile-char{
+            font-size: clamp(23px, 4.35vw, 36px);
+            transform:scale(1.18);
+            transform-origin:center;
+        }
+        .tile.tile-man .tile-number{
+            font-size: clamp(21px, 4.0vw, 30px);
+            line-height:.95;
+        }
+        .tile.tile-man .tile-suit{
+            font-size: clamp(13px, 2.3vw, 19px);
+            line-height:.95;
+        }
+        .tile.tile-honor .tile-char{
+            font-size: clamp(24px, 4.55vw, 37px);
+            transform:scale(1.1);
+        }
+        .discard-tile.tile-pin .tile-char,
+        .discard-tile.tile-sou .tile-char{
+            font-size: clamp(13px, 2.35vw, 20px);
+            transform:scale(1.18);
+        }
+        .discard-tile.tile-man .tile-number{font-size:clamp(10px,2vw,15px)}
+        .discard-tile.tile-man .tile-suit{font-size:clamp(7px,1.4vw,10px)}
+        .discard-tile.tile-honor .tile-char{font-size:clamp(12px,2.1vw,18px);transform:scale(1.08)}
+        .river-left{left:calc(50% - var(--side-river-inset));}
+        .river-right{right:calc(50% - var(--side-river-inset));}
+        .center-board{width:clamp(104px,20vmin,180px);height:clamp(104px,20vmin,180px);}
+        .turn-timer{font-size:clamp(32px,5.4vmin,48px);}
+        .hand-status{
+            bottom:calc(var(--tile-h) + clamp(18px, 3.3vh, 30px));
+            width:min(300px,72vw);
+            padding:6px 10px;
+            border-radius:12px;
+            background:rgba(4,10,16,.82);
+            border-color:rgba(244,177,58,.18);
+            box-shadow:0 8px 20px rgba(0,0,0,.18);
+        }
+        .hand-status .status-main{font-size:10px;letter-spacing:.03em}
+        .hand-status .status-sub{font-size:8px;line-height:1.25}
+        .machi-bubble{min-width:110px; font-size:9px;}
+        .topbar{padding-top:max(2px, env(safe-area-inset-top));}
+        #game-board::after{
+            content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+            background:radial-gradient(circle at 50% 47%, rgba(89,173,199,.08), transparent 38%), linear-gradient(110deg, transparent 38%, rgba(255,255,255,.018) 50%, transparent 62%);
+            animation:mahjongAmbient 10s ease-in-out infinite alternate;
+        }
+        .topbar,.player-seat,.enemy-hand-top,.enemy-hand-side,.enemy-melds,.river-container,.center-board,.hand-status,#action-overlay,.melds-container,.hand-bottom-container{z-index:10;}
+        @keyframes mahjongAmbient{from{opacity:.45;transform:translateX(-1%)}to{opacity:.8;transform:translateX(1%)}}
+        #game-board.riichi-active::after{
+            animation:riichiAtmosphere 2.4s ease-in-out infinite alternate;
+            background:radial-gradient(circle at 50% 48%, rgba(184,36,54,.06), transparent 40%), linear-gradient(110deg, transparent 35%, rgba(190,42,52,.055) 50%, transparent 65%);
+        }
+        @keyframes riichiAtmosphere{from{opacity:.38}to{opacity:.78}}
+
+        /* Compact landscape: use width for touch size, while keeping the whole safe area visible. */
+        @media (orientation:landscape) and (max-height:560px){
+            #game-board{--tile-w:clamp(36px,6.45vw,48px);--tile-h:clamp(53px,9.4vw,69px);--discard-w:clamp(19px,3.0vw,26px);--discard-h:clamp(29px,4.35vw,38px);--side-river-inset:clamp(120px,20.5vw,255px);}
+            .center-board{width:clamp(106px,26vh,145px);height:clamp(106px,26vh,145px)}
+            .player-seat.pos-bottom{bottom:calc(var(--tile-h) + 3px)}
+            .avatar-img{width:34px;height:34px}.avatar-name{font-size:8px}.time-bank-tag{font-size:8px}
+            .river-top{top:72px}.river-bottom{bottom:calc(var(--tile-h) + 42px)}
+            .hand-status{bottom:calc(var(--tile-h) + 4px);width:min(270px,46vw);padding:4px 8px}
+            .hand-status .status-main{font-size:9px}.hand-status .status-sub{font-size:7px}
+            #action-overlay{bottom:calc(var(--tile-h) + 6px)}
+            .topbar{left:max(5px,env(safe-area-inset-left));right:max(5px,env(safe-area-inset-right));}
+        }
+        @media (max-width:700px) and (orientation:landscape){
+            .top-right-btns .icon-btn{width:32px;height:32px}.dora-panel{transform:scale(.88);transform-origin:top left}.top-right-btns{transform:scale(.9);transform-origin:top right}
+            .river-left{left:calc(50% - clamp(110px,20vw,180px));}.river-right{right:calc(50% - clamp(110px,20vw,180px));}
+            .machi-bubble{min-width:94px;font-size:8px}
+        }
+        @media (orientation:portrait) and (max-width:600px){
+            #game-board{--tile-w:clamp(31px,8.15vw,44px);--tile-h:clamp(45px,11.9vw,64px);--discard-w:clamp(18px,3.9vw,25px);--discard-h:clamp(27px,5.3vw,36px);--side-river-inset:clamp(95px,28vw,165px);}
+            .center-board{width:clamp(108px,29vmin,142px);height:clamp(108px,29vmin,142px)}
+            .hand-status{width:min(300px,80vw);bottom:calc(var(--tile-h) + 12px)}
+            .river-left{left:calc(50% - var(--side-river-inset));}.river-right{right:calc(50% - var(--side-river-inset));}
+        }
+        @media (max-width:430px) and (orientation:portrait){
+            #game-board{--tile-w:clamp(30px,8.35vw,38px);--tile-h:clamp(44px,12vw,55px);}
+            .tile.tile-pin .tile-char,.tile.tile-sou .tile-char{font-size:clamp(21px,5.7vw,28px)}
+            .tile.tile-man .tile-number{font-size:clamp(19px,5.1vw,24px)}
+            .tile.tile-man .tile-suit{font-size:clamp(12px,3.2vw,15px)}
+            .tile.tile-honor .tile-char{font-size:clamp(22px,5.9vw,29px)}
+            .hand-status{width:min(280px,86vw)}
+        }
+        @media (min-width:1000px) and (min-height:650px){
+            .hand-tiles{gap:4px}.hand-status{width:320px}.machi-bubble{font-size:10px}
+        }
+        @media (prefers-reduced-motion:reduce){#game-board::after,#game-board.riichi-active::after{animation:none}}
+
+        /* ===== v17: local Chinese instrumental via Web Audio ===== */
+        .music-note-status{font-size:10px;color:var(--muted);margin-top:4px;text-align:right}
+
+/* ===== MAHYONG DJ — ELEGANT HUD v18 ===== */
+:root{
+  --hud-bg:rgba(7,16,27,.78);
+  --hud-bg-strong:rgba(8,18,29,.92);
+  --hud-line:rgba(255,255,255,.11);
+  --hud-soft:rgba(255,255,255,.055);
+  --hud-glow:rgba(255,198,78,.18);
+}
+.topbar{
+  left:max(8px,env(safe-area-inset-left));
+  right:max(8px,env(safe-area-inset-right));
+  display:grid;
+  grid-template-columns:minmax(150px,1fr) auto minmax(150px,1fr);
+  align-items:start;
+  pointer-events:none;
+}
+.topbar > *{pointer-events:auto}
+.dora-panel{
+  width:max-content;
+  min-width:clamp(150px,22vw,220px);
+  max-width:min(44vw,250px);
+  padding:9px 11px 8px;
+  border:1px solid var(--hud-line);
+  background:linear-gradient(180deg,rgba(8,19,31,.90),rgba(5,13,22,.82));
+  box-shadow:0 12px 28px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.035);
+  border-radius:14px;
+}
+.dora-panel::after{
+  content:"";display:block;height:1px;margin-top:8px;
+  background:linear-gradient(90deg,transparent,rgba(255,202,92,.30),transparent);
+}
+.hud-label{font-size:9px;letter-spacing:.15em;color:#aeb8c6}
+.dora-tiles{gap:4px}
+.dora-tile-box{
+  width:clamp(23px,3.2vw,29px);height:clamp(31px,4.3vw,39px);
+  border-radius:6px;font-size:clamp(12px,1.7vw,15px);
+  box-shadow:0 3px 8px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.14);
+}
+.stick-counters{margin-top:7px;font-size:9px}
+.kan-info{margin-top:5px;font-size:9px;color:#55dbe5}
+.top-right-btns{justify-self:end;display:flex;gap:7px}
+.top-right-btns .icon-btn{
+  width:40px;height:40px;border-radius:12px;
+  background:linear-gradient(180deg,rgba(9,20,31,.88),rgba(4,11,19,.90));
+  border-color:var(--hud-line);box-shadow:0 10px 22px rgba(0,0,0,.22);
+}
+.round-hud-shell{
+  position:absolute;left:50%;top:max(8px,env(safe-area-inset-top));transform:translateX(-50%);
+  min-width:150px;padding:8px 14px;border:1px solid rgba(255,255,255,.09);
+  border-radius:999px;background:linear-gradient(180deg,rgba(9,20,32,.88),rgba(4,10,17,.82));
+  box-shadow:0 12px 30px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.04);
+  text-align:center;pointer-events:none;z-index:12;
+}
+.round-hud-title{font-size:10px;font-weight:900;letter-spacing:.16em;color:#f4c662;text-transform:uppercase}
+.round-hud-sub{margin-top:2px;color:#92a0af;font-size:8px;font-weight:800}
+.player-seat{filter:drop-shadow(0 10px 18px rgba(0,0,0,.22))}
+.player-seat.active-seat .avatar-img{box-shadow:0 0 0 2px rgba(255,208,95,.65),0 0 24px rgba(255,193,54,.18),0 8px 22px rgba(0,0,0,.24)}
+.avatar-img{border-color:rgba(255,207,103,.78)}
+.avatar-name{
+  background:linear-gradient(180deg,rgba(8,17,27,.94),rgba(5,11,18,.88));
+  border-color:rgba(255,255,255,.10);box-shadow:0 4px 12px rgba(0,0,0,.18)
+}
+.time-bank-tag{background:rgba(7,15,24,.86);border:1px solid rgba(244,177,58,.14)}
+.center-board{
+  width:clamp(142px,20vw,188px);height:clamp(142px,20vw,188px);
+  border-radius:28px;
+  background:
+    radial-gradient(circle at 50% 30%,rgba(46,108,145,.16),transparent 42%),
+    linear-gradient(180deg,rgba(9,20,32,.97),rgba(4,10,17,.98));
+  border:2px solid rgba(255,255,255,.13);
+  box-shadow:0 22px 55px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.04), inset 0 0 34px rgba(0,0,0,.18);
+}
+.center-board::before{
+  content:"";position:absolute;inset:9px;border-radius:21px;
+  border:1px solid rgba(255,255,255,.035);pointer-events:none;
+}
+.round-info{font-size:13px;letter-spacing:.13em;text-transform:uppercase}
+.turn-timer{margin:7px 0 3px;font-size:clamp(34px,5.5vw,48px);font-variant-numeric:tabular-nums;text-shadow:0 0 22px rgba(255,255,255,.06)}
+.tiles-left{font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.score-tag{
+  min-width:62px;padding:5px 8px;border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.10);color:#d8e0e9;font-size:9px;
+  box-shadow:0 5px 12px rgba(0,0,0,.16)
+}
+.score-tag::before{font-size:7px;color:#7f8b99;letter-spacing:.12em;font-weight:900;display:block;margin-bottom:1px}
+.score-south::before{content:"YOU"}.score-east::before{content:"EAST"}.score-north::before{content:"NORTH"}.score-west::before{content:"WEST"}
+.score-south{bottom:6px;color:#55e6a2}.score-east{right:6px}.score-north{top:6px}.score-west{left:6px}
+.hand-status{
+  width:min(420px,76vw);padding:6px 12px;border-radius:13px;
+  background:linear-gradient(180deg,rgba(5,12,19,.86),rgba(5,11,18,.70));
+  border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 22px rgba(0,0,0,.18);
+  bottom:calc(var(--tile-h) + 13px)
+}
+.hand-status .status-main{font-size:10px;letter-spacing:.10em;text-transform:uppercase}
+.hand-status .status-sub{font-size:8px}
+#action-overlay{
+  background:linear-gradient(180deg,rgba(6,14,23,.96),rgba(3,9,15,.96));
+  border:1px solid rgba(255,200,83,.42);box-shadow:0 18px 40px rgba(0,0,0,.38),0 0 0 1px rgba(255,255,255,.02) inset;
+}
+.riichi-overlay{
+  background:
+    radial-gradient(circle at center,rgba(168,25,35,.08),rgba(0,0,0,.54) 68%),
+    linear-gradient(180deg,rgba(4,6,11,.18),rgba(4,6,11,.46));
+  box-shadow:inset 0 0 160px rgba(255,51,64,.14);
+  mix-blend-mode:normal;
+}
+@keyframes hudPulse{0%,100%{box-shadow:0 22px 55px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.04),0 0 0 rgba(255,190,58,0)}50%{box-shadow:0 22px 55px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.04),0 0 26px rgba(255,190,58,.10)}}
+.center-board{animation:hudPulse 3.8s ease-in-out infinite}
+@media(max-width:720px){
+  .topbar{grid-template-columns:minmax(124px,1fr) auto minmax(110px,1fr);gap:6px}
+  .dora-panel{min-width:124px;padding:7px 8px;border-radius:12px}
+  .top-right-btns .icon-btn{width:35px;height:35px}
+  .round-hud-shell{min-width:124px;padding:6px 10px}
+  .round-hud-title{font-size:8px}.round-hud-sub{font-size:7px}
+  .center-board{width:clamp(128px,24vw,166px);height:clamp(128px,24vw,166px)}
+}
+@media(max-height:560px) and (orientation:landscape){
+  .topbar{grid-template-columns:minmax(110px,1fr) auto minmax(95px,1fr)}
+  .dora-panel{min-width:108px;padding:5px 6px}
+  .dora-tiles{gap:3px}.dora-tile-box{width:18px;height:25px;font-size:10px}
+  .round-hud-shell{top:4px;padding:5px 8px;min-width:104px}
+  .round-hud-title{font-size:7px}.round-hud-sub{font-size:6px}
+  .center-board{width:122px;height:122px;border-radius:22px}.turn-timer{font-size:31px;margin:4px 0 1px}.round-info{font-size:9px}.tiles-left{font-size:8px}
+  .score-tag{min-width:52px;padding:4px 6px;font-size:8px}.score-tag::before{font-size:6px}
+  .hand-status{bottom:calc(var(--tile-h) + 8px);width:min(48vw,360px);padding:5px 9px}.hand-status .status-main{font-size:8px}.hand-status .status-sub{font-size:7px}
+}
+@media(prefers-reduced-motion:reduce){.center-board{animation:none}}
+
+
+/* ===== MAHYONG DJ v19 — FINAL RESPONSIVE PASS ===== */
+#game-board{overflow:hidden;}
+/* Scores sit around the center instead of covering the timer/round text. */
+.center-board{overflow:visible;}
+.score-tag{z-index:22;min-width:68px;padding:5px 8px;font-size:10px;line-height:1.05;white-space:nowrap;text-align:center;background:linear-gradient(180deg,rgba(13,25,38,.94),rgba(5,12,20,.92));border:1px solid rgba(255,210,105,.16);box-shadow:0 7px 16px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.04);}
+.score-tag::before{font-size:7px;margin-bottom:3px;}
+.score-south{left:50%;right:auto;bottom:-40px;transform:translateX(-50%);}
+.score-east{right:-77px;top:50%;bottom:auto;transform:translateY(-50%);}
+.score-north{left:50%;right:auto;top:-40px;transform:translateX(-50%);}
+.score-west{left:-77px;right:auto;top:50%;transform:translateY(-50%);}
+
+/* Tile faces: use CSS pip art so the symbols occupy the face instead of leaving large glyph whitespace. */
+.tile-art{position:absolute;inset:9% 11%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);align-items:center;justify-items:center;transform:scale(1.04);transform-origin:center;}
+.tile-pip{display:block;width:62%;height:62%;border-radius:50%;filter:drop-shadow(0 1px 0 rgba(255,255,255,.65));}
+.pin-pip{background:radial-gradient(circle at 35% 30%,#fff 0 12%,#58616c 13% 28%,#222c35 45% 100%);border:1px solid rgba(18,24,30,.48);}
+.sou-pip{width:40%;height:72%;border-radius:5px;background:linear-gradient(90deg,#116344 0 26%,#34a875 27% 54%,#0d553b 55% 73%,#45bd86 74% 100%);border:1px solid rgba(13,85,59,.55);}
+.tile-art .p-1-1{grid-row:1;grid-column:1}.tile-art .p-1-2{grid-row:1;grid-column:2}.tile-art .p-1-3{grid-row:1;grid-column:3}
+.tile-art .p-2-1{grid-row:2;grid-column:1}.tile-art .p-2-2{grid-row:2;grid-column:2}.tile-art .p-2-3{grid-row:2;grid-column:3}
+.tile-art .p-3-1{grid-row:3;grid-column:1}.tile-art .p-3-2{grid-row:3;grid-column:2}.tile-art .p-3-3{grid-row:3;grid-column:3}
+.tile.tile-pin .tile-char,.tile.tile-sou .tile-char{font-size:1em;}
+.tile.tile-man .tile-char{gap:1px;}
+.tile.tile-man .tile-number{font-size:clamp(23px,4.3vw,31px);font-family:"Noto Serif CJK SC","Songti SC","Hiragino Mincho ProN",serif;font-weight:900;line-height:.9;}
+.tile.tile-man .tile-suit{font-size:clamp(15px,2.6vw,20px);font-family:"Noto Serif CJK SC","Songti SC","Hiragino Mincho ProN",serif;font-weight:800;line-height:.9;}
+.tile.tile-honor .tile-char{font-size:clamp(26px,4.9vw,39px);font-family:"Noto Serif CJK SC","Songti SC","Hiragino Mincho ProN",serif;font-weight:900;line-height:.95;}
+.tile.tile-honor .tile-char.honor-wind{color:#315b82;text-shadow:0 1px 0 rgba(255,255,255,.75),0 0 8px rgba(79,140,195,.10)}
+.tile.tile-honor .tile-char.honor-dragon-red{color:#d34045;text-shadow:0 1px 0 rgba(255,255,255,.70),0 0 8px rgba(211,64,69,.10)}
+.tile.tile-honor .tile-char.honor-dragon-green{color:#149b60;text-shadow:0 1px 0 rgba(255,255,255,.70),0 0 8px rgba(20,155,96,.10)}
+.tile.tile-honor .tile-char.honor-dragon-white{color:#68747f;text-shadow:0 1px 0 rgba(255,255,255,.90),0 0 7px rgba(154,170,184,.12)}
+/* discard faces are intentionally smaller, but still use most of the face. */
+.discard-tile .tile-art{inset:8% 9%;transform:scale(1.02)}
+.discard-tile .tile-pip{width:66%;height:66%}
+.discard-tile .sou-pip{width:43%;height:74%}
+.discard-tile.tile-man .tile-number{font-size:clamp(10px,2.2vw,15px);font-weight:900}
+.discard-tile.tile-man .tile-suit{font-size:clamp(8px,1.65vw,11px);font-weight:800}
+.discard-tile.tile-honor .tile-char{font-size:clamp(12px,2.6vw,18px);}
+
+/* Centered, predictable rivers. Side rivers stay close enough to read but never touch the board. */
+.river-left{left:calc(50% - clamp(190px,29vw,360px));}
+.river-right{right:calc(50% - clamp(190px,29vw,360px));}
+
+/* Landscape phones: use width for touch size; reserve a slim HUD band top/bottom. */
+@media (orientation:landscape) and (max-height:700px){
+  #game-board{--tile-w:clamp(35px,6.4vw,50px);--tile-h:clamp(50px,9.1vw,71px);--discard-w:clamp(19px,3.05vw,27px);--discard-h:clamp(29px,4.45vw,39px);}
+  .hand-bottom-container{min-height:calc(var(--tile-h) + max(6px,env(safe-area-inset-bottom)));padding-bottom:max(5px,env(safe-area-inset-bottom));}
+  .hand-tiles{gap:2px;padding-inline:8px;}
+  .center-board{width:clamp(116px,25vh,154px);height:clamp(116px,25vh,154px);}
+  .score-tag{min-width:56px;font-size:8px;padding:4px 6px}.score-tag::before{font-size:6px}
+  .score-south{bottom:-30px}.score-north{top:-30px}.score-east{right:-63px}.score-west{left:-63px}
+  .score-tag::before{margin-bottom:2px}
+  .pos-bottom{bottom:calc(var(--tile-h) + 4px)}
+  .pos-left,.pos-right{top:50%}
+  .river-left{left:calc(50% - clamp(120px,21vw,230px));}
+  .river-right{right:calc(50% - clamp(120px,21vw,230px));}
+  .river-top{top:62px}.river-bottom{bottom:calc(var(--tile-h) + 44px)}
+  .tile-art{inset:7% 8%;transform:scale(1.03)}
+  .tile.tile-man .tile-number{font-size:clamp(21px,4vw,29px)}.tile.tile-man .tile-suit{font-size:clamp(14px,2.3vw,19px)}
+  .tile.tile-honor .tile-char{font-size:clamp(23px,4.7vw,35px)}
+  .hand-status{bottom:calc(var(--tile-h) + 7px);width:min(300px,42vw);padding:5px 9px;border-radius:10px;}
+  .hand-status .status-main{font-size:8px}.hand-status .status-sub{font-size:7px}
+}
+@media (orientation:landscape) and (max-height:460px){
+  #game-board{--tile-w:clamp(33px,6.1vw,45px);--tile-h:clamp(47px,8.8vw,64px);}
+  .center-board{width:108px;height:108px;border-radius:20px}
+  .topbar{top:max(3px,env(safe-area-inset-top));}
+  .dora-panel{min-width:102px;padding:4px 5px}.dora-tile-box{width:17px;height:24px;font-size:9px}
+  .top-right-btns .icon-btn{width:30px;height:30px}
+  .round-hud-shell{top:3px;min-width:98px;padding:4px 7px}.round-hud-title{font-size:7px}.round-hud-sub{font-size:6px}
+  .river-top{top:53px}.river-bottom{bottom:calc(var(--tile-h) + 33px)}
+  .score-south{bottom:-26px}.score-north{top:-26px}.score-east{right:-58px}.score-west{left:-58px}
+  .score-tag{min-width:52px;padding:3px 5px;font-size:7px}.score-tag::before{font-size:5px}
+  .hand-status{display:none}
+}
+
+/* Portrait phones: keep the hand touchable; center scores stay outside the board. */
+@media (orientation:portrait) and (max-width:600px){
+  #game-board{--tile-w:clamp(30px,7.8vw,43px);--tile-h:clamp(43px,11.1vw,61px);--discard-w:clamp(18px,3.6vw,25px);--discard-h:clamp(27px,5.0vw,35px);}
+  .hand-bottom-container{padding-bottom:max(6px,env(safe-area-inset-bottom));}
+  .hand-tiles{gap:2px;padding-inline:10px;min-width:max-content;}
+  .center-board{width:clamp(112px,28vmin,146px);height:clamp(112px,28vmin,146px);}
+  .score-tag{min-width:54px;padding:4px 6px;font-size:8px}.score-tag::before{font-size:5px}
+  .score-south{bottom:-31px}.score-north{top:-31px}.score-east{right:-61px}.score-west{left:-61px}
+  .river-left{left:calc(50% - clamp(105px,27vw,165px));}.river-right{right:calc(50% - clamp(105px,27vw,165px));}
+  .river-top{top:94px}.river-bottom{bottom:calc(var(--tile-h) + 48px)}
+  .tile-art{inset:7% 8%}
+  .tile.tile-man .tile-number{font-size:clamp(20px,5.1vw,28px)}.tile.tile-man .tile-suit{font-size:clamp(13px,2.9vw,18px)}
+  .tile.tile-honor .tile-char{font-size:clamp(22px,5.6vw,32px)}
+  .hand-status{width:min(286px,78vw);bottom:calc(var(--tile-h) + 10px);padding:5px 9px;border-radius:10px;}
+  .hand-status .status-main{font-size:9px}.hand-status .status-sub{font-size:7px}
+}
+@media (orientation:portrait) and (max-width:400px){
+  #game-board{--tile-w:clamp(29px,7.55vw,36px);--tile-h:clamp(42px,10.8vw,52px)}
+  .score-tag{min-width:48px;font-size:7px;padding:3px 5px}.score-tag::before{font-size:5px}
+  .score-south{bottom:-27px}.score-north{top:-27px}.score-east{right:-53px}.score-west{left:-53px}
+  .center-board{width:104px;height:104px}
+}
+
+/* Tablet/desktop: preserve an attractive amount of negative space without making the hand tiny. */
+@media (min-width:900px){
+  #game-board{--tile-w:clamp(42px,4.1vw,55px);--tile-h:clamp(60px,5.85vw,78px);--discard-w:clamp(22px,2.05vw,30px);--discard-h:clamp(33px,2.9vw,42px);}
+  .center-board{width:clamp(152px,16vw,196px);height:clamp(152px,16vw,196px)}
+  .score-south{bottom:-42px}.score-north{top:-42px}.score-east{right:-82px}.score-west{left:-82px}
+}
+@media (min-width:1200px){
+  .river-left{left:calc(50% - clamp(210px,25vw,370px));}
+  .river-right{right:calc(50% - clamp(210px,25vw,370px));}
+}
+
+/* Respect iPhone safe-area while keeping the playable area visually centered. */
+#game-board{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom);}
+.hand-bottom-container{padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right));}
+
+/* No hover-dependent movement on touch devices. */
+@media(pointer:coarse){.tile:hover{transform:none}.score-tag:hover{transform:inherit}.player-seat:hover .avatar-img{transform:none}}
+@media(prefers-reduced-motion:reduce){.center-board{animation:none}}
+
+
+/* ===== MAHYONG DJ v20 — TILE ART PASS ===== */
+.tile{
+  background:linear-gradient(180deg,#fbfaf4 0%,#f3efe4 58%,#e9e4d7 100%);
+  border:1px solid rgba(92,92,82,.20);
+  border-bottom:4px solid #3f5e3f;
+  box-shadow:0 3px 0 rgba(255,255,255,.72) inset,0 5px 10px rgba(0,0,0,.28);
+}
+.tile-art{
+  inset:3.5% 6%;
+  gap:0;
+  transform:scale(1.05);
+}
+.tile-pip{
+  width:82%;
+  height:82%;
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.8));
+}
+.pin-pip{
+  width:84%;
+  height:84%;
+  background:
+    radial-gradient(circle at 36% 32%,#fefefe 0 12%,#aeb7bd 13% 29%,#505962 30% 47%,#1f2730 48% 72%,#677078 73% 100%);
+  border:1px solid rgba(20,27,34,.55);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.45),inset 0 -1px 1px rgba(0,0,0,.32);
+}
+.sou-pip{
+  width:52%;
+  height:88%;
+  border-radius:5px;
+  background:linear-gradient(90deg,#0a573b 0%,#15935f 26%,#46bf88 49%,#15935f 70%,#07442e 100%);
+  border:1px solid rgba(8,73,48,.62);
+  box-shadow:inset 1px 0 0 rgba(255,255,255,.28),inset -1px 0 0 rgba(0,0,0,.22);
+}
+/* Red 5 center pips, matching the familiar Riichi palette. */
+.tile.tile-pin .tile-art[data-num="5"] .p-2-2,
+.tile.tile-sou .tile-art[data-num="5"] .p-2-2,
+.discard-tile.tile-pin .tile-art[data-num="5"] .p-2-2,
+.discard-tile.tile-sou .tile-art[data-num="5"] .p-2-2{
+  background:linear-gradient(145deg,#ff5f5f,#c7262e 68%,#8d1820);
+  border-color:#85171f;
+  box-shadow:inset 1px 0 0 rgba(255,255,255,.28),0 0 2px rgba(192,33,42,.30);
+}
+.tile.tile-man .tile-char{
+  gap:0;
+  transform:translateY(-1%);
+}
+.tile.tile-man .tile-number{
+  font-size:clamp(26px,4.8vw,36px);
+  font-family:"Noto Serif CJK SC","Songti SC","Hiragino Mincho ProN",serif;
+  font-weight:900;
+  line-height:.84;
+  letter-spacing:-.06em;
+}
+.tile.tile-man .tile-suit{
+  margin-top:1px;
+  font-size:clamp(17px,2.9vw,22px);
+  font-family:"Noto Serif CJK SC","Songti SC","Hiragino Mincho ProN",serif;
+  font-weight:900;
+  line-height:.82;
+}
+.tile.tile-man .tile-helper{z-index:3}
+.tile.tile-man:nth-child(5) .tile-number{color:#c3262d}
+.tile.tile-honor .tile-char{
+  font-size:clamp(28px,5.2vw,42px);
+  font-family:"Noto Serif CJK SC","Songti SC","Hiragino Mincho ProN",serif;
+  font-weight:900;
+  line-height:.9;
+  transform:translateY(-1%);
+}
+.tile.tile-honor .tile-char.honor-wind{color:#416b92;text-shadow:0 1px 0 rgba(255,255,255,.88),0 0 7px rgba(79,140,195,.12)}
+.tile.tile-honor .tile-char.honor-dragon-red{color:#c52e36;text-shadow:0 1px 0 rgba(255,255,255,.82),0 0 7px rgba(197,46,54,.12)}
+.tile.tile-honor .tile-char.honor-dragon-green{color:#168c58;text-shadow:0 1px 0 rgba(255,255,255,.84),0 0 7px rgba(22,140,88,.12)}
+.tile.tile-honor .tile-char.honor-dragon-white{color:#75808a;text-shadow:0 1px 0 rgba(255,255,255,.95),0 0 6px rgba(154,170,184,.12)}
+.discard-tile .tile-art{inset:4% 5%;transform:scale(1.03)}
+.discard-tile .tile-pip{width:82%;height:82%}
+.discard-tile .sou-pip{width:52%;height:86%}
+.discard-tile.tile-man .tile-number{font-size:clamp(10px,2.5vw,16px);line-height:.82}
+.discard-tile.tile-man .tile-suit{font-size:clamp(8px,1.8vw,12px);line-height:.82}
+.discard-tile.tile-honor .tile-char{font-size:clamp(12px,2.7vw,19px)}
+/* Make the face artwork scale from the available tile size, not from screen width. */
+@media (orientation:landscape) and (max-height:700px){
+  .tile-art{inset:3% 5%;transform:scale(1.06)}
+  .tile.tile-man .tile-number{font-size:clamp(25px,4.5vw,34px)}
+  .tile.tile-man .tile-suit{font-size:clamp(16px,2.8vw,21px)}
+  .tile.tile-honor .tile-char{font-size:clamp(26px,5vw,39px)}
+}
+@media (orientation:landscape) and (max-height:460px){
+  .tile-art{inset:3% 5%;transform:scale(1.04)}
+  .tile.tile-man .tile-number{font-size:clamp(23px,4.3vw,31px)}
+  .tile.tile-man .tile-suit{font-size:clamp(15px,2.6vw,19px)}
+  .tile.tile-honor .tile-char{font-size:clamp(24px,4.8vw,35px)}
+}
+@media (orientation:portrait) and (max-width:600px){
+  .tile-art{inset:3% 5%;transform:scale(1.04)}
+  .tile.tile-man .tile-number{font-size:clamp(23px,5.6vw,31px)}
+  .tile.tile-man .tile-suit{font-size:clamp(15px,3.2vw,20px)}
+  .tile.tile-honor .tile-char{font-size:clamp(25px,5.9vw,34px)}
+}
+
+
+/* ===== V21 VECTOR TILE / PREMIUM RIICHI TABLE ===== */
+.tile{background:linear-gradient(145deg,#fffef8 0%,#f7f3ea 68%,#e6e0d2 100%);border:1px solid rgba(61,68,71,.22);border-bottom:3px solid #4c684c;box-shadow:0 5px 10px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.88);overflow:visible;}
+.tile::before{content:"";position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(255,255,255,.52);pointer-events:none;}
+.tile-svg{position:absolute;inset:4% 4%;width:92%;height:92%;display:block;overflow:visible;shape-rendering:geometricPrecision;}
+.tile-pip-circle{filter:drop-shadow(0 1px 0 rgba(255,255,255,.8));}
+.tile-pip-pin{fill:url(#pinGrad);stroke:#5b5651;stroke-width:1.15;}
+.tile-pip-pin-inner{fill:url(#pinInner);}
+.tile-pip-sou{fill:none;stroke:url(#souGrad);stroke-width:8;stroke-linecap:round;}
+.tile-pip-sou-core{fill:none;stroke:#f5fff0;stroke-width:2;stroke-linecap:round;opacity:.72;}
+.tile-pip-sou-node{fill:#197844;stroke:#0e5b32;stroke-width:1;}
+.tile-man-main{font-family:"Noto Serif CJK JP","Hiragino Mincho ProN","Yu Mincho","Songti SC",serif;font-weight:900;fill:#171717;}
+.tile-man-red{fill:#b4232b;}
+.tile-honor-main{font-family:"Noto Serif CJK JP","Hiragino Mincho ProN","Yu Mincho","Songti SC",serif;font-weight:900;}
+.tile-honor-wind{fill:#26384d;}
+.tile-honor-white{fill:#59636c;}
+.tile-honor-green{fill:#16824c;}
+.tile-honor-red{fill:#bf2830;}
+.tile-honor-shadow{fill:none;stroke:rgba(255,255,255,.78);stroke-width:1.2;}
+.tile.red-five-tile{box-shadow:0 5px 11px rgba(0,0,0,.28),0 0 0 1px rgba(190,45,51,.14),inset 0 1px 0 rgba(255,255,255,.88);}
+.tile.red-five-tile .tile-svg{filter:drop-shadow(0 0 2px rgba(190,45,51,.12));}
+.discard-tile{background:linear-gradient(145deg,#fffef8 0%,#f3eee3 72%,#dfd8c9 100%);border:1px solid rgba(61,68,71,.18);border-bottom:2px solid #486047;box-shadow:0 3px 7px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.8);overflow:visible;}
+.discard-tile::before{content:"";position:absolute;inset:1px;border-radius:3px;border:1px solid rgba(255,255,255,.42);pointer-events:none;}
+.discard-tile .tile-svg{inset:3% 3%;width:94%;height:94%;}
+.discard-tile .tile-pip-sou{stroke-width:7;}.discard-tile .tile-pip-pin{stroke-width:1;}.discard-tile .tile-man-main,.discard-tile .tile-honor-main{font-size:inherit;}
+.tile.selected-tile{transform:translateY(-9px);box-shadow:0 0 0 2px rgba(255,92,92,.95),0 12px 24px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.9);}
+.tile.selected-tile::before{border-color:rgba(255,100,100,.9);box-shadow:inset 0 0 0 1px rgba(255,110,110,.28);}
+.tile.selected-tile .tile-svg{filter:drop-shadow(0 2px 2px rgba(0,0,0,.10));}
+.tile.swipe-arming{transform:translateY(-11px) scale(1.015);box-shadow:0 0 0 2px rgba(255,177,70,.95),0 14px 26px rgba(0,0,0,.36);}
+.discard-highlight{outline:2px solid rgba(255,78,78,.95);outline-offset:1px;box-shadow:0 0 0 3px rgba(255,78,78,.16),0 0 14px rgba(255,78,78,.30);}
+.machi-bubble{bottom:calc(100% + 13px);min-width:138px;padding:7px 9px;border-radius:10px;background:linear-gradient(180deg,rgba(9,17,26,.98),rgba(3,9,15,.98));border:1px solid rgba(246,193,77,.54);box-shadow:0 12px 30px rgba(0,0,0,.38);font-size:10px;}
+.machi-bubble::after{content:"";position:absolute;left:50%;bottom:-5px;width:9px;height:9px;background:#070f18;border-right:1px solid rgba(246,193,77,.54);border-bottom:1px solid rgba(246,193,77,.54);transform:translateX(-50%) rotate(45deg);}
+.hand-status{bottom:calc(var(--tile-h) + 16px);width:min(430px,82vw);padding:6px 11px;background:rgba(6,13,21,.88);border:1px solid rgba(246,193,77,.26);box-shadow:0 8px 20px rgba(0,0,0,.20);}
+.hand-status .status-main{font-size:10px;letter-spacing:.10em;text-transform:uppercase;}.hand-status .status-sub{font-size:8px;}
+#center-board-box{border:2px solid rgba(93,168,255,.4);box-shadow:0 20px 60px rgba(0,0,0,.36),inset 0 0 30px rgba(255,255,255,.025),0 0 0 1px rgba(255,255,255,.03);background:radial-gradient(circle at 50% 38%,rgba(70,113,156,.10),transparent 52%),linear-gradient(180deg,rgba(12,24,36,.95),rgba(4,11,18,.97));}
+#center-board-box::before{content:"";position:absolute;inset:8px;border-radius:inherit;border:1px solid rgba(255,255,255,.045);pointer-events:none;}
+.round-info{font-size:clamp(11px,2.1vw,14px);letter-spacing:.14em;text-transform:uppercase;}.turn-timer{font-variant-numeric:tabular-nums;letter-spacing:-.03em;text-shadow:0 3px 16px rgba(255,255,255,.12);}.tiles-left{letter-spacing:.08em;}
+.score-tag{background:linear-gradient(180deg,rgba(17,28,40,.96),rgba(7,14,22,.96));border:1px solid rgba(255,255,255,.10);box-shadow:0 4px 12px rgba(0,0,0,.24);font-variant-numeric:tabular-nums;backdrop-filter:blur(6px);}
+.score-tag.score-south{color:#63e6ac}.score-tag.score-east{color:#ffd166}.score-tag.score-north{color:#8fc7ff}.score-tag.score-west{color:#d0a3ff}
+#action-overlay{background:linear-gradient(180deg,rgba(7,15,23,.98),rgba(3,8,13,.98));border:1px solid rgba(246,193,77,.38);box-shadow:0 18px 44px rgba(0,0,0,.42),0 0 0 1px rgba(255,255,255,.025);}
+.act-btn{min-width:62px;min-height:38px;box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 4px 10px rgba(0,0,0,.18);}
+.riichi-active{filter:brightness(.88) saturate(.92);}
+.riichi-active::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;box-shadow:inset 0 0 130px rgba(230,49,63,.25),inset 0 0 0 1px rgba(255,75,88,.08);background:radial-gradient(circle at center,transparent 42%,rgba(118,0,18,.12) 100%);z-index:88;}
+.riichi-active .center-board{border-color:rgba(239,72,87,.72)!important;box-shadow:0 0 28px rgba(239,72,87,.12),inset 0 0 30px rgba(255,255,255,.02),0 20px 60px rgba(0,0,0,.42);}
+.riichi-active .turn-timer{color:#ff696f!important;text-shadow:0 0 18px rgba(255,84,96,.2);}
+.riichi-active .riichi-overlay{display:block!important;animation:riichiBreath 3.8s ease-in-out infinite;}
+@keyframes riichiBreath{0%,100%{opacity:.48}50%{opacity:.78}}
+.tile-discard-flash{animation:discardFlash .18s ease-out;}
+@keyframes discardFlash{0%{filter:brightness(1.7);transform:scale(1.03)}100%{filter:none;transform:scale(1)}}
+.win-flash{animation:winFlash .42s ease-out;}
+.draw-flash{animation:drawFlash .42s ease-out;}
+@keyframes winFlash{0%{box-shadow:inset 0 0 0 0 rgba(246,193,77,0),0 0 0 rgba(246,193,77,0)}40%{box-shadow:inset 0 0 80px rgba(246,193,77,.14),0 0 42px rgba(246,193,77,.14)}100%{box-shadow:inset 0 0 0 0 rgba(246,193,77,0),0 0 0 rgba(246,193,77,0)}}
+@keyframes drawFlash{0%{box-shadow:inset 0 0 0 0 rgba(100,170,220,0),0 0 0 rgba(100,170,220,0)}40%{box-shadow:inset 0 0 70px rgba(84,154,205,.10),0 0 34px rgba(84,154,205,.10)}100%{box-shadow:inset 0 0 0 0 rgba(100,170,220,0),0 0 0 rgba(100,170,220,0)}}
+@media(max-width:720px){.machi-bubble{min-width:120px;font-size:9px}.score-tag{min-width:48px}.tile.selected-tile{transform:translateY(-7px)}}
+@media(max-width:560px){.hand-status{bottom:calc(var(--tile-h) + 11px);width:min(360px,76vw)}.machi-bubble{min-width:106px}.score-tag{font-size:8px;padding:3px 4px}}
+@media(max-height:560px) and (orientation:landscape){.hand-status{display:none!important}.machi-bubble{min-width:100px;font-size:8px}.tile.selected-tile{transform:translateY(-6px)}.score-tag{font-size:8px}.center-board{transform:translate(-50%,-50%) scale(.94)}}
+@media(max-width:420px) and (orientation:portrait){.hand-status{width:min(320px,74vw)}.machi-bubble{min-width:100px}.tile.selected-tile{transform:translateY(-6px)}}
+
+.dora-tile-box.has-tile{padding:0;overflow:hidden;background:linear-gradient(145deg,#fffef8,#eee8db);}.dora-tile-box.has-tile .tile-svg{inset:0;width:100%;height:100%;}.dora-tile-box.has-tile .tile-pip-pin{stroke-width:1.8}.dora-tile-box.has-tile .tile-pip-sou{stroke-width:9}.dora-tile-box.has-tile .tile-man-main{font-size:44px}.dora-tile-box.has-tile .tile-honor-main{font-size:50px;}
+
+/* ===== MAHYONG DJ v22 — LOCAL SVG TILE ART, REFERENCE-LIKE ===== */
+.tile-svg-img{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:fill;pointer-events:none;user-select:none;-webkit-user-drag:none;}
+.tile,.discard-tile{overflow:hidden;background:transparent;border:0;box-shadow:none;}
+.tile::before,.tile::after,.discard-tile::before,.discard-tile::after{display:none!important;}
+.tile.selected-tile{transform:translateY(-7px) scale(1.018);filter:drop-shadow(0 7px 12px rgba(0,0,0,.30));}
+.tile.selected-tile .tile-svg-img{filter:brightness(1.05) saturate(1.07);}
+.discard-tile.discard-highlight{transform:translateY(-2px) scale(1.055);filter:drop-shadow(0 0 5px rgba(255,80,80,.48));}
+.drawn-tile-gap{margin-left:10px;outline:2px solid rgba(247,189,65,.86);outline-offset:2px;border-radius:8px;}
+.riichi-legal-discard{outline:1px solid rgba(184,126,255,.48);outline-offset:1px;border-radius:8px;}
+@media (orientation:landscape) and (max-height:700px){
+  #game-board{--tile-w:clamp(37px,6.8vw,52px);--tile-h:clamp(54px,9.6vw,74px);--discard-w:clamp(20px,3.25vw,29px);--discard-h:clamp(30px,4.7vw,41px);}
+}
+@media (max-width:600px) and (orientation:portrait){
+  #game-board{--tile-w:clamp(31px,8.0vw,45px);--tile-h:clamp(46px,11.2vw,66px);--discard-w:clamp(18px,4.25vw,26px);--discard-h:clamp(27px,6.1vw,37px);}
+}
+@media (max-width:420px) and (orientation:portrait){
+  #game-board{--tile-w:clamp(30px,7.9vw,40px);--tile-h:clamp(44px,11vw,59px);}
+}
+@media (orientation:landscape) and (max-height:700px){
+  .river-left{left:calc(50% - clamp(142px,22vw,240px));}
+  .river-right{right:calc(50% - clamp(142px,22vw,240px));}
+}
+
+/* ===== MAHYONG DJ v23 — SAFE VIEWPORT GEOMETRY =====
+   Geometry is derived from the usable screen rectangle rather than the raw
+   viewport edges. This prevents iPhone landscape camera/notch areas from
+   squeezing or overlapping the table. */
 #game-board{
   --safe-l:env(safe-area-inset-left,0px);
   --safe-r:env(safe-area-inset-right,0px);
   --safe-t:env(safe-area-inset-top,0px);
   --safe-b:env(safe-area-inset-bottom,0px);
-  --safe-mid-x:calc((100vw - var(--safe-l) - var(--safe-r))/2 + var(--safe-l));
-  --safe-mid-y:calc((100dvh - var(--safe-t) - var(--safe-b))/2 + var(--safe-t));
-
-  /* B = screenshot composition + slightly larger touch tiles */
-  --table-center:clamp(108px,17vmin,132px);
-  --river-ns:clamp(126px,15vw,154px);
-  --river-side:clamp(178px,22vw,222px);
-  --river-gap:clamp(8px,1.1vw,13px);
-  --tile-w:clamp(38px,4.5vw,46px);
-  --tile-h:clamp(54px,6.4vw,65px);
-  --discard-w:clamp(20px,2.45vw,25px);
-  --discard-h:clamp(30px,3.9vw,36px);
-
-  position:relative;
-  width:100vw;
+  --safe-mid-x:calc((100% + var(--safe-l) - var(--safe-r))/2);
+  --safe-mid-y:calc((100% + var(--safe-t) - var(--safe-b))/2);
+  width:100%;
   height:100dvh;
+  max-width:none;
+  max-height:none;
   overflow:hidden;
-  isolation:isolate;
-  padding:0;
-  background:
-    radial-gradient(ellipse at 50% 48%,rgba(220,160,90,.18),transparent 56%),
-    linear-gradient(135deg,#27242a 0%,#4a3b37 31%,#695349 55%,#30292d 100%);
-  box-shadow:inset 0 0 120px rgba(0,0,0,.42);
 }
-
-/* Perspective table surface. */
-#game-board::before{
-  content:"";
-  position:absolute;
-  z-index:0;
-  pointer-events:none;
-  left:6.8%; right:6.8%; top:6.5%; bottom:10%;
-  clip-path:polygon(17% 0,83% 0,100% 100%,0 100%);
-  background:
-    radial-gradient(ellipse at 50% 52%,rgba(255,193,104,.12),transparent 52%),
-    linear-gradient(180deg,rgba(106,78,66,.72),rgba(47,41,43,.52));
-  border:1px solid rgba(229,191,123,.30);
-  box-shadow:
-    inset 0 0 70px rgba(0,0,0,.25),
-    0 0 0 1px rgba(0,0,0,.20),
-    0 18px 40px rgba(0,0,0,.16);
-}
-#game-board::after{
-  content:"";
-  position:absolute;
-  z-index:0;
-  pointer-events:none;
-  left:7.7%; right:7.7%; top:7.7%; bottom:11.2%;
-  clip-path:polygon(18% 0,82% 0,98.5% 100%,1.5% 100%);
-  background:
-    linear-gradient(90deg,transparent 49.8%,rgba(255,255,255,.025) 50%,transparent 50.2%),
-    linear-gradient(0deg,transparent 49.8%,rgba(255,255,255,.018) 50%,transparent 50.2%);
-  box-shadow:inset 0 0 42px rgba(0,0,0,.18);
-}
-#game-board > *{position:relative;z-index:1}
-
-/* HUD */
 #game-board .topbar{
-  top:max(8px,var(--safe-t));
+  top:max(6px,var(--safe-t));
   left:max(8px,var(--safe-l));
   right:max(8px,var(--safe-r));
-  z-index:70;
 }
-#game-board .dora-panel{min-width:150px;padding:6px 8px}
-#game-board .top-right-btns{gap:5px}
-
-/* Center */
 #game-board .center-board{
-  left:var(--safe-mid-x)!important;
-  top:45%!important;
-  width:var(--table-center)!important;
-  height:var(--table-center)!important;
-  border-radius:14px!important;
-  border:1px solid rgba(82,230,160,.78)!important;
-  background:linear-gradient(180deg,#18202a,#070a0f)!important;
-  box-shadow:
-    0 14px 32px rgba(0,0,0,.52),
-    inset 0 0 24px rgba(0,0,0,.25),
-    0 0 0 1px rgba(255,255,255,.025);
-  z-index:40!important;
-}
-#game-board .center-board::after{
-  content:"";
-  position:absolute;
-  inset:9px;
-  border:1px solid rgba(255,255,255,.035);
-  border-radius:10px;
-  pointer-events:none;
-}
-#game-board .turn-timer{font-size:clamp(30px,5.2vmin,43px)}
-
-/* Score labels: small enough to leave a clean gap around rivers. */
-#game-board .score-tag{
-  min-width:48px!important;
-  padding:3px 5px!important;
-  border-radius:6px!important;
-  font-size:7px!important;
-  line-height:1.05;
-  background:linear-gradient(180deg,rgba(25,31,39,.98),rgba(7,11,17,.98))!important;
-  z-index:45!important;
-}
-#game-board .score-south{left:50%!important;right:auto!important;bottom:-25px!important;transform:translateX(-50%)!important}
-#game-board .score-north{left:50%!important;right:auto!important;top:-25px!important;transform:translateX(-50%)!important}
-#game-board .score-east{right:-53px!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
-#game-board .score-west{left:-53px!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
-
-/* Discard rivers: compact 6-column lanes around the center. */
-#game-board .river-container{
-  z-index:25!important;
-  gap:1px!important;
-  align-content:start;
-}
-#game-board .river-top,
-#game-board .river-bottom{
-  left:var(--safe-mid-x)!important;
-  width:var(--river-ns)!important;
-  grid-template-columns:repeat(6,var(--discard-w))!important;
-  justify-content:center;
-}
-#game-board .river-top{
-  top:calc(45% - var(--table-center)/2 - var(--river-gap) - var(--discard-h)*1.5)!important;
-  transform:translate(-50%,-50%) rotate(180deg)!important;
-}
-#game-board .river-bottom{
-  top:calc(45% + var(--table-center)/2 + var(--river-gap) + var(--discard-h)*1.5)!important;
-  transform:translate(-50%,-50%)!important;
-}
-#game-board .river-left,
-#game-board .river-right{
-  top:45%!important;
-  height:var(--river-ns)!important;
-  width:calc(var(--discard-h)*3 + 4px)!important;
-  grid-template-columns:repeat(6,var(--discard-w))!important;
-}
-#game-board .river-left{
-  left:calc(var(--safe-mid-x) - var(--river-side))!important;
-  transform:translate(-50%,-50%) rotate(90deg)!important;
-}
-#game-board .river-right{
-  left:calc(var(--safe-mid-x) + var(--river-side))!important;
-  right:auto!important;
-  transform:translate(-50%,-50%) rotate(-90deg)!important;
-}
-#game-board .discard-tile{
-  border-radius:2px!important;
-  box-shadow:0 2px 4px rgba(0,0,0,.38)!important;
-}
-
-/* Slightly larger discard artwork for phone readability. */
-#game-board .discard-tile.tile-pin .tile-char,
-#game-board .discard-tile.tile-sou .tile-char{
-  font-size:clamp(11px,2.35vw,17px)!important;
-  transform:scale(1.08);
-}
-#game-board .discard-tile.tile-man .tile-number{font-size:clamp(9px,1.95vw,13px)!important}
-#game-board .discard-tile.tile-man .tile-suit{font-size:clamp(6px,1.35vw,9px)!important}
-#game-board .discard-tile.tile-honor .tile-char{font-size:clamp(10px,2.15vw,16px)!important}
-
-/* Walls sit outside the discard lanes, like the reference. */
-#game-board .enemy-hand-top{
-  left:var(--safe-mid-x)!important;
-  top:calc(var(--safe-t) + 6px)!important;
-  transform:translateX(-50%)!important;
-  gap:1px!important;
-  z-index:18!important;
-}
-#game-board .enemy-hand-top .tile-back{
-  width:clamp(16px,2vw,21px)!important;
-  height:clamp(23px,2.9vw,30px)!important;
-}
-#game-board .enemy-hand-side{
-  top:45%!important;
-  gap:1px!important;
-  z-index:18!important;
-}
-#game-board .enemy-hand-side .tile-back{
-  width:clamp(22px,2.8vw,29px)!important;
-  height:clamp(16px,1.9vw,21px)!important;
-}
-#game-board .side-left{
-  left:clamp(22px,5.4vw,58px)!important;
-  transform:translateY(-50%) rotate(13deg)!important;
-}
-#game-board .side-right{
-  right:clamp(22px,5.4vw,58px)!important;
-  transform:translateY(-50%) rotate(-13deg)!important;
-}
-
-/* Seats / avatars. */
-#game-board .player-seat{z-index:55!important}
-#game-board .player-seat.pos-top{
-  left:auto!important;
-  right:clamp(60px,12vw,125px)!important;
-  top:max(5px,var(--safe-t))!important;
-}
-#game-board .player-seat.pos-left{
-  left:clamp(7px,1.2vw,18px)!important;
-  top:39%!important;
-}
-#game-board .player-seat.pos-right{
-  right:clamp(7px,1.2vw,18px)!important;
-  top:39%!important;
+  left:var(--safe-mid-x);
+  top:var(--safe-mid-y);
 }
 #game-board .player-seat.pos-bottom{
-  left:clamp(130px,19vw,205px)!important;
-  bottom:calc(var(--tile-h) + var(--safe-b) + 7px)!important;
+  left:var(--safe-mid-x);
+  bottom:calc(var(--tile-h) + var(--safe-b) + 6px);
+  transform:translateX(-50%);
 }
-#game-board .avatar-img{
-  width:clamp(40px,4.5vw,50px)!important;
-  height:clamp(40px,4.5vw,50px)!important;
-  border-radius:9px!important;
+#game-board .player-seat.pos-top{
+  left:var(--safe-mid-x);
+  right:auto;
+  top:calc(var(--safe-t) + 6px);
+  transform:translateX(-50%);
 }
-
-/* Player hand — large/touch friendly, but still fits 14 tiles. */
-#game-board .hand-bottom-container{
-  left:var(--safe-l)!important;
-  right:var(--safe-r)!important;
-  bottom:var(--safe-b)!important;
-  width:auto!important;
-  min-height:calc(var(--tile-h) + var(--safe-b) + 8px)!important;
-  padding:0 max(7px,var(--safe-l)) max(3px,var(--safe-b))!important;
-  display:flex!important;
-  align-items:flex-end!important;
-  justify-content:center!important;
-  overflow-x:auto!important;
-  overflow-y:hidden!important;
-  z-index:65!important;
+#game-board .player-seat.pos-left{
+  left:calc(var(--safe-l) + 6px);
 }
-#game-board .hand-tiles{
-  gap:2px!important;
-  padding:2px 3px 0!important;
-  min-width:max-content;
-  justify-content:center!important;
+#game-board .player-seat.pos-right{
+  right:calc(var(--safe-r) + 6px);
 }
-#game-board .hand-bottom-container .tile{
-  border-radius:5px!important;
-  box-shadow:0 3px 8px rgba(0,0,0,.40)!important;
+#game-board .enemy-hand-top{
+  left:var(--safe-mid-x);
+  top:calc(var(--safe-t) + 58px);
 }
-
-/* Keep touch targets readable without oversized artwork. */
-#game-board .tile.tile-pin .tile-char,
-#game-board .tile.tile-sou .tile-char{
-  font-size:clamp(22px,4.2vw,34px)!important;
-  transform:scale(1.10);
+#game-board .side-left{left:calc(var(--safe-l) + 6px)}
+#game-board .side-right{right:calc(var(--safe-r) + 6px)}
+#game-board .river-top{
+  left:var(--safe-mid-x);
+  top:calc(var(--safe-t) + 72px);
 }
-#game-board .tile.tile-man .tile-number{font-size:clamp(20px,3.8vw,29px)!important}
-#game-board .tile.tile-man .tile-suit{font-size:clamp(12px,2.2vw,18px)!important}
-#game-board .tile.tile-honor .tile-char{font-size:clamp(23px,4.4vw,36px)!important}
-
-/* Melds stay above the table but below the hand. */
+#game-board .river-bottom{
+  left:var(--safe-mid-x);
+  bottom:calc(var(--tile-h) + var(--safe-b) + 48px);
+}
+#game-board .river-left{
+  left:calc(var(--safe-mid-x) - clamp(110px,21vw,235px));
+}
+#game-board .river-right{
+  right:auto;
+  left:calc(var(--safe-mid-x) + clamp(110px,21vw,235px));
+}
 #game-board .melds-container{
-  right:max(7px,var(--safe-r))!important;
-  bottom:calc(var(--tile-h) + var(--safe-b) + 7px)!important;
-  z-index:45!important;
+  right:calc(max(6px,var(--safe-r)) + 2px);
+  bottom:calc(var(--tile-h) + var(--safe-b) + 6px);
 }
-
-/* Action controls: do not cover the center. */
+#game-board .hand-bottom-container{
+  left:var(--safe-l);
+  right:var(--safe-r);
+  bottom:var(--safe-b);
+  width:auto;
+  min-height:calc(var(--tile-h) + var(--safe-b) + 10px);
+}
 #game-board #action-overlay{
-  left:var(--safe-mid-x)!important;
-  bottom:calc(var(--tile-h) + var(--safe-b) + 42px)!important;
-  max-width:min(88vw,620px)!important;
-  z-index:80!important;
+  left:var(--safe-mid-x);
+  bottom:calc(var(--tile-h) + var(--safe-b) + 44px);
+}
+#game-board .hand-status{
+  left:var(--safe-mid-x);
+  bottom:calc(var(--tile-h) + var(--safe-b) + 8px);
+}
+#game-board .beginner-tip{
+  left:var(--safe-mid-x);
+  bottom:calc(var(--tile-h) + var(--safe-b) + 48px);
+}
+#game-board .furiten-panel{
+  left:var(--safe-mid-x);
+  bottom:calc(var(--tile-h) + var(--safe-b) + 80px);
 }
 
-/* Ambient table lighting. */
-#game-board:not(.riichi-active)::after{
-  background:
-    radial-gradient(circle at 50% 47%,rgba(255,193,104,.045),transparent 38%),
-    linear-gradient(110deg,transparent 38%,rgba(255,255,255,.018) 50%,transparent 62%);
-}
-
-/* iPhone 12 / compact landscape: slightly tighter center geometry. */
-@media (orientation:landscape) and (max-height:620px){
+/* Small landscape phones: use screen width as the touch-size budget and
+   pull the whole table inward so every control remains inside the usable area. */
+@media (orientation:landscape) and (max-height:560px){
   #game-board{
-    --table-center:clamp(104px,24vmin,122px);
-    --river-ns:clamp(120px,15vw,146px);
-    --river-side:clamp(170px,21vw,208px);
-    --tile-w:clamp(37px,4.25vw,43px);
-    --tile-h:clamp(53px,6.05vw,61px);
-    --discard-w:clamp(19px,2.35vw,23px);
-    --discard-h:clamp(29px,3.7vw,34px);
+    --tile-w:clamp(34px,6.0vw,46px);
+    --tile-h:clamp(49px,8.6vw,66px);
+    --discard-w:clamp(18px,2.9vw,25px);
+    --discard-h:clamp(28px,4.25vw,36px);
   }
-  #game-board .player-seat.pos-left,#game-board .player-seat.pos-right{top:38%}
-  #game-board .player-seat.pos-bottom{left:clamp(115px,18vw,190px)}
-  #game-board .dora-panel{transform:scale(.90);transform-origin:top left}
-  #game-board .top-right-btns{transform:scale(.90);transform-origin:top right}
-  #game-board .hand-status{display:none!important}
+  #game-board .center-board{width:clamp(108px,22vh,132px);height:clamp(108px,22vh,132px)}
+  #game-board .river-left{left:calc(var(--safe-mid-x) - clamp(92px,19vw,205px))}
+  #game-board .river-right{left:calc(var(--safe-mid-x) + clamp(92px,19vw,205px))}
+  #game-board .river-top{top:calc(var(--safe-t) + 52px)}
+  #game-board .river-bottom{bottom:calc(var(--tile-h) + var(--safe-b) + 34px)}
+  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 42px)}
+  #game-board .pos-top{top:var(--safe-t)}
+  #game-board .pos-left,#game-board .pos-right{top:50%}
+  #game-board .hand-status{bottom:calc(var(--tile-h) + var(--safe-b) + 2px);width:min(48vw,320px)}
+  #game-board .beginner-tip{display:none}
 }
 
-/* Portrait fallback keeps the game usable; landscape remains the primary composition. */
-@media (orientation:portrait){
+/* Very narrow landscape screens: keep the table readable instead of shrinking
+   tiles into tiny icons. The hand can scroll horizontally when needed. */
+@media (orientation:landscape) and (max-width:420px){
   #game-board{
-    --table-center:clamp(100px,27vmin,128px);
-    --river-ns:clamp(118px,43vw,168px);
-    --river-side:clamp(128px,35vw,188px);
-    --tile-w:clamp(29px,8vw,40px);
-    --tile-h:clamp(41px,11.3vw,57px);
-    --discard-w:clamp(16px,4.7vw,22px);
-    --discard-h:clamp(24px,6.5vw,32px);
+    --tile-w:clamp(33px,7.0vw,40px);
+    --tile-h:clamp(48px,10vw,58px);
+    --discard-w:clamp(17px,3.35vw,22px);
+    --discard-h:clamp(26px,4.9vw,33px);
   }
-  #game-board .player-seat.pos-top{left:50%!important;right:auto!important;transform:translateX(-50%);top:max(4px,var(--safe-t))!important}
-  #game-board .player-seat.pos-bottom{left:50%!important;transform:translateX(-50%);bottom:calc(var(--tile-h) + var(--safe-b) + 6px)!important}
-  #game-board .player-seat.pos-left{left:4px!important;top:34%!important}
-  #game-board .player-seat.pos-right{right:4px!important;top:34%!important}
+  #game-board .center-board{width:102px;height:102px}
+  #game-board .river-left{left:calc(var(--safe-mid-x) - clamp(82px,17vw,175px))}
+  #game-board .river-right{left:calc(var(--safe-mid-x) + clamp(82px,17vw,175px))}
+  #game-board .score-tag{min-width:48px;font-size:7px;padding:3px 5px}
 }
 
-@media (pointer:coarse){
-  .tile:hover{transform:none!important}
-  .score-tag:hover{transform:inherit!important}
-  .player-seat:hover .avatar-img{transform:none!important}
+/* Portrait phones: prioritize a comfortable hand while keeping the safe inset. */
+@media (orientation:portrait) and (max-width:600px){
+  #game-board .river-left{left:calc(var(--safe-mid-x) - clamp(94px,25vw,155px))}
+  #game-board .river-right{left:calc(var(--safe-mid-x) + clamp(94px,25vw,155px))}
+  #game-board .river-top{top:calc(var(--safe-t) + 88px)}
+  #game-board .pos-top{top:calc(var(--safe-t) + 4px)}
+  #game-board .enemy-hand-top{top:calc(var(--safe-t) + 84px)}
 }
 
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{
-    scroll-behavior:auto!important;
-    transition:none!important;
-    animation:none!important;
-  }
-}
-
-
-/* ================================================================
-   iPHONE 844x390 — REFERENCE TABLE GEOMETRY OVERRIDE
-   Rebuilds the game-table composition instead of only recoloring it.
-   Designed around the supplied 844x390 landscape reference.
-   ================================================================ */
-@media (orientation: landscape) and (max-width: 900px) and (max-height: 520px){
-  :root{
-    --tile-w: 36px;
-    --tile-h: 52px;
-    --discard-w: 18px;
-    --discard-h: 27px;
-  }
-
-  html,body{background:#090909!important;overflow:hidden!important}
-  #screen-game{padding:0!important;background:#090909!important}
-  #game-board{
-    width:100vw!important;height:100dvh!important;
-    background:#090909!important;
-    box-shadow:none!important;
-    overflow:hidden!important;
-    isolation:isolate!important;
-  }
-
-  /* Wooden/felt trapezoid exactly defines the playable table. */
-  #game-board::before{
-    content:""!important;
-    position:absolute!important;
-    z-index:0!important;
-    left:5.8%!important;right:5.8%!important;
-    top:5.2%!important;bottom:3.0%!important;
-    clip-path:polygon(9% 0,91% 0,100% 100%,0 100%)!important;
-    background:#17683f!important;
-    border:2px solid #70452d!important;
-    box-shadow:inset 0 0 50px rgba(0,0,0,.24),0 0 0 1px rgba(0,0,0,.7)!important;
-  }
-  #game-board::after{
-    content:""!important;
-    position:absolute!important;
-    z-index:0!important;
-    left:7.0%!important;right:7.0%!important;
-    top:6.3%!important;bottom:4.0%!important;
-    clip-path:polygon(9.5% 0,90.5% 0,99.2% 100%,.8% 100%)!important;
-    background:
-      radial-gradient(ellipse at 50% 48%,rgba(255,255,255,.025),transparent 56%),
-      #176b42!important;
-    box-shadow:inset 0 0 55px rgba(0,0,0,.22)!important;
-  }
-  #game-board > *{position:relative;z-index:2}
-
-  /* ---------- top HUD ---------- */
-  #game-board .topbar{
-    top:10px!important;left:12px!important;right:12px!important;
-    height:58px!important;align-items:flex-start!important;z-index:90!important;
-  }
-  #game-board .dora-panel{
-    min-width:154px!important;width:154px!important;height:74px!important;
-    padding:8px 10px!important;border-radius:12px!important;
-    background:rgba(10,12,11,.94)!important;
-    border:1px solid rgba(255,255,255,.20)!important;
-    box-shadow:0 7px 18px rgba(0,0,0,.32)!important;
-  }
-  #game-board .hud-label{display:block!important;font-size:8px!important;letter-spacing:.16em!important;margin-bottom:4px!important}
-  #game-board .dora-tiles{gap:3px!important}
-  #game-board .dora-tile-box{width:22px!important;height:29px!important;border-radius:4px!important}
-  #game-board .stick-counters{font-size:8px!important;margin-top:4px!important}
-  #game-board .kan-info{font-size:8px!important;margin-top:3px!important}
-  #game-board .furiten-panel{z-index:100!important}
-  #game-board .top-right-btns{gap:5px!important;margin-top:0!important}
-  #game-board .top-right-btns .icon-btn{
-    width:39px!important;height:39px!important;border-radius:12px!important;
-    background:rgba(10,10,10,.88)!important;border:1px solid rgba(255,255,255,.18)!important;
-  }
-
-  /* ---------- Walls ---------- */
-  #game-board .enemy-hand-top{
-    left:50%!important;top:27px!important;transform:translateX(-50%)!important;
-    width:286px!important;height:18px!important;gap:2px!important;
-    display:flex!important;align-items:flex-start!important;z-index:12!important;
-  }
-  #game-board .enemy-hand-top .tile-back{
-    width:20px!important;height:27px!important;
-    border-radius:3px!important;
-    background:linear-gradient(180deg,#ef8331,#bd4c12)!important;
-    border:1px solid #8b3b12!important;border-bottom:2px solid #6e2d0d!important;
-  }
-  #game-board .enemy-hand-side{
-    top:50%!important;gap:2px!important;width:18px!important;height:286px!important;
-    display:flex!important;z-index:12!important;
-  }
-  #game-board .enemy-hand-side .tile-back{
-    width:27px!important;height:18px!important;
-    border-radius:3px!important;
-    background:linear-gradient(180deg,#ef8331,#bd4c12)!important;
-    border:1px solid #8b3b12!important;border-bottom:2px solid #6e2d0d!important;
-  }
-  #game-board .side-left{left:55px!important;transform:translateY(-50%)!important}
-  #game-board .side-right{right:55px!important;transform:translateY(-50%)!important}
-
-  /* ---------- Player seats ---------- */
-  #game-board .player-seat{z-index:75!important}
-  #game-board .avatar-img{
-    width:42px!important;height:42px!important;border-radius:50%!important;
-    border:3px solid #e7bb4b!important;
-    box-shadow:0 4px 12px rgba(0,0,0,.45)!important;
-  }
-  #game-board .avatar-name{
-    margin-top:3px!important;padding:2px 7px!important;border-radius:7px!important;
-    background:rgba(5,8,7,.90)!important;border:1px solid rgba(255,255,255,.14)!important;
-    font-size:8px!important;white-space:nowrap!important;
-  }
-  #game-board .time-bank-tag{font-size:8px!important;margin-top:2px!important;padding:2px 5px!important}
-  #game-board .player-seat.pos-top{top:8px!important;right:67px!important}
-  #game-board .player-seat.pos-left{left:9px!important;top:49%!important;transform:translateY(-50%)!important}
-  #game-board .player-seat.pos-right{right:9px!important;top:49%!important;transform:translateY(-50%)!important}
-  #game-board .player-seat.pos-bottom{left:27%!important;bottom:calc(var(--tile-h) + 6px)!important;transform:translateX(-50%)!important}
-
-  /* ---------- Enemy open melds ---------- */
-  #game-board .enemy-melds{z-index:22!important;gap:2px!important}
-  #game-board .enemy-melds-top{top:93px!important;left:50%!important;transform:translateX(-50%)!important}
-  #game-board .enemy-melds-left{left:92px!important;top:43%!important;transform:none!important}
-  #game-board .enemy-melds-right{right:92px!important;top:43%!important;transform:none!important}
-  #game-board .meld-group{gap:1px!important;padding:2px!important;border-radius:4px!important;background:rgba(0,0,0,.24)!important}
-  #game-board .meld-group .tile{width:18px!important;height:27px!important;border-radius:3px!important}
-
-  /* ---------- Discard rivers ---------- */
-  #game-board .river-container{z-index:24!important;gap:2px!important}
-  #game-board .river-top,#game-board .river-bottom{
-    left:50%!important;width:132px!important;height:88px!important;
-    grid-template-columns:repeat(6,18px)!important;gap:2px!important;
-  }
-  #game-board .river-top{
-    top:141px!important;transform:translateX(-50%) rotate(180deg)!important;
-  }
-  #game-board .river-bottom{
-    top:267px!important;transform:translateX(-50%)!important;
-  }
-  #game-board .river-left,#game-board .river-right{
-    top:49%!important;width:88px!important;height:132px!important;
-    grid-template-columns:repeat(6,18px)!important;gap:2px!important;
-  }
-  #game-board .river-left{left:174px!important;transform:translate(-50%,-50%) rotate(90deg)!important}
-  #game-board .river-right{right:auto!important;left:670px!important;transform:translate(-50%,-50%) rotate(-90deg)!important}
-  #game-board .discard-tile{
-    width:18px!important;height:27px!important;border-radius:2px!important;
-    box-shadow:0 1px 3px rgba(0,0,0,.38)!important;border-bottom:2px solid #425c46!important;
-  }
-  #game-board .discard-tile .tile-char{font-size:11px!important}
-  #game-board .discard-tile.tile-man .tile-number{font-size:9px!important}
-  #game-board .discard-tile.tile-man .tile-suit{font-size:6px!important}
-  #game-board .discard-tile.tile-honor .tile-char{font-size:11px!important}
-
-  /* ---------- Center ---------- */
-  #game-board .center-board{
-    left:50%!important;top:49%!important;transform:translate(-50%,-50%)!important;
-    width:112px!important;height:112px!important;border-radius:15px!important;
-    border:3px solid #38cf86!important;
-    background:linear-gradient(180deg,rgba(29,26,22,.96),rgba(11,12,10,.97))!important;
-    box-shadow:0 9px 25px rgba(0,0,0,.52),inset 0 0 22px rgba(0,0,0,.28)!important;
-    z-index:45!important;
-  }
-  #game-board .center-board::after{inset:7px!important;border-radius:10px!important}
-  #game-board .round-info{font-size:10px!important;letter-spacing:.16em!important;color:#f0bd51!important}
-  #game-board .turn-timer{font-size:43px!important;line-height:.95!important;margin:2px 0!important}
-  #game-board .tiles-left{font-size:10px!important;color:#8a9b91!important}
-  #game-board .score-tag{font-size:7px!important;min-width:47px!important;padding:3px 5px!important}
-  #game-board .score-north{top:-23px!important}
-  #game-board .score-south{bottom:-23px!important}
-  #game-board .score-west{left:-51px!important}
-  #game-board .score-east{right:-51px!important}
-
-  /* ---------- Player hand ---------- */
-  #game-board .hand-bottom-container{
-    left:0!important;right:0!important;bottom:0!important;
-    min-height:57px!important;height:57px!important;
-    padding:0 6px 3px!important;overflow:hidden!important;
-    z-index:80!important;background:transparent!important;
-  }
-  #game-board .hand-tiles{
-    gap:2px!important;padding:0!important;min-width:0!important;
-    max-width:100%!important;justify-content:center!important;
-  }
-  #game-board .hand-bottom-container .tile{
-    width:34px!important;height:50px!important;border-radius:4px!important;
-    border-bottom:3px solid #3d563d!important;box-shadow:0 3px 7px rgba(0,0,0,.42)!important;
-  }
-  #game-board .tile.tile-pin .tile-char,#game-board .tile.tile-sou .tile-char{font-size:23px!important;transform:scale(1.03)!important}
-  #game-board .tile.tile-man .tile-number{font-size:20px!important}
-  #game-board .tile.tile-man .tile-suit{font-size:11px!important}
-  #game-board .tile.tile-honor .tile-char{font-size:23px!important}
-  #game-board .drawn-tile-gap{margin-left:7px!important}
-  #game-board .tile.selected-tile{transform:translateY(-6px)!important}
-
-  /* Bottom melds sit just above the hand on the right, as in the reference. */
-  #game-board .melds-container{
-    right:9px!important;bottom:59px!important;z-index:70!important;
-  }
-  #game-board .melds-container .meld-group .tile{width:18px!important;height:27px!important}
-
-  /* Status/action UI is compact and never allowed to cover the center. */
-  #game-board .hand-status{display:none!important}
-  #game-board #action-overlay{
-    left:50%!important;bottom:61px!important;transform:translateX(-50%)!important;
-    max-width:82vw!important;padding:6px!important;z-index:100!important;
-  }
-  #game-board .act-btn{min-width:50px!important;min-height:31px!important;font-size:10px!important;padding:5px 8px!important}
-  #game-board .beginner-tip{display:none!important}
-  #game-board .furiten-panel{bottom:64px!important;width:260px!important}
-
-  /* Remove the old fake round HUD if present. */
-  #game-board .round-hud-shell{display:none!important}
+/* Tablets/desktops: keep generous negative space while using the safe center. */
+@media (min-width:900px){
+  #game-board .river-left{left:calc(var(--safe-mid-x) - clamp(150px,18vw,310px))}
+  #game-board .river-right{left:calc(var(--safe-mid-x) + clamp(150px,18vw,310px))}
 }
 
 </style>
@@ -1089,7 +1439,7 @@
             <div id="res-summary" class="result-summary"></div>
             <div class="result-section-title">Papan Skor</div>
             <div id="res-scores" class="result-score-list"></div>
-            <button id="next-round-btn" class="btn btn-primary btn-wide" onclick="nextRoundOrFinish()">Lanjut ke Round Berikutnya</button>
+            <button class="btn btn-primary btn-wide" onclick="nextRoundOrFinish()">Lanjut ke Ronde Berikutnya</button>
         </section>
     </div>
 
@@ -1560,7 +1910,7 @@
         setText('name-left',`${state.roomPlayers?.[map[3]]?.name||'Kursi'} • West`);setText('name-top',`${state.roomPlayers?.[map[2]]?.name||'Kursi'} • North`);setText('name-right',`${state.roomPlayers?.[map[1]]?.name||'Kursi'} • East`);
         mpRenderHandAndTable(s,map,hands,rivers,state);
         if(state.phase==='result'&&state.result){
-            setText('res-title',state.result.title||'Ronde Selesai');setText('res-desc',state.result.desc||'');setText('res-round-label',`HASIL • ${['East 1','East 2','East 3','East 4','East 5 (Extra)'][state.currentRoundIndex]||'Ronde'}`);setDisplay('modal-result','flex');const nb=byId('next-round-btn');if(nb)nb.textContent=`LANJUT KE ROUND KE-${(state.currentRoundIndex||0)+2}  ›`;
+            setText('res-title',state.result.title||'Ronde Selesai');setText('res-desc',state.result.desc||'');setText('res-round-label',`HASIL • ${['East 1','East 2','East 3','East 4','East 5 (Extra)'][state.currentRoundIndex]||'Ronde'}`);setDisplay('modal-result','flex');
             const scoreBox=byId('res-scores');if(scoreBox){scoreBox.innerHTML=state.playerScores.map((sc,canon)=>{const d=sc-(state.roundStartScores?.[canon]??sc);const nm=escapeHtml(state.roomPlayers?.[canon]?.name||`Player ${canon+1}`);return `<div class="score-row"><div class="score-name"><strong>${nm}${canon===s?' (Anda)':''}</strong><div class="score-seat">${['South','East','North','West'][canon]}</div></div><div class="score-delta ${d>=0?'delta-up':'delta-down'}">${d>0?'+':''}${d.toLocaleString('id-ID')}</div><div class="score-total">${sc.toLocaleString('id-ID')}</div><div class="score-place">#${[...state.playerScores].sort((a,b)=>b-a).indexOf(sc)+1}</div></div>`}).join('')}
         }
     }
@@ -1589,7 +1939,7 @@
         if(['Ron','Pon','Kan','Chi','Skip'].includes(act)&&mpPendingCallQueue[0]?.seat!==seat)return;
         if(act==='Tsumo'){const e=evaluateYakuAndScore(seat,null,true);if(checkWinningHand(playerHands[seat],playerMelds[seat].length)&&e.valid){playerScores[seat]+=e.points;endRound(`TSUMO by ${mp.room.players?.[seat]?.name||'Player'}`,`${e.yakuStr} (+${e.points} Pts)`)}return}
         if(act==='Riichi'){if(currentTurn!==seat||aiRiichi[seat])return;aiRiichi[seat]=true;playerScores[seat]-=1000;riichiSticks++;mpPendingRiichiSeat=seat;startRemoteTurnTimer(seat);mpBroadcastState({remoteActions:{seat,actions:[]},handStatus:{seat,main:'RIICHI',sub:'Buang tile untuk mengunci tangan.'}});return}
-        if(act==='Ron'&&lastDiscardedTile){const e=evaluateYakuAndScore(seat,lastDiscardedTile,false);if(e.valid&&checkWinningHand([...playerHands[seat],lastDiscardedTile],playerMelds[seat].length)&&!checkSeatFuriten(seat,lastDiscardedTile.id)){playerScores[seat]+=e.points;playerScores[lastDiscarderIdx]-=e.points;endRound(`RON by ${mp.room.players?.[seat]?.name||'Player'}`,`${e.yakuStr} (+${e.points} Pts)`)}return}
+        if(act==='Ron'&&lastDiscardedTile){const e=evaluateYakuAndScore(seat,lastDiscardedTile,false);if(e.valid&&checkWinningHand([...playerHands[seat],lastDiscardedTile],playerMelds[seat].length)&&!checkSeatFuriten(seat,lastDiscardedTile.id)){playerScores[seat]+=e.points;playerScores[lastDiscarderIdx]-=e.points;endRound(`RON by ${mp.room.players?.[seat]?.name||'Player'}`,`${e.yakuStr} (+${e.points} Pts)`) }return}
         if(act==='Pon'){mpPendingCallQueue=[];executePon(seat);return}
         if(act==='Kan'){mpPendingCallQueue=[];executeKan(seat);return}
         if(act==='Chi'){mpPendingCallQueue=[];executeChi(seat);return}
@@ -1630,108 +1980,6 @@
     let aiMoveTimer = null, autoDiscardTimer = null, roundToken = 0;
     let roundActive = false;
     let roundEnding = false;
-
-    let honbaCount = 0;
-    let roundOutcome = null;
-    let matchFinished = false;
-    let ippatsuEligible = [false, false, false, false];
-    let doubleRiichiEligible = [false, false, false, false];
-    let lastWinMethod = null;
-
-    const SEAT_ORDER_V24 = [1, 0, 3, 2]; // East, South, West, North by canonical player index.
-    function getSeatWindForPlayer(pIdx) {
-        const di = SEAT_ORDER_V24.indexOf(currentDealerIdx);
-        const pi = SEAT_ORDER_V24.indexOf(pIdx);
-        if (di < 0 || pi < 0) return PLAYER_SEAT_WINDS[pIdx] || 'S';
-        return WIND_ORDER[(pi - di + 4) % 4];
-    }
-    function getSeatLabelForPlayer(pIdx) {
-        return getSeatWindForPlayer(pIdx);
-    }
-
-    function calculateWinPayments(han, fu, isDealer, isTsumo) {
-        let basePoint;
-        const yakuman = han >= 13;
-        if (yakuman) {
-            if (isTsumo) {
-                return isDealer
-                    ? { total: 48000, payments: [16000,16000,16000], detail: 'Yakuman tsumo • setiap Ko bayar 16000' }
-                    : { total: 32000, payments: [16000,8000,8000], detail: 'Yakuman tsumo • Oya 16000, Ko 8000' };
-            }
-            return { total: isDealer ? 48000 : 32000, ron: isDealer ? 48000 : 32000, detail: 'Yakuman ron' };
-        }
-        if (han >= 11) basePoint = 6000;
-        else if (han >= 8) basePoint = 4000;
-        else if (han >= 6) basePoint = 3000;
-        else if (han >= 5 || (han === 4 && fu >= 40) || (han === 3 && fu >= 70)) basePoint = 2000;
-        else basePoint = Math.min(fu * Math.pow(2, han + 2), 2000);
-        if (isTsumo) {
-            if (isDealer) {
-                const pay = ceil100(basePoint * 2);
-                return { total: pay * 3, payments: [pay,pay,pay], detail: `Setiap Ko bayar ${pay}` };
-            }
-            const payDealer = ceil100(basePoint * 2);
-            const payOther = ceil100(basePoint);
-            return { total: payDealer + payOther * 2, payments: [payOther,payDealer,payOther], detail: `Oya: ${payDealer}, Ko: ${payOther}` };
-        }
-        const ron = ceil100(basePoint * (isDealer ? 6 : 4));
-        return { total: ron, ron, detail: `Lawan bayar ${ron}` };
-    }
-
-    function applyWinSettlement(winner, loser, result, method, titleOverride, descExtra='') {
-        if (!result?.valid || roundEnding || !roundActive) return false;
-        const isTsumo = method === 'tsumo';
-        const isDealer = winner === currentDealerIdx;
-        const calc = calculateWinPayments(result.han, result.fu, isDealer, isTsumo);
-        const before = [...playerScores];
-        const honba = honbaCount;
-        const kyotaku = riichiSticks;
-        const delta = [0,0,0,0];
-
-        if (isTsumo) {
-            const seatOrder = [0,1,2,3].filter(p => p !== winner);
-            seatOrder.forEach((payer) => {
-                const basePay = isDealer
-                    ? (calc.payments?.[0] || Math.ceil(calc.total / 3))
-                    : (payer === currentDealerIdx ? (calc.payments?.[1] || Math.ceil(calc.total / 2)) : (calc.payments?.[0] || Math.ceil(calc.total / 4)));
-                const pay = basePay + honba * 100;
-                playerScores[payer] -= pay;
-                delta[payer] -= pay;
-            });
-            const gain = calc.total + honba * 300 + kyotaku * 1000;
-            playerScores[winner] += gain;
-            delta[winner] += gain;
-        } else {
-            const pay = (calc.ron || calc.total) + honba * 300;
-            if (loser == null || loser === winner) return false;
-            playerScores[loser] -= pay;
-            playerScores[winner] += pay + kyotaku * 1000;
-            delta[loser] -= pay;
-            delta[winner] += pay + kyotaku * 1000;
-        }
-
-        riichiSticks = 0; // winner collects all kyotaku.
-        lastWinMethod = method;
-        roundOutcome = {
-            kind: 'win', winner, loser: isTsumo ? null : loser, method,
-            dealerWon: winner === currentDealerIdx, honbaUsed: honba,
-            kyotakuClaimed: kyotaku, deltas: delta, beforeScores: before,
-            result
-        };
-        const title = titleOverride || `${method.toUpperCase()} WIN!`;
-        const paymentsText = isTsumo
-            ? `Pembayaran: ${calc.detail}${honba ? ` + ${honba} honba` : ''}${kyotaku ? ` + ${kyotaku * 1000} kyotaku` : ''}.`
-            : `Pembayaran: ${calc.total.toLocaleString('id-ID')}${honba ? ` + ${honba}×300 honba` : ''}${kyotaku ? ` + ${kyotaku * 1000} kyotaku` : ''}.`;
-        endRound(title, `${result.yakuStr} • ${result.han} Han • ${result.fu} Fu\n${paymentsText}${descExtra ? `\n${descExtra}` : ''}`);
-        return true;
-    }
-
-    // Ura-dora and ippatsu helpers.
-    function markRiichiDeclared(pIdx, isDouble=false) {
-        ippatsuEligible[pIdx] = true;
-        doubleRiichiEligible[pIdx] = !!isDouble;
-    }
-    function cancelIppatsuForAll() { ippatsuEligible = [false,false,false,false]; }
 
     function ceil100(v) { return Math.ceil(v / 100) * 100; }
 
@@ -1953,7 +2201,7 @@
         const groups = decomposition.groups;
         const pairId = decomposition.pairId;
         const roundWind = 'E';
-        const seatWind = getSeatWindForPlayer(pIdx);
+        const seatWind = PLAYER_SEAT_WINDS[pIdx] || 'S';
 
         if (pIdx === 0 ? isRiichi : aiRiichi[pIdx]) yaku.push({ name: 'Riichi', han: 1 });
         if (isTsumo && closed) yaku.push({ name: 'Menzen Tsumo', han: 1 });
@@ -2033,78 +2281,6 @@
         return yaku;
     }
 
-    // Additional yaku layer (keeps the proven base evaluator and adds common Riichi yaku).
-    const __evaluateStandardYakuV24Base = evaluateStandardYaku;
-    evaluateStandardYaku = function(hand, melds, decomposition, winTile, isTsumo, pIdx) {
-        let yaku = __evaluateStandardYakuV24Base(hand, melds, decomposition, winTile, isTsumo, pIdx);
-        const allTiles = getAllTilesForHand(hand, melds);
-        const groups = decomposition?.groups || [];
-        const allGroups = [...groups, ...((melds || []).map(g => ({
-            type: g.length === 4 || g.every(t => t.id === g[0].id) ? 'triplet' : 'sequence', ids: g.map(t=>t.id)
-        })) )];
-        const triplets = allGroups.filter(g=>g.type==='triplet');
-        const dragons = [31,32,33];
-        const winds = [27,28,29,30];
-        const closed = (melds || []).length === 0;
-
-        if (yaku.some(y=>y.name==='Riichi') && doubleRiichiEligible[pIdx]) {
-            yaku = yaku.filter(y=>y.name!=='Riichi');
-            yaku.push({name:'Double Riichi',han:2});
-        }
-        if (ippatsuEligible[pIdx]) yaku.push({name:'Ippatsu',han:1});
-        if (isTsumo && fullDeck.length === 0) yaku.push({name:'Haitei Raoyue',han:1});
-        if (!isTsumo && fullDeck.length === 0) yaku.push({name:'Houtei Raoyui',han:1});
-        if (lastWinMethod === 'chankan') yaku.push({name:'Chankan',han:1});
-
-        // Sanshoku Doukou: triplets of the same number in all three suits.
-        const tripletIds = new Set(triplets.map(g=>g.ids[0]));
-        for (let n=1;n<=9;n++) {
-            if ([n-1,9+n-1,18+n-1].every(id=>tripletIds.has(id))) { yaku.push({name:'Sanshoku Doukou',han:2}); break; }
-        }
-        // Sankantsu / Daisangen / Shousangen / wind yakuman.
-        const kanCountHere = (melds||[]).filter(g=>g.length===4).length;
-        if (kanCountHere >= 3) yaku.push({name:'Sankantsu',han:2});
-        const dragonTriplets = dragons.filter(id=>tripletIds.has(id)).length;
-        if (dragonTriplets === 3) yaku.push({name:'Daisangen',han:13,yakuman:true});
-        else if (dragonTriplets === 2 && dragons.some(id=>decomposition.pairId===id)) yaku.push({name:'Shousangen',han:2});
-        const windTriplets = winds.filter(id=>tripletIds.has(id)).length;
-        if (windTriplets === 4) yaku.push({name:'Daisuushi',han:26,yakuman:true});
-        else if (windTriplets === 3 && winds.some(id=>decomposition.pairId===id)) yaku.push({name:'Shousuushi',han:13,yakuman:true});
-
-        // Ryanpeikou supersedes two Iipeiko in a closed hand.
-        if (closed) {
-            const seqKeys = groups.filter(g=>g.type==='sequence').map(g=>g.ids.join('-'));
-            const freq = {}; seqKeys.forEach(k=>freq[k]=(freq[k]||0)+1);
-            const pairs = Object.values(freq).filter(v=>v>=2).length;
-            if (pairs>=2) {
-                yaku = yaku.filter(y=>!/^Iipeiko/.test(y.name));
-                yaku.push({name:'Ryanpeikou',han:3});
-            }
-        }
-
-        // Ryuuiisou: only green sou tiles plus green dragon.
-        if (allTiles.length === 14 && allTiles.every(t=>
-            (t.type==='sou' && [2,3,4,6,8].includes(t.num)) || t.id===32
-        )) yaku.push({name:'Ryuuiisou',han:13,yakuman:true});
-
-        // Chuuren Poutou (closed, one suit, exact 1112345678999 + one duplicate).
-        if (closed && hand.length===14) {
-            const suits=new Set(hand.map(t=>t.type));
-            if (suits.size===1 && [...suits][0] !== 'honor') {
-                const c=tileCounts(hand); const base=([1,1,1,1,1,1,1,1,1]);
-                let ok=true, extra=0;
-                for(let i=1;i<=9;i++){
-                    const id=(suits.has('man')?0:suits.has('pin')?9:18)+(i-1);
-                    const need=(i===1||i===9)?3:1;
-                    if(c[id]<need) ok=false;
-                    extra += c[id]-need;
-                }
-                if(ok && extra===1) yaku.push({name:'Chuuren Poutou',han:13,yakuman:true});
-            }
-        }
-        return yaku;
-    };
-
     function evaluateChiitoitsu(hand, melds, isTsumo, pIdx) {
         if ((melds || []).length) return [];
         const counts = tileCounts(hand);
@@ -2130,62 +2306,63 @@
 
     function calculateFu(decomp, hand, melds, winTile, isTsumo, pIdx, yaku) {
         if (yaku.some(y => y.name === 'Chiitoitsu')) return 25;
-        const winId = winTile?.id;
-        const seatWind = getSeatWindForPlayer(pIdx);
-        const roundWind = 'E';
         if (yaku.some(y => y.name === 'Pinfu')) return isTsumo ? 20 : 30;
 
+        const closed = (melds || []).length === 0;
         let fu = 20;
         if (isTsumo) fu += 2;
-        else if ((melds || []).length === 0) fu += 10;
+        else if (closed) fu += 10;
 
-        // Pair value: dragons, seat wind, round wind; double wind pair is 4 fu.
-        const pairId = decomp?.pairId;
-        const pairTile = Number.isInteger(pairId) ? TILE_TYPES[pairId] : null;
-        if (pairTile?.type === 'honor') {
-            const isDragon = pairId >= 31;
-            const isSeat = pairId === 27 + WIND_ORDER.indexOf(seatWind);
-            const isRound = pairId === 27 + WIND_ORDER.indexOf(roundWind);
-            if (isDragon || isSeat || isRound) fu += (isSeat && isRound) ? 4 : 2;
-        }
+        if (isValuePair(decomp.pairId, PLAYER_SEAT_WINDS[pIdx] || 'S', 'E')) fu += 2;
 
         const allGroups = [
-            ...((decomp?.groups || []).map(g => ({ ...g, open: false }))),
-            ...((melds || []).map(g => ({
-                type: g.length === 4 || g.every(t => t.id === g[0].id) ? 'triplet' : 'sequence',
-                ids: g.map(t => t.id), open: true
-            })))
+            ...decomp.groups.map(g => ({ ...g, open: false })),
+            ...((melds || []).map(g => ({ type: g.every(t => t.id === g[0].id) ? 'triplet' : 'sequence', ids: g.map(t => t.id), open: true })))
         ];
-
         for (const g of allGroups) {
             if (g.type !== 'triplet') continue;
             const t = TILE_TYPES[g.ids[0]];
             const terminalHonor = isTerminalOrHonor(t);
+            const open = g.open;
             const isKan = g.ids.length === 4;
-            if (isKan) fu += terminalHonor ? (g.open ? 16 : 32) : (g.open ? 8 : 16);
-            else fu += terminalHonor ? (g.open ? 4 : 8) : (g.open ? 2 : 4);
+            if (isKan) fu += terminalHonor ? (open ? 16 : 32) : (open ? 8 : 16);
+            else fu += terminalHonor ? (open ? 4 : 8) : (open ? 2 : 4);
         }
 
-        // Wait fu: tanki / kanchan / penchan = 2 fu; ryanmen = 0.
-        if (Number.isInteger(winId) && Number.isInteger(pairId) && pairId === winId) {
-            fu += 2;
-        } else if (Number.isInteger(winId)) {
-            const seq = (decomp?.groups || []).find(g => g.type === 'sequence' && g.ids.includes(winId));
-            if (seq) {
-                const nums = seq.ids.map(id => TILE_TYPES[id].num).sort((a,b) => a-b);
-                const n = TILE_TYPES[winId].num;
-                const edgeWait = (nums[0] === 1 && n === 3) || (nums[0] === 7 && n === 7);
-                const middleWait = nums[1] === n;
-                if (edgeWait || middleWait) fu += 2;
-            }
+        if (decomp.groups.every(g => g.type === 'sequence') &&
+            sequenceIsEdgeWait(decomp.groups.find(g => g.ids.includes(winTile.id))?.ids || [], winTile.id)) {
+            fu += 0; // ryanmen has no extra fu
+        } else {
+            fu += 2; // tanki / kanchan / penchan
         }
 
         return Math.max(20, Math.ceil(fu / 10) * 10);
     }
 
     function calculateRiichiPoints(han, fu, isDealer, isTsumo) {
-        const p = calculateWinPayments(han, fu, isDealer, isTsumo);
-        return { total: p.total, detail: p.detail };
+        if (han >= 13) return isTsumo
+            ? (isDealer ? { total: 24000, detail: 'Semua lawan bayar 8000' } : { total: 16000, detail: 'Oya bayar 8000, Ko masing-masing 4000' })
+            : { total: isDealer ? 48000 : 32000, detail: 'Bayaran Yakuman dari lawan' };
+
+        let basePoint;
+        if (han >= 11) basePoint = 6000;
+        else if (han >= 8) basePoint = 4000;
+        else if (han >= 6) basePoint = 3000;
+        else if (han >= 5 || (han === 4 && fu >= 40) || (han === 3 && fu >= 70)) basePoint = 2000;
+        else basePoint = Math.min(fu * Math.pow(2, han + 2), 2000);
+
+        if (isTsumo) {
+            if (isDealer) {
+                const pay = ceil100(basePoint * 2);
+                return { total: pay * 3, detail: `Setiap Ko bayar ${pay}` };
+            }
+            const payDealer = ceil100(basePoint * 2);
+            const payOther = ceil100(basePoint);
+            return { total: payDealer + payOther * 2, detail: `Oya: ${payDealer}, Ko: ${payOther}` };
+        }
+
+        const pay = ceil100(basePoint * (isDealer ? 6 : 4));
+        return { total: pay, detail: `Lawan bayar ${pay}` };
     }
 
     function evaluateRiichiHand(pIdx, winningTile, isTsumo) {
@@ -2369,7 +2546,7 @@
 
     function updateScoresUI() {
         for (let i = 0; i < 4; i++) setText(`score-${i}`, playerScores[i]);
-        setText('riichi-stick-counter', `1000 × ${riichiSticks}`); setText('kan-info', `Rinshan 4 • Kandora ${doraIndicators?.length||0} • Honba ${honbaCount}`);
+        setText('riichi-stick-counter', `1000 × ${riichiSticks}`);
     }
 
     // GAME INITIALIZATION
@@ -2380,12 +2557,7 @@
         aiDifficulty = diff;
         isMultiplayerMode = isMultiplayer;
         currentRoundIndex = 0;
-        currentDealerIdx = 1; // East starts as dealer
         playerScores = [25000, 25000, 25000, 25000];
-        honbaCount = 0;
-        riichiSticks = 0;
-        roundOutcome = null;
-        matchFinished = false;
         
         nav('screen-game');
         setupRound();
@@ -2421,14 +2593,11 @@
         playerRivers = [[], [], [], []];
         playerMelds = [[], [], [], []]; 
         aiRiichi = [false, false, false, false];
-        ippatsuEligible = [false,false,false,false];
-        doubleRiichiEligible = [false,false,false,false];
-        lastWinMethod = null;
         temporaryFuriten = [false, false, false, false];
         riichiFuriten = [false, false, false, false];
         pendingPlayerActions = [];
         riichiDiscardIndices = [];
-        isRiichi = false; pendingRiichi = false;
+        isRiichi = false; pendingRiichi = false; riichiSticks = 0;
         lastDiscardedTile = null; lastDiscarderIdx = -1;
         drawnTile = null; isDiscardable = false; isActionPhase = false;
         setDisplay('riichi-effect', 'none'); byId('game-board')?.classList.remove('riichi-active');
@@ -2455,7 +2624,7 @@
 
         renderEnemyHands();
         updateHandStatus();
-        currentTurn = currentDealerIdx;
+        currentTurn = 0;
         roundActive = true;
         roundEnding = false;
         processTurn();
@@ -2723,8 +2892,9 @@
                 canRevealUraDora = aiRiichi[currentTurn];
                 let evalScore = evaluateYakuAndScore(currentTurn, null, true);
                 if (!evalScore.valid) { /* structural agari without yaku: continue play */ } else {
+                playerScores[currentTurn] += evalScore.points;
                 let pNames = ["You", "P1 (East)", "P2 (North)", "P3 (West)"];
-                applyWinSettlement(currentTurn, null, evalScore, 'tsumo', `TSUMO by ${pNames[currentTurn]}!`);
+                endRound(`TSUMO by ${pNames[currentTurn]}!`, `${evalScore.yakuStr} - ${evalScore.points} Pts`);
                 return;
                 }
             }
@@ -2734,7 +2904,6 @@
                 aiRiichi[currentTurn] = true;
                 playerScores[currentTurn] -= 1000;
                 riichiSticks++;
-                markRiichiDeclared(currentTurn, playerRivers[currentTurn].length===0);
                 updateScoresUI();
             }
             
@@ -2752,7 +2921,13 @@
                     discardIdx = hand.indexOf(drawnTile);
                     if (discardIdx === -1) discardIdx = hand.length - 1;
                 } else {
-                    discardIdx = chooseAIDiscardIndexV24(currentTurn);
+                    // Smart Discard: Prioritize isolated Honor tiles -> Terminals (1/9)
+                    let honorIdx = hand.findIndex(t => t.type === 'honor');
+                    let terminalIdx = hand.findIndex(t => t.num === 1 || t.num === 9);
+                    
+                    if (honorIdx !== -1) discardIdx = honorIdx;
+                    else if (terminalIdx !== -1) discardIdx = terminalIdx;
+                    else discardIdx = Math.floor(Math.random() * hand.length);
                 }
 
                 let discarded = hand.splice(discardIdx, 1)[0];
@@ -2760,85 +2935,6 @@
                 commitDiscard(currentTurn, discarded);
             }, delay);
         }
-    }
-
-    // ---------- Shanten / Ukeire AI ----------
-    const __shantenMemoV24 = new Map();
-    function calculateStandardShantenV24(tiles, openMelds=0) {
-        const counts = tileCounts(tiles);
-        const key = counts.join('') + '|' + openMelds;
-        if (__shantenMemoV24.has(key)) return __shantenMemoV24.get(key);
-        let best = 8 - openMelds * 2;
-        const c = counts.slice();
-        function dfs(idx, m, t, pair) {
-            while(idx<34 && c[idx]===0) idx++;
-            if(idx>=34){
-                const mm=Math.min(4,m+openMelds), tt=Math.min(t,4-mm);
-                best=Math.min(best,8-mm*2-tt-pair);
-                return;
-            }
-            // Skip tile.
-            const saved=c[idx]; c[idx]=0; dfs(idx+1,m,t,pair); c[idx]=saved;
-            if(c[idx]>=3){c[idx]-=3;dfs(idx,m+1,t,pair);c[idx]+=3;}
-            if(pair===0 && c[idx]>=2){c[idx]-=2;dfs(idx,m,t,1);c[idx]+=2;}
-            if(c[idx]>=2){c[idx]-=2;dfs(idx,m,t+1,pair);c[idx]+=2;}
-            if(idx<27 && idx%9<=6 && c[idx+1]>0 && c[idx+2]>0){c[idx]--;c[idx+1]--;c[idx+2]--;dfs(idx,m+1,t,pair);c[idx]++;c[idx+1]++;c[idx+2]++;}
-            if(idx<27 && idx%9<=7 && c[idx+1]>0){c[idx]--;c[idx+1]--;dfs(idx,m,t+1,pair);c[idx]++;c[idx+1]++;}
-            if(idx<27 && idx%9<=6 && c[idx+2]>0){c[idx]--;c[idx+2]--;dfs(idx,m,t+1,pair);c[idx]++;c[idx+2]++;}
-        }
-        dfs(0,0,0,0);
-        return __shantenMemoV24.set(key,best).get(key);
-    }
-    function calculateShantenV24(tiles, openMelds=0){
-        const counts=tileCounts(tiles);
-        const standard=calculateStandardShantenV24(tiles,openMelds);
-        if(openMelds===0){
-            const distinct=counts.filter(c=>c>0).length;
-            const pairs=counts.filter(c=>c>=2).length;
-            const chiitoi=6-pairs+Math.max(0,7-distinct);
-            const terminals=[0,8,9,17,18,26,27,28,29,30,31,32,33];
-            const unique=terminals.filter(id=>counts[id]>0).length;
-            const hasPair=terminals.some(id=>counts[id]>=2);
-            const kokushi=13-unique-(hasPair?1:0);
-            return Math.min(standard,chiitoi,kokushi);
-        }
-        return standard;
-    }
-    function getAvailableTileCountV24(id){
-        return (fullDeck||[]).reduce((n,t)=>n+(t.id===id?1:0),0);
-    }
-    function getUkeireForDiscardV24(hand13, openMelds, baseShanten){
-        let total=0;
-        for(const t of TILE_TYPES){
-            const c=tileCounts(hand13); if(c[t.id]>=4) continue;
-            const next=calculateShantenV24([...hand13,t],openMelds);
-            if(next<baseShanten) total+=getAvailableTileCountV24(t.id);
-        }
-        return total;
-    }
-    function isSafeAgainstRiichiV24(tileId, selfIdx){
-        for(let p=0;p<4;p++) if(p!==selfIdx && (aiRiichi[p]|| (p===0&&isRiichi))) {
-            if((playerRivers[p]||[]).some(t=>t.id===tileId)) return true;
-        }
-        return false;
-    }
-    function chooseAIDiscardIndexV24(pIdx){
-        const hand=playerHands[pIdx]||[]; if(hand.length<=1)return 0;
-        if(aiRiichi[pIdx]){
-            const d=hand.indexOf(drawnTile); return d>=0?d:hand.length-1;
-        }
-        let best=null;
-        for(let i=0;i<hand.length;i++){
-            const h13=hand.filter((_,j)=>j!==i);
-            const sh=calculateShantenV24(h13,playerMelds[pIdx].length);
-            const uke=getUkeireForDiscardV24(h13,playerMelds[pIdx].length,sh);
-            const t=hand[i];
-            const isolated=(t.type==='honor'||t.num===1||t.num===9)?1:0;
-            const safe=isSafeAgainstRiichiV24(t.id,pIdx)?1:0;
-            const key=[-sh, uke, safe, isolated, -(t.type==='honor'?0:1)];
-            if(!best || key.some((v,k)=>v>(best.key[k]||-Infinity) && key.slice(0,k).every((x,j)=>x===best.key[j]))) best={i,key,sh,uke};
-        }
-        return best?.i ?? 0;
     }
 
     function discardTile(index) {
@@ -2897,8 +2993,10 @@
                 if (isWin) {
                     let evalScore = evaluateYakuAndScore(p, tile, false);
                     if (!evalScore.valid) continue;
+                    playerScores[p] += evalScore.points;
+                    playerScores[pIdx] -= evalScore.points;
                     let pNames = ["You", "Player 1 (East)", "Player 2 (North)", "Player 3 (West)"];
-                    applyWinSettlement(p, pIdx, evalScore, 'ron', `RON by ${pNames[p]}!`);
+                    endRound(`RON by ${pNames[p]}!`, `${evalScore.yakuStr} (+${evalScore.points} Pts paid by ${pNames[pIdx]})`);
                     return;
                 }
             }
@@ -2983,9 +3081,13 @@
             pendingPlayerActions = [];
             riichiDiscardIndices = [];
             canRevealUraDora = isRiichi;
-            const evalScore = evaluateYakuAndScore(0, act === 'Ron' ? lastDiscardedTile : null, act === 'Tsumo');
-            if (!evalScore.valid) return;
-            applyWinSettlement(0, act === 'Ron' ? lastDiscarderIdx : null, evalScore, act === 'Tsumo' ? 'tsumo' : 'ron', `${act.toUpperCase()} WIN!`);
+            let evalScore = evaluateYakuAndScore(0, act === 'Ron' ? lastDiscardedTile : null, act === 'Tsumo');
+            if (!evalScore.valid || evalScore.points <= 0) return;
+            playerScores[0] += evalScore.points;
+            if (act === 'Ron' && lastDiscarderIdx !== -1) {
+                playerScores[lastDiscarderIdx] -= evalScore.points;
+            }
+            endRound(`${act.toUpperCase()} WIN!`, `${evalScore.yakuStr} (+${evalScore.points} Poin)\n${evalScore.detail}`);
             return;
         }
         
@@ -3026,7 +3128,6 @@
     }
 
     function executePon(playerIdx) {
-        cancelIppatsuForAll();
         let count = 0, indicesToRemove = [];
         for (let i = playerHands[playerIdx].length - 1; i >= 0; i--) {
             if (playerHands[playerIdx][i].id === lastDiscardedTile.id && count < 2) {
@@ -3092,7 +3193,6 @@
     }
 
     function executeKan(playerIdx) {
-        cancelIppatsuForAll();
         if (!lastDiscardedTile || kanCount >= 4) return false;
         const a = takeTilesById(playerHands[playerIdx], lastDiscardedTile.id, 3);
         if (a.length !== 3) return false;
@@ -3101,7 +3201,6 @@
     }
 
     function executeAnkan(playerIdx, tileId) {
-        cancelIppatsuForAll();
         if (!roundActive || roundEnding || kanCount >= 4) return false;
         const a = takeTilesById(playerHands[playerIdx], tileId, 4);
         if (a.length !== 4) {
@@ -3122,30 +3221,10 @@
         return continueAfterKanDraw(playerIdx);
     }
 
-    function tryChankanV24(playerIdx, tile) {
-        if (!tile || !roundActive || roundEnding) return false;
-        for (let p=0;p<4;p++) {
-            if (p===playerIdx) continue;
-            const isHuman = p===0 || roomCanAct?.(p);
-            const canRon = checkWinningHand([...(playerHands[p]||[]), tile], (playerMelds[p]||[]).length);
-            if (!canRon) continue;
-            lastWinMethod='chankan';
-            const ev=evaluateYakuAndScore(p,tile,false);
-            if (!ev.valid) { lastWinMethod=null; continue; }
-            if (p===0 && checkFuriten(tile.id)) { lastWinMethod=null; continue; }
-            applyWinSettlement(p,playerIdx,ev,'ron',`CHANKAN by ${p===0?'You':`Player ${p+1}`}!`,'Kan dibatalkan karena tile Kan menjadi winning tile.');
-            return true;
-        }
-        return false;
-    }
-
     function executeShouminkan(playerIdx, meldIndex) {
-        cancelIppatsuForAll();
         if (!roundActive || roundEnding || kanCount >= 4) return false;
         const g = playerMelds[playerIdx][meldIndex];
         if (!g || g.length !== 3 || !g.every(t => t.id === g[0].id)) return false;
-        const candidate = playerHands[playerIdx].find(t => t.id === g[0].id);
-        if (candidate && tryChankanV24(playerIdx, candidate)) return true;
         const i = playerHands[playerIdx].findIndex(t => t.id === g[0].id);
         if (i < 0) return false;
         g.push(playerHands[playerIdx].splice(i, 1)[0]);
@@ -3170,7 +3249,6 @@
     }
 
     function executeChi(playerIdx) {
-        cancelIppatsuForAll();
         const combos = getChiCombinations(playerHands[playerIdx], lastDiscardedTile);
         const chosenCombo = combos[0];
         if (!chosenCombo || !lastDiscardedTile) return;
@@ -3214,23 +3292,33 @@
 
     function settleExhaustiveDraw() {
         if (!roundActive || roundEnding) return;
-        const tenpai = [0,1,2,3].map(getPlayerTenpaiStatus);
-        const readyPlayers = tenpai.map((v,i)=>v?i:-1).filter(i=>i!==-1);
-        const notenPlayers = tenpai.map((v,i)=>!v?i:-1).filter(i=>i!==-1);
-        const deltas=[0,0,0,0];
-        let description='';
-        if (readyPlayers.length>0 && readyPlayers.length<4) {
-            const gain=3000/readyPlayers.length, loss=3000/notenPlayers.length;
-            readyPlayers.forEach(p=>{playerScores[p]+=gain;deltas[p]+=gain;});
-            notenPlayers.forEach(p=>{playerScores[p]-=loss;deltas[p]-=loss;});
+
+        const tenpai = [0, 1, 2, 3].map(getPlayerTenpaiStatus);
+        const readyPlayers = tenpai.map((v, i) => v ? i : -1).filter(i => i !== -1);
+        const notenPlayers = tenpai.map((v, i) => !v ? i : -1).filter(i => i !== -1);
+
+        let description = '';
+
+        if (readyPlayers.length > 0 && readyPlayers.length < 4) {
+            const gain = 3000 / readyPlayers.length;
+            const loss = 3000 / notenPlayers.length;
+            readyPlayers.forEach(p => { playerScores[p] += gain; });
+            notenPlayers.forEach(p => { playerScores[p] -= loss; });
+
             updateScoresUI();
-            description=`Tenpai: ${readyPlayers.map(p=>['You','Player 1','Player 2','Player 3'][p]).join(', ')}. +${gain.toLocaleString('id-ID')} per Tenpai; -${loss.toLocaleString('id-ID')} per Noten.`;
-        } else if(readyPlayers.length===4) description='Semua pemain Tenpai. Tidak ada pembayaran Tenpai/Noten.';
-        else description='Tidak ada pemain Tenpai. Tidak ada pembayaran Tenpai/Noten.';
-        const dealerTenpai=tenpai[currentDealerIdx]===true;
-        roundOutcome={kind:'draw',winner:null,loser:null,method:'draw',dealerWon:false,dealerTenpai,honbaUsed:honbaCount,kyotakuClaimed:0,deltas,beforeScores:[...roundStartScores]};
-        const readyCount=readyPlayers.length;
-        endRound(readyCount>0?`RYUUKYOKU • ${readyCount} TENPAI`:'RYUUKYOKU • SEMUA NOTEN',`${description}\nDealer: ${dealerTenpai?'TENPAI → RENCHAN':'NOTEN → dealer berpindah'}.`);
+
+            const names = ['You (South)', 'Player 1 (East)', 'Player 2 (North)', 'Player 3 (West)'];
+            const readyNames = readyPlayers.map(p => names[p]).join(', ');
+            description = `Tenpai: ${readyNames}. Masing-masing +${gain.toLocaleString('id-ID')} poin; Noten membayar total 3000 poin.`;
+        } else if (readyPlayers.length === 4) {
+            description = 'Semua pemain Tenpai. Tidak ada pembayaran Tenpai/Noten.';
+        } else {
+            description = 'Tidak ada pemain Tenpai. Tidak ada pembayaran Tenpai/Noten.';
+        }
+
+        const readyCount = readyPlayers.length;
+        const title = readyCount > 0 ? `RYUUKYOKU • ${readyCount} TENPAI` : 'RYUUKYOKU • SEMUA NOTEN';
+        endRound(title, description);
     }
 
     // ROUND END & EXTENSION MECHANICS
@@ -3329,12 +3417,6 @@
         const scoreBox = byId('res-scores');
         if (scoreBox) scoreBox.innerHTML = scoreHtml;
         setDisplay('modal-result', 'flex');
-        const nextBtn = byId('next-round-btn');
-        if (nextBtn) {
-            const nextRoundNo = currentRoundIndex + 2;
-            nextBtn.textContent = (currentRoundIndex < 4 || (currentRoundIndex === 4 && Math.max(...playerScores) < 30000)) ? `LANJUT KE ROUND KE-${nextRoundNo}  ›` : 'SELESAIKAN PERMAINAN  ›';
-        }
-        if (!roundOutcome) roundOutcome = {kind: isDraw ? 'draw' : 'win', dealerWon:false, dealerTenpai:false};
     }
 
     function nextRoundOrFinish() {
@@ -3342,28 +3424,16 @@
         setDisplay('modal-result', 'none');
         document.getElementById('hand-status')?.classList.remove('action-open');
         pendingPlayerActions = [];
-        const outcome = roundOutcome || {};
-        const maxScore = Math.max(...playerScores);
-
-        // Every hand advances East 1 → East 2 → ...; dealer may renchan without changing seat.
         currentRoundIndex++;
-        if (outcome.kind === 'win') {
-            if (outcome.dealerWon) honbaCount += 1;
-            else { honbaCount = 0; currentDealerIdx = SEAT_ORDER_V24[(SEAT_ORDER_V24.indexOf(currentDealerIdx)+1)%4]; }
-        } else if (outcome.kind === 'draw') {
-            honbaCount += 1;
-            if (!outcome.dealerTenpai) currentDealerIdx = SEAT_ORDER_V24[(SEAT_ORDER_V24.indexOf(currentDealerIdx)+1)%4];
-        }
-
-        // East 1-4, plus one extension hand when no player has reached 30k yet.
-        const shouldContinue = currentRoundIndex < 4 || (currentRoundIndex === 4 && maxScore < 30000);
-        if (shouldContinue) {
+        
+        // Standard match flow: East 1-4, with East 5 extra only when the configured extension condition is met.
+        let maxScore = Math.max(...playerScores);
+        if (currentRoundIndex < 4 || (currentRoundIndex === 4 && maxScore < 30000)) {
+            nav('screen-game');
             nav('screen-game');
             setupRound();
         } else {
-            matchFinished = true;
-            const finalPlace = [...playerScores].sort((a,b)=>b-a).indexOf(playerScores[0])+1;
-            alert(`Permainan Selesai!\nPeringkat Anda: #${finalPlace}\nSkor Akhir: ${Math.round(playerScores[0]).toLocaleString('id-ID')}`);
+            alert("Permainan Selesai!\nSkor Akhir Anda: " + playerScores[0]);
             nav('screen-main');
         }
     }
@@ -3390,10 +3460,9 @@
         playerRivers[pIdx].push(tile);lastDiscardedTile=tile;lastDiscarderIdx=pIdx;
         const riverIds=['river-bottom','river-right','river-top','river-left'],riverEl=byId(riverIds[pIdx]);
         const d=document.createElement('div');d.className=`discard-tile tile-${tile.type}`;d.dataset.tileId=String(tile.id);d.innerHTML=tileMarkup(tile);if(riverEl)riverEl.appendChild(d);
-        if(pIdx===0&&pendingRiichi){isRiichi=true;pendingRiichi=false;riichiDiscardIndices=[];playerScores[0]-=1000;riichiSticks++;markRiichiDeclared(0, playerRivers[0].length===1);d.classList.add('riichi-tile');setDisplay('riichi-effect','block'); byId('game-board')?.classList.add('riichi-active');}
+        if(pIdx===0&&pendingRiichi){isRiichi=true;pendingRiichi=false;riichiDiscardIndices=[];playerScores[0]-=1000;riichiSticks++;d.classList.add('riichi-tile');setDisplay('riichi-effect','block'); byId('game-board')?.classList.add('riichi-active');}
         if(pIdx!==0&&aiRiichi[pIdx]&&playerRivers[pIdx].length===1)d.classList.add('riichi-tile');
         if(temporaryFuriten[pIdx])temporaryFuriten[pIdx]=false;
-        if(ippatsuEligible[pIdx] && (isRiichi || aiRiichi[pIdx]) && playerRivers[pIdx].length>1) ippatsuEligible[pIdx]=false;
         const human=mpRoomHumanSeats().filter(x=>x!==pIdx);
         const ron=human.filter(x=>checkWinningHand([...playerHands[x],tile],playerMelds[x].length)&&evaluateYakuAndScore(x,tile,false).valid&&!checkSeatFuriten(x,tile.id));
         if(ron.length){mpPendingCallQueue=ron.map(x=>({seat:x}));mpPromptNextNetworkCall();mpBroadcastState();return;}
@@ -3452,7 +3521,7 @@ window.addEventListener('pointerdown',()=>{try{if(typeof startChineseMusic==='fu
 </script>
 
 <script>
-/* FINAL responsive sizing — single source of truth for gameplay tiles. */
+/* v19 responsive sizing: derive touch-safe tile size from the actual viewport width. */
 (function(){
   function syncMahyongSizing(){
     const b=document.getElementById('game-board');
@@ -3461,30 +3530,25 @@ window.addEventListener('pointerdown',()=>{try{if(typeof startChineseMusic==='fu
     const w=Math.max(1,vv?.width||window.innerWidth);
     const h=Math.max(1,vv?.height||window.innerHeight);
     const landscape=w>h;
-
     let tileW;
     if(landscape){
-      /* Slightly larger than the reference for comfortable iPhone touch. */
-      tileW=Math.min(46,Math.max(38,(w-86)/17.2));
-      if(h<430) tileW=Math.min(tileW,42.5);
+      tileW=Math.min(50,Math.max(33,(w-34)/14.6));
+      if(h<460) tileW=Math.min(tileW,45);
     }else{
-      tileW=Math.min(40,Math.max(29,(w-22)/15));
+      tileW=Math.min(43,Math.max(29,(w-24)/14.8));
     }
-
     b.style.setProperty('--tile-w',tileW.toFixed(2)+'px');
     b.style.setProperty('--tile-h',(tileW*1.42).toFixed(2)+'px');
-    b.style.setProperty('--discard-w',(tileW*.54).toFixed(2)+'px');
-    b.style.setProperty('--discard-h',(tileW*.79).toFixed(2)+'px');
-
-    const center=Math.max(104,Math.min(132,tileW*2.72));
-    const sideOffset=center/2+tileW*3.15;
-    b.style.setProperty('--table-center',center.toFixed(2)+'px');
-    b.style.setProperty('--river-side',sideOffset.toFixed(2)+'px');
+    b.style.setProperty('--discard-w',(tileW*.57).toFixed(2)+'px');
+    b.style.setProperty('--discard-h',(tileW*.80).toFixed(2)+'px');
+    // Keep side rivers a consistent distance from the center on every aspect ratio.
+    const center=Math.max(108, Math.min(196, tileW*3.1));
+    const sideOffset=center/2 + tileW*3.15;
+    b.style.setProperty('--side-river-inset',sideOffset.toFixed(2)+'px');
   }
-
   syncMahyongSizing();
   window.addEventListener('resize',syncMahyongSizing,{passive:true});
-  window.addEventListener('orientationchange',()=>setTimeout(syncMahyongSizing,100),{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(syncMahyongSizing,90),{passive:true});
   window.visualViewport?.addEventListener('resize',syncMahyongSizing,{passive:true});
 })();
 </script>
