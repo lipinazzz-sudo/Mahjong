@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="22.0-mahyong-dj">
+    <meta name="app-version" content="25.0-mahyong-dj">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
     <meta name="description" content="Majong DJ - HongKong Mahjong dengan AI dan Cloudflare multiplayer.">
@@ -14,9 +14,9 @@
 .modal{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.70);backdrop-filter:blur(8px)}.modal-box{width:min(94vw,500px);padding:20px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(180deg,#231d19,#100e0c);box-shadow:0 30px 80px rgba(0,0,0,.5)}.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.modal-kicker{font-size:9px;color:#e3b762;font-weight:900;letter-spacing:.16em}.modal-title{font-size:21px;font-weight:900;margin-top:3px}.modal-copy{margin-top:5px;color:var(--muted);font-size:11px;line-height:1.45}.field-label{font-size:11px;color:var(--muted)}.field-input{width:100%;padding:11px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:#14110f;color:#fff;outline:none}.field-input:focus{border-color:#dbad5b}.mp-setup,.mp-room-panel,.lobby-actions{display:grid;gap:10px}.mp-p2p-choice{display:grid;grid-template-columns:1fr 1fr;gap:8px}.p2p-card{display:grid;gap:8px;padding:12px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.035);border-radius:12px}.p2p-card-title{font-size:10px;font-weight:900;color:#e3b762;letter-spacing:.1em;text-transform:uppercase}.room-share-big strong{display:block;font-size:31px;letter-spacing:5px;color:#f3c978}.p2p-row{display:flex;gap:8px;position:relative;z-index:5}.p2p-row .field-input{flex:1}.share-link-btn{position:relative;z-index:6;pointer-events:auto;touch-action:manipulation;cursor:pointer;white-space:nowrap}.p2p-mini,.mp-hint{color:#958b80;font-size:10px;line-height:1.4}.connection-badge{padding:5px 8px;border-radius:999px;font-size:9px;font-weight:900;border:1px solid rgba(255,255,255,.12)}.connection-badge.online{color:#7bedb7;background:rgba(35,132,87,.18);border-color:rgba(92,230,159,.35)}.connection-badge.offline{color:#ff9b91;background:rgba(140,43,37,.16);border-color:rgba(255,120,110,.28)}.ready-player-list{display:grid;gap:7px;margin-top:12px}.ready-item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 11px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.035);font-size:12px}.status-ready{color:#74e5ae;font-weight:900}.status-waiting{color:#ffb39d;font-weight:900}.signal-qr{display:block;width:180px;height:180px;margin:auto;background:#fff;border-radius:8px;padding:5px}.signal-qr:not(.visible){visibility:hidden}.reconnect-card{display:grid;gap:6px;padding:10px;border-radius:9px;border:1px solid rgba(232,174,73,.28);background:rgba(185,116,28,.08)}
 
 #screen-game{padding:0}.game-shell{position:relative;width:100vw;height:100dvh;overflow:hidden;background:#0b0a09}.table-plane{position:absolute;left:10.5vw;right:10.5vw;top:7vh;bottom:7vh;transform:perspective(1200px) rotateX(9deg);transform-origin:center;pointer-events:none}.table-plane::before{content:"";position:absolute;inset:0;border-radius:32px;background:linear-gradient(150deg,#6f4c44,#38455a 46%,#202a38);box-shadow:0 24px 48px rgba(0,0,0,.46),inset 0 0 0 2px rgba(255,235,208,.11),inset 0 0 0 9px rgba(0,0,0,.15)}.table-plane::after{content:"";position:absolute;inset:15px;border-radius:24px;border:1px solid rgba(120,220,230,.10);box-shadow:inset 0 0 40px rgba(0,0,0,.28),inset 0 0 0 1px rgba(242,196,95,.05)}
-#game-board{position:absolute;inset:0;overflow:hidden;--sideInset:clamp(92px,min(15vw,23vh),220px);--focus-pan-y:-15px}.topbar{position:absolute;left:14px;right:14px;top:10px;z-index:50;display:flex;justify-content:space-between;align-items:flex-start}.dora-panel{width:140px;padding:6px 7px;border-radius:10px;border:1px solid rgba(255,224,178,.2);background:rgba(20,15,13,.86);box-shadow:0 8px 22px rgba(0,0,0,.28);backdrop-filter:blur(10px)}.hud-label{font-size:7px;letter-spacing:.12em;color:#d6cabd;font-weight:900;text-transform:uppercase}.dora-tiles{display:flex;gap:3px;margin-top:3px}.dora-tile-box{width:18px;height:24px;border-radius:3px;background:#9a5428;border:1px solid #61321b}.dora-tile-box.dora-open{background:#f2ede3;color:#141313;display:grid;place-items:center}.dora-tile-box .tile-svg-img{width:100%;height:100%;object-fit:contain}.stick-counters{display:flex;justify-content:space-between;margin-top:4px;font-size:7px;color:#c1b6aa}.kan-info{margin-top:2px;font-size:7px;color:#76d8c9}.top-right-btns{display:flex;gap:6px}.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(20,17,15,.8);color:#fff}
+#game-board{position:absolute;inset:0;overflow:hidden;--sideInset:clamp(92px,min(15vw,23vh),220px);--focus-pan-y:-25px}.topbar{position:absolute;left:14px;right:14px;top:10px;z-index:50;display:flex;justify-content:space-between;align-items:flex-start}.dora-panel{width:140px;padding:6px 7px;border-radius:10px;border:1px solid rgba(255,224,178,.2);background:rgba(20,15,13,.86);box-shadow:0 8px 22px rgba(0,0,0,.28);backdrop-filter:blur(10px)}.hud-label{font-size:7px;letter-spacing:.12em;color:#d6cabd;font-weight:900;text-transform:uppercase}.dora-tiles{display:flex;gap:3px;margin-top:3px}.dora-tile-box{width:18px;height:24px;border-radius:3px;background:#9a5428;border:1px solid #61321b}.dora-tile-box.dora-open{background:#f2ede3;color:#141313;display:grid;place-items:center}.dora-tile-box .tile-svg-img{width:100%;height:100%;object-fit:contain}.stick-counters{display:flex;justify-content:space-between;margin-top:4px;font-size:7px;color:#c1b6aa}.kan-info{margin-top:2px;font-size:7px;color:#76d8c9}.top-right-btns{display:flex;gap:6px}.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(20,17,15,.8);color:#fff}
 .round-hud-shell{position:absolute;top:10px;right:106px;left:auto;transform:none;z-index:48;min-width:88px;text-align:center;padding:5px 8px;border-radius:10px;background:rgba(15,13,12,.72);border:1px solid rgba(255,255,255,.10)}.round-hud-title{font-size:8px;font-weight:950;letter-spacing:.11em}.round-hud-sub{font-size:6px;letter-spacing:.14em;color:#a79c92;margin-top:2px}
-.player-seat{position:absolute;z-index:35;display:flex;flex-direction:column;align-items:center;text-align:center}.avatar-img{width:clamp(34px,min(5vw,6vh),48px);height:clamp(34px,min(5vw,6vh),48px);border-radius:12px;border:2px solid #dfb158;background:radial-gradient(circle at 34% 28%,#ffdb86,#8e4d27 50%,#261714 100%);box-shadow:0 7px 20px rgba(0,0,0,.34)}.avatar-name{margin-top:4px;padding:3px 7px;border-radius:7px;font-size:9px;font-weight:900;background:rgba(13,11,10,.86);border:1px solid rgba(255,255,255,.08);white-space:nowrap}.seat-direction{opacity:.65}.time-bank-tag{margin-top:3px;font-size:8px;color:#f0c66b}.pos-bottom{left:clamp(18px,8vw,125px);bottom:calc(var(--tileH) + 7px);transform:none;align-items:center}.pos-top{top:20px;right:clamp(180px,17vw,250px);left:auto;transform:translateY(var(--focus-pan-y))}.pos-left{left:4.2vw;top:50%;transform:translateY(calc(-50% + var(--focus-pan-y)))}.pos-right{right:4.2vw;top:50%;transform:translateY(calc(-50% + var(--focus-pan-y)))}
+.player-seat{position:absolute;z-index:35;display:flex;flex-direction:column;align-items:center;text-align:center}.avatar-img{width:clamp(34px,min(5vw,6vh),48px);height:clamp(34px,min(5vw,6vh),48px);border-radius:12px;border:2px solid #dfb158;background:radial-gradient(circle at 34% 28%,#ffdb86,#8e4d27 50%,#261714 100%);box-shadow:0 7px 20px rgba(0,0,0,.34)}.avatar-name{margin-top:4px;padding:3px 7px;border-radius:7px;font-size:9px;font-weight:900;background:rgba(13,11,10,.86);border:1px solid rgba(255,255,255,.08);white-space:nowrap}.seat-direction{opacity:.65}.time-bank-tag{margin-top:3px;font-size:8px;color:#f0c66b}.pos-bottom{left:clamp(18px,8vw,125px);bottom:calc(var(--tileH) + 7px);transform:none;align-items:center}.pos-top{top:30px;right:calc(clamp(180px,17vw,250px) + 20px);left:auto;transform:translateY(var(--focus-pan-y))}.pos-left{left:4.2vw;top:50%;transform:translateY(calc(-50% + var(--focus-pan-y)))}.pos-right{right:4.2vw;top:50%;transform:translateY(calc(-50% + var(--focus-pan-y)))}
 .tile-back{display:block;border-radius:3px;border:1px solid #6c3b1e;background:linear-gradient(160deg,#d47d35,#8c3d12);box-shadow:inset 0 1px 0 rgba(255,236,197,.25),0 1px 3px rgba(0,0,0,.28)}.enemy-hand-count{display:flex;justify-content:center;gap:1px;margin-top:3px;min-height:12px;max-width:96px;overflow:hidden}.enemy-hand-count .mini-back{width:5px;height:9px;border-radius:1.5px;background:linear-gradient(160deg,#d47d35,#8c3d12);border:1px solid #6c3b1e;box-shadow:0 1px 2px rgba(0,0,0,.25)}.enemy-hand-count .hand-count-label{margin-left:3px;padding:2px 5px;border-radius:5px;background:rgba(13,11,10,.88);color:#f2d18b;font-size:10px;font-weight:900;line-height:12px;border:1px solid rgba(255,255,255,.08);white-space:nowrap}.enemy-meld-summary{display:none}.enemy-melds-visible{display:flex;justify-content:center;gap:3px;margin-top:3px;pointer-events:none}.enemy-meld-group{display:flex;gap:1px;padding:2px 2px 1px;border-radius:4px;background:rgba(11,9,8,.76);border:1px solid rgba(255,255,255,.10);box-shadow:0 2px 6px rgba(0,0,0,.22)}.enemy-meld-group .tile{width:clamp(13px,min(1.9vw,2.7vh),22px);height:clamp(19px,min(2.8vw,3.8vh),31px);border-radius:3px;box-shadow:0 2px 4px rgba(0,0,0,.28);cursor:default}.enemy-meld-group .tile .tile-char{font-size:.72em}.pos-left .enemy-hand-count,.pos-right .enemy-hand-count{max-width:110px}.pos-left .enemy-hand-count .mini-back,.pos-right .enemy-hand-count .mini-back{width:4px;height:8px}.pos-left .enemy-melds-visible,.pos-right .enemy-melds-visible{flex-direction:column;align-items:center}.pos-left .enemy-meld-group,.pos-right .enemy-meld-group{flex-direction:row}
 /* Stable collision-safe geometry: rivers occupy four fixed bands around a protected center zone. */
 #game-board{--centerSize:clamp(94px,min(10vw,12.5vh),116px);--centerHalf:calc(var(--centerSize)/2);--riverGap:clamp(22px,3vh,34px);--riverRowsH:calc(var(--discH)*3 + 10px);--riverColsW:calc(var(--discW)*6 + 15px);--sideGap:clamp(18px,2.5vw,28px)}
@@ -35,7 +35,7 @@
 .melds-container{position:absolute;right:10vw;bottom:calc(var(--tileH) + 10px);z-index:28;display:flex;gap:4px}.melds-container .meld-group{background:rgba(22,16,13,.55);border:1px solid rgba(255,255,255,.08)}
 .hand-bottom-container{position:absolute;left:0;right:0;bottom:4px;z-index:40;display:flex;justify-content:center;overflow:visible;padding:0 6px calc(env(safe-area-inset-bottom) + 1px)}.hand-tiles{display:flex;gap:3px;max-width:100%;padding:2px 2px 0;justify-content:center}
 
-#action-overlay{position:absolute;left:auto;right:clamp(18px,4.2vw,72px);top:calc(50% + var(--focus-pan-y) + 77px);bottom:auto;transform:none;z-index:60;display:none;flex-wrap:wrap;justify-content:flex-end;gap:7px;max-width:min(32vw,270px);padding:7px 9px;border-radius:14px;background:rgba(16,12,10,.95);border:1px solid rgba(229,179,88,.45);box-shadow:0 16px 35px rgba(0,0,0,.4);backdrop-filter:blur(10px)}.act-btn{min-width:58px;min-height:36px;padding:7px 10px;border:0;border-radius:9px;color:#fff;font-size:11px;font-weight:900}.btn-hu{background:#b74642}.btn-ron{background:#b74642}.btn-pon{background:#2c75b5}.btn-chi{background:#26945f}.btn-kan{background:#198c82}.btn-tsumo{background:#bf7a29}.btn-skip{background:#5d666b}
+#action-overlay{position:absolute;left:auto;right:clamp(18px,4.2vw,72px);top:calc(50% + var(--focus-pan-y) + 92px);bottom:auto;transform:none;z-index:60;display:none;flex-wrap:wrap;justify-content:flex-end;gap:7px;max-width:min(32vw,270px);padding:7px 9px;border-radius:14px;background:rgba(16,12,10,.95);border:1px solid rgba(229,179,88,.45);box-shadow:0 16px 35px rgba(0,0,0,.4);backdrop-filter:blur(10px)}.act-btn{min-width:58px;min-height:36px;padding:7px 10px;border:0;border-radius:9px;color:#fff;font-size:11px;font-weight:900}.btn-hu{background:#b74642}.btn-ron{background:#b74642}.btn-pon{background:#2c75b5}.btn-chi{background:#26945f}.btn-kan{background:#198c82}.btn-tsumo{background:#bf7a29}.btn-skip{background:#5d666b}
 .furiten-panel{display:none}.win-flash{animation:winflash .52s ease-out}.draw-flash{animation:drawflash .52s ease-out}@keyframes winflash{0%{box-shadow:0 14px 34px rgba(0,0,0,.44)}45%{box-shadow:0 0 0 8px rgba(246,211,116,.16),0 0 28px rgba(246,211,116,.38)}100%{box-shadow:0 14px 34px rgba(0,0,0,.44)}}@keyframes drawflash{45%{box-shadow:0 0 0 8px rgba(115,190,223,.12),0 0 24px rgba(115,190,223,.25)}}
 @media (orientation:portrait){#game-board{--centerSize:clamp(92px,15vw,108px);--riverGap:clamp(18px,2.5vh,28px)}.round-hud-shell{right:98px;top:8px;min-width:78px;padding:4px 6px}.round-hud-title{font-size:7px}.round-hud-sub{font-size:5px}.pos-bottom{left:clamp(14px,7vw,90px);bottom:calc(var(--tileH) + 5px)}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -299,7 +299,7 @@ function getChiCombinations(hand,tile){if(!tile||tile.type==='honor')return[];co
 function canFormMelds(c){for(let i=0;i<34;i++){if(c[i]>=3){c[i]-=3;if(canFormMelds(c))return true;c[i]+=3}if(i<27&&i%9<=6&&c[i]&&c[i+1]&&c[i+2]){c[i]--;c[i+1]--;c[i+2]--;if(canFormMelds(c))return true;c[i]++;c[i+1]++;c[i+2]++}if(c[i])return false}return true}
 function isSevenPairs(c){let pairs=0;for(const n of c){if(n===2)pairs++;else if(n===4)pairs+=2;else if(n!==0)return false}return pairs===7}
 function isStandardWin(tiles,meldCount=0){const needed=14-meldCount*3;if((tiles?.length||0)!==needed)return false;const c=tileCounts(tiles);if(isSevenPairs(c)&&meldCount===0)return true;for(let i=0;i<34;i++)if(c[i]>=2){c[i]-=2;if(canFormMelds(c))return true;c[i]+=2}return false}
-function checkWinningHand(tiles,meldCount=0){return isStandardWin(tiles,meldCount)}
+function checkWinningHand(tiles,meldCount=0){return isWinningShape(tiles,meldCount)}
 function getWaitIds(hand13,meldCount=0){if(!hand13||hand13.length%3!==1)return[];const out=[];for(const t of TILE_TYPES){if(tileCounts([...hand13,t]).some(n=>n>4))continue;if(checkWinningHand([...hand13,t],meldCount))out.push(t.id)}return out}
 function isTenpai(hand,meldCount=0){return getWaitIds(hand,meldCount).length>0}
 
@@ -417,7 +417,32 @@ function start4PGame(diff='Medium',multi=false){
   if(mp.host){fillAiSeats();playerScores=[25000,25000,25000,25000];nav('screen-game');setTimeout(setupRound,20);mpSaveSession({started:true});mpBroadcastState()}
 }
 function fillAiSeats(){const human=new Set((mp.room?.players||[]).map((p,i)=>p?i:-1).filter(i=>i>=0));aiSeats=new Set();for(let i=0;i<4;i++)if(!human.has(i))aiSeats.add(i)}
-function checkCurrentWin(p,t,isTsumo){const hand=t?[...playerHands[p],t]:playerHands[p];if(!checkWinningHand(hand,playerMelds[p].length))return null;return evaluateHK(p,t,isTsumo)}
+function checkCurrentWin(p,t,isTsumo){
+  const base=Array.isArray(playerHands[p])?playerHands[p]:[];
+  const melds=Array.isArray(playerMelds[p])?playerMelds[p]:[];
+  const hand=t?[...base,t]:[...base];
+  const meldCount=melds.length;
+  // Hong Kong hand structure: each exposed meld removes 3 concealed tiles
+  // from the normal 14-tile winning shape, including a 4-tile Kan.
+  const expected=14-(meldCount*3);
+  if(hand.length!==expected)return null;
+  if(!isWinningShape(hand,meldCount))return null;
+  return evaluateHK(p,t,isTsumo);
+}
+function isWinningShape(tiles,meldCount=0){
+  const needed=14-(meldCount*3);
+  if(!Array.isArray(tiles)||tiles.length!==needed)return false;
+  const c=tileCounts(tiles);
+  if(meldCount===0&&isSevenPairs(c))return true;
+  // Try every possible pair, then solve the remaining tiles as sequences/triplets.
+  for(let id=0;id<34;id++){
+    if(c[id]<2)continue;
+    c[id]-=2;
+    if(canFormMelds(c))return true;
+    c[id]+=2;
+  }
+  return false;
+}
 function startTurnTimer(){clearInterval(turnTimer);secondsLeft=12;setText('turn-timer-display',secondsLeft);turnTimer=setInterval(()=>{secondsLeft--;setText('turn-timer-display',secondsLeft);if(secondsLeft<=0){clearInterval(turnTimer);autoDiscardCurrent()}},1000)}
 function autoDiscardCurrent(){if(!roundActive||roundEnding)return;const p=currentTurn;if(p===(mp.seat??0)){discardTile(selectedTileIndex>=0?selectedTileIndex:playerHands[p].length-1)}else aiDiscard(p)}
 function processTurn(){
@@ -443,8 +468,14 @@ function getDiscardCallOptions(p,tile){
   const same=hand.filter(t=>t.id===tile.id).length;
   const isNext=((lastDiscarderIdx+1)%4)===p;
   const chi=getChiCombinations(hand,tile);
-  const win=checkCurrentWin(p,tile,false);
-  if(win?.valid)actions.push({type:'Ron',score:win});
+  // Ron must be evaluated against the exact 13-tile concealed hand + the discarded tile.
+  // Do this independently from the self-draw path so a stale turn/drawnTile state can never hide Ron.
+  const ronHand=[...hand,tile];
+  const ronShape=isWinningShape(ronHand,playerMelds[p]?.length||0);
+  if(ronShape){
+    const ron= evaluateHK(p,tile,false);
+    if(ron?.valid)actions.push({type:'Ron',score:ron});
+  }
   if(same>=3)actions.push({type:'Kan'});
   if(same>=2)actions.push({type:'Pon'});
   if(isNext&&chi.length)actions.push({type:'Chi',combo:chi[0],combos:chi});
