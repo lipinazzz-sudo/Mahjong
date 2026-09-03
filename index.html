@@ -11,7 +11,7 @@
 :root{color-scheme:dark;--bg:#100f0e;--panel:rgba(20,17,15,.90);--line:rgba(255,255,255,.12);--text:#f5f1e8;--muted:#a8a094;--gold:#e5ae55;--green:#40d6a0;--red:#e86a62;--brown:#60453a;--table:#654c43;--table2:#4e3932;--tileW:clamp(27px,min(4.9vw,7.6vh),48px);--tileH:clamp(40px,min(6.9vw,11vh),61px);--discW:clamp(16px,min(2.55vw,3.8vh),27px);--discH:clamp(24px,min(3.85vw,5.5vh),38px)}
 *{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 50% 45%,#25211e 0%,#120f0e 64%,#0a0908 100%);color:var(--text);-webkit-font-smoothing:antialiased;user-select:none}button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .screen{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:18px}.screen.active{display:flex}.screen-card,.settings-card{width:min(92vw,460px);padding:26px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,rgba(33,27,24,.94),rgba(15,13,12,.96));box-shadow:0 24px 70px rgba(0,0,0,.42)}.brand-lockup{text-align:center;margin-bottom:24px}.brand-kicker{display:inline-flex;gap:8px;align-items:center;color:#e8bf75;font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--gold)}h1{font-size:clamp(34px,7vw,58px);line-height:.98;margin:9px 0 8px;letter-spacing:-.045em}.brand-subtitle,.section-kicker{color:var(--muted);font-size:12px;line-height:1.45}.screen-heading{font-size:34px}.menu-actions{display:grid;gap:10px}.btn{min-height:44px;border-radius:11px;padding:10px 14px;border:1px solid rgba(255,255,255,.12);color:#fff;font-weight:850;background:rgba(255,255,255,.05)}.btn-primary{color:#1a1007;background:linear-gradient(180deg,#f6c96e,#bf7928);border-color:#f8dd9d}.btn-secondary{background:rgba(255,255,255,.06)}.btn-wide{width:100%}.btn-compact{min-height:34px;padding:6px 10px;font-size:11px}.btn-danger{background:#6b2424}.btn-note{opacity:.7;font-weight:650}.settings-row{display:grid;gap:10px;padding:16px 0;border-bottom:1px solid var(--line)}.settings-row:last-child{border-bottom:0}.settings-label{display:flex;justify-content:space-between;gap:12px;align-items:center}.settings-label span{display:block;color:var(--muted);font-size:11px;margin-top:3px}.range-wrap{display:grid;gap:7px}.range-caption{display:flex;justify-content:space-between;color:var(--muted);font-size:10px}
-.modal{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.70);backdrop-filter:blur(8px)}.modal-box{width:min(94vw,500px);padding:20px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(180deg,#231d19,#100e0c);box-shadow:0 30px 80px rgba(0,0,0,.5)}.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.modal-kicker{font-size:9px;color:#e3b762;font-weight:900;letter-spacing:.16em}.modal-title{font-size:21px;font-weight:900;margin-top:3px}.modal-copy{margin-top:5px;color:var(--muted);font-size:11px;line-height:1.45}.field-label{font-size:11px;color:var(--muted)}.field-input{width:100%;padding:11px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:#14110f;color:#fff;outline:none}.field-input:focus{border-color:#dbad5b}.mp-setup,.mp-room-panel,.lobby-actions{display:grid;gap:10px}.mp-p2p-choice{display:grid;grid-template-columns:1fr 1fr;gap:8px}.p2p-card{display:grid;gap:8px;padding:12px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.035);border-radius:12px}.p2p-card-title{font-size:10px;font-weight:900;color:#e3b762;letter-spacing:.1em;text-transform:uppercase}.room-share-big strong{display:block;font-size:31px;letter-spacing:5px;color:#f3c978}.p2p-row{display:flex;gap:8px}.p2p-row .field-input{flex:1}.p2p-mini,.mp-hint{color:#958b80;font-size:10px;line-height:1.4}.connection-badge{padding:5px 8px;border-radius:999px;font-size:9px;font-weight:900;border:1px solid rgba(255,255,255,.12)}.connection-badge.online{color:#7bedb7;background:rgba(35,132,87,.18);border-color:rgba(92,230,159,.35)}.connection-badge.offline{color:#ff9b91;background:rgba(140,43,37,.16);border-color:rgba(255,120,110,.28)}.ready-player-list{display:grid;gap:7px;margin-top:12px}.ready-item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 11px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.035);font-size:12px}.status-ready{color:#74e5ae;font-weight:900}.status-waiting{color:#ffb39d;font-weight:900}.signal-qr{display:block;width:180px;height:180px;margin:auto;background:#fff;border-radius:8px;padding:5px}.signal-qr:not(.visible){visibility:hidden}.reconnect-card{display:grid;gap:6px;padding:10px;border-radius:9px;border:1px solid rgba(232,174,73,.28);background:rgba(185,116,28,.08)}
+.modal{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.70);backdrop-filter:blur(8px)}.modal-box{width:min(94vw,500px);padding:20px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(180deg,#231d19,#100e0c);box-shadow:0 30px 80px rgba(0,0,0,.5)}.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.modal-kicker{font-size:9px;color:#e3b762;font-weight:900;letter-spacing:.16em}.modal-title{font-size:21px;font-weight:900;margin-top:3px}.modal-copy{margin-top:5px;color:var(--muted);font-size:11px;line-height:1.45}.field-label{font-size:11px;color:var(--muted)}.field-input{width:100%;padding:11px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:#14110f;color:#fff;outline:none}.field-input:focus{border-color:#dbad5b}.mp-setup,.mp-room-panel,.lobby-actions{display:grid;gap:10px}.mp-p2p-choice{display:grid;grid-template-columns:1fr 1fr;gap:8px}.p2p-card{display:grid;gap:8px;padding:12px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.035);border-radius:12px}.p2p-card-title{font-size:10px;font-weight:900;color:#e3b762;letter-spacing:.1em;text-transform:uppercase}.room-share-big strong{display:block;font-size:31px;letter-spacing:5px;color:#f3c978}.p2p-row{display:flex;gap:8px;position:relative;z-index:5}.p2p-row .field-input{flex:1}.share-link-btn{position:relative;z-index:6;pointer-events:auto;touch-action:manipulation;cursor:pointer;white-space:nowrap}.p2p-mini,.mp-hint{color:#958b80;font-size:10px;line-height:1.4}.connection-badge{padding:5px 8px;border-radius:999px;font-size:9px;font-weight:900;border:1px solid rgba(255,255,255,.12)}.connection-badge.online{color:#7bedb7;background:rgba(35,132,87,.18);border-color:rgba(92,230,159,.35)}.connection-badge.offline{color:#ff9b91;background:rgba(140,43,37,.16);border-color:rgba(255,120,110,.28)}.ready-player-list{display:grid;gap:7px;margin-top:12px}.ready-item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 11px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.035);font-size:12px}.status-ready{color:#74e5ae;font-weight:900}.status-waiting{color:#ffb39d;font-weight:900}.signal-qr{display:block;width:180px;height:180px;margin:auto;background:#fff;border-radius:8px;padding:5px}.signal-qr:not(.visible){visibility:hidden}.reconnect-card{display:grid;gap:6px;padding:10px;border-radius:9px;border:1px solid rgba(232,174,73,.28);background:rgba(185,116,28,.08)}
 
 #screen-game{padding:0}.game-shell{position:relative;width:100vw;height:100dvh;overflow:hidden;background:#0b0a09}.table-plane{position:absolute;left:10.5vw;right:10.5vw;top:7vh;bottom:7vh;transform:perspective(1200px) rotateX(9deg);transform-origin:center;pointer-events:none}.table-plane::before{content:"";position:absolute;inset:0;border-radius:32px;background:linear-gradient(150deg,#7b6054,#513d36 52%,#3d2c27);box-shadow:0 24px 48px rgba(0,0,0,.46),inset 0 0 0 2px rgba(255,235,208,.11),inset 0 0 0 9px rgba(0,0,0,.15)}.table-plane::after{content:"";position:absolute;inset:15px;border-radius:24px;border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 0 40px rgba(0,0,0,.22)}
 #game-board{position:absolute;inset:0;overflow:hidden;--sideInset:clamp(92px,min(15vw,23vh),220px)}.topbar{position:absolute;left:14px;right:14px;top:10px;z-index:50;display:flex;justify-content:space-between;align-items:flex-start}.dora-panel{width:140px;padding:6px 7px;border-radius:10px;border:1px solid rgba(255,224,178,.2);background:rgba(20,15,13,.86);box-shadow:0 8px 22px rgba(0,0,0,.28);backdrop-filter:blur(10px)}.hud-label{font-size:7px;letter-spacing:.12em;color:#d6cabd;font-weight:900;text-transform:uppercase}.dora-tiles{display:flex;gap:3px;margin-top:3px}.dora-tile-box{width:18px;height:24px;border-radius:3px;background:#9a5428;border:1px solid #61321b}.dora-tile-box.dora-open{background:#f2ede3;color:#141313;display:grid;place-items:center}.dora-tile-box .tile-svg-img{width:100%;height:100%;object-fit:contain}.stick-counters{display:flex;justify-content:space-between;margin-top:4px;font-size:7px;color:#c1b6aa}.kan-info{margin-top:2px;font-size:7px;color:#76d8c9}.top-right-btns{display:flex;gap:6px}.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(20,17,15,.8);color:#fff}
@@ -116,7 +116,7 @@
                     <div class="room-share-big"><span class="hud-label">ROOM CODE</span><strong id="mp-host-room-code">-----</strong></div>
                     <canvas id="mp-offer-qr" class="signal-qr" width="240" height="240" aria-label="QR Room"></canvas>
                     <div class="p2p-mini" id="mp-invite-help">Bagikan link ini ke pemain lain. Kursi kosong akan tetap dimainkan AI.</div>
-                    <div class="p2p-row"><input class="field-input" id="mp-room-link" readonly><button class="btn btn-secondary btn-compact" onclick="mpCopyRoomLink()">Salin Link</button></div>
+                    <div class="p2p-row"><input class="field-input" id="mp-room-link" readonly><button type="button" class="btn btn-primary btn-compact share-link-btn" id="btn-share-room-link" onclick="mpCopyRoomLink()">Bagikan Link</button></div>
                     <div class="p2p-mini">Transport tetap memakai Cloudflare Room yang sudah Anda miliki.</div>
                 </div>
                 <div id="mp-guest-invite" class="p2p-card" hidden>
@@ -136,7 +136,7 @@
             <div id="mp-room-panel" class="mp-room-panel" hidden>
                 <div class="room-share-card">
                     <div><span class="hud-label">ROOM CODE</span><strong id="mp-room-code-display">-----</strong></div>
-                    <button class="btn btn-secondary btn-compact" onclick="mpCopyRoomInfo()">Salin Info</button>
+                    <button type="button" class="btn btn-secondary btn-compact" onclick="mpCopyRoomInfo()">Salin Info</button>
                 </div>
                 <div id="mp-player-list" class="ready-player-list"></div>
                 <div class="lobby-actions">
@@ -492,7 +492,43 @@ function mpSaveSession(extra={}){try{localStorage.setItem(MP_SESSION_KEY,JSON.st
 function mpLoadSession(){try{return JSON.parse(localStorage.getItem(MP_SESSION_KEY)||'null')}catch{return null}}
 function mpClearSession(){try{localStorage.removeItem(MP_SESSION_KEY)}catch{}}
 function mpRoomUrl(code){const u=new URL(location.href);u.searchParams.set(MP_ROOM_PARAM,code);return u.href}
-async function mpCopyRoomLink(){const link=byId('mp-room-link')?.value||mpRoomUrl(mp.room?.code||'');try{await navigator.clipboard.writeText(link);setText('mp-invite-help','Link sudah disalin.')}catch{const i=byId('mp-room-link');if(i){i.focus();i.select();setText('mp-invite-help','Clipboard browser dibatasi. Tekan salin manual dari kotak di atas.')}}}
+async function mpCopyRoomLink(){
+ const link=byId('mp-room-link')?.value||mpRoomUrl(mp.room?.code||'');
+ if(!link)return;
+ const shareButton=byId('btn-share-room-link');
+ if(shareButton)shareButton.disabled=true;
+ try{
+   if(navigator.share){
+     try{
+       await navigator.share({title:'Mahjong DJ',text:'Gabung ke room Mahjong DJ',url:link});
+       setText('mp-invite-help','Link room berhasil dibagikan.');
+       return;
+     }catch(e){
+       if(e&&e.name==='AbortError')return;
+     }
+   }
+   try{
+     if(navigator.clipboard&&window.isSecureContext){
+       await navigator.clipboard.writeText(link);
+       setText('mp-invite-help','Link room berhasil disalin.');
+       return;
+     }
+   }catch(e){}
+   const input=byId('mp-room-link');
+   if(input){
+     input.removeAttribute('readonly');
+     input.focus();
+     input.select();
+     input.setSelectionRange(0,input.value.length);
+     let copied=false;
+     try{copied=document.execCommand('copy')}catch(e){}
+     input.setAttribute('readonly','readonly');
+     setText('mp-invite-help',copied?'Link room berhasil disalin.':'Tekan lama/klick kotak link lalu salin manual.');
+   }
+ }finally{
+   if(shareButton)shareButton.disabled=false;
+ }
+}
 function mpRenderRoomQr(code){setText('mp-host-room-code',code||'-----');const input=byId('mp-room-link');if(input)input.value=mpRoomUrl(code);const canvas=byId('mp-offer-qr');if(canvas){canvas.classList.remove('visible');if(window.QRCode?.toCanvas)QRCode.toCanvas(canvas,mpRoomUrl(code),{width:180,margin:1},()=>canvas.classList.add('visible'))}}
 function mpConnect(code='',role=''){const c=String(code||mp.room?.code||'').trim();if(!/^\d{5}$/.test(c))return false;if(mp.ws&&(mp.ws.readyState===1||mp.ws.readyState===0))return true;try{const ws=new WebSocket(`${mpServerUrl(c)}&name=${encodeURIComponent(mp.playerName||'Player')}&role=${role||(mp.host?'host':'guest')}${mp.seat!=null?`&seat=${mp.seat}`:''}`);mp.ws=ws;ws.onopen=()=>{mp.connected=true;mpSetConnection(true);ws.send(JSON.stringify({type:mp.host?'createRoom':'joinRoom',code:c,name:mp.playerName,seat:mp.seat}))};ws.onmessage=e=>{try{mpHandle(JSON.parse(e.data))}catch(err){console.error(err)}};ws.onerror=()=>mpSetConnection(false);ws.onclose=()=>{mp.connected=false;mpSetConnection(false)};return true}catch{return false}}
 function mpSend(type,data={}){if(mp.ws?.readyState===1)mp.ws.send(JSON.stringify({type,...data}))}
