@@ -41,6 +41,7 @@
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 
+.tile-svg-img.tile-asset{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:fill;pointer-events:none;-webkit-user-drag:none;}
 </style>
 </head>
 <body>
@@ -262,19 +263,32 @@ for(let i=0;i<9;i++)TILE_TYPES.push({id:idCounter++,type:'sou',num:i+1,val:SOU[i
 const PIP_POS={1:[[2,2]],2:[[1,1],[3,3]],3:[[1,1],[2,2],[3,3]],4:[[1,1],[1,3],[3,1],[3,3]],5:[[1,1],[1,3],[2,2],[3,1],[3,3]],6:[[1,1],[1,3],[2,1],[2,3],[3,1],[3,3]],7:[[1,1],[1,3],[2,1],[2,3],[3,1],[3,3],[2,2]],8:[[1,1],[1,2],[1,3],[3,1],[3,2],[3,3],[2,1],[2,3]],9:[[1,1],[1,2],[1,3],[2,1],[2,2],[2,3],[3,1],[3,2],[3,3]]};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function byId(id){return document.getElementById(id)}
+setTimeout(preloadTileAssets,0);
 function setText(id,v){const e=byId(id);if(e)e.textContent=v==null?'':String(v);return e}
 function setDisplay(id,v){const e=byId(id);if(e){e.hidden=v==='none';e.style.display=v}return e}
 function nav(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));byId(id)?.classList.add('active');activeScreenId=id}
-function tileSVG(t){
+const TILE_ASSET_ROOT='icon/tiles/';
+function tileAssetName(t){
   if(!t)return '';
-  let body='';
-  if(t.type==='man') body=`<text x="50" y="64" text-anchor="middle" font-size="48" font-family="serif">${esc(t.num<=4?['','一','二','三','四','五','六','七','八','九'][t.num]:String(t.num))}</text><text x="50" y="112" text-anchor="middle" font-size="33" font-family="serif">萬</text>`;
-  else if(t.type==='pin'){const pts=PIP_POS[t.num]||[];body=pts.map(([r,c])=>{const x=25+(c-1)*25,y=28+(r-1)*42;return `<circle cx="${x}" cy="${y}" r="9" fill="none" stroke="#6d7377" stroke-width="4"/><circle cx="${x}" cy="${y}" r="4" fill="#f8f7f2"/>`}).join('')}
-  else if(t.type==='sou'){body=(PIP_POS[t.num]||[]).map(([r,c])=>{const x=25+(c-1)*25,y=28+(r-1)*42;return `<path d="M${x-5} ${y+11}Q${x-11} ${y} ${x-5} ${y-11}M${x+5} ${y+11}Q${x+11} ${y} ${x+5} ${y-11}" stroke="#208951" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="${x}" cy="${y}" r="3" fill="#208951"/>`}).join('')}
-  else {let c='#314d6e';if(t.id===31)c='#89939a';else if(t.id===32)c='#148957';else if(t.id===33)c='#c54042';body=`<text x="50" y="88" text-anchor="middle" font-size="55" font-family="serif" font-weight="700" fill="${c}">${esc(t.val)}</text>`}
-  return `<svg class="tile-svg-img" viewBox="0 0 100 140" aria-hidden="true"><rect x="0" y="0" width="100" height="140" fill="transparent"/>${body}</svg>`;
+  if(t.type==='man')return `man_${t.num}.svg`;
+  if(t.type==='pin')return `pin_${t.num}.svg`;
+  if(t.type==='sou')return `sou_${t.num}.svg`;
+  const honors={27:'east.svg',28:'south.svg',29:'west.svg',30:'north.svg',31:'white.svg',32:'green.svg',33:'red.svg'};
+  return honors[t.id]||'';
+}
+function tileSVG(t){
+  const file=tileAssetName(t);
+  if(!file)return '';
+  const src=TILE_ASSET_ROOT+file;
+  return `<img class="tile-svg-img tile-asset" src="${src}" alt="" draggable="false" loading="eager" decoding="async">`;
 }
 function tileMarkup(t){return tileSVG(t)}
+function preloadTileAssets(){
+  const urls=[];
+  for(let i=1;i<=9;i++){urls.push(`${TILE_ASSET_ROOT}man_${i}.svg`,`${TILE_ASSET_ROOT}pin_${i}.svg`,`${TILE_ASSET_ROOT}sou_${i}.svg`)}
+  ['east','south','west','north','white','green','red'].forEach(x=>urls.push(`${TILE_ASSET_ROOT}${x}.svg`));
+  urls.forEach(src=>{const im=new Image();im.decoding='async';im.src=src;});
+}
 function cloneTile(t){return {...t}}
 function makeDeck(){const d=[];let uid=0;for(const type of TILE_TYPES)for(let i=0;i<4;i++)d.push({...type,uniqueId:`t${++uid}`});return d.sort(()=>Math.random()-.5)}
 function tileCounts(tiles){const c=Array(34).fill(0);for(const t of tiles||[])if(t)c[t.id]++;return c}
