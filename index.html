@@ -32,7 +32,7 @@
 /* Meld summaries stay at the player seat; they never occupy the river lanes. */
 .enemy-melds{display:none}
 .enemy-melds{position:absolute;z-index:20;display:flex;gap:3px}.enemy-melds-top{top:24vh;left:31%}.enemy-melds-left{left:calc(50% - var(--sideInset) - 8px);top:62%;flex-direction:column}.enemy-melds-right{right:calc(50% - var(--sideInset) - 8px);top:62%;flex-direction:column}.meld-group{display:flex;gap:1px;padding:3px;border-radius:6px;background:rgba(0,0,0,.18)}.meld-group .tile{width:clamp(18px,min(2.35vw,3.2vh),29px);height:clamp(26px,min(3.45vw,4.6vh),39px);cursor:default}
-.center-board{position:absolute;left:50%;top:calc(50% + var(--focus-pan-y));transform:translate(-50%,-50%);z-index:25;width:var(--centerSize);height:var(--centerSize);border-radius:20px;background:linear-gradient(180deg,rgba(28,43,39,.98),rgba(10,17,15,.99));border:2px solid rgba(189,210,181,.17);box-shadow:0 14px 34px rgba(0,0,0,.44),inset 0 0 0 1px rgba(255,255,255,.04)}.center-board::before{content:"";position:absolute;inset:7px;border:1px solid rgba(255,255,255,.05);border-radius:14px}.round-info{position:absolute;top:11px;left:50%;transform:translateX(-50%);font-size:8px;color:#70c5ff;font-weight:900;white-space:nowrap;letter-spacing:.04em}.turn-timer{position:absolute;top:31px;left:50%;transform:translateX(-50%);font-size:clamp(22px,min(2.55vw,4.2vh),29px);font-weight:950;line-height:1}.tiles-left{position:absolute;bottom:13px;left:50%;transform:translateX(-50%);font-size:8px;color:#edbf67;font-weight:900;white-space:nowrap}.score-tag{position:absolute;min-width:36px;padding:3px 4px;border-radius:6px;background:rgba(18,29,25,.96);border:1px solid rgba(255,255,255,.07);font-size:7px;font-weight:900;text-align:center;white-space:nowrap;z-index:30}.score-south{left:50%;bottom:6px;transform:translateX(-50%)}.score-east{right:-2px;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;text-orientation:mixed;min-width:22px;min-height:54px;padding:5px 3px;display:flex;align-items:center;justify-content:center}.score-north{left:50%;top:5px;transform:translateX(-50%)}.score-west{left:-2px;top:50%;transform:translateY(-50%) rotate(180deg);writing-mode:vertical-rl;text-orientation:mixed;min-width:22px;min-height:54px;padding:5px 3px;display:flex;align-items:center;justify-content:center}
+.center-board{position:absolute;left:50%;top:calc(50% + var(--focus-pan-y));transform:translate(-50%,-50%);z-index:25;width:var(--centerSize);height:var(--centerSize);border-radius:20px;background:linear-gradient(180deg,rgba(28,43,39,.98),rgba(10,17,15,.99));border:2px solid rgba(189,210,181,.17);box-shadow:0 14px 34px rgba(0,0,0,.44),inset 0 0 0 1px rgba(255,255,255,.04)}.center-board::before{content:"";position:absolute;inset:7px;border:1px solid rgba(255,255,255,.05);border-radius:14px}.round-info{position:absolute;top:11px;left:50%;transform:translateX(-50%);font-size:8px;color:#70c5ff;font-weight:900;white-space:nowrap;letter-spacing:.04em}.turn-timer{position:absolute;top:31px;left:50%;transform:translateX(-50%);font-size:clamp(22px,min(2.55vw,4.2vh),29px);font-weight:950;line-height:1}.tiles-left{position:absolute;bottom:23px;left:50%;transform:translateX(-50%);font-size:8px;color:#ff6b6b;font-weight:950;white-space:nowrap;text-shadow:0 0 7px rgba(255,72,72,.75);background:rgba(210,32,32,.24);border:1px solid rgba(255,72,72,.42);border-radius:6px;padding:3px 6px;box-shadow:0 0 8px rgba(255,53,53,.28)}.score-tag{position:absolute;min-width:36px;padding:3px 4px;border-radius:6px;background:rgba(18,29,25,.96);border:1px solid rgba(255,255,255,.07);font-size:7px;font-weight:900;text-align:center;white-space:nowrap;z-index:30}.score-south{left:50%;bottom:6px;transform:translateX(-50%)}.score-east{right:-2px;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;text-orientation:mixed;min-width:22px;min-height:54px;padding:5px 3px;display:flex;align-items:center;justify-content:center}.score-north{left:50%;top:5px;transform:translateX(-50%) rotate(180deg)}.score-west{left:-2px;top:50%;transform:translateY(-50%) rotate(180deg);writing-mode:vertical-rl;text-orientation:mixed;min-width:22px;min-height:54px;padding:5px 3px;display:flex;align-items:center;justify-content:center}.score-turn-active{border-color:#ff4f4f!important;background:rgba(210,32,32,.34)!important;color:#fff!important;box-shadow:0 0 0 2px rgba(255,72,72,.45),0 0 15px rgba(255,53,53,.55),0 0 26px rgba(255,53,53,.22)!important;text-shadow:0 0 7px rgba(255,255,255,.75)}
 .tile{width:var(--tileW);height:var(--tileH);flex:0 0 auto;position:relative;display:flex;align-items:center;justify-content:center;border-radius:5px;background:linear-gradient(180deg,#fffefb,#ebe5da);border:1px solid rgba(73,63,54,.18);border-bottom:3px solid #486048;box-shadow:0 4px 9px rgba(0,0,0,.30);color:#111;overflow:hidden;touch-action:none}.tile-svg-img{display:block;width:100%;height:100%;object-fit:contain}.tile.selected-tile{transform:translateY(-7px);box-shadow:0 0 0 2px #ef635b,0 10px 20px rgba(0,0,0,.38)}.tile.same-tile-highlight{box-shadow:0 0 0 2px rgba(239,99,91,.92),0 0 10px rgba(239,99,91,.22),0 4px 9px rgba(0,0,0,.30)}.tile.selected-tile{box-shadow:0 0 0 3px #ef635b,0 10px 20px rgba(0,0,0,.38)}.drawn-tile-gap{margin-left:8px;border:2px solid #d9ad58;box-shadow:0 0 0 2px rgba(217,173,88,.13),0 8px 16px rgba(0,0,0,.28)}
 .melds-container{position:absolute;right:10vw;bottom:calc(var(--tileH) + 10px);z-index:28;display:flex;gap:4px}.melds-container .meld-group{background:rgba(22,16,13,.55);border:1px solid rgba(255,255,255,.08)}
 .hand-bottom-container{position:absolute;left:0;right:0;bottom:4px;z-index:40;display:flex;justify-content:center;overflow:visible;padding:0 6px calc(env(safe-area-inset-bottom) + 1px)}.hand-tiles{display:flex;gap:3px;max-width:100%;padding:2px 2px 0;justify-content:center}
@@ -206,7 +206,7 @@
 
             <div class="player-seat pos-bottom">
                 <div class="avatar-img" aria-hidden="true"></div>
-                <div class="avatar-name">You <span class="seat-direction">• South</span></div>
+                <div class="avatar-name" id="name-bottom">You <span class="seat-direction">• South</span></div>
                 <div class="time-bank-tag" id="player-time-bank">+20s</div>
             </div>
             <div class="player-seat pos-left">
@@ -320,12 +320,28 @@ let mpClientId=null,mpReconnectTimer=null,mpAutoStartTimer=null,mpPendingCalls=[
 let aiSeats=new Set();
 const HUMAN_NAMES=['Player','Player 2','Player 3','Player 4'];
 
-function updateScoresUI(){const m=mappedSeats(mp.seat??0);m.forEach((canon,display)=>setText(`score-${display}`,Math.round(playerScores[canon]).toLocaleString('id-ID')))}
+function updateScoresUI(){
+  const localSeat=mp.seat??0;
+  const m=mappedSeats(localSeat);
+  document.querySelectorAll('.score-tag').forEach(el=>el.classList.remove('score-turn-active'));
+  m.forEach((canon,display)=>{
+    setText(`score-${display}`,Math.round(playerScores[canon]).toLocaleString('id-ID'));
+    if(canon===currentTurn)byId(`score-${display}`)?.classList.add('score-turn-active');
+  });
+}
 function getRoundName(){return ['East 1','East 2','East 3','East 4','East 5','East 6'][currentRoundIndex]||`East ${currentRoundIndex+1}`}
 function playerName(i){if(mp.room?.players?.[i]?.name)return mp.room.players[i].name;if(aiSeats.has(i))return `AI ${['Red','Jade','Bamboo','Pearl'][i]||'Bot'}`;return HUMAN_NAMES[i]}
 function mappedSeats(seat){const s=seat??0;return[s,(s+1)%4,(s+2)%4,(s+3)%4]}
 function sortHand(p){if(!autoSortSetting||!playerHands[p])return;const h=playerHands[p];h.sort((a,b)=>a.id-b.id);if(drawnTile&&p===currentTurn){const i=h.findIndex(t=>t.uniqueId===drawnTile.uniqueId);if(i>=0&&i!==h.length-1)h.push(h.splice(i,1)[0])}}
-function renderNames(){const s=mp.seat??0,m=mappedSeats(s);setText('name-left',`${playerName(m[3])} • West`);setText('name-top',`${playerName(m[2])} • North`);setText('name-right',`${playerName(m[1])} • East`);setText('round-title-display',getRoundName())}
+function renderNames(){
+  const s=mp.seat??0,m=mappedSeats(s);
+  const winds=['South','East','North','West'];
+  setText('name-bottom',`${playerName(m[0])} • ${winds[m[0]]}`);
+  setText('name-left',`${playerName(m[3])} • ${winds[m[3]]}`);
+  setText('name-top',`${playerName(m[2])} • ${winds[m[2]]}`);
+  setText('name-right',`${playerName(m[1])} • ${winds[m[1]]}`);
+  setText('round-title-display',getRoundName());
+}
 // -------- Hand advisor: known remaining tiles + one-away waits --------
 function advisorKnownCounts(excludeSeatHand=false){
   const known=Array(34).fill(0);
@@ -544,10 +560,9 @@ function processTurn(){
   const turnActions=[];const win=checkCurrentWin(currentTurn,null,true);if(win?.valid)turnActions.push('Tsumo');
   const selfKans=getSelfKanOptions(currentTurn);if(selfKans.length)turnActions.push('Kan');
   if(aiSeats.has(currentTurn)){setText('hand-status-main',`${playerName(currentTurn)} berpikir...`);setText('hand-status-sub','AI memilih aksi dan buangan.');
-    clearTimeout(aiMoveTimer);
     if(win?.valid){resolveWin(currentTurn,win,true);return}
     if(selfKans.length&&Math.random()<.28){executeSelfKan(currentTurn,selfKans[0]);return}
-    aiMoveTimer=setTimeout(()=>{aiMoveTimer=null;aiDiscard(currentTurn)},450)
+    aiMoveTimer=setTimeout(()=>aiDiscard(currentTurn),450)
   }else{
     isDiscardable=true;
     if(currentTurn===(mp.seat??0)){
@@ -624,7 +639,6 @@ function highestPendingCall(){
 }
 function stopCallWindow(){
   clearInterval(actionTimer);actionTimer=null;isActionPhase=false;actionSecondsLeft=0;actionTimeoutHandler=null;actionSeat=-1;actionMode='';
-  clearTimeout(aiMoveTimer);
 }
 function resolveCallChoice(seat,action){
   const q=mpPendingCalls.find(x=>x.seat===seat);
@@ -689,18 +703,26 @@ function promptNextCall(){
     return;
   }
 
-  // AI should never sit idle for the whole human timer. It gets a short
-  // thinking delay, then chooses the highest-value legal call immediately.
-  // The human 5s + bank timing remains unchanged for human players.
+  // AI should never consume the human action timer/time bank.
+  // Give it a short thinking delay, then resolve its call immediately.
+  // Human players still use the normal 5-second action window + shared bank.
   if(aiSeats.has(best.seat)){
-    stopCallWindow();
-    clearTimeout(aiMoveTimer);
+    clearInterval(actionTimer);
+    actionTimer=null;
+    isActionPhase=false;
+    actionSecondsLeft=0;
+    actionTimeoutHandler=null;
+    actionSeat=-1;
+    actionMode='';
+    const aiSeat=best.seat;
+    setText('hand-status-main',`${playerName(aiSeat)} berpikir...`);
+    setText('hand-status-sub','AI mengevaluasi call...');
+    aiMoveTimer&&clearTimeout(aiMoveTimer);
     aiMoveTimer=setTimeout(()=>{
-      aiMoveTimer=null;
-      const live=mpPendingCalls.find(x=>x.seat===best.seat);
-      if(!live){promptNextCall();return}
+      const live=mpPendingCalls.find(x=>x.seat===aiSeat);
+      if(!live)return promptNextCall();
       const pick=chooseAiCall(live.actions);
-      if(pick){resolveCallChoice(best.seat,pick);return}
+      if(pick){resolveCallChoice(aiSeat,pick);return}
       mpPendingCalls=mpPendingCalls.filter(x=>x!==live);
       promptNextCall();
     },450);
