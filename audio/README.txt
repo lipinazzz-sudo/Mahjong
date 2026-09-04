@@ -1,17 +1,25 @@
 MAJONG DJ - AUDIO
 ===================
 
-bgm-game.mp3
-Original lightweight ambient background music for the Mahjong game.
-
 Put this folder next to index.html on GitHub:
 
 /
 ├── index.html
 └── audio/
-    └── bgm-game.mp3
+    ├── bgm-game.mp3
+    ├── sfx-draw.mp3
+    ├── sfx-discard.mp3
+    ├── sfx-chi.mp3
+    ├── sfx-pon.mp3
+    ├── sfx-kan.mp3
+    ├── sfx-ron.mp3
+    ├── sfx-tsumo.mp3
+    └── sfx-button.mp3
 
-The game HTML loads:
-audio/bgm-game.mp3
-
+The HTML loads these files with relative paths.
 No external audio host is required.
+
+Audio controls:
+- Music Volume: 0-100%
+- SFX Volume: 0-100%
+- Audio ON/OFF: global mute
