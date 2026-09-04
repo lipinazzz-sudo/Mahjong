@@ -313,7 +313,7 @@ let fullDeck=[],playerHands=[[],[],[],[]],playerRivers=[[],[],[],[]],playerMelds
 let playerScores=[25000,25000,25000,25000],roundStartScores=[25000,25000,25000,25000];
 let currentRoundIndex=0,currentDealerIdx=1,currentTurn=0,lastDiscardedTile=null,lastDiscarderIdx=-1,drawnTile=null;
 const TURN_BASE_SECONDS=10,TIME_BANK_MAX=20,ACTION_WINDOW_SECONDS=5;
-let roundActive=false,roundEnding=false,isDiscardable=false,isActionPhase=false,selectedTileIndex=-1,aiMoveTimer=null,turnTimer=null,actionTimer=null,secondsLeft=10,timeBank=[20,20,20,20],actionSecondsLeft=0,pendingCallChoice=null;
+let roundActive=false,roundEnding=false,isDiscardable=false,isActionPhase=false,selectedTileIndex=-1,aiMoveTimer=null,turnTimer=null,actionTimer=null,secondsLeft=10,timeBank=[20,20,20,20],actionSecondsLeft=0,pendingCallChoice=null,actionTimeoutHandler=null,actionSeat=-1,actionMode='';
 let autoSortSetting=true,activeScreenId='screen-main',previousScreenId='screen-main',isMultiplayerMode=false;try{autoSortSetting=localStorage.getItem('hk_auto_sort')!=='0'}catch{}
 let mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,playerName:'Player'};
 let mpClientId=null,mpReconnectTimer=null,mpAutoStartTimer=null,mpPendingCalls=[];const MP_WORKER_URL='https://mahjong-room.mahjongjong.workers.dev',MP_ROOM_PARAM='room',MP_SESSION_KEY='mahjongHKRoomV1';
@@ -454,42 +454,82 @@ function updateTimeBankUI(p=currentTurn){
   const el=byId('player-time-bank');
   if(el)el.textContent=`+${Math.max(0,timeBank[p]??0)}s`;
 }
+function broadcastTimerState(extra={}){
+  if(isMultiplayerMode&&mp.host&&mp.connected)mpBroadcastState({remoteTimer:{seat:currentTurn,baseTime:secondsLeft,timeBank:timeBank[currentTurn]??0,actionSeconds:actionSecondsLeft,isActionPhase,...extra}});
+}
 function startTurnTimer(){
   clearInterval(turnTimer);clearInterval(actionTimer);
-  isActionPhase=false;actionSecondsLeft=0;pendingCallChoice=null;
+  isActionPhase=false;actionSecondsLeft=0;pendingCallChoice=null;actionTimeoutHandler=null;actionSeat=-1;actionMode='';
   const p=currentTurn;
   secondsLeft=TURN_BASE_SECONDS;
   setText('turn-timer-display',secondsLeft);
   updateTimeBankUI(p);
+  broadcastTimerState();
   turnTimer=setInterval(()=>{
     if(!roundActive||roundEnding){clearInterval(turnTimer);return}
     if(secondsLeft>0){
       secondsLeft--;
       setText('turn-timer-display',secondsLeft);
+    }else if((timeBank[p]||0)>0){
+      timeBank[p]--;
+      setText('turn-timer-display',timeBank[p]);
+      updateTimeBankUI(p);
+      if(timeBank[p]<=0){clearInterval(turnTimer);broadcastTimerState();autoDiscardCurrent();return}
+    }else{
+      clearInterval(turnTimer);
+      autoDiscardCurrent();
       return;
     }
+    broadcastTimerState();
+  },1000);
+}
+function startActionWindow(timeoutHandler,seat=currentTurn,mode='call'){
+  clearInterval(turnTimer);clearInterval(actionTimer);
+  isActionPhase=true;actionSecondsLeft=ACTION_WINDOW_SECONDS;actionTimeoutHandler=timeoutHandler;actionSeat=seat;actionMode=mode;
+  setText('turn-timer-display',actionSecondsLeft);
+  updateTimeBankUI(seat);
+  broadcastTimerState({actionMode:mode,seat});
+  actionTimer=setInterval(()=>{
+    if(!roundActive||roundEnding){clearInterval(actionTimer);return}
+    if(actionSecondsLeft>0){
+      actionSecondsLeft--;
+      setText('turn-timer-display',Math.max(0,actionSecondsLeft));
+      broadcastTimerState({actionMode:mode,seat});
+      return;
+    }
+    if((timeBank[seat]||0)>0){
+      timeBank[seat]--;
+      setText('turn-timer-display',timeBank[seat]);
+      updateTimeBankUI(seat);
+      broadcastTimerState({actionMode:mode,seat});
+      if(timeBank[seat]<=0){
+        clearInterval(actionTimer);actionTimer=null;isActionPhase=false;
+        const cb=actionTimeoutHandler;actionTimeoutHandler=null;actionSeat=-1;actionMode='';
+        cb?.();
+      }
+      return;
+    }
+    clearInterval(actionTimer);actionTimer=null;isActionPhase=false;
+    const cb=actionTimeoutHandler;actionTimeoutHandler=null;actionSeat=-1;actionMode='';
+    cb?.();
+  },1000);
+}
+function startBankTimerOnly(p=currentTurn){
+  clearInterval(turnTimer);
+  secondsLeft=0;
+  setText('turn-timer-display',timeBank[p]||0);
+  updateTimeBankUI(p);
+  broadcastTimerState({phase:'bank-only',seat:p});
+  turnTimer=setInterval(()=>{
+    if(!roundActive||roundEnding){clearInterval(turnTimer);return}
     if((timeBank[p]||0)>0){
       timeBank[p]--;
       setText('turn-timer-display',timeBank[p]);
       updateTimeBankUI(p);
+      broadcastTimerState({phase:'bank-only',seat:p});
       if(timeBank[p]<=0){clearInterval(turnTimer);autoDiscardCurrent();}
-      return;
-    }
-    clearInterval(turnTimer);
-    autoDiscardCurrent();
-  },1000);
-}
-function startActionWindow(timeoutHandler){
-  clearInterval(turnTimer);clearInterval(actionTimer);
-  isActionPhase=true;actionSecondsLeft=ACTION_WINDOW_SECONDS;
-  setText('turn-timer-display',actionSecondsLeft);
-  actionTimer=setInterval(()=>{
-    if(!roundActive||roundEnding){clearInterval(actionTimer);return}
-    actionSecondsLeft--;
-    setText('turn-timer-display',Math.max(0,actionSecondsLeft));
-    if(actionSecondsLeft<=0){
-      clearInterval(actionTimer);actionTimer=null;isActionPhase=false;
-      timeoutHandler?.();
+    }else{
+      clearInterval(turnTimer);autoDiscardCurrent();
     }
   },1000);
 }
@@ -510,11 +550,22 @@ function processTurn(){
     if(currentTurn===(mp.seat??0)){
       setText('hand-status-main','Giliran Anda');
       setText('hand-status-sub',turnActions.length?`Pilih aksi: ${turnActions.join(' / ')} atau pilih tile.`:'Pilih tile untuk membuang.');
-      if(turnActions.length){showAvailableActions(turnActions);startActionWindow(()=>{setDisplay('action-overlay','none');startTurnTimer()});}
+      if(turnActions.length){showAvailableActions(turnActions);startActionWindow(()=>{hideAvailableActions();mpBroadcastState({remoteActions:[]});if((timeBank[currentTurn]||0)>0){secondsLeft=0;startBankTimerOnly(currentTurn)}else autoDiscardCurrent();},currentTurn,'turn-action');}
       else startTurnTimer();
-    }else startTurnTimer();
+    }else if(isMultiplayerMode&&mp.host){
+      // Host remains authoritative for a guest turn. If that guest has optional
+      // self-actions (Tsumo/Kan), expose them for 5 seconds first, then consume
+      // that player's round time bank. A normal discard may still arrive at any time.
+      if(turnActions.length){
+        startActionWindow(()=>{mpBroadcastState({remoteActions:[]});if((timeBank[currentTurn]||0)>0){secondsLeft=0;startBankTimerOnly(currentTurn)}else autoDiscardCurrent();},currentTurn,'turn-action');
+      }else{
+        startTurnTimer();
+      }
+    }else{
+      startTurnTimer();
+    }
   }
-  mpBroadcastState({remoteActions:(!aiSeats.has(currentTurn)&&currentTurn!==(mp.seat??0))?{seat:currentTurn,actions:turnActions}:[],handStatus:{seat:currentTurn,main:'GILIRAN',sub:currentTurn===(mp.seat??0)?'Pilih tile untuk dibuang.':(turnActions.length?`Aksi tersedia: ${turnActions.join(' / ')}`:'Menunggu.')}})
+  mpBroadcastState({remoteActions:(!aiSeats.has(currentTurn)&&currentTurn!==(mp.seat??0))?{seat:currentTurn,actions:turnActions,actionWindow:turnActions.length?ACTION_WINDOW_SECONDS:0}:[],handStatus:{seat:currentTurn,main:'GILIRAN',sub:currentTurn===(mp.seat??0)?'Pilih tile untuk dibuang.':(turnActions.length?`Aksi tersedia: ${turnActions.join(' / ')}`:'Menunggu.')}})
 }
 function aiDiscard(p){if(!roundActive||roundEnding)return;const h=playerHands[p];if(!h.length)return;let best=0;for(let i=0;i<h.length;i++){const t=h[i];if(isSimple(t))best=i; if(t.type==='honor')best=i}const tile=h.splice(best,1)[0];drawnTile=null;commitDiscard(p,tile)}
 function handleTileTap(i,el){if(currentTurn!==(mp.seat??0)||!isDiscardable)return;const h=playerHands[mp.seat??0]||[],picked=h[i];if(!picked)return;document.querySelectorAll('#player-hand-tiles .tile, .discard-tile').forEach(x=>{x.classList.remove('selected-tile');x.classList.toggle('same-tile-highlight',Number(x.dataset.tileId)===picked.id)});el.classList.add('selected-tile');if(selectedTileIndex===i){discardTile(i);return}selectedTileIndex=i;showTileAdvisor(i);const discarded=countDiscardedTile(picked.id),known=countKnownTile(picked.id),left=Math.max(0,4-known);setText('hand-status-sub',`${byId('hand-status-sub')?.textContent||''} • ${picked.val||'Tile'}: dibuang ${discarded}, terlihat ${known}, sisa ${left}`)}
@@ -569,7 +620,7 @@ function highestPendingCall(){
   return best;
 }
 function stopCallWindow(){
-  clearInterval(actionTimer);actionTimer=null;isActionPhase=false;actionSecondsLeft=0;
+  clearInterval(actionTimer);actionTimer=null;isActionPhase=false;actionSecondsLeft=0;actionTimeoutHandler=null;actionSeat=-1;actionMode='';
 }
 function resolveCallChoice(seat,action){
   const q=mpPendingCalls.find(x=>x.seat===seat);
@@ -618,7 +669,7 @@ function promptNextCall(){
   if(human){
     const actions=human.actions.map(x=>x.type);
     showAvailableActions([...actions,'Skip']);
-    startActionWindow(finishCallWindow);
+    startActionWindow(finishCallWindow,human.seat,'discard-call');
     mpBroadcastState({remoteActions:{seat:human.seat,actions:[...actions,'Skip'],actionWindow:ACTION_WINDOW_SECONDS}});
     return;
   }
@@ -796,6 +847,14 @@ function mpApplyRemoteState(state){
   drawnTile=state.drawnTile||null;
   roundActive=!!state.roundActive;
   roundEnding=!!state.roundEnding;
+  if(state.remoteTimer && state.remoteTimer.seat===mp.seat){
+    if(state.remoteTimer.isActionPhase){
+      setText('turn-timer-display',Math.max(0,state.remoteTimer.actionSeconds??0));
+    }else{
+      const visibleTimer=(state.remoteTimer.baseTime??0)>0?state.remoteTimer.baseTime:(state.remoteTimer.timeBank??0);
+      setText('turn-timer-display',Math.max(0,visibleTimer));
+    }
+  }
   aiSeats=new Set(state.aiSeats||[]);
   if(state.roomPlayers)mp.room={...(mp.room||{}),players:state.roomPlayers};
 
@@ -827,7 +886,7 @@ function mpApplyRemoteState(state){
 function roomCanAct(seat){return!!mp.room?.players?.[seat]}
 function mpHandlePlayerAction(seat,action){if(!mp.host||!roundActive||!roomCanAct(seat))return;if(action.type==='discard'){
   const i=playerHands[seat].findIndex(t=>t.uniqueId===action.uniqueId);
-  if(i>=0&&currentTurn===seat&&!isActionPhase&&roundActive){
+  if(i>=0&&currentTurn===seat&&roundActive){
     const t=playerHands[seat].splice(i,1)[0];
     isDiscardable=false;
     commitDiscard(seat,t);
