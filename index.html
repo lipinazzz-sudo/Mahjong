@@ -734,7 +734,21 @@ function mpCreateRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().
 function mpJoinRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code)){alert('Masukkan kode room 5 digit.');return}mp.host=false;mp.seat=null;mp.ready=true;mp.started=false;mp.room={code,players:[null,null,null,null],started:false};isMultiplayerMode=true;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Menghubungkan ke Room '+code+'…');mpSaveSession();mpConnect(code,'guest')}
 function mpShowJoinForm(){setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','block')}
 function togglePlayerReady(){if(!mp.room)return;mp.ready=!mp.ready;mpSend('ready',{ready:mp.ready});mpSaveSession();if(mp.host&&mp.room.players?.[0])mp.room.players[0].ready=mp.ready;mpRenderLobby(mp.room)}
-function mpStartGame(){if(mp.host)mpSend('start')}
+function mpStartGame(){
+  if(!mp.host)return;
+  const humans=(mp.room?.players||[]).filter(Boolean).length;
+  if(humans<1)return;
+  // The host is the authoritative game engine. For solo-host testing,
+  // start locally so the existing AI seats can fill the empty chairs.
+  if(!mp.started){
+    mp.started=true;
+    if(mp.room)mp.room.started=true;
+    setDisplay('modal-lobby','none');
+    start4PGame('Medium',true);
+    mpSaveSession({started:true});
+    if(humans>1)mpSend('start');
+  }
+}
 function mpHandle(msg){
   if(msg.type==='hello'){mpClientId=msg.clientId;return}
   if(msg.type==='error'){setText('lobby-help',msg.message||'Room error');mpSetConnection(false);return}
@@ -766,9 +780,60 @@ function mpRenderLobby(room){
 }
 function mpStateSnapshot(extra={}){return{currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,playerHands,playerRivers,playerMelds,playerScores,lastDiscardedTile,lastDiscarderIdx,drawnTile,roundActive,roundEnding,roomPlayers:mp.room?.players||[],aiSeats:[...aiSeats],...extra}}
 function mpBroadcastState(extra={}){if(isMultiplayerMode&&mp.host&&mp.connected)mpSend('state',{state:mpStateSnapshot(extra)})}
-function mpApplyRemoteState(state){if(mp.host)return;mp.state=state;mp.seat=mp.seat??0;playerScores=state.playerScores||playerScores;fullDeck=state.fullDeck||[];playerHands=state.playerHands||playerHands;playerRivers=state.playerRivers||playerRivers;playerMelds=state.playerMelds||playerMelds;currentRoundIndex=state.currentRoundIndex||0;currentTurn=state.currentTurn||0;lastDiscardedTile=state.lastDiscardedTile||null;lastDiscarderIdx=state.lastDiscarderIdx??-1;roundActive=!!state.roundActive;roundEnding=!!state.roundEnding;aiSeats=new Set(state.aiSeats||[]);if(state.roomPlayers)mp.room={...(mp.room||{}),players:state.roomPlayers};clearInterval(turnTimer);clearInterval(actionTimer);isActionPhase=false;actionSecondsLeft=0;pendingCallChoice=null;isDiscardable=roundActive&&!roundEnding&&currentTurn===(mp.seat??0);nav('screen-game');renderTable();if(state.remoteActions?.seat===(mp.seat??0)&&Array.isArray(state.remoteActions.actions)&&state.remoteActions.actions.length)showAvailableActions(state.remoteActions.actions);else hideAvailableActions();if(state.phase==='result'&&state.result){setText('res-title',state.result.title);setText('res-desc',state.result.desc);setDisplay('modal-result','flex')}}
+function mpApplyRemoteState(state){
+  if(mp.host)return;
+  mp.state=state;
+  mp.seat=mp.seat??0;
+  playerScores=state.playerScores||playerScores;
+  fullDeck=state.fullDeck||[];
+  playerHands=state.playerHands||playerHands;
+  playerRivers=state.playerRivers||playerRivers;
+  playerMelds=state.playerMelds||playerMelds;
+  currentRoundIndex=state.currentRoundIndex||0;
+  currentTurn=state.currentTurn||0;
+  lastDiscardedTile=state.lastDiscardedTile||null;
+  lastDiscarderIdx=state.lastDiscarderIdx??-1;
+  drawnTile=state.drawnTile||null;
+  roundActive=!!state.roundActive;
+  roundEnding=!!state.roundEnding;
+  aiSeats=new Set(state.aiSeats||[]);
+  if(state.roomPlayers)mp.room={...(mp.room||{}),players:state.roomPlayers};
+
+  // Guest may discard only on their own synchronized turn.
+  // The host remains authoritative: the actual discard is sent back
+  // through mpHandlePlayerAction().
+  isDiscardable=roundActive && !roundEnding && currentTurn===(mp.seat??0) && !state.remoteActions?.actions?.length;
+
+  nav('screen-game');
+  renderTable();
+
+  if(state.remoteActions?.seat===(mp.seat??0)&&Array.isArray(state.remoteActions.actions)&&state.remoteActions.actions.length){
+    isDiscardable=false;
+    showAvailableActions(state.remoteActions.actions);
+  }else{
+    hideAvailableActions();
+    if(currentTurn===(mp.seat??0) && roundActive){
+      setText('hand-status-main','Giliran Anda');
+      setText('hand-status-sub','Pilih tile untuk membuang.');
+    }
+  }
+
+  if(state.phase==='result'&&state.result){
+    setText('res-title',state.result.title);
+    setText('res-desc',state.result.desc);
+    setDisplay('modal-result','flex');
+  }
+}
 function roomCanAct(seat){return!!mp.room?.players?.[seat]}
-function mpHandlePlayerAction(seat,action){if(!mp.host||!roundActive||!roomCanAct(seat))return;if(action.type==='discard'){const i=playerHands[seat].findIndex(t=>t.uniqueId===action.uniqueId);if(i>=0&&currentTurn===seat){const t=playerHands[seat].splice(i,1)[0];isDiscardable=false;commitDiscard(seat,t)}return}if(action.type==='call'){const a=action.action,q=mpPendingCalls.find(x=>x.seat===seat);if(a==='Tsumo'&&seat===currentTurn){const e=checkCurrentWin(seat,null,true);if(e?.valid){stopCallWindow();resolveWin(seat,e,true)}return}if(!q)return;if(a==='Skip'){mpPendingCalls=mpPendingCalls.filter(x=>x!==q);if(mpPendingCalls.length)promptNextCall();else finishCallWindow();return}const act=q.actions.find(x=>x.type===a);if(!act)return;pendingCallChoice={seat,action:act};const best=highestPendingCall();if(!best||callPriority(act)>=callPriority(best.action))resolveCallChoice(seat,act)}}
+function mpHandlePlayerAction(seat,action){if(!mp.host||!roundActive||!roomCanAct(seat))return;if(action.type==='discard'){
+  const i=playerHands[seat].findIndex(t=>t.uniqueId===action.uniqueId);
+  if(i>=0&&currentTurn===seat&&!isActionPhase&&roundActive){
+    const t=playerHands[seat].splice(i,1)[0];
+    isDiscardable=false;
+    commitDiscard(seat,t);
+  }
+  return;
+}if(action.type==='call'){const a=action.action,q=mpPendingCalls.find(x=>x.seat===seat);if(a==='Tsumo'&&seat===currentTurn){const e=checkCurrentWin(seat,null,true);if(e?.valid){stopCallWindow();resolveWin(seat,e,true)}return}if(!q)return;if(a==='Skip'){mpPendingCalls=mpPendingCalls.filter(x=>x!==q);if(mpPendingCalls.length)promptNextCall();else finishCallWindow();return}const act=q.actions.find(x=>x.type===a);if(!act)return;pendingCallChoice={seat,action:act};const best=highestPendingCall();if(!best||callPriority(act)>=callPriority(best.action))resolveCallChoice(seat,act)}}
 function mpTapRemoteDiscard(t){mpSend('action',{action:{type:'discard',uniqueId:t.uniqueId}})}
 function mpCopyRoomInfo(){mpCopyRoomLink()}
 function mpReconnect(){const saved=mpLoadSession();if(!saved?.room)return;mp.playerName=saved.name||'Player';mp.host=!!saved.host;mp.seat=saved.seat;mp.ready=true;mp.started=!!saved.started;mp.room={code:saved.room,players:[null,null,null,null],started:!!saved.started};setDisplay('modal-lobby','flex');setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');mpConnect(saved.room,mp.host?'host':'guest')}
