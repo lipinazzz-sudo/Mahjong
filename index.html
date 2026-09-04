@@ -107,7 +107,7 @@
                 <div>
                     <div class="modal-kicker">ONLINE FRIEND ROOM</div>
                     <div class="modal-title" id="lobby-title">Multiplayer</div>
-                    <p class="modal-copy" id="lobby-help">Buat room dan bagikan link. 1 pemain sudah cukup; kursi kosong otomatis diisi AI.</p>
+                    <p class="modal-copy" id="lobby-help">Buat room dan bagikan link. kursi kosong otomatis diisi AI.</p>
                 </div>
                 <div id="mp-connection-badge" class="connection-badge offline">OFFLINE</div>
             </div>
@@ -124,26 +124,26 @@
                     <canvas id="mp-offer-qr" class="signal-qr" width="240" height="240" aria-label="QR Room"></canvas>
                     <div class="p2p-mini" id="mp-invite-help">Bagikan link ini ke pemain lain. Kursi kosong akan tetap dimainkan AI.</div>
                     <div class="p2p-row"><input class="field-input" id="mp-room-link" readonly><button type="button" class="btn btn-primary btn-compact share-link-btn" id="btn-share-room-link" onclick="mpCopyRoomLink()">Bagikan Link</button></div>
-                    <div class="p2p-mini">Transport tetap memakai Cloudflare Room yang sudah Anda miliki.</div>
+                    <div class="p2p-mini">Transport memakai Cloudflare.</div>
                 </div>
                 <div id="mp-guest-invite" class="p2p-card" hidden>
                     <div class="p2p-card-title">Gabung Room</div>
                     <label class="field-label" for="mp-room-code">Kode Room</label>
                     <input class="field-input" id="mp-room-code" maxlength="5" inputmode="numeric" placeholder="12345">
                     <button class="btn btn-primary btn-wide" onclick="mpJoinRoom()">Gabung Sekarang</button>
-                    <div class="mp-hint">Biasanya tidak perlu mengetik kode. Scan QR host dan room akan terbuka otomatis.</div>
+                    <div class="mp-hint">Masukan Kode Room akan Masuk otomatis.</div>
                     <div id="mp-reconnect-card" class="reconnect-card" hidden>
                         <strong id="mp-reconnect-title">Menyambungkan kembali</strong>
                         <span id="mp-reconnect-text">Sesi room tersimpan.</span>
                         <button class="btn btn-secondary btn-compact" onclick="mpReconnect()">Sambungkan Kembali</button>
                     </div>
                 </div>
-                <div class="mp-hint">Mode multiplayer memakai room server ringan untuk signaling dan sinkronisasi. Game dapat dibuka dari GitHub Pages; semua pemain cukup menggunakan link/QR yang sama.</div>
+                <div class="mp-hint">Mode multiplayer Memakai Link ,semua pemain cukup menggunakan link yang sama.</div>
             </div>
             <div id="mp-room-panel" class="mp-room-panel" hidden>
                 <div class="room-share-card">
                     <div><span class="hud-label">ROOM CODE</span><strong id="mp-room-code-display">-----</strong></div>
-                    <button type="button" class="btn btn-secondary btn-compact" onclick="mpCopyRoomInfo()">Salin Info</button>
+                    <button type="button" class="btn btn-secondary btn-compact" onclick="mpCopyRoomInfo()">Salin</button>
                 </div>
                 <div id="mp-player-list" class="ready-player-list"></div>
                 <div class="lobby-actions">
