@@ -544,9 +544,10 @@ function processTurn(){
   const turnActions=[];const win=checkCurrentWin(currentTurn,null,true);if(win?.valid)turnActions.push('Tsumo');
   const selfKans=getSelfKanOptions(currentTurn);if(selfKans.length)turnActions.push('Kan');
   if(aiSeats.has(currentTurn)){setText('hand-status-main',`${playerName(currentTurn)} berpikir...`);setText('hand-status-sub','AI memilih aksi dan buangan.');
+    clearTimeout(aiMoveTimer);
     if(win?.valid){resolveWin(currentTurn,win,true);return}
     if(selfKans.length&&Math.random()<.28){executeSelfKan(currentTurn,selfKans[0]);return}
-    aiMoveTimer=setTimeout(()=>aiDiscard(currentTurn),450)
+    aiMoveTimer=setTimeout(()=>{aiMoveTimer=null;aiDiscard(currentTurn)},450)
   }else{
     isDiscardable=true;
     if(currentTurn===(mp.seat??0)){
@@ -623,6 +624,7 @@ function highestPendingCall(){
 }
 function stopCallWindow(){
   clearInterval(actionTimer);actionTimer=null;isActionPhase=false;actionSecondsLeft=0;actionTimeoutHandler=null;actionSeat=-1;actionMode='';
+  clearTimeout(aiMoveTimer);
 }
 function resolveCallChoice(seat,action){
   const q=mpPendingCalls.find(x=>x.seat===seat);
@@ -687,17 +689,21 @@ function promptNextCall(){
     return;
   }
 
-  // AI gets its own 5-second decision window, followed by its bank if needed.
+  // AI should never sit idle for the whole human timer. It gets a short
+  // thinking delay, then chooses the highest-value legal call immediately.
+  // The human 5s + bank timing remains unchanged for human players.
   if(aiSeats.has(best.seat)){
-    startActionWindow(()=>{
+    stopCallWindow();
+    clearTimeout(aiMoveTimer);
+    aiMoveTimer=setTimeout(()=>{
+      aiMoveTimer=null;
       const live=mpPendingCalls.find(x=>x.seat===best.seat);
-      if(!live)return promptNextCall();
+      if(!live){promptNextCall();return}
       const pick=chooseAiCall(live.actions);
       if(pick){resolveCallChoice(best.seat,pick);return}
       mpPendingCalls=mpPendingCalls.filter(x=>x!==live);
       promptNextCall();
-    },best.seat,'discard-call');
-    // AI acts after the same 5s window rather than bypassing the human-facing timing model.
+    },450);
     return;
   }
   mpPendingCalls=mpPendingCalls.filter(x=>x!==q);
