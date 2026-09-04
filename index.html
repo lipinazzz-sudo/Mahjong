@@ -359,10 +359,8 @@ function byId(id){return document.getElementById(id)}
 /* ============================================================
    AUDIO MANAGER
    Local GitHub audio: ./audio/*.mp3
-   Volume levels are intentionally discrete and soft.
    ============================================================ */
 const GAME_BGM_SRC='audio/bgm-game.mp3';
-const AUDIO_LEVELS=[0.10,0.30,0.50,0.80,1.00];
 const SFX_SOURCES={
   draw:'audio/sfx-draw.mp3',
   discard:'audio/sfx-discard.mp3',
@@ -373,43 +371,81 @@ const SFX_SOURCES={
   tsumo:'audio/sfx-tsumo.mp3',
   button:'audio/sfx-button.mp3'
 };
+const AUDIO_LEVELS=[0.10,0.30,0.50,0.80,1.00];
 let audioMuted=false;
 let musicVolume=0.30;
 let sfxVolume=0.30;
 let audioUnlocked=false;
 const activeSfx=new Set();
 
-function nearestAudioLevel(value){
+function nearestAudioLevel(v){
   let best=0,d=Infinity;
-  AUDIO_LEVELS.forEach((v,i)=>{const nd=Math.abs(v-value);if(nd<d){d=nd;best=i;}});
+  AUDIO_LEVELS.forEach((x,i)=>{const nd=Math.abs(x-v);if(nd<d){d=nd;best=i;}});
   return best;
 }
-function getAudioLevel(index){
+function audioLevel(index){
   const i=Math.min(AUDIO_LEVELS.length-1,Math.max(0,Number(index)||0));
   return AUDIO_LEVELS[i];
 }
 try{
-  musicVolume=getAudioLevel(nearestAudioLevel(Number(localStorage.getItem('hk_music_volume')??0.30)));
-  sfxVolume=getAudioLevel(nearestAudioLevel(Number(localStorage.getItem('hk_sfx_volume')??0.30)));
+  musicVolume=audioLevel(nearestAudioLevel(Number(localStorage.getItem('hk_music_volume')??0.30)));
+  sfxVolume=audioLevel(nearestAudioLevel(Number(localStorage.getItem('hk_sfx_volume')??0.30)));
   audioMuted=localStorage.getItem('hk_audio_muted')==='1';
 }catch{}
 
 function applyAudioSettings(){
   const bgm=byId('bg-music');
   if(bgm)bgm.volume=audioMuted?0:musicVolume;
-  activeSfx.forEach(audio=>audio.volume=audioMuted?0:sfxVolume);
+  activeSfx.forEach(a=>a.volume=audioMuted?0:sfxVolume);
 
   const mv=byId('music-volume'),mvv=byId('music-volume-value');
   const sv=byId('sfx-volume'),svv=byId('sfx-volume-value');
-  if(mv){mv.value=String(nearestAudioLevel(musicVolume));}
+  if(mv)mv.value=String(nearestAudioLevel(musicVolume));
   if(mvv)mvv.textContent=Math.round(musicVolume*100)+'%';
-  if(sv){sv.value=String(nearestAudioLevel(sfxVolume));}
+  if(sv)sv.value=String(nearestAudioLevel(sfxVolume));
   if(svv)svv.textContent=Math.round(sfxVolume*100)+'%';
 
   const ab=byId('btn-toggle-audio');
   if(ab)ab.textContent=audioMuted?'OFF':'ON';
 }
-
+function setMusicVolume(index){
+  musicVolume=audioLevel(index);
+  try{localStorage.setItem('hk_music_volume',String(musicVolume))}catch{}
+  applyAudioSettings();
+}
+function setSfxVolume(index){
+  sfxVolume=audioLevel(index);
+  try{localStorage.setItem('hk_sfx_volume',String(sfxVolume))}catch{}
+  applyAudioSettings();
+}
+function stopAllSfx(){
+  activeSfx.forEach(a=>{try{a.pause();a.currentTime=0}catch{}});
+  activeSfx.clear();
+}
+function toggleAudioMute(){
+  audioMuted=!audioMuted;
+  try{localStorage.setItem('hk_audio_muted',audioMuted?'1':'0')}catch{}
+  const bgm=byId('bg-music');
+  if(audioMuted){
+    if(bgm)bgm.pause();
+    stopAllSfx();
+  }else if(roundActive){
+    playGameMusic();
+  }
+  applyAudioSettings();
+}
+function playSfx(type){
+  if(audioMuted||sfxVolume<=0)return;
+  const src=SFX_SOURCES[type];
+  if(!src)return;
+  const a=new Audio(src);
+  a.preload='auto';
+  a.volume=sfxVolume;
+  activeSfx.add(a);
+  a.addEventListener('ended',()=>activeSfx.delete(a),{once:true});
+  const p=a.play();
+  if(p&&typeof p.catch==='function')p.catch(()=>activeSfx.delete(a));
+}
 function unlockGameAudio(){
   const audio=byId('bg-music');
   if(!audio||audioUnlocked)return;
@@ -423,53 +459,9 @@ function unlockGameAudio(){
       audio.currentTime=0;
       audioUnlocked=true;
       applyAudioSettings();
-    }).catch(()=>{applyAudioSettings()});
+    }).catch(()=>applyAudioSettings());
   }
 }
-
-function setMusicVolume(index){
-  musicVolume=getAudioLevel(index);
-  try{localStorage.setItem('hk_music_volume',String(musicVolume))}catch{}
-  applyAudioSettings();
-}
-
-function setSfxVolume(index){
-  sfxVolume=getAudioLevel(index);
-  try{localStorage.setItem('hk_sfx_volume',String(sfxVolume))}catch{}
-  applyAudioSettings();
-}
-
-function stopAllSfx(){
-  activeSfx.forEach(audio=>{try{audio.pause();audio.currentTime=0}catch{}});
-  activeSfx.clear();
-}
-
-function toggleAudioMute(){
-  audioMuted=!audioMuted;
-  try{localStorage.setItem('hk_audio_muted',audioMuted?'1':'0')}catch{}
-  if(audioMuted){
-    stopAllSfx();
-    const bgm=byId('bg-music');
-    if(bgm)bgm.pause();
-  }else if(roundActive){
-    playGameMusic();
-  }
-  applyAudioSettings();
-}
-
-function playSfx(type){
-  if(audioMuted||sfxVolume<=0)return;
-  const src=SFX_SOURCES[type];
-  if(!src)return;
-  const audio=new Audio(src);
-  audio.preload='auto';
-  audio.volume=sfxVolume;
-  activeSfx.add(audio);
-  audio.addEventListener('ended',()=>activeSfx.delete(audio),{once:true});
-  const p=audio.play();
-  if(p&&typeof p.catch==='function')p.catch(()=>activeSfx.delete(audio));
-}
-
 function playGameMusic(){
   const audio=byId('bg-music');
   if(!audio||audioMuted)return;
@@ -479,20 +471,17 @@ function playGameMusic(){
   const p=audio.play();
   if(p&&typeof p.catch==='function')p.catch(()=>{});
 }
-
+function stopGameMusic(){
+  const audio=byId('bg-music');
+  if(audio){audio.pause();audio.currentTime=0;}
+  stopAllSfx();
+}
 function initAudioSettingsUI(){
   const mv=byId('music-volume'),sv=byId('sfx-volume');
   if(mv)mv.addEventListener('input',e=>setMusicVolume(e.target.value));
   if(sv)sv.addEventListener('input',e=>setSfxVolume(e.target.value));
   applyAudioSettings();
 }
-
-function stopGameMusic(){
-  const audio=byId('bg-music');
-  if(audio){audio.pause();audio.currentTime=0;}
-  stopAllSfx();
-}
-
 document.addEventListener('pointerdown',unlockGameAudio,{once:true,passive:true});
 document.addEventListener('DOMContentLoaded',initAudioSettingsUI);
 
