@@ -10,7 +10,61 @@
     <style>
 :root{color-scheme:dark;--bg:#08131b;--panel:rgba(10,22,31,.92);--line:rgba(125,214,224,.16);--text:#eef8f7;--muted:#9eb5ba;--gold:#f2c45f;--green:#41d9a4;--red:#ef6a6a;--brown:#3b2d2a;--table:#4a3f49;--table2:#2b2530;--tileW:clamp(27px,min(4.9vw,7.6vh),48px);--tileH:clamp(40px,min(6.9vw,11vh),61px);--discW:clamp(16px,min(2.55vw,3.8vh),27px);--discH:clamp(24px,min(3.85vw,5.5vh),38px)}
 *{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 50% 42%,#12313b 0%,#08171f 48%,#050a10 100%);color:var(--text);-webkit-font-smoothing:antialiased;user-select:none}button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}
-.screen{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:18px}.screen.active{display:flex}.screen-card,.settings-card{width:min(92vw,460px);padding:26px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,rgba(33,27,24,.94),rgba(15,13,12,.96));box-shadow:0 24px 70px rgba(0,0,0,.42)}.brand-lockup{text-align:center;margin-bottom:24px}.brand-kicker{display:inline-flex;gap:8px;align-items:center;color:#e8bf75;font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--gold)}h1{font-size:clamp(25.5px,5.25vw,43.5px);line-height:.98;margin:9px 0 8px;letter-spacing:-.045em}.brand-subtitle,.section-kicker{color:var(--muted);font-size:12px;line-height:1.45}.screen-heading{font-size:34px}.menu-actions{display:grid;gap:10px}.btn{min-height:44px;border-radius:11px;padding:10px 14px;border:1px solid rgba(255,255,255,.12);color:#fff;font-weight:850;background:rgba(255,255,255,.05)}.btn-primary{color:#1a1007;background:linear-gradient(180deg,#f6c96e,#bf7928);border-color:#f8dd9d}.btn-secondary{background:rgba(255,255,255,.06)}.btn-wide{width:100%}.btn-compact{min-height:34px;padding:6px 10px;font-size:11px}.btn-danger{background:#6b2424}.btn-note{opacity:.7;font-weight:650}.settings-row{display:grid;gap:10px;padding:16px 0;border-bottom:1px solid var(--line)}.settings-row:last-child{border-bottom:0}.settings-label{display:flex;justify-content:space-between;gap:12px;align-items:center}.settings-label span{display:block;color:var(--muted);font-size:11px;margin-top:3px}.range-wrap{display:grid;gap:7px}.range-caption{display:flex;justify-content:space-between;color:var(--muted);font-size:10px}
+.screen{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:18px}.screen.active{display:flex}.screen#screen-settings{background:rgba(0,0,0,.62);backdrop-filter:blur(6px);z-index:900;padding:12px;overflow:hidden}.screen-card{width:min(92vw,460px);padding:26px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,rgba(33,27,24,.94),rgba(15,13,12,.96));box-shadow:0 24px 70px rgba(0,0,0,.42)}.brand-lockup{text-align:center;margin-bottom:24px}.brand-kicker{display:inline-flex;gap:8px;align-items:center;color:#e8bf75;font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--gold)}h1{font-size:clamp(25.5px,5.25vw,43.5px);line-height:.98;margin:9px 0 8px;letter-spacing:-.045em}.brand-subtitle,.section-kicker{color:var(--muted);font-size:12px;line-height:1.45}.screen-heading{font-size:34px}.menu-actions{display:grid;gap:10px}.btn{min-height:44px;border-radius:11px;padding:10px 14px;border:1px solid rgba(255,255,255,.12);color:#fff;font-weight:850;background:rgba(255,255,255,.05)}.btn-primary{color:#1a1007;background:linear-gradient(180deg,#f6c96e,#bf7928);border-color:#f8dd9d}.btn-secondary{background:rgba(255,255,255,.06)}.btn-wide{width:100%}.btn-compact{min-height:34px;padding:6px 10px;font-size:11px}.btn-danger{background:#6b2424}.btn-note{opacity:.7;font-weight:650}.settings-row{display:grid;gap:10px;padding:16px 0;border-bottom:1px solid var(--line)}.settings-row:last-child{border-bottom:0}.settings-label{display:flex;justify-content:space-between;gap:12px;align-items:center}.settings-label span{display:block;color:var(--muted);font-size:11px;margin-top:3px}.range-wrap{display:grid;gap:7px}.range-caption{display:flex;justify-content:space-between;color:var(--muted);font-size:10px}
+.settings-card{
+  width:min(88vw,520px);
+  max-height:min(82dvh,430px);
+  padding:16px 18px;
+  overflow:auto;
+  overscroll-behavior:contain;
+  border:1px solid rgba(229,179,88,.24);
+  border-radius:16px;
+  background:linear-gradient(180deg,rgba(30,23,19,.97),rgba(12,10,9,.98));
+  box-shadow:0 24px 70px rgba(0,0,0,.58);
+}
+.settings-card .settings-row{padding:9px 0}
+.settings-card .modal-head{margin-bottom:3px}
+.settings-card .section-title{font-size:18px;font-weight:950}
+.settings-card .section-kicker{font-size:9px}
+.settings-card .settings-label strong{font-size:12px}
+.settings-card .settings-label span{font-size:9px;margin-top:2px}
+.settings-card .range-wrap{gap:3px}
+.settings-card .range-caption{font-size:8px}
+.settings-card input[type="range"]{width:100%;accent-color:#d9ad58;height:18px}
+.settings-card .btn-wide{margin-top:5px;min-height:38px;padding:8px 12px;font-size:11px}
+@media (orientation:landscape){
+  .settings-card{
+    width:min(78vw,560px);
+    max-height:78dvh;
+    padding:14px 18px;
+  }
+  .settings-card .settings-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(210px,1.15fr);
+    align-items:center;
+    gap:14px;
+    min-height:50px;
+    padding:8px 0;
+  }
+  .settings-card .settings-row .range-wrap{
+    min-width:0;
+  }
+  .settings-card .settings-row:first-of-type,
+  .settings-card .settings-row:nth-of-type(2){
+    min-height:56px;
+  }
+  .settings-card .settings-row:nth-of-type(3),
+  .settings-card .settings-row:nth-of-type(4){
+    min-height:44px;
+  }
+  .settings-card .settings-row .settings-label{
+    min-width:0;
+  }
+  .settings-card .btn-wide{
+    min-height:36px;
+    margin-top:4px;
+  }
+}
 .modal{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.70);backdrop-filter:blur(8px)}.modal-box{width:min(94vw,500px);padding:20px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(180deg,#231d19,#100e0c);box-shadow:0 30px 80px rgba(0,0,0,.5)}.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.modal-kicker{font-size:9px;color:#e3b762;font-weight:900;letter-spacing:.16em}.modal-title{font-size:21px;font-weight:900;margin-top:3px}.modal-copy{margin-top:5px;color:var(--muted);font-size:11px;line-height:1.45}.field-label{font-size:11px;color:var(--muted)}.field-input{width:100%;padding:11px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:#14110f;color:#fff;outline:none}.field-input:focus{border-color:#dbad5b}.mp-setup,.mp-room-panel,.lobby-actions{display:grid;gap:10px}.mp-p2p-choice{display:grid;grid-template-columns:1fr 1fr;gap:8px}.p2p-card{display:grid;gap:8px;padding:12px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.035);border-radius:12px}.p2p-card-title{font-size:10px;font-weight:900;color:#e3b762;letter-spacing:.1em;text-transform:uppercase}.room-share-big strong{display:block;font-size:31px;letter-spacing:5px;color:#f3c978}.p2p-row{display:flex;gap:8px;position:relative;z-index:5}.p2p-row .field-input{flex:1}.share-link-btn{position:relative;z-index:6;pointer-events:auto;touch-action:manipulation;cursor:pointer;white-space:nowrap}.p2p-mini,.mp-hint{color:#958b80;font-size:10px;line-height:1.4}.connection-badge{padding:5px 8px;border-radius:999px;font-size:9px;font-weight:900;border:1px solid rgba(255,255,255,.12)}.connection-badge.online{color:#7bedb7;background:rgba(35,132,87,.18);border-color:rgba(92,230,159,.35)}.connection-badge.offline{color:#ff9b91;background:rgba(140,43,37,.16);border-color:rgba(255,120,110,.28)}.ready-player-list{display:grid;gap:7px;margin-top:12px}.ready-item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 11px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.035);font-size:12px}.status-ready{color:#74e5ae;font-weight:900}.status-waiting{color:#ffb39d;font-weight:900}.signal-qr{display:block;width:180px;height:180px;margin:auto;background:#fff;border-radius:8px;padding:5px}.signal-qr:not(.visible){visibility:hidden}.reconnect-card{display:grid;gap:6px;padding:10px;border-radius:9px;border:1px solid rgba(232,174,73,.28);background:rgba(185,116,28,.08)}
 .lobby-box{max-height:calc(100dvh - 20px);overflow:auto;overscroll-behavior:contain}.lobby-back-main{margin-top:10px}.pos-top .enemy-melds-visible{flex-direction:row}.pos-top .enemy-meld-group{flex-direction:row}
 @media (orientation:landscape) and (max-height:620px){.modal{padding:8px}.lobby-box{width:min(760px,96vw);padding:13px 16px;max-height:calc(100dvh - 16px)}.lobby-box .modal-copy{margin-top:2px}.lobby-box .mp-setup,.lobby-box .mp-room-panel,.lobby-box .lobby-actions{gap:6px}.lobby-box .p2p-card{gap:5px;padding:8px 10px}.lobby-box .field-input{padding:8px 10px}.lobby-box .signal-qr{width:132px;height:132px}.lobby-box .room-share-big strong{font-size:24px}.lobby-box .ready-player-list{gap:4px;margin-top:6px}.lobby-box .ready-item{padding:7px 9px}.lobby-box .btn{min-height:38px}.lobby-box .p2p-mini,.lobby-box .mp-hint{font-size:9px}.lobby-back-main{margin-top:6px}}
@@ -73,16 +127,48 @@
             <div class="modal-head">
                 <div>
                     <div class="section-title" id="settings-title">Settings</div>
-                    <div class="section-kicker">Atur pengalaman bermain tanpa menyentuh engine permainan.</div>
+                    <div class="section-kicker">Atur permainan dan audio.</div>
                 </div>
             </div>
+
+            <div class="settings-row">
+                <div class="settings-label">
+                    <div><strong>Music Volume</strong><span>Volume musik permainan.</span></div>
+                    <strong id="music-volume-value">24%</strong>
+                </div>
+                <div class="range-wrap">
+                    <input id="music-volume" type="range" min="0" max="100" value="24" step="1" aria-label="Music Volume">
+                    <div class="range-caption"><span>0%</span><span>100%</span></div>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <div class="settings-label">
+                    <div><strong>SFX Volume</strong><span>Efek suara permainan.</span></div>
+                    <strong id="sfx-volume-value">100%</strong>
+                </div>
+                <div class="range-wrap">
+                    <input id="sfx-volume" type="range" min="0" max="100" value="100" step="1" aria-label="SFX Volume">
+                    <div class="range-caption"><span>0%</span><span>100%</span></div>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <div class="settings-label">
+                    <div><strong>Audio</strong><span>Mute semua suara.</span></div>
+                    <button class="btn btn-secondary btn-compact toggle-btn" id="btn-toggle-audio" onclick="toggleAudioMute()">ON</button>
+                </div>
+            </div>
+
             <div class="settings-row">
                 <div class="settings-label">
                     <div><strong>Auto-Sort Hand</strong><span>Urutkan tile pemain secara otomatis.</span></div>
                     <button class="btn btn-secondary btn-compact toggle-btn" id="btn-toggle-autosort" onclick="toggleAutoSortSetting()">ON</button>
                 </div>
             </div>
-            <button class="btn btn-secondary btn-wide" onclick="exitSettings()">Back</button>
+
+            <button class="btn btn-primary btn-wide" onclick="returnToGameFromSettings()">Kembali ke Permainan</button>
+            <button class="btn btn-danger btn-wide" onclick="exitGameFromSettings()">Kembali ke Menu Utama</button>
         </section>
     </main>
 
@@ -193,7 +279,6 @@
                 </div>
                 <div class="top-right-btns">
                     <button class="icon-btn" onclick="openSettingsFromGame()" title="Settings" aria-label="Settings">⚙️</button>
-                    <button class="icon-btn" onclick="quitGame()" title="Quit game" aria-label="Quit game">🚪</button>
                 </div>
             </div>
 
@@ -276,6 +361,15 @@ function byId(id){return document.getElementById(id)}
    Local GitHub audio: ./audio/bgm-game.mp3
    ============================================================ */
 const GAME_BGM_SRC='audio/bgm-game.mp3';
+const SFX_DEFAULT_VOLUME=1;
+let audioMuted=false;
+let musicVolume=0.24;
+let sfxVolume=SFX_DEFAULT_VOLUME;
+try{
+  musicVolume=Math.min(1,Math.max(0,Number(localStorage.getItem('hk_music_volume')??0.24)));
+  sfxVolume=Math.min(1,Math.max(0,Number(localStorage.getItem('hk_sfx_volume')??1)));
+  audioMuted=localStorage.getItem('hk_audio_muted')==='1';
+}catch{}
 let audioUnlocked=false;
 
 function unlockGameAudio(){
@@ -295,14 +389,47 @@ function unlockGameAudio(){
   }
 }
 
+function applyAudioSettings(){
+  const audio=byId('bg-music');
+  if(audio)audio.volume=audioMuted?0:musicVolume;
+  const mv=byId('music-volume'),mvv=byId('music-volume-value');
+  const sv=byId('sfx-volume'),svv=byId('sfx-volume-value');
+  if(mv)mv.value=Math.round(musicVolume*100);
+  if(mvv)mvv.textContent=Math.round(musicVolume*100)+'%';
+  if(sv)sv.value=Math.round(sfxVolume*100);
+  if(svv)svv.textContent=Math.round(sfxVolume*100)+'%';
+  const ab=byId('btn-toggle-audio');
+  if(ab)ab.textContent=audioMuted?'OFF':'ON';
+}
+function setMusicVolume(v){
+  musicVolume=Math.min(1,Math.max(0,Number(v)/100));
+  try{localStorage.setItem('hk_music_volume',String(musicVolume))}catch{}
+  applyAudioSettings();
+}
+function setSfxVolume(v){
+  sfxVolume=Math.min(1,Math.max(0,Number(v)/100));
+  try{localStorage.setItem('hk_sfx_volume',String(sfxVolume))}catch{}
+  applyAudioSettings();
+}
+function toggleAudioMute(){
+  audioMuted=!audioMuted;
+  try{localStorage.setItem('hk_audio_muted',audioMuted?'1':'0')}catch{}
+  applyAudioSettings();
+}
 function playGameMusic(){
   const audio=byId('bg-music');
   if(!audio)return;
   if(!audio.src) audio.src=GAME_BGM_SRC;
   audio.loop=true;
-  audio.volume=0.24;
+  applyAudioSettings();
   const p=audio.play();
   if(p&&typeof p.catch==='function')p.catch(()=>{});
+}
+function initAudioSettingsUI(){
+  const mv=byId('music-volume'),sv=byId('sfx-volume');
+  if(mv)mv.addEventListener('input',e=>setMusicVolume(e.target.value));
+  if(sv)sv.addEventListener('input',e=>setSfxVolume(e.target.value));
+  applyAudioSettings();
 }
 
 function stopGameMusic(){
@@ -313,11 +440,12 @@ function stopGameMusic(){
 }
 
 document.addEventListener('pointerdown',unlockGameAudio,{once:true,passive:true});
+document.addEventListener('DOMContentLoaded',initAudioSettingsUI);
 
 setTimeout(preloadTileAssets,0);
 function setText(id,v){const e=byId(id);if(e)e.textContent=v==null?'':String(v);return e}
 function setDisplay(id,v){const e=byId(id);if(e){e.hidden=v==='none';e.style.display=v}return e}
-function nav(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));byId(id)?.classList.add('active');activeScreenId=id}
+function nav(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));byId(id)?.classList.add('active');activeScreenId=id;if(id==='screen-settings')applyAudioSettings()}
 const TILE_ASSET_ROOT=new URL('icons/tiles/', document.baseURI).href;
 function tileAssetName(t){
   if(!t)return '';
@@ -858,7 +986,11 @@ function endRound(title,desc){roundEnding=true;roundActive=false;clearInterval(t
 function nextRoundOrFinish(){setDisplay('modal-result','none');currentRoundIndex++;if(currentRoundIndex>=4){nav('screen-play');return}currentDealerIdx=(currentDealerIdx+1)%4;setupRound();mpBroadcastState()}
 function flashBoard(kind){const e=byId('center-board-box');if(!e)return;e.classList.remove('win-flash','draw-flash');void e.offsetWidth;e.classList.add(kind==='draw'?'draw-flash':'win-flash')}
 function quitGame(){clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;stopGameMusic();nav('screen-main');if(mp.connected)mpSend('leave')}
-function openSettingsFromGame(){previousScreenId='screen-game';nav('screen-settings')}function exitSettings(){nav(previousScreenId||'screen-main')}function toggleAutoSortSetting(){autoSortSetting=!autoSortSetting;try{localStorage.setItem('hk_auto_sort',autoSortSetting?'1':'0')}catch{};setText('btn-toggle-autosort',autoSortSetting?'ON':'OFF');if(roundActive)renderTable()}
+function openSettingsFromGame(){previousScreenId=activeScreenId==='screen-game'?'screen-game':(previousScreenId||'screen-main');nav('screen-settings');applyAudioSettings()}
+function returnToGameFromSettings(){nav(previousScreenId==='screen-game'?'screen-game':'screen-game')}
+function exitGameFromSettings(){clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;stopGameMusic();previousScreenId='screen-main';nav('screen-main')}
+function exitSettings(){returnToGameFromSettings()}
+function toggleAutoSortSetting(){autoSortSetting=!autoSortSetting;try{localStorage.setItem('hk_auto_sort',autoSortSetting?'1':'0')}catch{};setText('btn-toggle-autosort',autoSortSetting?'ON':'OFF');if(roundActive)renderTable()}
 
 // --------------------- Multiplayer -------------------------
 function escapeHtml(v){return esc(v)}
