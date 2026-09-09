@@ -80,7 +80,7 @@
 @media (orientation:landscape) and (max-height:620px){.modal{padding:8px}.lobby-box{width:min(760px,96vw);padding:13px 16px;max-height:calc(100dvh - 16px)}.lobby-box .modal-copy{margin-top:2px}.lobby-box .mp-setup,.lobby-box .mp-room-panel,.lobby-box .lobby-actions{gap:6px}.lobby-box .p2p-card{gap:5px;padding:8px 10px}.lobby-box .field-input{padding:8px 10px}.lobby-box .signal-qr{width:132px;height:132px}.lobby-box .room-share-big strong{font-size:24px}.lobby-box .ready-player-list{gap:4px;margin-top:6px}.lobby-box .ready-item{padding:7px 9px}.lobby-box .btn{min-height:38px}.lobby-box .p2p-mini,.lobby-box .mp-hint{font-size:9px}.lobby-back-main{margin-top:6px}}
 
 #screen-game{padding:0}.game-shell{position:relative;width:100vw;height:100dvh;overflow:hidden;background:#0b0a09}.table-plane{position:absolute;left:10.5vw;right:10.5vw;top:7vh;bottom:7vh;transform:perspective(1200px) rotateX(9deg);transform-origin:center;pointer-events:none}.table-plane::before{content:"";position:absolute;inset:0;border-radius:32px;background:radial-gradient(ellipse at 50% 42%,rgba(89,113,79,.16),transparent 68%),linear-gradient(145deg,#3a281e,#241813 10%,#142218 25%,#101c16 58%,#080f0c);box-shadow:0 32px 66px rgba(0,0,0,.68),inset 0 0 0 2px rgba(231,202,145,.12),inset 0 0 0 9px rgba(0,0,0,.25),inset 0 -38px 62px rgba(0,0,0,.34)}.table-plane::after{content:"";position:absolute;inset:14px;border-radius:24px;border:1px solid rgba(226,188,111,.08);background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 24%,rgba(0,0,0,.10) 78%,rgba(0,0,0,.22));box-shadow:inset 0 0 46px rgba(0,0,0,.36),inset 0 0 0 1px rgba(214,164,74,.035)}
-#game-board{position:absolute;inset:0;overflow:hidden;--sideInset:clamp(92px,min(15vw,23vh),220px);--focus-pan-y:-35px}.topbar{position:absolute;left:14px;right:14px;top:10px;z-index:50;display:flex;justify-content:space-between;align-items:flex-start}.score-panel{width:140px;padding:6px 7px;border-radius:10px;border:1px solid rgba(220,177,91,.18);background:linear-gradient(180deg,rgba(26,20,15,.92),rgba(10,9,8,.97));box-shadow:0 10px 24px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,235,192,.045);backdrop-filter:blur(10px)}.hud-score{margin-top:2px;color:#e8bd6c;font-size:19px;font-weight:950;line-height:1;letter-spacing:.02em;text-shadow:0 2px 12px rgba(0,0,0,.40)}.hud-label{font-size:7px;letter-spacing:.12em;color:#d6cabd;font-weight:900;text-transform:uppercase}.stick-counters{display:flex;justify-content:space-between;margin-top:4px;font-size:7px;color:#c1b6aa}.kan-info{margin-top:2px;font-size:7px;color:#76d8c9}.top-right-btns{display:flex;gap:6px}.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(20,17,15,.8);color:#fff}
+#game-board{position:absolute;inset:0;overflow:hidden;--sideInset:clamp(92px,min(15vw,23vh),220px);--focus-pan-y:-35px}.topbar{position:absolute;left:14px;right:14px;top:10px;z-index:50;display:flex;justify-content:space-between;align-items:flex-start}.score-panel{width:156px;padding:7px 8px;border-radius:10px;border:1px solid rgba(220,177,91,.18);background:linear-gradient(180deg,rgba(26,20,15,.94),rgba(10,9,8,.98));box-shadow:0 10px 24px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,235,192,.045);backdrop-filter:blur(10px)}.score-guide-panel .score-guide-grid{display:grid;gap:2px;margin-top:4px}.score-guide-panel .score-guide-grid>div{display:flex;align-items:baseline;gap:5px;line-height:1.08}.score-guide-panel .score-guide-grid span{min-width:35px;color:#e0b45d;font-size:7px;font-weight:950;letter-spacing:.03em}.score-guide-panel .score-guide-grid strong{color:#c8bfb1;font-size:6.5px;font-weight:750;white-space:nowrap}.score-guide-rule{margin-top:5px;padding-top:4px;border-top:1px solid rgba(226,188,111,.10);color:#9f9587;font-size:6px;font-weight:850;letter-spacing:.06em}.hud-label{font-size:7px;letter-spacing:.12em;color:#d6cabd;font-weight:900;text-transform:uppercase}.stick-counters{display:flex;justify-content:space-between;margin-top:4px;font-size:7px;color:#c1b6aa}.kan-info{margin-top:2px;font-size:7px;color:#76d8c9}.top-right-btns{display:flex;gap:6px}.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(20,17,15,.8);color:#fff}
 .round-hud-shell{position:absolute;top:10px;right:106px;left:auto;transform:none;z-index:48;min-width:88px;text-align:center;padding:5px 8px;border-radius:10px;background:rgba(13,11,9,.78);border:1px solid rgba(218,175,91,.13);box-shadow:0 8px 20px rgba(0,0,0,.28)}.round-hud-title{font-size:8px;font-weight:950;letter-spacing:.11em}.round-hud-sub{font-size:6px;letter-spacing:.14em;color:#a79c92;margin-top:2px}
 .player-seat{position:absolute;z-index:35;display:flex;flex-direction:column;align-items:center;text-align:center}.avatar-img{width:clamp(34px,min(5vw,6vh),48px);height:clamp(34px,min(5vw,6vh),48px);border-radius:12px;border:2px solid #dfb158;background:radial-gradient(circle at 34% 28%,#ffdb86,#8e4d27 50%,#261714 100%);box-shadow:0 7px 20px rgba(0,0,0,.34)}.avatar-name{margin-top:4px;padding:3px 7px;border-radius:7px;font-size:9px;font-weight:900;background:rgba(13,11,10,.86);border:1px solid rgba(255,255,255,.08);white-space:nowrap}.seat-direction{opacity:.65}.time-bank-tag{margin-top:3px;font-size:8px;color:#f0c66b}.pos-bottom{left:clamp(18px,8vw,125px);bottom:calc(var(--tileH) + 2px);transform:none;align-items:center}.pos-top{top:40px;right:calc(clamp(180px,17vw,250px) + 23px);left:auto;transform:translateY(var(--focus-pan-y))}.pos-left{left:4.2vw;top:50%;transform:translateY(calc(-50% + var(--focus-pan-y)))}.pos-right{right:4.2vw;top:50%;transform:translateY(calc(-50% + var(--focus-pan-y)))}
 .tile-back{display:block;border-radius:3px;border:1px solid #6c3b1e;background:linear-gradient(160deg,#d47d35,#8c3d12);box-shadow:inset 0 1px 0 rgba(255,236,197,.25),0 1px 3px rgba(0,0,0,.28)}.enemy-hand-count{display:flex;justify-content:center;gap:1px;margin-top:3px;min-height:12px;max-width:96px;overflow:hidden}.enemy-hand-count .mini-back{width:5px;height:9px;border-radius:1.5px;background:linear-gradient(160deg,#d47d35,#8c3d12);border:1px solid #6c3b1e;box-shadow:0 1px 2px rgba(0,0,0,.25)}.enemy-hand-count .hand-count-label{margin-left:3px;padding:2px 5px;border-radius:5px;background:rgba(13,11,10,.88);color:#f2d18b;font-size:10px;font-weight:900;line-height:12px;border:1px solid rgba(255,255,255,.08);white-space:nowrap}.enemy-meld-summary{display:none}.enemy-melds-visible{display:flex;justify-content:center;gap:3px;margin-top:3px;pointer-events:none}.enemy-meld-group{display:flex;gap:1px;padding:2px 2px 1px;border-radius:4px;background:rgba(11,9,8,.76);border:1px solid rgba(255,255,255,.10);box-shadow:0 2px 6px rgba(0,0,0,.22)}.enemy-meld-group .tile{width:clamp(13px,min(1.9vw,2.7vh),22px);height:clamp(19px,min(2.8vw,3.8vh),31px);cursor:default}.enemy-meld-group .tile .tile-char{font-size:.72em}.pos-left .enemy-hand-count,.pos-right .enemy-hand-count{max-width:110px}.pos-left .enemy-hand-count .mini-back,.pos-right .enemy-hand-count .mini-back{width:4px;height:8px}.pos-left .enemy-melds-visible,.pos-right .enemy-melds-visible{flex-direction:column;align-items:center}.pos-left .enemy-meld-group,.pos-right .enemy-meld-group{flex-direction:row}
@@ -124,6 +124,7 @@ border:1px solid rgba(255,221,164,.09)}
 .result-score-list .ready-item{padding:9px 11px;border-color:rgba(255,225,176,.08);background:rgba(255,255,255,.028)}
 @keyframes resultIn{from{opacity:0;transform:translateY(7px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes turnPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.10)}}
+@keyframes resultReveal{0%{opacity:0;transform:translateY(9px) scale(.975)}100%{opacity:1;transform:translateY(0) scale(1)}} .result-reveal .result-modal-box{animation:resultReveal .28s cubic-bezier(.2,.8,.25,1)} .result-score-row strong{color:#e8bd6c;text-shadow:0 0 10px rgba(214,164,74,.16)}
 </style>
 </head>
 <body>
@@ -284,14 +285,16 @@ border:1px solid rgba(255,221,164,.09)}
     <main id="screen-game" class="screen" aria-label="Game board">
         <section id="game-board" aria-label="Hong Kong Mahjong table">
             <div class="topbar">
-                <div class="score-panel hud-card">
-                    <div class="hud-label">Your Score</div>
-                    <div class="hud-score" id="hud-player-score">15.000</div>
-                    <div class="stick-counters">
-                        <span id="kan-counter">KAN × 0</span>
-                        <span id="riichi-stick-counter">MIN 3 FAN</span>
+                <div class="score-panel hud-card score-guide-panel">
+                    <div class="hud-label">SCORE GUIDE</div>
+                    <div class="score-guide-grid">
+                        <div><span>1 FAN</span><strong>Dragon/Wind • Kan • Tsumo</strong></div>
+                        <div><span>2 FAN</span><strong>All Simples</strong></div>
+                        <div><span>3 FAN</span><strong>All Pungs • Mixed One Suit</strong></div>
+                        <div><span>4 FAN</span><strong>Seven Pairs</strong></div>
+                        <div><span>6 FAN</span><strong>Pure One Suit</strong></div>
                     </div>
-                    <div class="kan-info" id="hud-table-total">TABLE TOTAL • 60.000</div>
+                    <div class="score-guide-rule">MIN 3 FAN • 500 / FAN</div>
                 </div>
                 <div class="furiten-panel" id="furiten-panel" aria-live="polite" aria-label="Furiten status">
                     <div class="furiten-status" id="furiten-status"></div>
@@ -416,7 +419,10 @@ try{
 
 function applyAudioSettings(){
   const bgm=byId('bg-music');
-  if(bgm)bgm.volume=audioMuted?0:musicVolume;
+  if(bgm){
+    bgm.volume=audioMuted||musicVolume===0?0:musicVolume;
+    if(audioMuted||musicVolume===0)bgm.pause();
+  }
   activeSfx.forEach(a=>a.volume=audioMuted?0:sfxVolume);
 
   const mv=byId('music-volume'),mvv=byId('music-volume-value');
@@ -432,6 +438,17 @@ function applyAudioSettings(){
 function setMusicVolume(index){
   musicVolume=audioLevel(index);
   try{localStorage.setItem('hk_music_volume',String(musicVolume))}catch{}
+  const bgm=byId('bg-music');
+  if(musicVolume===0){
+    if(bgm){
+      bgm.volume=0;
+      bgm.pause();
+      bgm.currentTime=0;
+    }
+  }else{
+    applyAudioSettings();
+    if(roundActive&&!audioMuted)playGameMusic();
+  }
   applyAudioSettings();
 }
 function setSfxVolume(index){
@@ -488,10 +505,11 @@ function unlockGameAudio(){
 }
 function playGameMusic(){
   const audio=byId('bg-music');
-  if(!audio||audioMuted)return;
+  if(!audio||audioMuted||musicVolume===0)return;
   if(!audio.src)audio.src=GAME_BGM_SRC;
   audio.loop=true;
   applyAudioSettings();
+  if(audio.volume===0)audio.volume=musicVolume;
   const p=audio.play();
   if(p&&typeof p.catch==='function')p.catch(()=>{});
 }
@@ -565,14 +583,21 @@ let mpClientId=null,mpReconnectTimer=null,mpAutoStartTimer=null,mpPendingCalls=[
 let aiSeats=new Set();
 const HUMAN_NAMES=['Player','Player 2','Player 3','Player 4'];
 
+function animateScoreValue(el,target,duration=520){
+  if(!el)return;
+  const next=Math.round(Number(target)||0);
+  const raw=el.dataset.scoreValue;
+  const current=raw!==undefined?Number(raw):Number(String(el.textContent||'').replace(/\D/g,''))||0;
+  if(current===next){el.textContent=next.toLocaleString('id-ID');el.dataset.scoreValue=String(next);return;}
+  const start=current,t0=performance.now(),ease=t=>1-Math.pow(1-t,3);
+  const frame=now=>{const p=Math.min(1,(now-t0)/duration);const value=Math.round(start+(next-start)*ease(p));el.textContent=value.toLocaleString('id-ID');el.dataset.scoreValue=String(value);if(p<1)requestAnimationFrame(frame)};
+  requestAnimationFrame(frame);
+}
 function updateScoresUI(){
   const localSeat=mp.seat??0;
   const m=mappedSeats(localSeat);
   document.querySelectorAll('.score-tag').forEach(el=>el.classList.remove('score-turn-active'));
-  m.forEach((canon,display)=>{
-    setText(`score-${display}`,Math.round(playerScores[canon]).toLocaleString('id-ID'));
-    if(canon===currentTurn)byId(`score-${display}`)?.classList.add('score-turn-active');
-  });
+  m.forEach((canon,display)=>{animateScoreValue(byId(`score-${display}`),playerScores[canon],520);if(canon===currentTurn)byId(`score-${display}`)?.classList.add('score-turn-active');});
 }
 function getRoundName(){return ['East 1','East 2','East 3','East 4','East 5','East 6'][currentRoundIndex]||`East ${currentRoundIndex+1}`}
 function playerName(i){if(mp.room?.players?.[i]?.name)return mp.room.players[i].name;if(aiSeats.has(i))return `AI ${['Red','Jade','Bamboo','Pearl'][i]||'Bot'}`;return HUMAN_NAMES[i]}
@@ -1101,7 +1126,16 @@ function triggerAction(a){
 }
 
 function nextTurn(){if(!roundActive||roundEnding)return;currentTurn=(currentTurn+1)%4;processTurn()}
-function endRound(title,desc){roundEnding=true;roundActive=false;clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);setText('res-title',title);setText('res-desc',desc);setText('res-round-label',getRoundName());const box=byId('res-scores');if(box){box.innerHTML=playerScores.map((s,i)=>`<div class="ready-item"><span>${esc(playerName(i))}</span><strong>${Math.round(s).toLocaleString('id-ID')}</strong></div>`).join('')}setDisplay('modal-result','flex');mpBroadcastState({phase:'result',result:{title,desc},playerScores})}
+function endRound(title,desc){
+  roundEnding=true;roundActive=false;clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);
+  setText('res-title',title);setText('res-desc',desc);setText('res-round-label',getRoundName());
+  const box=byId('res-scores');
+  if(box){box.innerHTML=playerScores.map((s,i)=>`<div class="ready-item result-score-row"><span>${esc(playerName(i))}</span><strong data-target-score="${Math.round(s)}">0</strong></div>`).join('');}
+  setDisplay('modal-result','flex');
+  const modal=byId('modal-result');if(modal){modal.classList.remove('result-reveal');void modal.offsetWidth;modal.classList.add('result-reveal');}
+  requestAnimationFrame(()=>{if(box)box.querySelectorAll('[data-target-score]').forEach((el,i)=>animateScoreValue(el,Number(el.dataset.targetScore),700+i*80));});
+  mpBroadcastState({phase:'result',result:{title,desc},playerScores});
+}
 function nextRoundOrFinish(){setDisplay('modal-result','none');currentRoundIndex++;if(currentRoundIndex>=4){nav('screen-play');return}currentDealerIdx=(currentDealerIdx+1)%4;setupRound();mpBroadcastState()}
 function flashBoard(kind){const e=byId('center-board-box');if(!e)return;e.classList.remove('win-flash','draw-flash');void e.offsetWidth;e.classList.add(kind==='draw'?'draw-flash':'win-flash')}
 function quitGame(){clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;stopGameMusic();nav('screen-main');if(mp.connected)mpSend('leave')}
