@@ -125,6 +125,7 @@ border:1px solid rgba(255,221,164,.09)}
 @keyframes resultIn{from{opacity:0;transform:translateY(7px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes turnPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.10)}}
 @keyframes resultReveal{0%{opacity:0;transform:translateY(9px) scale(.975)}100%{opacity:1;transform:translateY(0) scale(1)}} .result-reveal .result-modal-box{animation:resultReveal .28s cubic-bezier(.2,.8,.25,1)} .result-score-row strong{color:#e8bd6c;text-shadow:0 0 10px rgba(214,164,74,.16)}
+.timer-danger{color:#e4574f!important;text-shadow:0 0 11px rgba(228,87,79,.24);animation:timerDanger .75s ease-in-out infinite}@keyframes timerDanger{0%,100%{opacity:1}50%{opacity:.72}}
 </style>
 </head>
 <body>
@@ -508,10 +509,17 @@ function playGameMusic(){
   if(!audio||audioMuted||musicVolume===0)return;
   if(!audio.src)audio.src=GAME_BGM_SRC;
   audio.loop=true;
+  updateMusicIntensity();
   applyAudioSettings();
   if(audio.volume===0)audio.volume=musicVolume;
   const p=audio.play();
   if(p&&typeof p.catch==='function')p.catch(()=>{});
+}
+function updateMusicIntensity(){
+  const audio=byId('bg-music');
+  if(!audio)return;
+  const urgent=(fullDeck.length>0&&fullDeck.length<=20);
+  audio.playbackRate=urgent?2.0:1.0;
 }
 function stopGameMusic(){
   const audio=byId('bg-music');
@@ -690,7 +698,7 @@ function renderHand(){const wrap=byId('player-hand-tiles');if(!wrap)return;const
 function renderEnemyHands(){const s=mp.seat??0,m=mappedSeats(s);[[`enemy-hand-top`,m[2]],[`enemy-hand-right`,m[1]],[`enemy-hand-left`,m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const count=Math.max(0,playerHands[p]?.length||0);for(let i=0;i<count;i++){const b=document.createElement('span');b.className='mini-back';e.appendChild(b)}const label=document.createElement('span');label.className='hand-count-label';label.textContent=`×${count}`;e.appendChild(label);})}
 function renderRivers(){const s=mp.seat??0,m=mappedSeats(s);const selectedId=(selectedTileIndex>=0&&playerHands[s]?.[selectedTileIndex])?playerHands[s][selectedTileIndex].id:null;[['river-bottom',m[0]],['river-right',m[1]],['river-top',m[2]],['river-left',m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';(playerRivers[p]||[]).forEach(t=>{const d=document.createElement('div');d.className='discard-tile';if(selectedId!==null&&t.id===selectedId)d.classList.add('same-tile-highlight');d.dataset.tileId=t.id;d.innerHTML=tileMarkup(t);e.appendChild(d)})})}
 function renderMelds(){const s=mp.seat??0,m=mappedSeats(s);const own=byId('player-melds-container');if(own){own.innerHTML='';(playerMelds[m[0]]||[]).forEach(g=>{const box=document.createElement('div');box.className='meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});own.appendChild(box)})}const enemyMap=[['enemy-meld-top-label','enemy-meld-top-tiles',m[2]],['enemy-meld-right-label','enemy-meld-right-tiles',m[1]],['enemy-meld-left-label','enemy-meld-left-tiles',m[3]]];enemyMap.forEach(([labelId,tilesId,p])=>{const label=byId(labelId),wrap=byId(tilesId);const groups=playerMelds[p]||[];const labels=groups.map(g=>g.length===4?'Kan':(g.length===3&&g.every(t=>t.id===g[0].id)?'Pon':'Chow'));if(label)setText(labelId,labels.length?labels.join(' • '):'');if(!wrap)return;wrap.innerHTML='';groups.forEach(g=>{const box=document.createElement('div');box.className='enemy-meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});wrap.appendChild(box)})})}
-function renderTable(){renderNames();renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);const localSeat=mp.seat??0;setText('hud-player-score',Math.round(playerScores[localSeat]??0).toLocaleString('id-ID'));setText('hud-table-total',`TABLE TOTAL • ${Math.round(playerScores.reduce((a,b)=>a+b,0)).toLocaleString('id-ID')}`);setText('tiles-remaining',`SISA ${fullDeck.length}`);setText('kan-counter',`KAN × ${playerMelds.flat().filter(g=>g.length===4).length}`);setText('riichi-stick-counter','MIN 3 FAN');setText('kan-info','Hong Kong • simplified scoring');if(currentTurn===(mp.seat??0))showCurrentWaitAdvisor();else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');}}
+function renderTable(){renderNames();renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);const localSeat=mp.seat??0;setText('hud-player-score',Math.round(playerScores[localSeat]??0).toLocaleString('id-ID'));setText('hud-table-total',`TABLE TOTAL • ${Math.round(playerScores.reduce((a,b)=>a+b,0)).toLocaleString('id-ID')}`);setText('tiles-remaining',`SISA ${fullDeck.length}`);updateMusicIntensity();setText('kan-counter',`KAN × ${playerMelds.flat().filter(g=>g.length===4).length}`);setText('riichi-stick-counter','MIN 3 FAN');setText('kan-info','Hong Kong • simplified scoring');if(currentTurn===(mp.seat??0))showCurrentWaitAdvisor();else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');}}
 
 function evaluateHK(pIdx,winningTile,isTsumo=false){
   const hand=playerHands[pIdx]||[];
@@ -784,6 +792,12 @@ function isWinningShape(tiles,meldCount=0){
   }
   return false;
 }
+function updateTurnTimerVisual(){
+  const el=byId('turn-timer-display');
+  if(!el)return;
+  const urgent=Number(secondsLeft)<5;
+  el.classList.toggle('timer-danger',urgent);
+}
 function updateTimeBankUI(p=currentTurn){
   const el=byId('player-time-bank');
   if(el)el.textContent=`+${Math.max(0,timeBank[p]??0)}s`;
@@ -796,17 +810,17 @@ function startTurnTimer(){
   isActionPhase=false;actionSecondsLeft=0;pendingCallChoice=null;actionTimeoutHandler=null;actionSeat=-1;actionMode='';
   const p=currentTurn;
   secondsLeft=TURN_BASE_SECONDS;
-  setText('turn-timer-display',secondsLeft);
+  setText('turn-timer-display',secondsLeft);updateTurnTimerVisual();
   updateTimeBankUI(p);
   broadcastTimerState();
   turnTimer=setInterval(()=>{
     if(!roundActive||roundEnding){clearInterval(turnTimer);return}
     if(secondsLeft>0){
       secondsLeft--;
-      setText('turn-timer-display',secondsLeft);
+      setText('turn-timer-display',secondsLeft);updateTurnTimerVisual();
     }else if((timeBank[p]||0)>0){
       timeBank[p]--;
-      setText('turn-timer-display',timeBank[p]);
+      setText('turn-timer-display',timeBank[p]);updateTurnTimerVisual();
       updateTimeBankUI(p);
       if(timeBank[p]<=0){clearInterval(turnTimer);broadcastTimerState();autoDiscardCurrent();return}
     }else{
@@ -858,7 +872,7 @@ function startBankTimerOnly(p=currentTurn){
     if(!roundActive||roundEnding){clearInterval(turnTimer);return}
     if((timeBank[p]||0)>0){
       timeBank[p]--;
-      setText('turn-timer-display',timeBank[p]);
+      setText('turn-timer-display',timeBank[p]);updateTurnTimerVisual();
       updateTimeBankUI(p);
       broadcastTimerState({phase:'bank-only',seat:p});
       if(timeBank[p]<=0){clearInterval(turnTimer);autoDiscardCurrent();}
