@@ -126,6 +126,7 @@ border:1px solid rgba(255,221,164,.09)}
 @keyframes turnPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.10)}}
 @keyframes resultReveal{0%{opacity:0;transform:translateY(9px) scale(.975)}100%{opacity:1;transform:translateY(0) scale(1)}} .result-reveal .result-modal-box{animation:resultReveal .28s cubic-bezier(.2,.8,.25,1)} .result-score-row strong{color:#e8bd6c;text-shadow:0 0 10px rgba(214,164,74,.16)}
 .timer-danger{color:#e4574f!important;text-shadow:0 0 11px rgba(228,87,79,.24);animation:timerDanger .75s ease-in-out infinite}@keyframes timerDanger{0%,100%{opacity:1}50%{opacity:.72}}
+.smart-assistant{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);display:grid;gap:2px;min-width:170px;max-width:min(58vw,330px);padding:6px 9px;border-radius:9px;border:1px solid rgba(224,180,93,.22);background:linear-gradient(180deg,rgba(25,20,15,.96),rgba(10,9,8,.98));box-shadow:0 10px 26px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,235,192,.05);backdrop-filter:blur(10px);pointer-events:none;animation:smartAssistantIn .18s ease-out}.smart-assistant[hidden]{display:none}.smart-assistant-title{font-size:8px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:#e0b45d}.smart-assistant-detail{font-size:7px;font-weight:750;line-height:1.25;color:#c8bfb1;white-space:normal;text-align:center}.smart-assistant.is-green{border-color:rgba(85,199,154,.32)}.smart-assistant.is-green .smart-assistant-title{color:#69d3ab}.smart-assistant.is-red{border-color:rgba(217,101,90,.36)}.smart-assistant.is-red .smart-assistant-title{color:#e26d61}@keyframes smartAssistantIn{from{opacity:0;transform:translate(-50%,4px) scale(.98)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
 </style>
 </head>
 <body>
@@ -355,6 +356,10 @@ border:1px solid rgba(255,221,164,.09)}
             <div id="action-overlay" aria-live="polite"></div>
             <div class="melds-container" id="player-melds-container"></div>
             <div class="hand-bottom-container">
+                <div id="smart-assistant" class="smart-assistant" aria-live="polite" hidden>
+                    <div id="smart-assistant-title" class="smart-assistant-title"></div>
+                    <div id="smart-assistant-detail" class="smart-assistant-detail"></div>
+                </div>
                 <div class="hand-tiles" id="player-hand-tiles"></div>
             </div>
         </section>
@@ -667,30 +672,11 @@ function showTileAdvisor(index){
   setText('hand-status-main',`Buang ${name} → belum Tenpai`);
   setText('hand-status-sub','Belum ada 1 kartu langsung menuju Mahjong dari buangan ini.');
 }
-function showCurrentWaitAdvisor(){
-  const p=mp.seat??0,hand=playerHands[p]||[];
-  const meldCount=(playerMelds[p]||[]).length;
-  if(hand.length===14){
-    const win=checkCurrentWin(p,null,true);
-    if(win?.valid){
-      setText('hand-status-main','TSUMO tersedia');
-      setText('hand-status-sub',`${win.yakuStr} • ${win.points} poin`);
-      return;
-    }
-  }
-  if(hand.length===13){
-    const waits=getWaitIds(hand,meldCount),known=advisorKnownCounts();
-    if(waits.length){
-      const parts=waits.map(id=>`${tileLabelById(id)} ×${Math.max(0,4-(known[id]||0))}`);
-      const live=parts.filter((_,i)=>4-(known[waits[i]]||0)>0);
-      setText('hand-status-main',`TENPAI • butuh ${waits.length} kartu`);
-      setText('hand-status-sub',live.length?`Tsumo/Ron: ${live.join(' · ')}`:'Semua kartu tunggu yang diketahui sudah habis.');
-      return;
-    }
-  }
-  setText('hand-status-main','Giliran Anda');
-  setText('hand-status-sub','Klik tile untuk melihat kartu yang dibutuhkan dan sisa yang masih tersedia.');
-}
+function smartAssistantShow(title,detail,tone='gold'){const box=byId('smart-assistant');if(!box)return;box.hidden=false;box.classList.remove('is-green','is-red');if(tone==='green')box.classList.add('is-green');if(tone==='red')box.classList.add('is-red');setText('smart-assistant-title',title);setText('smart-assistant-detail',detail)}
+function smartAssistantHide(){const box=byId('smart-assistant');if(!box)return;box.hidden=true;box.classList.remove('is-green','is-red');setText('smart-assistant-title','');setText('smart-assistant-detail','')}
+function updateCriticalAssistant(){if(!roundActive||currentTurn!==(mp.seat??0))return false;if(Number(secondsLeft)<5){smartAssistantShow(`${secondsLeft} DETIK`,'Pilih tile sekarang.','red');return true}return false}
+function showCurrentWaitAdvisor(){const p=mp.seat??0,hand=playerHands[p]||[],meldCount=(playerMelds[p]||[]).length;if(hand.length===14){const win=checkCurrentWin(p,null,true);if(win?.valid){smartAssistantShow('TSUMO TERSEDIA',`${win.fan} FAN • ${win.points.toLocaleString('id-ID')} poin`,'green');return;}}if(hand.length===13){const waits=getWaitIds(hand,meldCount),known=advisorKnownCounts();if(waits.length){const live=waits.map(id=>({id,left:Math.max(0,4-(known[id]||0))})).filter(x=>x.left>0).map(x=>`${tileLabelById(x.id)} ×${x.left}`).join(' • ');if(live)smartAssistantShow('TENPAI',`Menunggu: ${live}`,'gold');else smartAssistantShow('TENPAI • WAIT HABIS','Semua tile tunggu yang diketahui sudah habis.','red');return;}}smartAssistantHide()}
+
 function countDiscardedTile(id){let n=0;for(const river of playerRivers||[])for(const t of (river||[]))if(t&&t.id===id)n++;return n}
 function countKnownTile(id){const known=advisorKnownCounts();return known[id]||0}
 function highlightMatchingTiles(tileId){document.querySelectorAll('#player-hand-tiles .tile').forEach(x=>x.classList.toggle('same-tile-highlight',Number(x.dataset.tileId)===tileId));document.querySelectorAll('.discard-tile').forEach(x=>x.classList.toggle('same-tile-highlight',Number(x.dataset.tileId)===tileId));}
@@ -810,17 +796,17 @@ function startTurnTimer(){
   isActionPhase=false;actionSecondsLeft=0;pendingCallChoice=null;actionTimeoutHandler=null;actionSeat=-1;actionMode='';
   const p=currentTurn;
   secondsLeft=TURN_BASE_SECONDS;
-  setText('turn-timer-display',secondsLeft);updateTurnTimerVisual();
+  setText('turn-timer-display',secondsLeft);updateTurnTimerVisual();updateCriticalAssistant();
   updateTimeBankUI(p);
   broadcastTimerState();
   turnTimer=setInterval(()=>{
     if(!roundActive||roundEnding){clearInterval(turnTimer);return}
     if(secondsLeft>0){
       secondsLeft--;
-      setText('turn-timer-display',secondsLeft);updateTurnTimerVisual();
+      setText('turn-timer-display',secondsLeft);updateTurnTimerVisual();updateCriticalAssistant();
     }else if((timeBank[p]||0)>0){
       timeBank[p]--;
-      setText('turn-timer-display',timeBank[p]);updateTurnTimerVisual();
+      setText('turn-timer-display',timeBank[p]);updateTurnTimerVisual();updateCriticalAssistant();
       updateTimeBankUI(p);
       if(timeBank[p]<=0){clearInterval(turnTimer);broadcastTimerState();autoDiscardCurrent();return}
     }else{
@@ -872,7 +858,7 @@ function startBankTimerOnly(p=currentTurn){
     if(!roundActive||roundEnding){clearInterval(turnTimer);return}
     if((timeBank[p]||0)>0){
       timeBank[p]--;
-      setText('turn-timer-display',timeBank[p]);updateTurnTimerVisual();
+      setText('turn-timer-display',timeBank[p]);updateTurnTimerVisual();updateCriticalAssistant();
       updateTimeBankUI(p);
       broadcastTimerState({phase:'bank-only',seat:p});
       if(timeBank[p]<=0){clearInterval(turnTimer);autoDiscardCurrent();}
@@ -889,7 +875,7 @@ function processTurn(){
   const t=drawTile();if(!t){const r=settleExhaustiveDraw();renderTable();endRound(r.changed?'DRAW • TENPAI BONUS':'DRAW',r.desc);return}playerHands[currentTurn].push(t);drawnTile=t;playSfx('draw');sortHand(currentTurn);renderTable();
   const turnActions=[];const win=checkCurrentWin(currentTurn,null,true);if(win?.valid)turnActions.push('Tsumo');
   const selfKans=getSelfKanOptions(currentTurn);if(selfKans.length)turnActions.push('Kan');
-  if(aiSeats.has(currentTurn)){setText('hand-status-main',`${playerName(currentTurn)} berpikir...`);setText('hand-status-sub','AI memilih aksi dan buangan.');
+  if(aiSeats.has(currentTurn)){smartAssistantHide();setText('hand-status-main',`${playerName(currentTurn)} berpikir...`);setText('hand-status-sub','AI memilih aksi dan buangan.');
     if(win?.valid){resolveWin(currentTurn,win,true);return}
     if(selfKans.length&&Math.random()<.28){executeSelfKan(currentTurn,selfKans[0]);return}
     aiMoveTimer=setTimeout(()=>aiDiscard(currentTurn),450)
@@ -916,7 +902,7 @@ function processTurn(){
   mpBroadcastState({remoteActions:(!aiSeats.has(currentTurn)&&currentTurn!==(mp.seat??0))?{seat:currentTurn,actions:turnActions,actionWindow:turnActions.length?ACTION_WINDOW_SECONDS:0}:[],handStatus:{seat:currentTurn,main:'GILIRAN',sub:currentTurn===(mp.seat??0)?'Pilih tile untuk dibuang.':(turnActions.length?`Aksi tersedia: ${turnActions.join(' / ')}`:'Menunggu.')}})
 }
 function aiDiscard(p){if(!roundActive||roundEnding)return;const h=playerHands[p];if(!h.length)return;let best=0;for(let i=0;i<h.length;i++){const t=h[i];if(isSimple(t))best=i; if(t.type==='honor')best=i}const tile=h.splice(best,1)[0];drawnTile=null;commitDiscard(p,tile)}
-function handleTileTap(i,el){if(currentTurn!==(mp.seat??0)||!isDiscardable)return;const h=playerHands[mp.seat??0]||[],picked=h[i];if(!picked)return;document.querySelectorAll('#player-hand-tiles .tile, .discard-tile').forEach(x=>{x.classList.remove('selected-tile');x.classList.toggle('same-tile-highlight',Number(x.dataset.tileId)===picked.id)});el.classList.add('selected-tile');if(selectedTileIndex===i){discardTile(i);return}selectedTileIndex=i;showTileAdvisor(i);const discarded=countDiscardedTile(picked.id),known=countKnownTile(picked.id),left=Math.max(0,4-known);setText('hand-status-sub',`${byId('hand-status-sub')?.textContent||''} • ${picked.val||'Tile'}: dibuang ${discarded}, terlihat ${known}, sisa ${left}`)}
+function handleTileTap(i,el){if(currentTurn!==(mp.seat??0)||!isDiscardable)return;const h=playerHands[mp.seat??0]||[],picked=h[i];if(!picked)return;document.querySelectorAll('#player-hand-tiles .tile, .discard-tile').forEach(x=>{x.classList.remove('selected-tile');x.classList.toggle('same-tile-highlight',Number(x.dataset.tileId)===picked.id)});el.classList.add('selected-tile');if(selectedTileIndex===i){discardTile(i);return}selectedTileIndex=i}
 function discardTile(i){if(currentTurn!==(mp.seat??0)||!isDiscardable)return;clearInterval(turnTimer);const tile=playerHands[currentTurn]?.[i];if(!tile)return;selectedTileIndex=-1;isDiscardable=false;drawnTile=null;if(isMultiplayerMode&&!mp.host){mpSend('action',{action:{type:'discard',uniqueId:tile.uniqueId}});return}playerHands[currentTurn].splice(i,1);sortHand(currentTurn);renderTable();commitDiscard(currentTurn,tile)}
 function getDiscardCallOptions(p,tile){
   if(!tile||p===lastDiscarderIdx)return [];
@@ -1076,8 +1062,10 @@ function hideAvailableActions(){
   const o=byId('action-overlay');
   if(o){o.innerHTML='';o.style.display='none';o.hidden=true;}
   isActionPhase=false;
+  showCurrentWaitAdvisor();
 }
 function showAvailableActions(actions){
+  if((actions||[]).some(a=>(typeof a==='string'?a:a?.type)==='Ron'))smartAssistantShow('RON TERSEDIA','Kartu buangan terakhir membuat Anda bisa menang.','green');
   const o=byId('action-overlay');
   hideAvailableActions();
   if(!o||!Array.isArray(actions)||!actions.length)return;
@@ -1140,7 +1128,7 @@ function triggerAction(a){
 }
 
 function nextTurn(){if(!roundActive||roundEnding)return;currentTurn=(currentTurn+1)%4;processTurn()}
-function endRound(title,desc){
+function endRound(title,desc){smartAssistantHide();
   roundEnding=true;roundActive=false;clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);
   setText('res-title',title);setText('res-desc',desc);setText('res-round-label',getRoundName());
   const box=byId('res-scores');
