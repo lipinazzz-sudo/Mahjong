@@ -1251,6 +1251,174 @@ function mpTapRemoteDiscard(t){mpSend('action',{action:{type:'discard',uniqueId:
 function mpCopyRoomInfo(){mpCopyRoomLink()}
 function mpReconnect(){const saved=mpLoadSession();if(!saved?.room)return;mp.playerName=saved.name||'Player';mp.host=!!saved.host;mp.seat=saved.seat;mp.ready=true;mp.started=!!saved.started;mp.room={code:saved.room,players:[null,null,null,null],started:!!saved.started};setDisplay('modal-lobby','flex');setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');mpConnect(saved.room,mp.host?'host':'guest')}
 window.mpConnect=mpConnect;window.mpSend=mpSend;window.openPlayerLobby=openPlayerLobby;window.mpCreateRoom=mpCreateRoom;window.mpJoinRoom=mpJoinRoom;window.mpShowJoinForm=mpShowJoinForm;window.togglePlayerReady=togglePlayerReady;window.mpStartGame=mpStartGame;window.closeLobby=closeLobby;window.mpCopyRoomLink=mpCopyRoomLink;window.mpCopyRoomInfo=mpCopyRoomInfo;
+<!-- ========================================================= -->
+<!-- INTEGRASI FITUR: SCORE COUNT-UP, RESULT ANIMATION & GUIDE -->
+<!-- Taruh blok ini di baris paling bawah sebelum tag </body>   -->
+<!-- ========================================================= -->
+
+<style>
+  /* 1. ANIMASI RESULT SCREEN (Masuk Elegan & Halus) */
+  /* Menangkap berbagai kemungkinan ID/Class modal hasil ronde */
+  #result-screen, #resultModal, .result-modal, .result-screen, #gameOverModal {
+    animation: resultEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  }
+
+  @keyframes resultEntrance {
+    0% {
+      opacity: 0;
+      transform: translateY(25px) scale(0.96);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* 2. PANEL SCORE GUIDE */
+  #score-guide-panel {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: rgba(18, 18, 24, 0.88);
+    border: 1px solid #D4AF37;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: #FFFFFF;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    z-index: 99999;
+    pointer-events: none;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    max-width: 280px;
+  }
+
+  #score-guide-panel h4 {
+    margin: 0 0 10px 0;
+    color: #D4AF37;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .sg-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    font-size: 12px;
+    gap: 12px;
+  }
+
+  .sg-fan {
+    color: #FFD700;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .sg-desc {
+    color: #E2E8F0;
+    text-align: right;
+  }
+
+  .sg-footer {
+    margin-top: 10px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(212, 175, 55, 0.4);
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #FFA500;
+    letter-spacing: 0.8px;
+  }
+</style>
+
+<script>
+(function() {
+  // ---------------------------------------------------------
+  // A. MEMPASANG SCORE GUIDE UI DILAYAR
+  // ---------------------------------------------------------
+  const guideHTML = `
+    <div id="score-guide-panel">
+      <h4>Score Guide</h4>
+      <div class="sg-row"><span class="sg-fan">1 FAN</span><span class="sg-desc">Dragon/Wind • Kan • Tsumo</span></div>
+      <div class="sg-row"><span class="sg-fan">2 FAN</span><span class="sg-desc">All Simples</span></div>
+      <div class="sg-row"><span class="sg-fan">3 FAN</span><span class="sg-desc">All Pungs • Mixed One Suit</span></div>
+      <div class="sg-row"><span class="sg-fan">4 FAN</span><span class="sg-desc">Seven Pairs</span></div>
+      <div class="sg-row"><span class="sg-fan">6 FAN</span><span class="sg-desc">Pure One Suit</span></div>
+      <div class="sg-footer">MIN 3 FAN • 500 / FAN</div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', guideHTML);
+
+  // ---------------------------------------------------------
+  // B. KONTROL ANIMASI COUNT-UP (500 - 700 ms)
+  // Tidak memodifikasi logika kalkulasi skor asli game.
+  // ---------------------------------------------------------
+  function animateScore(element, startVal, endVal, duration = 600) {
+    let startTime = null;
+    const diff = endVal - startVal;
+
+    function step(currentTime) {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+      
+      // Easing function (Cubic Out) agar gerakan halus di akhir
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+      const currentVal = Math.floor(startVal + (diff * easeProgress));
+
+      element.textContent = currentVal.toLocaleString();
+
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        element.textContent = endVal.toLocaleString();
+        element.dataset.animating = "false";
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  // Monitor perubahan teks skor secara otomatis tanpa merusak fungsi JS asli
+  function attachScoreObserver() {
+    // Mencakup elemen skor permainan & elemen skor layar Result
+    const targets = document.querySelectorAll(
+      '[id*="score"], [class*="score"], .player-score, #result-score, .result-score'
+    );
+
+    targets.forEach(el => {
+      // Hindari memantau panel Score Guide
+      if (el.closest('#score-guide-panel')) return;
+      if (el.dataset.hasScoreObserver) return;
+
+      el.dataset.hasScoreObserver = "true";
+      let initialVal = parseInt(el.textContent.replace(/[^0-9-]/g, '')) || 0;
+      el.dataset.lastScore = initialVal;
+
+      const observer = new MutationObserver(() => {
+        if (el.dataset.animating === "true") return;
+
+        let newScore = parseInt(el.textContent.replace(/[^0-9-]/g, ''));
+        let oldScore = parseInt(el.dataset.lastScore) || 0;
+
+        if (!isNaN(newScore) && newScore !== oldScore) {
+          el.dataset.animating = "true";
+          el.textContent = oldScore.toLocaleString(); // Tahan di angka lama lalu count-up
+          
+          animateScore(el, oldScore, newScore, 600); // Durasi 600ms (antara 500ms - 700ms)
+          el.dataset.lastScore = newScore;
+        }
+      });
+
+      observer.observe(el, { childList: true, characterData: true, subtree: true });
+    });
+  }
+
+  // Inisialisasi observer
+  attachScoreObserver();
+  setInterval(attachScoreObserver, 1500); // Memastikan jika layar Result muncul baru, skornya tetap animasi
+})();
 </script>
 </body>
 </html>
