@@ -591,7 +591,40 @@ function canFormMelds(c){for(let i=0;i<34;i++){if(c[i]>=3){c[i]-=3;if(canFormMel
 function isSevenPairs(c){let pairs=0;for(const n of c){if(n===2)pairs++;else if(n===4)pairs+=2;else if(n!==0)return false}return pairs===7}
 function isStandardWin(tiles,meldCount=0){const needed=14-meldCount*3;if((tiles?.length||0)!==needed)return false;const c=tileCounts(tiles);if(isSevenPairs(c)&&meldCount===0)return true;for(let i=0;i<34;i++)if(c[i]>=2){c[i]-=2;if(canFormMelds(c))return true;c[i]+=2}return false}
 function checkWinningHand(tiles,meldCount=0){return isWinningShape(tiles,meldCount)}
-function getWaitIds(hand13,meldCount=0){if(!hand13||hand13.length%3!==1)return[];const out=[];for(const t of TILE_TYPES){if(tileCounts([...hand13,t]).some(n=>n>4))continue;if(checkWinningHand([...hand13,t],meldCount))out.push(t.id)}return out}
+const waitCache=new Map();
+function checkWinningHandCounts(counts,meldCount=0){
+  if(isSevenPairs(counts)&&meldCount===0)return true;
+  const needed=14-meldCount*3;
+  let total=0;
+  for(const n of counts)total+=n;
+  if(total!==needed)return false;
+  for(let i=0;i<34;i++){
+    if(counts[i]<2)continue;
+    counts[i]-=2;
+    if(canFormMelds(counts)){counts[i]+=2;return true;}
+    counts[i]+=2;
+  }
+  return false;
+}
+function getWaitIds(hand13,meldCount=0){
+  if(!hand13||hand13.length%3!==1)return[];
+  const key=`${meldCount}|${tileCounts(hand13).join(',')}`;
+  const cached=waitCache.get(key);
+  if(cached)return cached.slice();
+
+  const out=[];
+  const baseCounts=tileCounts(hand13);
+  for(const t of TILE_TYPES){
+    if(baseCounts[t.id]>=4)continue;
+    const candidate=baseCounts.slice();
+    candidate[t.id]++;
+    if(checkWinningHandCounts(candidate,meldCount))out.push(t.id);
+  }
+
+  waitCache.set(key,out.slice());
+  if(waitCache.size>96)waitCache.delete(waitCache.keys().next().value);
+  return out;
+}
 function isTenpai(hand,meldCount=0){return getWaitIds(hand,meldCount).length>0}
 
 let fullDeck=[],playerHands=[[],[],[],[]],playerRivers=[[],[],[],[]],playerMelds=[[],[],[],[]];
@@ -635,13 +668,29 @@ function renderNames(){
   setText('round-title-display',getRoundName());
 }
 // -------- Hand advisor: known remaining tiles + one-away waits --------
+let advisorKnownCacheKey='';
+let advisorKnownCache=null;
 function advisorKnownCounts(excludeSeatHand=false){
+  const seat=mp.seat??0;
+  const hand=playerHands[seat]||[];
+  const key=[
+    seat,
+    excludeSeatHand?'1':'0',
+    hand.map(t=>t?.uniqueId||'').join(','),
+    (playerRivers||[]).map(r=>(r||[]).map(t=>t?.uniqueId||'').join(',')).join('|'),
+    (playerMelds||[]).map(gs=>(gs||[]).map(g=>(g||[]).map(t=>t?.uniqueId||'').join(',')).join('/')).join('|')
+  ].join('||');
+
+  if(advisorKnownCache && advisorKnownCacheKey===key)return advisorKnownCache.slice();
+
   const known=Array(34).fill(0);
-  // Every tile visible to the player is counted. Hidden opponent hands are intentionally ignored.
-  for(const t of (playerHands[mp.seat??0]||[])) if(t) known[t.id]++;
-  for(const river of playerRivers||[]) for(const t of (river||[])) if(t) known[t.id]++;
-  for(const groups of playerMelds||[]) for(const g of (groups||[])) for(const t of (g||[])) if(t) known[t.id]++;
-  return known;
+  if(!excludeSeatHand)for(const t of hand)if(t)known[t.id]++;
+  for(const river of playerRivers||[])for(const t of (river||[]))if(t)known[t.id]++;
+  for(const groups of playerMelds||[])for(const g of (groups||[]))for(const t of (g||[]))if(t)known[t.id]++;
+
+  advisorKnownCacheKey=key;
+  advisorKnownCache=known;
+  return known.slice();
 }
 function tileLabelById(id){const t=TILE_TYPES[id];return t?t.val:'?'}
 function formatWaitList(waitIds,known){
@@ -681,10 +730,66 @@ function showTileAdvisor(index){
   setText('hand-status-main',`Buang ${name} → belum Tenpai`);
   setText('hand-status-sub','Belum ada 1 kartu langsung menuju Mahjong dari buangan ini.');
 }
-function smartAssistantShow(title,detail,tone='gold'){const box=byId('smart-assistant');if(!box)return;box.hidden=false;box.classList.remove('is-green','is-red');if(tone==='green')box.classList.add('is-green');if(tone==='red')box.classList.add('is-red');setText('smart-assistant-title',title);setText('smart-assistant-detail',detail)}
-function smartAssistantHide(){const box=byId('smart-assistant');if(!box)return;box.hidden=true;box.classList.remove('is-green','is-red');setText('smart-assistant-title','');setText('smart-assistant-detail','')}
+let smartAssistantState={title:'',detail:'',tone:'',visible:false};
+function smartAssistantShow(title,detail,tone='gold'){
+  const box=byId('smart-assistant');
+  if(!box)return;
+  if(smartAssistantState.visible&&smartAssistantState.title===title&&smartAssistantState.detail===detail&&smartAssistantState.tone===tone)return;
+  smartAssistantState={title,detail,tone,visible:true};
+  box.hidden=false;
+  box.classList.remove('is-green','is-red');
+  if(tone==='green')box.classList.add('is-green');
+  if(tone==='red')box.classList.add('is-red');
+  setText('smart-assistant-title',title);
+  setText('smart-assistant-detail',detail);
+}
+function smartAssistantHide(){
+  const box=byId('smart-assistant');
+  if(!box)return;
+  if(!smartAssistantState.visible)return;
+  smartAssistantState={title:'',detail:'',tone:'',visible:false};
+  box.hidden=true;
+  box.classList.remove('is-green','is-red');
+  setText('smart-assistant-title','');
+  setText('smart-assistant-detail','');
+}
 function updateCriticalAssistant(){if(!roundActive||currentTurn!==(mp.seat??0))return false;if(Number(secondsLeft)<5){smartAssistantShow(`${secondsLeft} DETIK`,'Pilih tile sekarang.','red');return true}return false}
-function showCurrentWaitAdvisor(){const p=mp.seat??0,hand=playerHands[p]||[],meldCount=(playerMelds[p]||[]).length;if(hand.length===14){const win=checkCurrentWin(p,null,true);if(win?.valid){smartAssistantShow('TSUMO TERSEDIA',`${win.fan} FAN • ${win.points.toLocaleString('id-ID')} poin`,'green');return;}}if(hand.length===13){const waits=getWaitIds(hand,meldCount),known=advisorKnownCounts();if(waits.length){const live=waits.map(id=>({id,left:Math.max(0,4-(known[id]||0))})).filter(x=>x.left>0).map(x=>`${tileLabelById(x.id)} ×${x.left}`).join(' • ');if(live)smartAssistantShow('TENPAI',`Menunggu: ${live}`,'gold');else smartAssistantShow('TENPAI • WAIT HABIS','Semua tile tunggu yang diketahui sudah habis.','red');return;}}smartAssistantHide()}
+let assistantDecisionKey='';
+function showCurrentWaitAdvisor(){
+  const p=mp.seat??0;
+  const hand=playerHands[p]||[];
+  const meldCount=(playerMelds[p]||[]).length;
+  const handKey=hand.map(t=>t?.uniqueId||'').join(',');
+  const known=advisorKnownCounts();
+  const key=`${p}|${currentTurn}|${handKey}|${meldCount}|${known.join(',')}`;
+
+  if(key===assistantDecisionKey)return;
+  assistantDecisionKey=key;
+
+  if(hand.length===14){
+    const win=checkCurrentWin(p,null,true);
+    if(win?.valid){
+      smartAssistantShow('TSUMO TERSEDIA',`${win.fan} FAN • ${win.points.toLocaleString('id-ID')} poin`,'green');
+      return;
+    }
+  }
+
+  if(hand.length===13){
+    const waits=getWaitIds(hand,meldCount);
+    if(waits.length){
+      const live=waits
+        .map(id=>({id,left:Math.max(0,4-(known[id]||0))}))
+        .filter(x=>x.left>0)
+        .map(x=>`${tileLabelById(x.id)} ×${x.left}`)
+        .join(' • ');
+      if(live)smartAssistantShow('TENPAI',`Menunggu: ${live}`,'gold');
+      else smartAssistantShow('TENPAI • WAIT HABIS','Semua tile tunggu yang diketahui sudah habis.','red');
+      return;
+    }
+  }
+
+  smartAssistantHide();
+}
 
 function countDiscardedTile(id){let n=0;for(const river of playerRivers||[])for(const t of (river||[]))if(t&&t.id===id)n++;return n}
 function countKnownTile(id){const known=advisorKnownCounts();return known[id]||0}
@@ -693,7 +798,7 @@ function renderHand(){const wrap=byId('player-hand-tiles');if(!wrap)return;const
 function renderEnemyHands(){const s=mp.seat??0,m=mappedSeats(s);[[`enemy-hand-top`,m[2]],[`enemy-hand-right`,m[1]],[`enemy-hand-left`,m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const count=Math.max(0,playerHands[p]?.length||0);for(let i=0;i<count;i++){const b=document.createElement('span');b.className='mini-back';e.appendChild(b)}const label=document.createElement('span');label.className='hand-count-label';label.textContent=`×${count}`;e.appendChild(label);})}
 function renderRivers(){const s=mp.seat??0,m=mappedSeats(s);const selectedId=(selectedTileIndex>=0&&playerHands[s]?.[selectedTileIndex])?playerHands[s][selectedTileIndex].id:null;[['river-bottom',m[0]],['river-right',m[1]],['river-top',m[2]],['river-left',m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';(playerRivers[p]||[]).forEach(t=>{const d=document.createElement('div');d.className='discard-tile';if(selectedId!==null&&t.id===selectedId)d.classList.add('same-tile-highlight');d.dataset.tileId=t.id;d.innerHTML=tileMarkup(t);e.appendChild(d)})})}
 function renderMelds(){const s=mp.seat??0,m=mappedSeats(s);const own=byId('player-melds-container');if(own){own.innerHTML='';(playerMelds[m[0]]||[]).forEach(g=>{const box=document.createElement('div');box.className='meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});own.appendChild(box)})}const enemyMap=[['enemy-meld-top-label','enemy-meld-top-tiles',m[2]],['enemy-meld-right-label','enemy-meld-right-tiles',m[1]],['enemy-meld-left-label','enemy-meld-left-tiles',m[3]]];enemyMap.forEach(([labelId,tilesId,p])=>{const label=byId(labelId),wrap=byId(tilesId);const groups=playerMelds[p]||[];const labels=groups.map(g=>g.length===4?'Kan':(g.length===3&&g.every(t=>t.id===g[0].id)?'Pon':'Chow'));if(label)setText(labelId,labels.length?labels.join(' • '):'');if(!wrap)return;wrap.innerHTML='';groups.forEach(g=>{const box=document.createElement('div');box.className='enemy-meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});wrap.appendChild(box)})})}
-function renderTable(){renderNames();renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);const localSeat=mp.seat??0;setText('hud-player-score',Math.round(playerScores[localSeat]??0).toLocaleString('id-ID'));setText('hud-table-total',`TABLE TOTAL • ${Math.round(playerScores.reduce((a,b)=>a+b,0)).toLocaleString('id-ID')}`);setText('tiles-remaining',`SISA ${fullDeck.length}`);updateMusicIntensity();setText('kan-counter',`KAN × ${playerMelds.flat().filter(g=>g.length===4).length}`);setText('riichi-stick-counter','MIN 3 FAN');setText('kan-info','Hong Kong • simplified scoring');if(currentTurn===(mp.seat??0))showCurrentWaitAdvisor();else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');}}
+function renderTable(){advisorKnownCacheKey='';advisorKnownCache=null;renderNames();renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);const localSeat=mp.seat??0;setText('hud-player-score',Math.round(playerScores[localSeat]??0).toLocaleString('id-ID'));setText('hud-table-total',`TABLE TOTAL • ${Math.round(playerScores.reduce((a,b)=>a+b,0)).toLocaleString('id-ID')}`);setText('tiles-remaining',`SISA ${fullDeck.length}`);updateMusicIntensity();setText('kan-counter',`KAN × ${playerMelds.flat().filter(g=>g.length===4).length}`);setText('riichi-stick-counter','MIN 3 FAN');setText('kan-info','Hong Kong • simplified scoring');if(currentTurn===(mp.seat??0))showCurrentWaitAdvisor();else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');}}
 
 function isAllPungsHand(hand,melds){
   // An exposed Chow immediately disqualifies All Pungs. Kongs are allowed.
@@ -757,7 +862,7 @@ function evaluateHK(pIdx,winningTile,isTsumo=false){
   };
 }
 function drawTile(){if(!fullDeck.length)return null;return fullDeck.pop()}
-function setupRound(){
+function setupRound(){assistantDecisionKey='';advisorKnownCacheKey='';advisorKnownCache=null;
   fullDeck=makeDeck();playerHands=[[],[],[],[]];playerRivers=[[],[],[],[]];playerMelds=[[],[],[],[]];lastDiscardedTile=null;lastDiscarderIdx=-1;selectedTileIndex=-1;roundEnding=false;roundActive=true;secondsLeft=TURN_BASE_SECONDS;timeBank=[TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX];actionSecondsLeft=0;pendingCallChoice=null;clearInterval(turnTimer);clearInterval(actionTimer);
   for(let n=0;n<13;n++)for(let p=0;p<4;p++)playerHands[p].push(fullDeck.pop());
   for(let p=0;p<4;p++)sortHand(p);
