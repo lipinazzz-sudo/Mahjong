@@ -128,6 +128,7 @@ border:1px solid rgba(255,221,164,.09)}
 @keyframes resultReveal{0%{opacity:0;transform:translateY(9px) scale(.975)}100%{opacity:1;transform:translateY(0) scale(1)}} .result-reveal .result-modal-box{animation:resultReveal .28s cubic-bezier(.2,.8,.25,1)} .result-score-row strong{color:#e8bd6c;text-shadow:0 0 10px rgba(214,164,74,.16)}
 .timer-danger{color:#e4574f!important;text-shadow:0 0 11px rgba(228,87,79,.24);animation:timerDanger .75s ease-in-out infinite}@keyframes timerDanger{0%,100%{opacity:1}50%{opacity:.72}}
 .smart-assistant{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);display:grid;gap:2px;min-width:170px;max-width:min(58vw,330px);padding:6px 9px;border-radius:9px;border:1px solid rgba(224,180,93,.22);background:linear-gradient(180deg,rgba(25,20,15,.96),rgba(10,9,8,.98));box-shadow:0 10px 26px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,235,192,.05);backdrop-filter:blur(10px);pointer-events:none;animation:smartAssistantIn .18s ease-out}.smart-assistant[hidden]{display:none}.smart-assistant-title{font-size:8px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:#e0b45d}.smart-assistant-detail{font-size:7px;font-weight:750;line-height:1.25;color:#c8bfb1;white-space:normal;text-align:center}.smart-assistant.is-green{border-color:rgba(85,199,154,.32)}.smart-assistant.is-green .smart-assistant-title{color:#69d3ab}.smart-assistant.is-red{border-color:rgba(217,101,90,.36)}.smart-assistant.is-red .smart-assistant-title{color:#e26d61}@keyframes smartAssistantIn{from{opacity:0;transform:translate(-50%,4px) scale(.98)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+.chi-choice-title{width:100%;font-size:8px;font-weight:950;letter-spacing:.1em;color:#e0b45d;text-align:center;padding:1px 0 2px;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -1113,7 +1114,18 @@ function executeSelfKan(p,opt){cancelAiTurn();playSfx('kan');if(!opt)return fals
   else return false;
   const t=drawTile();if(!t){endRound('DRAW','Tidak ada tile.');return true}playerHands[p].push(t);drawnTile=t;sortHand(p);renderTable();if(p===(mp.seat??0)){isDiscardable=true;startTurnTimer()}else aiDiscard(p);mpBroadcastState();return true;
 }
-function chooseAiCall(actions){if(!actions.length)return null;const ron=actions.find(a=>a.type==='Ron');if(ron)return ron;if(actions.some(a=>a.type==='Kan')&&Math.random()<.45)return actions.find(a=>a.type==='Kan');if(actions.some(a=>a.type==='Pon')&&Math.random()<.35)return actions.find(a=>a.type==='Pon');if(actions.some(a=>a.type==='Chi')&&Math.random()<.22)return actions.find(a=>a.type==='Chi');return null}
+function chooseAiCall(actions){
+  if(!actions.length)return null;
+  const ron=actions.find(a=>a.type==='Ron');if(ron)return ron;
+  if(actions.some(a=>a.type==='Kan')&&Math.random()<.45)return actions.find(a=>a.type==='Kan');
+  if(actions.some(a=>a.type==='Pon')&&Math.random()<.35)return actions.find(a=>a.type==='Pon');
+  const chi=actions.find(a=>a.type==='Chi');
+  if(chi&&Math.random()<.22){
+    const combos=chi.combos?.length?chi.combos:[chi.combo];
+    return {...chi,combo:[...combos[Math.floor(Math.random()*combos.length)]]};
+  }
+  return null;
+}
 const CALL_PRIORITY={Ron:4,Kan:3,Pon:2,Chi:1};
 function callPriority(action){return CALL_PRIORITY[action?.type]||0}
 function highestPendingCall(){
@@ -1219,6 +1231,60 @@ function hideAvailableActions(){
   isActionPhase=false;
   showCurrentWaitAdvisor();
 }
+function showChiChoice(action,seat){
+  const o=byId('action-overlay');
+  if(!o||!action?.combos?.length)return;
+  o.innerHTML='';
+  o.hidden=false;
+  o.style.display='flex';
+  isActionPhase=true;
+
+  const title=document.createElement('div');
+  title.className='chi-choice-title';
+  title.textContent='PILIH CHI';
+  o.appendChild(title);
+
+  action.combos.forEach(combo=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='act-btn btn-chi';
+    b.textContent=combo.join(' • ');
+    b.onclick=()=>triggerChiChoice(seat,action,combo);
+    o.appendChild(b);
+  });
+
+  const back=document.createElement('button');
+  back.type='button';
+  back.className='act-btn btn-skip';
+  back.textContent='Kembali';
+  back.onclick=()=>showAvailableActions(['Chi','Skip']);
+  o.appendChild(back);
+}
+function triggerChiChoice(seat,action,combo){
+  if(!combo||combo.length!==3)return;
+  hideAvailableActions();
+
+  if(isMultiplayerMode&&!mp.host){
+    mpSend('action',{action:{type:'call',action:'Chi',combo}});
+    return;
+  }
+
+  const q=mpPendingCalls.find(x=>x.seat===seat);
+  if(!q)return;
+  const act=q.actions.find(x=>x.type==='Chi');
+  if(!act)return;
+
+  const chosen={...act,combo:[...combo]};
+  pendingCallChoice={seat,action:chosen};
+  const best=highestPendingCall();
+  if(!best||callPriority(chosen)>=callPriority(best.action)){
+    resolveCallChoice(seat,chosen);
+  }else{
+    showAvailableActions(['Skip']);
+    setText('hand-status-sub',`Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`);
+  }
+}
+
 function showAvailableActions(actions){
   if((actions||[]).some(a=>(typeof a==='string'?a:a?.type)==='Ron'))smartAssistantShow('RON TERSEDIA','Kartu buangan terakhir membuat Anda bisa menang.','green');
   const o=byId('action-overlay');
@@ -1227,14 +1293,29 @@ function showAvailableActions(actions){
   isActionPhase=true;
   o.hidden=false;
   o.style.display='flex';
-  actions.forEach(a=>{
+
+  const q=(mpPendingCalls||[]).find(x=>x.seat===(mp.seat??0));
+  for(const raw of actions){
+    const type=typeof raw==='string'?raw:raw?.type;
+    if(type==='Chi'&&q){
+      const chi=q.actions.find(x=>x.type==='Chi');
+      if(chi?.combos?.length>1){
+        const b=document.createElement('button');
+        b.type='button';
+        b.className='act-btn btn-chi';
+        b.textContent='Chi';
+        b.onclick=()=>showChiChoice(chi,mp.seat??0);
+        o.appendChild(b);
+        continue;
+      }
+    }
     const b=document.createElement('button');
     b.type='button';
-    b.className=`act-btn btn-${String(a).toLowerCase()}`;
-    b.textContent=a==='Skip'?'Lewati':a;
-    b.onclick=()=>triggerAction(a);
+    b.className=`act-btn btn-${String(type).toLowerCase()}`;
+    b.textContent=type==='Skip'?'Lewati':type;
+    b.onclick=()=>triggerAction(type);
     o.appendChild(b);
-  });
+  }
 }
 function triggerAction(a){
   // Buttons belong only to the current action opportunity. A later opportunity
@@ -1262,6 +1343,13 @@ function triggerAction(a){
   }
   const q=mpPendingCalls.find(x=>x.seat===(mp.seat??0));
   if(q){
+    if(a==='Chi'){
+      const chi=q.actions.find(x=>x.type==='Chi');
+      if(chi?.combos?.length>1){
+        showChiChoice(chi,mp.seat??0);
+        return;
+      }
+    }
     const act=q.actions.find(x=>x.type===a);
     if(!act){hideAvailableActions();return;}
     pendingCallChoice={seat:mp.seat??0,action:act};
@@ -1445,6 +1533,8 @@ function mpApplyRemoteState(state){
   secondsLeft=state.secondsLeft??secondsLeft;
   if(Array.isArray(state.timeBank))timeBank=state.timeBank;
   actionSecondsLeft=state.actionSecondsLeft??actionSecondsLeft;
+  mpPendingCalls=Array.isArray(state.pendingCalls)?state.pendingCalls:[];
+  pendingCallChoice=null;
   roundActive=!!state.roundActive;
   roundEnding=!!state.roundEnding;
   if(state.remoteTimer && state.remoteTimer.seat===mp.seat){
@@ -1492,7 +1582,15 @@ function mpHandlePlayerAction(seat,action){if(!mp.host||!roundActive||!roomCanAc
     commitDiscard(seat,t);
   }
   return;
-}if(action.type==='call'){const a=action.action,q=mpPendingCalls.find(x=>x.seat===seat);if(a==='Tsumo'&&seat===currentTurn){const e=checkCurrentWin(seat,null,true);if(e?.valid){stopCallWindow();resolveWin(seat,e,true)}return}if(!q)return;if(a==='Skip'){mpPendingCalls=mpPendingCalls.filter(x=>x!==q);if(mpPendingCalls.length)promptNextCall();else finishCallWindow();return}const act=q.actions.find(x=>x.type===a);if(!act)return;pendingCallChoice={seat,action:act};const best=highestPendingCall();if(!best||callPriority(act)>=callPriority(best.action))resolveCallChoice(seat,act)}}
+}if(action.type==='call'){const a=action.action,q=mpPendingCalls.find(x=>x.seat===seat);if(a==='Tsumo'&&seat===currentTurn){const e=checkCurrentWin(seat,null,true);if(e?.valid){stopCallWindow();resolveWin(seat,e,true)}return}if(!q)return;if(a==='Skip'){mpPendingCalls=mpPendingCalls.filter(x=>x!==q);if(mpPendingCalls.length)promptNextCall();else finishCallWindow();return}const act=q.actions.find(x=>x.type===a);if(!act)return;
+  let chosen=act;
+  if(a==='Chi'&&Array.isArray(action.combo)&&act.combos?.length){
+    const found=act.combos.find(c=>c.join(',')===action.combo.join(','));
+    if(found)chosen={...act,combo:[...found]};
+  }
+  pendingCallChoice={seat,action:chosen};
+  const best=highestPendingCall();
+  if(!best||callPriority(chosen)>=callPriority(best.action))resolveCallChoice(seat,chosen)}}
 function mpTapRemoteDiscard(t){mpSend('action',{action:{type:'discard',uniqueId:t.uniqueId}})}
 function mpCopyRoomInfo(){mpCopyRoomLink()}
 function mpReconnect(){
