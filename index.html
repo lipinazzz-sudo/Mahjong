@@ -632,6 +632,7 @@ let playerScores=[15000,15000,15000,15000],roundStartScores=[15000,15000,15000,1
 let currentRoundIndex=0,currentDealerIdx=1,currentTurn=0,lastDiscardedTile=null,lastDiscarderIdx=-1,drawnTile=null;
 const TURN_BASE_SECONDS=10,TIME_BANK_MAX=20,ACTION_WINDOW_SECONDS=5;
 let roundActive=false,roundEnding=false,isDiscardable=false,isActionPhase=false,selectedTileIndex=-1,aiMoveTimer=null,turnTimer=null,actionTimer=null,secondsLeft=10,timeBank=[20,20,20,20],actionSecondsLeft=0,pendingCallChoice=null,actionTimeoutHandler=null,actionSeat=-1,actionMode='';
+let aiDecisionToken=0;
 let autoSortSetting=true,activeScreenId='screen-main',previousScreenId='screen-main',isMultiplayerMode=false;try{autoSortSetting=localStorage.getItem('hk_auto_sort')!=='0'}catch{}
 let mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,playerName:'Player'};
 let mpClientId=null,mpReconnectTimer=null,mpAutoStartTimer=null,mpPendingCalls=[];let mpReconnectAttempts=0,mpReconnectDeadline=0,mpLastRoomView=null;const MP_WORKER_URL='https://mahjong-room.mahjongjong.workers.dev',MP_ROOM_PARAM='room',MP_SESSION_KEY='mahjongHKRoomV1',MP_GAME_STATE_KEY='mahjongHKActiveGameV1';
@@ -862,7 +863,7 @@ function evaluateHK(pIdx,winningTile,isTsumo=false){
   };
 }
 function drawTile(){if(!fullDeck.length)return null;return fullDeck.pop()}
-function setupRound(){assistantDecisionKey='';advisorKnownCacheKey='';advisorKnownCache=null;
+function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKey='';advisorKnownCache=null;
   fullDeck=makeDeck();playerHands=[[],[],[],[]];playerRivers=[[],[],[],[]];playerMelds=[[],[],[],[]];lastDiscardedTile=null;lastDiscarderIdx=-1;selectedTileIndex=-1;roundEnding=false;roundActive=true;secondsLeft=TURN_BASE_SECONDS;timeBank=[TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX];actionSecondsLeft=0;pendingCallChoice=null;clearInterval(turnTimer);clearInterval(actionTimer);
   for(let n=0;n<13;n++)for(let p=0;p<4;p++)playerHands[p].push(fullDeck.pop());
   for(let p=0;p<4;p++)sortHand(p);
@@ -989,6 +990,41 @@ function startBankTimerOnly(p=currentTurn){
     }
   },1000);
 }
+function cancelAiTurn(){
+  aiDecisionToken++;
+  if(aiMoveTimer){clearTimeout(aiMoveTimer);aiMoveTimer=null;}
+}
+function scheduleAiTurn(seat,mode='discard'){
+  cancelAiTurn();
+  if(!roundActive||roundEnding||!aiSeats.has(seat)||currentTurn!==seat)return;
+  const token=aiDecisionToken;
+  setText('hand-status-main',`${playerName(seat)} berpikir...`);
+  setText('hand-status-sub',mode==='call'?'AI mengevaluasi call...':'AI memilih buangan...');
+  const run=()=>{
+    if(token!==aiDecisionToken||!roundActive||roundEnding||currentTurn!==seat||!aiSeats.has(seat))return;
+    aiMoveTimer=null;
+    if(mode==='call'){
+      const live=mpPendingCalls.find(x=>x.seat===seat);
+      if(!live){promptNextCall();return}
+      const pick=chooseAiCall(live.actions);
+      if(pick){resolveCallChoice(seat,pick);return}
+      mpPendingCalls=mpPendingCalls.filter(x=>x!==live);
+      promptNextCall();
+      return;
+    }
+    aiDiscard(seat);
+  };
+  aiMoveTimer=setTimeout(run,2000);
+  // Safety net: if a callback was interrupted/replaced, force one retry path.
+  setTimeout(()=>{
+    if(token===aiDecisionToken&&roundActive&&!roundEnding&&currentTurn===seat&&aiSeats.has(seat)&&aiMoveTimer){
+      clearTimeout(aiMoveTimer);
+      aiMoveTimer=null;
+      run();
+    }
+  },2600);
+}
+
 function autoDiscardCurrent(){if(!roundActive||roundEnding)return;const p=currentTurn;if(p===(mp.seat??0)){discardTile(selectedTileIndex>=0?selectedTileIndex:playerHands[p].length-1)}else aiDiscard(p)}
 function processTurn(){
   if(!roundActive||roundEnding)return;
@@ -997,10 +1033,9 @@ function processTurn(){
   const t=drawTile();if(!t){const r=settleExhaustiveDraw();renderTable();endRound(r.changed?'DRAW • TENPAI BONUS':'DRAW',r.desc);return}playerHands[currentTurn].push(t);drawnTile=t;playSfx('draw');sortHand(currentTurn);renderTable();
   const turnActions=[];const win=checkCurrentWin(currentTurn,null,true);if(win?.valid)turnActions.push('Tsumo');
   const selfKans=getSelfKanOptions(currentTurn);if(selfKans.length)turnActions.push('Kan');
-  if(aiSeats.has(currentTurn)){smartAssistantHide();setText('hand-status-main',`${playerName(currentTurn)} berpikir...`);setText('hand-status-sub','AI memilih aksi dan buangan.');
-    if(win?.valid){resolveWin(currentTurn,win,true);return}
-    if(selfKans.length&&Math.random()<.28){executeSelfKan(currentTurn,selfKans[0]);return}
-    aiMoveTimer=setTimeout(()=>aiDiscard(currentTurn),450)
+  if(aiSeats.has(currentTurn)){
+    smartAssistantHide();
+    scheduleAiTurn(currentTurn,'discard');
   }else{
     isDiscardable=true;
     if(currentTurn===(mp.seat??0)){
@@ -1054,10 +1089,10 @@ function getSelfKanOptions(p){
 }
 function removeLastDiscard(){const p=lastDiscarderIdx;if(p<0)return;playerRivers[p].pop();lastDiscardedTile=null;lastDiscarderIdx=-1;renderTable()}
 function takeTilesById(hand,id,n){const out=[];for(let i=hand.length-1;i>=0&&out.length<n;i--)if(hand[i].id===id)out.push(hand.splice(i,1)[0]);return out}
-function executePon(p){playSfx('pon');stopCallWindow();clearInterval(turnTimer);const tile=lastDiscardedTile;if(!tile)return;const a=takeTilesById(playerHands[p],tile.id,2);if(a.length<2)return;a.push(tile);playerMelds[p].push(a);removeLastDiscard();currentTurn=p;drawnTile=null;renderTable();if(p===(mp.seat??0)){isDiscardable=true;startTurnTimer()}else aiDiscard(p);mpPendingCalls=[];mpBroadcastState()}
-function executeChi(p,combo){playSfx('chi');stopCallWindow();clearInterval(turnTimer);const tile=lastDiscardedTile;if(!tile||!combo)return;const a=[];for(const n of combo){if(n===tile.num)continue;const idx=playerHands[p].findIndex(t=>t.type===tile.type&&t.num===n);if(idx<0)return;a.push(playerHands[p].splice(idx,1)[0])}a.push(tile);a.sort((x,y)=>x.num-y.num);playerMelds[p].push(a);removeLastDiscard();currentTurn=p;drawnTile=null;renderTable();if(p===(mp.seat??0)){isDiscardable=true;startTurnTimer()}else aiDiscard(p);mpPendingCalls=[];mpBroadcastState()}
-function executeKan(p){playSfx('kan');stopCallWindow();clearInterval(turnTimer);const tile=lastDiscardedTile;if(!tile)return;const a=takeTilesById(playerHands[p],tile.id,3);if(a.length<3)return;a.push(tile);playerMelds[p].push(a);removeLastDiscard();const t=drawTile();if(!t){endRound('DRAW','Tidak ada tile.');return}playerHands[p].push(t);drawnTile=t;currentTurn=p;renderTable();if(p===(mp.seat??0)){isDiscardable=true;startTurnTimer()}else aiDiscard(p);mpPendingCalls=[];mpBroadcastState()}
-function executeSelfKan(p,opt){playSfx('kan');if(!opt)return false;
+function executePon(p){cancelAiTurn();playSfx('pon');stopCallWindow();clearInterval(turnTimer);const tile=lastDiscardedTile;if(!tile)return;const a=takeTilesById(playerHands[p],tile.id,2);if(a.length<2)return;a.push(tile);playerMelds[p].push(a);removeLastDiscard();currentTurn=p;drawnTile=null;renderTable();if(p===(mp.seat??0)){isDiscardable=true;startTurnTimer()}else aiDiscard(p);mpPendingCalls=[];mpBroadcastState()}
+function executeChi(p,combo){cancelAiTurn();playSfx('chi');stopCallWindow();clearInterval(turnTimer);const tile=lastDiscardedTile;if(!tile||!combo)return;const a=[];for(const n of combo){if(n===tile.num)continue;const idx=playerHands[p].findIndex(t=>t.type===tile.type&&t.num===n);if(idx<0)return;a.push(playerHands[p].splice(idx,1)[0])}a.push(tile);a.sort((x,y)=>x.num-y.num);playerMelds[p].push(a);removeLastDiscard();currentTurn=p;drawnTile=null;renderTable();if(p===(mp.seat??0)){isDiscardable=true;startTurnTimer()}else aiDiscard(p);mpPendingCalls=[];mpBroadcastState()}
+function executeKan(p){cancelAiTurn();playSfx('kan');stopCallWindow();clearInterval(turnTimer);const tile=lastDiscardedTile;if(!tile)return;const a=takeTilesById(playerHands[p],tile.id,3);if(a.length<3)return;a.push(tile);playerMelds[p].push(a);removeLastDiscard();const t=drawTile();if(!t){endRound('DRAW','Tidak ada tile.');return}playerHands[p].push(t);drawnTile=t;currentTurn=p;renderTable();if(p===(mp.seat??0)){isDiscardable=true;startTurnTimer()}else aiDiscard(p);mpPendingCalls=[];mpBroadcastState()}
+function executeSelfKan(p,opt){cancelAiTurn();playSfx('kan');if(!opt)return false;
   if(opt.type==='closed'){const a=takeTilesById(playerHands[p],opt.id,4);if(a.length!==4)return false;playerMelds[p].push(a);}
   else if(opt.type==='added'){const g=playerMelds[p]?.[opt.groupIndex];if(!g||g.length!==3)return false;const idx=playerHands[p].findIndex(t=>t.id===opt.id);if(idx<0)return false;g.push(playerHands[p].splice(idx,1)[0]);}
   else return false;
@@ -1145,25 +1180,9 @@ function promptNextCall(){
   // Give it a short thinking delay, then resolve its call immediately.
   // Human players still use the normal 5-second action window + shared bank.
   if(aiSeats.has(best.seat)){
-    clearInterval(actionTimer);
-    actionTimer=null;
-    isActionPhase=false;
-    actionSecondsLeft=0;
-    actionTimeoutHandler=null;
-    actionSeat=-1;
-    actionMode='';
-    const aiSeat=best.seat;
-    setText('hand-status-main',`${playerName(aiSeat)} berpikir...`);
-    setText('hand-status-sub','AI mengevaluasi call...');
-    aiMoveTimer&&clearTimeout(aiMoveTimer);
-    aiMoveTimer=setTimeout(()=>{
-      const live=mpPendingCalls.find(x=>x.seat===aiSeat);
-      if(!live)return promptNextCall();
-      const pick=chooseAiCall(live.actions);
-      if(pick){resolveCallChoice(aiSeat,pick);return}
-      mpPendingCalls=mpPendingCalls.filter(x=>x!==live);
-      promptNextCall();
-    },450);
+    // AI calls use the same 2-second scheduler and watchdog as normal AI turns.
+    stopCallWindow();
+    scheduleAiTurn(best.seat,'call');
     return;
   }
   mpPendingCalls=mpPendingCalls.filter(x=>x!==q);
@@ -1263,10 +1282,10 @@ function endRound(title,desc){smartAssistantHide();
 }
 function nextRoundOrFinish(){setDisplay('modal-result','none');currentRoundIndex++;if(currentRoundIndex>=4){mpClearActiveGameState();nav('screen-play');return}currentDealerIdx=(currentDealerIdx+1)%4;setupRound();mpBroadcastState()}
 function flashBoard(kind){const e=byId('center-board-box');if(!e)return;e.classList.remove('win-flash','draw-flash');void e.offsetWidth;e.classList.add(kind==='draw'?'draw-flash':'win-flash')}
-function quitGame(){clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;mpClearActiveGameState();stopGameMusic();nav('screen-main');if(mp.connected)mpSend('leave')}
+function quitGame(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;mpClearActiveGameState();stopGameMusic();nav('screen-main');if(mp.connected)mpSend('leave')}
 function openSettingsFromGame(){previousScreenId=activeScreenId==='screen-game'?'screen-game':(previousScreenId||'screen-main');nav('screen-settings');applyAudioSettings()}
 function returnToGameFromSettings(){nav(previousScreenId||'screen-main')}
-function exitGameFromSettings(){clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;mpClearActiveGameState();stopGameMusic();previousScreenId='screen-main';nav('screen-main')}
+function exitGameFromSettings(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;mpClearActiveGameState();stopGameMusic();previousScreenId='screen-main';nav('screen-main')}
 function exitSettings(){returnToGameFromSettings()}
 function toggleAutoSortSetting(){autoSortSetting=!autoSortSetting;try{localStorage.setItem('hk_auto_sort',autoSortSetting?'1':'0')}catch{};setText('btn-toggle-autosort',autoSortSetting?'ON':'OFF');if(roundActive)renderTable()}
 
@@ -1313,7 +1332,7 @@ function mpRestoreHostGameState(state){
   nav('screen-game');
   renderTable();
   if(mpPendingCalls.length)promptNextCall();
-  else if(aiSeats.has(currentTurn))aiMoveTimer=setTimeout(()=>aiDiscard(currentTurn),450);
+  else if(aiSeats.has(currentTurn))scheduleAiTurn(currentTurn,'discard');
   else {
     isDiscardable=currentTurn===(mp.seat??0);
     startTurnTimer();
