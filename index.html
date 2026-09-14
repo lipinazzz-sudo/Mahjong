@@ -617,7 +617,6 @@ function cloneTile(t){return {...t}}
 function makeDeck(){const d=[];let uid=0;for(const type of TILE_TYPES)for(let i=0;i<4;i++)d.push({...type,uniqueId:`t${++uid}`});return d.sort(()=>Math.random()-.5)}
 function tileCounts(tiles){const c=Array(34).fill(0);for(const t of tiles||[])if(t)c[t.id]++;return c}
 function isTerminalOrHonor(t){return t.type==='honor'||t.num===1||t.num===9}
-function isSimple(t){return t.type!=='honor'&&t.num>=2&&t.num<=8}
 function getChiCombinations(hand,tile){if(!tile||tile.type==='honor')return[];const nums=(hand||[]).filter(x=>x.type===tile.type).map(x=>x.num);const out=[];for(const a of [tile.num-2,tile.num-1,tile.num]){const seq=[a,a+1,a+2];if(a>=1&&a<=7&&seq.includes(tile.num)&&seq.filter(n=>n!==tile.num).every(n=>nums.includes(n)))out.push(seq)}return out}
 function canFormMelds(c){for(let i=0;i<34;i++){if(c[i]>=3){c[i]-=3;if(canFormMelds(c))return true;c[i]+=3}if(i<27&&i%9<=6&&c[i]&&c[i+1]&&c[i+2]){c[i]--;c[i+1]--;c[i+2]--;if(canFormMelds(c))return true;c[i]++;c[i+1]++;c[i+2]++}if(c[i])return false}return true}
 function isSevenPairs(c){let pairs=0;for(const n of c){if(n===2)pairs++;else if(n===4)pairs+=2;else if(n!==0)return false}return pairs===7}
