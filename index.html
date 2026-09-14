@@ -313,16 +313,16 @@ border:1px solid rgba(255,221,164,.09)}
                 <div class="score-panel hud-card score-guide-panel">
                     <div class="hud-label">SCORE GUIDE</div>
                     <div class="score-guide-grid">
-                        <div><span>1 FAN</span><strong>Dragon/Wind • Kan • Tsumo</strong></div>
-                        <div><span>2 FAN</span><strong>All Simples</strong></div>
-                        <div><span>3 FAN</span><strong>All Pungs • Mixed One Suit</strong></div>
+                        <div><span>1 FAN</span><strong>All Chi</strong></div>
+                        <div><span>3 FAN</span><strong>All Pungs • Mixed 1 Suit</strong></div>
                         <div><span>4 FAN</span><strong>Seven Pairs</strong></div>
-                        <div><span>6 FAN</span><strong>Pure One Suit</strong></div>
+                        <div><span>7 FAN</span><strong>Full House</strong></div>
+                        <div><span>10–13 FAN</span><strong>Honors & Special Hands</strong></div>
                     </div>
-                    <div class="score-guide-rule">MIN 3 FAN • 500 / FAN</div>
+                    <div class="score-guide-rule">NO MIN FAN • 500 / FAN • BONUS +1F</div>
                     <div class="stick-counters">
                         <span id="kan-counter">KAN × 0</span>
-                        <span id="riichi-stick-counter">MIN 3 FAN</span>
+                        <span id="riichi-stick-counter">NO MIN FAN</span>
                     </div>
                     <div class="kan-info" id="kan-info">Hong Kong • simplified scoring</div>
                 </div>
@@ -831,66 +831,204 @@ function renderHand(){const wrap=byId('player-hand-tiles');if(!wrap)return;const
 function renderEnemyHands(){const s=mp.seat??0,m=mappedSeats(s);[[`enemy-hand-top`,m[2]],[`enemy-hand-right`,m[1]],[`enemy-hand-left`,m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const count=Math.max(0,playerHands[p]?.length||0);for(let i=0;i<count;i++){const b=document.createElement('span');b.className='mini-back';e.appendChild(b)}const label=document.createElement('span');label.className='hand-count-label';label.textContent=`×${count}`;e.appendChild(label);})}
 function renderRivers(){const s=mp.seat??0,m=mappedSeats(s);const selectedId=(selectedTileIndex>=0&&playerHands[s]?.[selectedTileIndex])?playerHands[s][selectedTileIndex].id:null;[['river-bottom',m[0]],['river-right',m[1]],['river-top',m[2]],['river-left',m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const tiles=(playerRivers[p]||[]).slice(0,id==='river-top'||id==='river-bottom'?32:30);tiles.forEach(t=>{const d=document.createElement('div');d.className='discard-tile';if(selectedId!==null&&t.id===selectedId)d.classList.add('same-tile-highlight');d.dataset.tileId=t.id;d.innerHTML=tileMarkup(t);e.appendChild(d)})})}
 function renderMelds(){const s=mp.seat??0,m=mappedSeats(s);const own=byId('player-melds-container');if(own){own.innerHTML='';(playerMelds[m[0]]||[]).forEach(g=>{const box=document.createElement('div');box.className='meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});own.appendChild(box)})}const enemyMap=[['enemy-meld-top-label','enemy-meld-top-tiles',m[2]],['enemy-meld-right-label','enemy-meld-right-tiles',m[1]],['enemy-meld-left-label','enemy-meld-left-tiles',m[3]]];enemyMap.forEach(([labelId,tilesId,p])=>{const label=byId(labelId),wrap=byId(tilesId);const groups=playerMelds[p]||[];const labels=groups.map(g=>g.length===4?'Kan':(g.length===3&&g.every(t=>t.id===g[0].id)?'Pon':'Chow'));if(label)setText(labelId,labels.length?labels.join(' • '):'');if(!wrap)return;wrap.innerHTML='';groups.forEach(g=>{const box=document.createElement('div');box.className='enemy-meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});wrap.appendChild(box)})})}
-function renderTable(){advisorKnownCacheKey='';advisorKnownCache=null;renderNames();renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);setText('tiles-remaining',`SISA ${fullDeck.length}`);updateMusicIntensity();setText('kan-counter',`KAN × ${playerMelds.flat().filter(g=>g.length===4).length}`);setText('riichi-stick-counter','MIN 3 FAN');setText('kan-info','Hong Kong • simplified scoring');if(currentTurn===(mp.seat??0))showCurrentWaitAdvisor();else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');}}
+function renderTable(){advisorKnownCacheKey='';advisorKnownCache=null;renderNames();renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);setText('tiles-remaining',`SISA ${fullDeck.length}`);updateMusicIntensity();setText('kan-counter',`KAN × ${playerMelds.flat().filter(g=>g.length===4).length}`);setText('riichi-stick-counter','NO MIN FAN');setText('kan-info','Hong Kong • simplified scoring');if(currentTurn===(mp.seat??0))showCurrentWaitAdvisor();else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');}}
 
+function isSequenceGroup(group){
+  if(!Array.isArray(group)||group.length!==3)return false;
+  const [a,b,c]=group;
+  if(!a||!b||!c||a.type==='honor'||b.type!==a.type||c.type!==a.type)return false;
+  return b.num===a.num+1&&c.num===a.num+2;
+}
+function canFormOnlySequences(counts){
+  for(let id=0;id<34;id++){
+    if(counts[id]===0)continue;
+    if(id>=27||id%9>6)return false;
+    if(counts[id]>0&&counts[id+1]>0&&counts[id+2]>0){
+      counts[id]--;counts[id+1]--;counts[id+2]--;
+      if(canFormOnlySequences(counts))return true;
+      counts[id]++;counts[id+1]++;counts[id+2]++;
+    }
+    return false;
+  }
+  return true;
+}
+function canFormOnlyTriplets(counts){
+  for(let id=0;id<34;id++){
+    if(counts[id]===0)continue;
+    if(counts[id]>=3){
+      counts[id]-=3;
+      if(canFormOnlyTriplets(counts))return true;
+      counts[id]+=3;
+    }
+    return false;
+  }
+  return true;
+}
 function isAllPungsHand(hand,melds){
-  // An exposed Chow immediately disqualifies All Pungs. Kongs are allowed.
-  if((melds||[]).some(g=>g.length===3&&!g.every(t=>t.id===g[0].id)))return false;
+  const groups=melds||[];
+  if(groups.some(g=>!Array.isArray(g)||!g.length||!g.every(t=>t&&t.id===g[0]?.id)))return false;
   const c=tileCounts(hand);
-  // The concealed portion must be exactly one pair plus triplets. Checking
-  // divisibility after removing each candidate pair avoids mistaking a hand
-  // with multiple pairs for an All Pungs hand.
   for(let id=0;id<34;id++){
     if(c[id]<2)continue;
     c[id]-=2;
-    const valid=c.every(n=>n%3===0);
+    if(canFormOnlyTriplets(c)){c[id]+=2;return true}
     c[id]+=2;
-    if(valid)return true;
   }
   return false;
 }
+function isAllChiHand(hand,melds){
+  const groups=melds||[];
+  if(groups.some(g=>!isSequenceGroup(g)))return false;
+  const c=tileCounts(hand);
+  for(let id=0;id<34;id++){
+    if(c[id]<2)continue;
+    c[id]-=2;
+    if(canFormOnlySequences(c)){c[id]+=2;return true}
+    c[id]+=2;
+  }
+  return false;
+}
+function isFullHouseHand(all){
+  const suits=new Set((all||[]).filter(t=>t&&t.type!=='honor').map(t=>t.type));
+  const hasHonor=(all||[]).some(t=>t&&t.type==='honor');
+  return suits.size===1&&!hasHonor;
+}
+function isMixedOneSuitHand(all){
+  const tiles=(all||[]).filter(Boolean);
+  for(const suit of ['man','pin','sou']){
+    const main=tiles.filter(t=>t.type===suit);
+    const outside=tiles.filter(t=>t.type!==suit);
+    if(main.length!==11&&main.length!==12)continue;
+    if(outside.length!==2&&outside.length!==3)continue;
+    if(outside.every(t=>t.id===outside[0].id))return true;
+  }
+  return false;
+}
+function isAllHonorsHand(all){
+  const tiles=(all||[]).filter(Boolean);
+  return tiles.length>0&&tiles.every(t=>t.type==='honor');
+}
+function isMixedTerminalsHonorsHand(all){
+  const tiles=(all||[]).filter(Boolean);
+  return tiles.length>0&&tiles.every(isTerminalOrHonor);
+}
+function isAllTerminalsHand(all){
+  const tiles=(all||[]).filter(Boolean);
+  return tiles.length>0&&tiles.every(t=>t.type!=='honor'&&(t.num===1||t.num===9));
+}
+function isThirteenOrphans(c,melds){
+  if((melds||[]).length)return false;
+  const required=[0,8,9,17,18,26,27,28,29,30,31,32,33];
+  if(!required.every(id=>c[id]>=1))return false;
+  let extra=0;
+  for(let id=0;id<34;id++){
+    if(!required.includes(id)){if(c[id]!==0)return false;continue}
+    if(c[id]===2)extra++;
+    else if(c[id]!==1)return false;
+  }
+  return extra===1;
+}
+function isNineGates(c,melds){
+  if((melds||[]).length)return false;
+  let suit=-1,total=0;
+  for(const s of ['man','pin','sou']){
+    const base=s==='man'?0:s==='pin'?9:18;
+    const counts=c.slice(base,base+9);
+    const sum=counts.reduce((a,b)=>a+b,0);
+    if(!sum)continue;
+    if(suit!==-1)return false;
+    suit=base;total=sum;
+  }
+  if(suit<0||total!==14)return false;
+  for(let i=0;i<34;i++)if(i<27&&i>=suit&&i<suit+9){}else if(c[i])return false;
+  const x=c.slice(suit,suit+9);
+  if(x[0]<3||x[8]<3)return false;
+  for(let i=1;i<=7;i++)if(x[i]<1)return false;
+  const excess=x[0]-3+x[8]-3+x.slice(1,8).reduce((a,n)=>a+(n-1),0);
+  return excess===1;
+}
+function dragonIds(){return [31,32,33]}
+function windIds(){return [27,28,29,30]}
+function countTripletIds(c,ids){return ids.filter(id=>c[id]>=3).length}
+function countPairIds(c,ids){return ids.filter(id=>c[id]===2).length}
+function isLittleThreeDragons(c){
+  const d=dragonIds();
+  return countTripletIds(c,d)===2&&countPairIds(c,d)===1;
+}
+function isBigThreeDragons(c){
+  return countTripletIds(c,dragonIds())===3;
+}
+function isLittleFourWinds(c){
+  const w=windIds();
+  return countTripletIds(c,w)===3&&countPairIds(c,w)===1;
+}
+function isBigFourWinds(c){
+  return countTripletIds(c,windIds())===4;
+}
+function isFourConcealedPungs(c,melds){
+  if((melds||[]).length)return false;
+  const ids=[];
+  for(let id=0;id<34;id++)if(c[id]>=3)ids.push(id);
+  if(ids.length!==4)return false;
+  let pair=0;
+  for(let id=0;id<34;id++){
+    if(ids.includes(id)){if(c[id]!==3)return false}
+    else if(c[id]===2)pair++;else if(c[id]!==0)return false;
+  }
+  return pair===1;
+}
+function isFourKongs(melds){
+  const groups=melds||[];
+  return groups.length===4&&groups.every(g=>Array.isArray(g)&&g.length===4&&g.every(t=>t&&t.id===g[0]?.id));
+}
 function evaluateHK(pIdx,winningTile,isTsumo=false){
-  // On Ron the winning tile is still in the river, not in the winner's hand.
-  // Include it for every score calculation; on Tsumo it is already in hand.
+  // On Ron the winning tile is still in the river, so include it in the
+  // winning-hand calculation exactly once. On Tsumo it is already in hand.
   const hand=[...(playerHands[pIdx]||[]),...(winningTile?[winningTile]:[])];
   const melds=playerMelds[pIdx]||[];
   const all=[...hand,...melds.flat()];
   const c=tileCounts(all);
   const y=[];
 
-  if(isSevenPairs(c)&&melds.length===0)y.push(['Seven Pairs',4]);
-
+  // Main winning-hand patterns.
+  if(isAllChiHand(hand,melds))y.push(['All Chi',1]);
   if(isAllPungsHand(hand,melds))y.push(['All Pungs',3]);
+  if(isMixedOneSuitHand(all))y.push(['Mixed One Suit',3]);
+  if(isFullHouseHand(all))y.push(['Full House',7]);
+  if(isAllHonorsHand(all))y.push(['All Honors',10]);
+  if(isMixedTerminalsHonorsHand(all))y.push(['Mixed Terminals & Honors',5]);
+  if(isAllTerminalsHand(all))y.push(['All Terminals',10]);
 
-  const suits=new Set(all.filter(t=>t.type!=='honor').map(t=>t.type));
-  const hasHonor=all.some(t=>t.type==='honor');
-  if(suits.size===1)y.push([hasHonor?'Mixed One Suit':'Pure One Suit',hasHonor?3:6]);
+  // Special winning hands.
+  if(isSevenPairs(c)&&melds.length===0)y.push(['Seven Pairs',4]);
+  if(isThirteenOrphans(c,melds))y.push(['Thirteen Orphans',13]);
+  if(isNineGates(c,melds))y.push(['Nine Gates',13]);
+  if(isLittleThreeDragons(c))y.push(['Little Three Dragons',5]);
+  if(isBigThreeDragons(c))y.push(['Big Three Dragons',13]);
+  if(isLittleFourWinds(c))y.push(['Little Four Winds',10]);
+  if(isBigFourWinds(c))y.push(['Big Four Winds',13]);
+  if(isFourConcealedPungs(c,melds))y.push(['Four Concealed Pungs',13]);
+  if(isFourKongs(melds))y.push(['Four Kongs',13]);
 
-  if(all.length&&all.every(isSimple))y.push(['All Simples',2]);
-
-  // Each Dragon or Wind Pung is worth 1 Fan.
-  for(let id=27;id<34;id++){
-    if(c[id]>=3)y.push([`Dragon/Wind Pung`,1]);
-  }
-
-  // Each Kan/Kong is worth 1 Fan.
-  const kanCount=melds.filter(g=>g.length===4).length;
+  // Bonus fan rules.
+  for(let id of dragonIds())if(c[id]>=3)y.push(['Dragon Pung/Kong',1]);
+  for(let id of windIds())if(c[id]>=3)y.push(['Wind Pung/Kong',1]);
+  const kanCount=melds.filter(g=>Array.isArray(g)&&g.length===4).length;
   for(let i=0;i<kanCount;i++)y.push(['Kan',1]);
-
+  if(melds.length===0)y.push(['Concealed Hand',1]);
   if(isTsumo)y.push(['Self Draw',1]);
 
   const fan=y.reduce((a,b)=>a+b[1],0);
-  const valid=fan>=3;
   const basePerFan=500;
   const payment=fan*basePerFan;
 
   return {
-    valid,
+    valid:true,
     fan,
     yaku:y,
     payment,
-    points:valid?payment*3:0,
-    yakuStr:y.map(x=>`${x[0]} +${x[1]}F`).join(', ')||'Belum cukup Fan',
+    points:payment*3,
+    yakuStr:y.map(x=>`${x[0]} +${x[1]}F`).join(', ')||'0 Fan • Tidak ada kombinasi Fan',
     detail:`${fan} Fan • ${isTsumo?'Self Draw':'Discard Win'}`
   };
 }
@@ -1119,7 +1257,7 @@ function getDiscardCallOptions(p,tile){
   const ronShape=isWinningShape(ronHand,playerMelds[p]?.length||0);
   if(ronShape){
     const ron= evaluateHK(p,tile,false);
-    if(ron?.valid)actions.push({type:'Ron',score:ron});
+    if(ron)actions.push({type:'Ron',score:ron});
   }
   if(same>=3)actions.push({type:'Kan'});
   if(same>=2)actions.push({type:'Pon'});
@@ -1243,7 +1381,7 @@ function settleExhaustiveDraw(){
   const tn=tenpai.map(playerName).join(', ');const nn=noten.map(playerName).join(', ');
   return {tenpai,noten,changed:true,desc:`Tenpai: ${tn}. Noten: ${nn}. Pool ${Math.round(totalPool).toLocaleString('id-ID')} poin dibagi rata; masing-masing Noten -${poolPerNoten.toLocaleString('id-ID')}, masing-masing Tenpai +${Math.round(gain).toLocaleString('id-ID')}.`};
 }
-function resolveWin(seat,result,isTsumo){playSfx(isTsumo?'tsumo':'ron');roundEnding=true;clearInterval(turnTimer);const payer=isTsumo?null:lastDiscarderIdx;let amount=result.points||300;if(isTsumo){for(let p=0;p<4;p++)if(p!==seat)playerScores[p]-=amount/3;playerScores[seat]+=amount}else{playerScores[seat]+=amount; if(payer>=0)playerScores[payer]-=amount}renderTable();flashBoard('win');endRound(`${isTsumo?'TSUMO':'RON'} • ${playerName(seat)}`,`${result.yakuStr} • ${result.points} poin`)}
+function resolveWin(seat,result,isTsumo){playSfx(isTsumo?'tsumo':'ron');roundEnding=true;clearInterval(turnTimer);const payer=isTsumo?null:lastDiscarderIdx;let amount=Number.isFinite(Number(result?.points))?Number(result.points):0;if(isTsumo){for(let p=0;p<4;p++)if(p!==seat)playerScores[p]-=amount/3;playerScores[seat]+=amount}else{playerScores[seat]+=amount; if(payer>=0)playerScores[payer]-=amount}renderTable();flashBoard('win');endRound(`${isTsumo?'TSUMO':'RON'} • ${playerName(seat)}`,`${result.yakuStr} • ${result.points} poin`)}
 function hideAvailableActions(){
   const o=byId('action-overlay');
   if(o){o.innerHTML='';o.style.display='none';o.hidden=true;}
@@ -1287,7 +1425,7 @@ function triggerAction(a){
   if(a==='Tsumo'){
     stopCallWindow();
     const e=checkCurrentWin(mp.seat,null,true);
-    if(e?.valid)resolveWin(mp.seat,e,true);
+    if(e)resolveWin(mp.seat,e,true);
     else startTurnTimer();
     return;
   }
@@ -1469,7 +1607,7 @@ function mpConnect(code='',role='',isReconnect=false){const c=String(code||mp.ro
     // Reconnect during a game too. The host keeps a local snapshot and sends
     // it again after the Worker accepts the restored room connection.
     if(mp.room?.code && isMultiplayerMode){
-      if(!mpReconnectDeadline)mpReconnectDeadline=Date.now()+5*60*1000;
+      if(!mpReconnectDeadline)mpReconnectDeadline=Date.now()+60000;
       if(Date.now()<mpReconnectDeadline){const delay=Math.min(2500,700+mpReconnectAttempts*450);mpReconnectAttempts++;clearTimeout(mpReconnectTimer);mpReconnectTimer=setTimeout(()=>{if(!mp.connected)mpConnect(mp.room.code,mp.host?'host':'guest',true)},delay)}
     }
   };return true}catch(e){mp.connected=false;mpSetConnection(false);console.error(e);return false}}
