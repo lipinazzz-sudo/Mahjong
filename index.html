@@ -1463,15 +1463,17 @@ function executePon(p){
   removeLastDiscard();
   currentTurn=p;
   drawnTile=null;
+  selectedTileIndex=-1;
   renderTable();
 
+  // Only AI seats may auto-discard.
+  // A human guest must keep control of the hand after Pon.
   if(aiSeats.has(p)){
     aiDiscard(p);
   }else if(p===(mp.seat??0)){
     isDiscardable=true;
     startTurnTimer();
   }else{
-    // Remote human guest: let that player choose the discard.
     isDiscardable=false;
   }
 
@@ -1505,15 +1507,17 @@ function executeChi(p,combo){
   removeLastDiscard();
   currentTurn=p;
   drawnTile=null;
+  selectedTileIndex=-1;
   renderTable();
 
+  // Only AI seats may auto-discard.
+  // A human guest must choose the discard after Chi.
   if(aiSeats.has(p)){
     aiDiscard(p);
   }else if(p===(mp.seat??0)){
     isDiscardable=true;
     startTurnTimer();
   }else{
-    // Remote human guest: let that player choose the discard.
     isDiscardable=false;
   }
 
@@ -1545,15 +1549,17 @@ function executeKan(p){
   playerHands[p].push(t);
   drawnTile=t;
   currentTurn=p;
+  selectedTileIndex=-1;
   renderTable();
 
+  // Only AI seats may auto-discard.
+  // A human guest must choose the discard after Kan draw.
   if(aiSeats.has(p)){
     aiDiscard(p);
   }else if(p===(mp.seat??0)){
     isDiscardable=true;
     startTurnTimer();
   }else{
-    // Remote human guest: choose a discard manually after the Kan draw.
     isDiscardable=false;
   }
 
@@ -1586,15 +1592,17 @@ function executeSelfKan(p,opt){
   playerHands[p].push(t);
   drawnTile=t;
   sortHand(p);
+  selectedTileIndex=-1;
   renderTable();
 
+  // Only AI seats may auto-discard.
+  // A human guest must choose the discard after self-Kan draw.
   if(aiSeats.has(p)){
     aiDiscard(p);
   }else if(p===(mp.seat??0)){
     isDiscardable=true;
     startTurnTimer();
   }else{
-    // Remote human guest: choose a discard manually after the Kan draw.
     isDiscardable=false;
   }
 
@@ -1658,19 +1666,20 @@ function commitDiscard(p,tile){
   mpBroadcastState();nextTurn();
 }
 function promptNextCall(){
-  if(!mpPendingCalls.length){stopCallWindow();mpBroadcastState({remoteActions:[]});nextTurn();return}
-  // Always resolve the highest-priority outstanding call first.
-  // Ron > Kan > Pon > Chi. A lower-priority call must wait.
+  if(!mpPendingCalls.length){
+    stopCallWindow();
+    mpBroadcastState({remoteActions:[]});
+    nextTurn();
+    return;
+  }
+
   const best=highestPendingCall();
   const q=mpPendingCalls.find(x=>x.seat===best.seat);
   if(!q){mpPendingCalls.shift();promptNextCall();return}
+
   const actions=q.actions.map(x=>x.type);
 
   if(!aiSeats.has(best.seat)){
-    // A remote/local human may already have sent the intended call while a
-    // higher-priority AI call was being resolved. As soon as that higher
-    // priority call disappears, apply the waiting human choice immediately
-    // instead of forcing the player to wait for another timer cycle.
     if(pendingCallChoice&&pendingCallChoice.seat===best.seat){
       const chosen=pendingCallChoice.action;
       pendingCallChoice=null;
@@ -1679,26 +1688,40 @@ function promptNextCall(){
         return;
       }
     }
+
     if(best.seat===(mp.seat??0)){
-      showAvailableActions([...actions,'Skip']);
+      showAvailableActions([...q.actions,{type:'Skip'}]);
       startActionWindow(finishCallWindow,best.seat,'discard-call');
     }
-    // Host broadcasts the action opportunity to the specific remote human.
-    // That player alone renders the buttons; other clients hide them.
+
+    // The remote guest needs the COMPLETE Chi action object so that
+    // multiple Chi combinations remain selectable on the guest client.
     if(mp.host){
-      mpBroadcastState({remoteActions:{seat:best.seat,actions:[...actions,'Skip'],actionWindow:ACTION_WINDOW_SECONDS}});
+      const remoteActions=q.actions.map(x=>{
+        if(x.type==='Chi')return {
+          type:'Chi',
+          combos:Array.isArray(x.combos)?x.combos.map(c=>[...c]):[]
+        };
+        return x.type;
+      });
+      remoteActions.push('Skip');
+      mpBroadcastState({
+        remoteActions:{
+          seat:best.seat,
+          actions:remoteActions,
+          actionWindow:ACTION_WINDOW_SECONDS
+        }
+      });
     }
     return;
   }
 
-  // AI should never consume the human action timer/time bank.
-  // Give it a short thinking delay, then resolve its call immediately.
-  // Human players still use the normal 5-second action window + shared bank.
   if(aiSeats.has(best.seat)){
     stopCallWindow();
     scheduleAiTurn(best.seat,'call');
     return;
   }
+
   mpPendingCalls=mpPendingCalls.filter(x=>x!==q);
   promptNextCall();
 }
@@ -1720,9 +1743,7 @@ function hideAvailableActions(){
   showCurrentWaitAdvisor();
 }
 function showAvailableActions(actions){
-  if((actions||[]).some(a=>
-    (typeof a==='string'?a:a?.type)==='Ron'
-  )){
+  if((actions||[]).some(a=>(typeof a==='string'?a:a?.type)==='Ron')){
     smartAssistantShow(
       'RON TERSEDIA',
       'Kartu buangan terakhir membuat Anda bisa menang.',
@@ -1742,7 +1763,6 @@ function showAvailableActions(actions){
   actions.forEach(a=>{
     const type=typeof a==='string'?a:a?.type;
 
-    // One Chi option: simply show CHI.
     if(type==='Chi'&&a?.combos?.length){
       if(a.combos.length===1){
         const b=document.createElement('button');
@@ -1757,7 +1777,6 @@ function showAvailableActions(actions){
         return;
       }
 
-      // Multiple Chi combinations: show every valid choice.
       a.combos.forEach(combo=>{
         const b=document.createElement('button');
         b.type='button';
@@ -1765,7 +1784,7 @@ function showAvailableActions(actions){
         b.textContent=`Chi ${combo.join('-')}`;
         b.onclick=()=>triggerAction({
           type:'Chi',
-          combo:combo
+          combo:[...combo]
         });
         o.appendChild(b);
       });
@@ -1793,7 +1812,7 @@ function triggerAction(a){
         action:{
           type:'call',
           action:'Chi',
-          combo:combo
+          combo:[...combo]
         }
       });
       return;
@@ -1833,9 +1852,14 @@ function triggerAction(a){
     return;
   }
 
-  // Normal multiplayer action from a guest.
+  // Guest always sends turn/call actions to the authoritative host.
   if(isMultiplayerMode&&!mp.host){
-    mpSend('action',{action:{type:'call',action:a}});
+    mpSend('action',{
+      action:{
+        type:'call',
+        action:a
+      }
+    });
     return;
   }
 
@@ -1887,7 +1911,7 @@ function triggerAction(a){
     return;
   }
 
-  // Self Kan during the player's own turn.
+  // Self-Kan during the player's own draw turn.
   if(a==='Kan'){
     const opt=getSelfKanOptions(mp.seat??0)[0];
     if(opt){
@@ -1896,7 +1920,6 @@ function triggerAction(a){
     }
   }
 }
-
 function nextTurn(){if(!roundActive||roundEnding)return;currentTurn=(currentTurn+1)%4;processTurn()}
 function renderResultModal(title,desc){
   setText('res-title',title);setText('res-desc','');setText('res-round-label',getRoundName());
@@ -2145,8 +2168,12 @@ function mpStateSnapshot(extra={}){return{currentRoundIndex,currentDealerIdx,cur
 function mpBroadcastState(extra={}){const state=mpStateSnapshot(extra);if(isMultiplayerMode&&mp.host)mpSaveActiveGameState(state);if(isMultiplayerMode&&mp.host&&mp.connected)mpSend('state',{state})}
 function mpApplyRemoteState(state){
   if(mp.host)return;
+
+  // A reconnected guest must remain in multiplayer mode.
+  isMultiplayerMode=true;
   mp.state=state;
   mp.seat=mp.seat??0;
+
   playerScores=state.playerScores||playerScores;
   fullDeck=state.fullDeck||[];
   playerHands=state.playerHands||playerHands;
@@ -2163,45 +2190,80 @@ function mpApplyRemoteState(state){
   actionSecondsLeft=state.actionSecondsLeft??actionSecondsLeft;
   roundActive=!!state.roundActive;
   roundEnding=!!state.roundEnding;
-  if(state.remoteTimer && state.remoteTimer.seat===mp.seat){
+
+  if(state.remoteTimer&&state.remoteTimer.seat===mp.seat){
     if(state.remoteTimer.isActionPhase){
       setText('turn-timer-display',Math.max(0,state.remoteTimer.actionSeconds??0));
     }else{
-      const visibleTimer=(state.remoteTimer.baseTime??0)>0?state.remoteTimer.baseTime:(state.remoteTimer.timeBank??0);
+      const visibleTimer=(state.remoteTimer.baseTime??0)>0
+        ?state.remoteTimer.baseTime
+        :(state.remoteTimer.timeBank??0);
       setText('turn-timer-display',Math.max(0,visibleTimer));
     }
   }
-  aiSeats=new Set(state.aiSeats||[]);
-  if(Array.isArray(state.playerAvatars)&&state.playerAvatars.length===4)playerAvatars=state.playerAvatars.slice();
-  if(state.roomPlayers){mp.room={...(mp.room||{}),players:state.roomPlayers};syncHumanAvatars(mp.room)}
 
-  // Guest may discard only on their own synchronized turn.
-  // The host remains authoritative: the actual discard is sent back
-  // through mpHandlePlayerAction().
-  isDiscardable=roundActive && !roundEnding && currentTurn===(mp.seat??0) && !state.remoteActions?.actions?.length;
+  aiSeats=new Set(state.aiSeats||[]);
+  if(Array.isArray(state.playerAvatars)&&state.playerAvatars.length===4){
+    playerAvatars=state.playerAvatars.slice();
+  }
+  if(state.roomPlayers){
+    mp.room={...(mp.room||{}),players:state.roomPlayers};
+    syncHumanAvatars(mp.room);
+  }
 
   nav('screen-game');
-  // Reconnecting mid-round (or during the result intermission) should always
-  // land on the game screen, not leave the lobby overlay stuck on top of it.
   if(state.roundActive||state.roundEnding)setDisplay('modal-lobby','none');
+
+  // Rebuild the guest's local control state from the synchronized table.
+  isDiscardable=
+    roundActive&&
+    !roundEnding&&
+    currentTurn===(mp.seat??0)&&
+    !state.remoteActions?.actions?.length;
+
   renderTable();
 
-  if(state.remoteActions?.seat===(mp.seat??0)&&Array.isArray(state.remoteActions.actions)&&state.remoteActions.actions.length){
+  if(
+    state.remoteActions?.seat===(mp.seat??0)&&
+    Array.isArray(state.remoteActions.actions)&&
+    state.remoteActions.actions.length
+  ){
     isDiscardable=false;
     showAvailableActions(state.remoteActions.actions);
-    // Remote guests must own their own visible call timer. Previously the host
-    // only broadcast the buttons, leaving the guest without a local action
-    // window and making stale/late call clicks possible.
     startActionWindow(()=>{
       hideAvailableActions();
       mpSend('action',{action:{type:'call',action:'Skip'}});
     },mp.seat??0,'discard-call');
-  }else{
+  }else if(currentTurn===(mp.seat??0)&&roundActive){
+    // Reconnect can happen during a normal turn without a fresh startGame
+    // message. Recreate the same Tsumo/Kan controls the player would have had.
+    const turnActions=[];
+    const win=checkCurrentWin(mp.seat,null,true);
+    if(win?.valid)turnActions.push('Tsumo');
+    if(getSelfKanOptions(mp.seat).length)turnActions.push('Kan');
+
     hideAvailableActions();
-    if(currentTurn===(mp.seat??0) && roundActive){
+
+    if(turnActions.length){
+      showAvailableActions(turnActions);
+      startActionWindow(()=>{
+        hideAvailableActions();
+        if((timeBank[currentTurn]||0)>0){
+          secondsLeft=0;
+          startBankTimerOnly(currentTurn);
+        }else{
+          isDiscardable=true;
+          autoDiscardCurrent();
+        }
+      },currentTurn,'turn-action');
+    }else{
+      isDiscardable=true;
+      startTurnTimer();
       setText('hand-status-main','Giliran Anda');
       setText('hand-status-sub','Pilih tile untuk membuang.');
     }
+  }else{
+    hideAvailableActions();
   }
 
   if(state.phase==='result'&&state.result){
@@ -2228,9 +2290,8 @@ function mpHandlePlayerAction(seat,action){
   if(action.type!=='call')return;
 
   const a=action.action;
-  const q=mpPendingCalls.find(x=>x.seat===seat);
 
-  // Tsumo is a turn action, not a discard-call action.
+  // Tsumo is a normal turn action.
   if(a==='Tsumo'&&seat===currentTurn){
     const e=checkCurrentWin(seat,null,true);
     if(e?.valid){
@@ -2240,6 +2301,19 @@ function mpHandlePlayerAction(seat,action){
     return;
   }
 
+  // Self-Kan is also a normal turn action and does not belong to
+  // mpPendingCalls (which is reserved for discard calls).
+  if(a==='Kan'&&seat===currentTurn){
+    const options=getSelfKanOptions(seat);
+    const opt=options[0];
+    if(opt){
+      stopCallWindow();
+      executeSelfKan(seat,opt);
+    }
+    return;
+  }
+
+  const q=mpPendingCalls.find(x=>x.seat===seat);
   if(!q)return;
 
   if(a==='Skip'){
@@ -2286,23 +2360,44 @@ function mpCopyRoomInfo(){mpCopyRoomLink()}
 function mpReconnect(){
   const saved=mpLoadSession();
   if(!saved?.room)return;
+
+  // Re-enter as the same multiplayer guest/host identity.
+  isMultiplayerMode=true;
   mp.playerName=saved.name||'Player';
-  mp.playerAvatar=saved.avatar||selectedAvatar;selectedAvatar=mp.playerAvatar;
+  mp.playerAvatar=saved.avatar||selectedAvatar;
+  selectedAvatar=mp.playerAvatar;
   mp.host=!!saved.host;
   mp.seat=saved.seat;
   mp.token=saved.token||mp.token||null;
-  mp.ready=true;
+  mp.ready=!!saved.ready;
   mp.started=!!saved.started;
-  mp.room={code:saved.room,players:[null,null,null,null],started:!!saved.started};
+  mp.room={
+    code:saved.room,
+    players:saved.players||[null,null,null,null],
+    started:!!saved.roomStarted||!!saved.started
+  };
+
+  clearTimeout(mpReconnectTimer);
+  mpReconnectAttempts=0;
+  mpReconnectDeadline=Date.now()+5*60*1000;
+
   const savedGame=mp.host?mpLoadActiveGameState(saved.room):null;
   if(savedGame?.state){
     mp.started=true;
     mp.room.started=true;
     mpRestoreHostGameState(savedGame.state);
     setDisplay('modal-lobby','none');
+  }else if(mp.started){
+    // Do not trap a returning guest in the lobby while the match is running.
+    setDisplay('modal-lobby','none');
+    setDisplay('mp-match-over','none');
+    nav('screen-game');
   }else{
-    setDisplay('modal-lobby','flex');setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');
+    setDisplay('modal-lobby','flex');
+    setDisplay('mp-setup','none');
+    setDisplay('mp-room-panel','grid');
   }
+
   mpConnect(saved.room,mp.host?'host':'guest',true);
 }
 window.mpConnect=mpConnect;window.mpSend=mpSend;window.openPlayerLobby=openPlayerLobby;window.mpCreateRoom=mpCreateRoom;window.mpJoinRoom=mpJoinRoom;window.mpShowJoinForm=mpShowJoinForm;window.togglePlayerReady=togglePlayerReady;window.mpStartGame=mpStartGame;window.closeLobby=closeLobby;window.mpCopyRoomLink=mpCopyRoomLink;window.mpCopyRoomInfo=mpCopyRoomInfo;
