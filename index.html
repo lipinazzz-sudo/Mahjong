@@ -5,8 +5,8 @@
     <meta name="app-version" content="25.0-mahyong-dj-actionfix">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
-    <meta name="description" content="Majong DJ - HongKong Mahjong dengan Cloudflare.">
-    <title>Majong DJ - HK</title>
+    <meta name="description" content="Majong DJ - HongKong Mahjong dengan AI dan Cloudflare multiplayer.">
+    <title>Majong DJ - HongKong</title>
     <style>
 :root{color-scheme:dark;--bg:#050505;--panel:rgba(18,15,11,.94);--line:rgba(212,164,76,.16);--text:#f6f0e4;--muted:#a99f91;--gold:#d7a64a;--green:#55c79a;--red:#d9655a;--brown:#241914;--table:#17130f;--table2:#0c0a08;--tileW:clamp(27px,min(4.9vw,7.6vh),48px);--tileH:clamp(40px,min(6.9vw,11vh),61px);--discW:clamp(16px,min(2.55vw,3.8vh),27px);--discH:clamp(24px,min(3.85vw,5.5vh),38px)}
 *{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 50% 42%,#12313b 0%,#08171f 48%,#050a10 100%);color:var(--text);-webkit-font-smoothing:antialiased;user-select:none}button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -1396,21 +1396,45 @@ function handleTileTap(i,el){if(currentTurn!==(mp.seat??0)||!isDiscardable)retur
 function discardTile(i){if(currentTurn!==(mp.seat??0)||!isDiscardable)return;clearInterval(turnTimer);const tile=playerHands[currentTurn]?.[i];if(!tile)return;selectedTileIndex=-1;isDiscardable=false;drawnTile=null;if(isMultiplayerMode&&!mp.host){mpSend('action',{action:{type:'discard',uniqueId:tile.uniqueId}});return}playerHands[currentTurn].splice(i,1);sortHand(currentTurn);renderTable();commitDiscard(currentTurn,tile)}
 function getDiscardCallOptions(p,tile){
   if(!tile||p===lastDiscarderIdx)return [];
-  const hand=playerHands[p]||[];const actions=[];
+
+  const hand=playerHands[p]||[];
+  const actions=[];
   const same=hand.filter(t=>t.id===tile.id).length;
   const isNext=((lastDiscarderIdx+1)%4)===p;
   const chi=getChiCombinations(hand,tile);
-  // Ron must be evaluated against the exact 13-tile concealed hand + the discarded tile.
-  // Do this independently from the self-draw path so a stale turn/drawnTile state can never hide Ron.
+
+  // Ron
   const ronHand=[...hand,tile];
-  const ronShape=isWinningShape(ronHand,playerMelds[p]?.length||0);
+  const ronShape=isWinningShape(
+    ronHand,
+    playerMelds[p]?.length||0
+  );
+
   if(ronShape){
-    const ron= evaluateHK(p,tile,false);
-    if(ron)actions.push({type:'Ron',score:ron});
+    const ron=evaluateHK(p,tile,false);
+    if(ron){
+      actions.push({type:'Ron',score:ron});
+    }
   }
-  if(same>=3)actions.push({type:'Kan'});
-  if(same>=2)actions.push({type:'Pon'});
-  if(isNext&&chi.length)actions.push({type:'Chi',combo:chi[0],combos:chi});
+
+  // Kan
+  if(same>=3){
+    actions.push({type:'Kan'});
+  }
+
+  // Pon
+  if(same>=2){
+    actions.push({type:'Pon'});
+  }
+
+  // Chi — keep every valid combination.
+  if(isNext&&chi.length){
+    actions.push({
+      type:'Chi',
+      combos:chi
+    });
+  }
+
   return actions;
 }
 function getSelfKanOptions(p){
@@ -1422,14 +1446,160 @@ function getSelfKanOptions(p){
 }
 function removeLastDiscard(){const p=lastDiscarderIdx;if(p<0)return;playerRivers[p].pop();lastDiscardedTile=null;lastDiscarderIdx=-1;renderTable()}
 function takeTilesById(hand,id,n){const out=[];for(let i=hand.length-1;i>=0&&out.length<n;i--)if(hand[i].id===id)out.push(hand.splice(i,1)[0]);return out}
-function executePon(p){cancelAiTurn();playSfx('pon');stopCallWindow();clearInterval(turnTimer);const tile=lastDiscardedTile;if(!tile)return;const a=takeTilesById(playerHands[p],tile.id,2);if(a.length<2)return;a.push(tile);playerMelds[p].push(a);removeLastDiscard();currentTurn=p;drawnTile=null;renderTable();if(p===(mp.seat??0)){isDiscardable=true;startTurnTimer()}else aiDiscard(p);mpPendingCalls=[];mpBroadcastState()}
-function executeChi(p,combo){cancelAiTurn();playSfx('chi');stopCallWindow();clearInterval(turnTimer);const tile=lastDiscardedTile;if(!tile||!combo)return;const a=[];for(const n of combo){if(n===tile.num)continue;const idx=playerHands[p].findIndex(t=>t.type===tile.type&&t.num===n);if(idx<0)return;a.push(playerHands[p].splice(idx,1)[0])}a.push(tile);a.sort((x,y)=>x.num-y.num);playerMelds[p].push(a);removeLastDiscard();currentTurn=p;drawnTile=null;renderTable();if(p===(mp.seat??0)){isDiscardable=true;startTurnTimer()}else aiDiscard(p);mpPendingCalls=[];mpBroadcastState()}
-function executeKan(p){cancelAiTurn();playSfx('kan');stopCallWindow();clearInterval(turnTimer);const tile=lastDiscardedTile;if(!tile)return;const a=takeTilesById(playerHands[p],tile.id,3);if(a.length<3)return;a.push(tile);playerMelds[p].push(a);removeLastDiscard();const t=drawTile();if(!t){endRound('DRAW','Tidak ada tile.');return}playerHands[p].push(t);drawnTile=t;currentTurn=p;renderTable();if(p===(mp.seat??0)){isDiscardable=true;startTurnTimer()}else aiDiscard(p);mpPendingCalls=[];mpBroadcastState()}
-function executeSelfKan(p,opt){cancelAiTurn();playSfx('kan');if(!opt)return false;
-  if(opt.type==='closed'){const a=takeTilesById(playerHands[p],opt.id,4);if(a.length!==4)return false;playerMelds[p].push(a);}
-  else if(opt.type==='added'){const g=playerMelds[p]?.[opt.groupIndex];if(!g||g.length!==3)return false;const idx=playerHands[p].findIndex(t=>t.id===opt.id);if(idx<0)return false;g.push(playerHands[p].splice(idx,1)[0]);}
-  else return false;
-  const t=drawTile();if(!t){endRound('DRAW','Tidak ada tile.');return true}playerHands[p].push(t);drawnTile=t;sortHand(p);renderTable();if(p===(mp.seat??0)){isDiscardable=true;startTurnTimer()}else aiDiscard(p);mpBroadcastState();return true;
+function executePon(p){
+  cancelAiTurn();
+  playSfx('pon');
+  stopCallWindow();
+  clearInterval(turnTimer);
+
+  const tile=lastDiscardedTile;
+  if(!tile)return;
+
+  const a=takeTilesById(playerHands[p],tile.id,2);
+  if(a.length<2)return;
+
+  a.push(tile);
+  playerMelds[p].push(a);
+  removeLastDiscard();
+  currentTurn=p;
+  drawnTile=null;
+  renderTable();
+
+  if(aiSeats.has(p)){
+    aiDiscard(p);
+  }else if(p===(mp.seat??0)){
+    isDiscardable=true;
+    startTurnTimer();
+  }else{
+    // Remote human guest: let that player choose the discard.
+    isDiscardable=false;
+  }
+
+  mpPendingCalls=[];
+  mpBroadcastState();
+}
+function executeChi(p,combo){
+  cancelAiTurn();
+  playSfx('chi');
+  stopCallWindow();
+  clearInterval(turnTimer);
+
+  const tile=lastDiscardedTile;
+  if(!tile||!Array.isArray(combo)||combo.length!==3)return;
+
+  const a=[];
+  for(const n of combo){
+    if(n===tile.num)continue;
+
+    const idx=playerHands[p].findIndex(
+      t=>t.type===tile.type&&t.num===n
+    );
+
+    if(idx<0)return;
+    a.push(playerHands[p].splice(idx,1)[0]);
+  }
+
+  a.push(tile);
+  a.sort((x,y)=>x.num-y.num);
+  playerMelds[p].push(a);
+  removeLastDiscard();
+  currentTurn=p;
+  drawnTile=null;
+  renderTable();
+
+  if(aiSeats.has(p)){
+    aiDiscard(p);
+  }else if(p===(mp.seat??0)){
+    isDiscardable=true;
+    startTurnTimer();
+  }else{
+    // Remote human guest: let that player choose the discard.
+    isDiscardable=false;
+  }
+
+  mpPendingCalls=[];
+  mpBroadcastState();
+}
+function executeKan(p){
+  cancelAiTurn();
+  playSfx('kan');
+  stopCallWindow();
+  clearInterval(turnTimer);
+
+  const tile=lastDiscardedTile;
+  if(!tile)return;
+
+  const a=takeTilesById(playerHands[p],tile.id,3);
+  if(a.length<3)return;
+
+  a.push(tile);
+  playerMelds[p].push(a);
+  removeLastDiscard();
+
+  const t=drawTile();
+  if(!t){
+    endRound('DRAW','Tidak ada tile.');
+    return;
+  }
+
+  playerHands[p].push(t);
+  drawnTile=t;
+  currentTurn=p;
+  renderTable();
+
+  if(aiSeats.has(p)){
+    aiDiscard(p);
+  }else if(p===(mp.seat??0)){
+    isDiscardable=true;
+    startTurnTimer();
+  }else{
+    // Remote human guest: choose a discard manually after the Kan draw.
+    isDiscardable=false;
+  }
+
+  mpPendingCalls=[];
+  mpBroadcastState();
+}
+function executeSelfKan(p,opt){
+  cancelAiTurn();
+  playSfx('kan');
+  if(!opt)return false;
+
+  if(opt.type==='closed'){
+    const a=takeTilesById(playerHands[p],opt.id,4);
+    if(a.length!==4)return false;
+    playerMelds[p].push(a);
+  }else if(opt.type==='added'){
+    const g=playerMelds[p]?.[opt.groupIndex];
+    if(!g||g.length!==3)return false;
+    const idx=playerHands[p].findIndex(t=>t.id===opt.id);
+    if(idx<0)return false;
+    g.push(playerHands[p].splice(idx,1)[0]);
+  }else return false;
+
+  const t=drawTile();
+  if(!t){
+    endRound('DRAW','Tidak ada tile.');
+    return true;
+  }
+
+  playerHands[p].push(t);
+  drawnTile=t;
+  sortHand(p);
+  renderTable();
+
+  if(aiSeats.has(p)){
+    aiDiscard(p);
+  }else if(p===(mp.seat??0)){
+    isDiscardable=true;
+    startTurnTimer();
+  }else{
+    // Remote human guest: choose a discard manually after the Kan draw.
+    isDiscardable=false;
+  }
+
+  mpBroadcastState();
+  return true;
 }
 function chooseAiCall(actions){if(!actions.length)return null;const ron=actions.find(a=>a.type==='Ron');if(ron)return ron;if(actions.some(a=>a.type==='Kan')&&Math.random()<.45)return actions.find(a=>a.type==='Kan');if(actions.some(a=>a.type==='Pon')&&Math.random()<.35)return actions.find(a=>a.type==='Pon');if(actions.some(a=>a.type==='Chi')&&Math.random()<.22)return actions.find(a=>a.type==='Chi');return null}
 const CALL_PRIORITY={Ron:4,Kan:3,Pon:2,Chi:1};
@@ -1550,39 +1720,136 @@ function hideAvailableActions(){
   showCurrentWaitAdvisor();
 }
 function showAvailableActions(actions){
-  if((actions||[]).some(a=>(typeof a==='string'?a:a?.type)==='Ron'))smartAssistantShow('RON TERSEDIA','Kartu buangan terakhir membuat Anda bisa menang.','green');
+  if((actions||[]).some(a=>
+    (typeof a==='string'?a:a?.type)==='Ron'
+  )){
+    smartAssistantShow(
+      'RON TERSEDIA',
+      'Kartu buangan terakhir membuat Anda bisa menang.',
+      'green'
+    );
+  }
+
   const o=byId('action-overlay');
   hideAvailableActions();
+
   if(!o||!Array.isArray(actions)||!actions.length)return;
+
   isActionPhase=true;
   o.hidden=false;
   o.style.display='flex';
+
   actions.forEach(a=>{
+    const type=typeof a==='string'?a:a?.type;
+
+    // One Chi option: simply show CHI.
+    if(type==='Chi'&&a?.combos?.length){
+      if(a.combos.length===1){
+        const b=document.createElement('button');
+        b.type='button';
+        b.className='act-btn btn-chi';
+        b.textContent='Chi';
+        b.onclick=()=>triggerAction({
+          type:'Chi',
+          combo:a.combos[0]
+        });
+        o.appendChild(b);
+        return;
+      }
+
+      // Multiple Chi combinations: show every valid choice.
+      a.combos.forEach(combo=>{
+        const b=document.createElement('button');
+        b.type='button';
+        b.className='act-btn btn-chi';
+        b.textContent=`Chi ${combo.join('-')}`;
+        b.onclick=()=>triggerAction({
+          type:'Chi',
+          combo:combo
+        });
+        o.appendChild(b);
+      });
+      return;
+    }
+
     const b=document.createElement('button');
     b.type='button';
-    b.className=`act-btn btn-${String(a).toLowerCase()}`;
-    b.textContent=a==='Skip'?'Lewati':a;
-    b.onclick=()=>triggerAction(a);
+    b.className=`act-btn btn-${String(type).toLowerCase()}`;
+    b.textContent=type==='Skip'?'Lewati':type;
+    b.onclick=()=>triggerAction(type);
     o.appendChild(b);
   });
 }
 function triggerAction(a){
-  // Buttons belong only to the current action opportunity. A later opportunity
-  // gets a new button set, so this is not a one-use-per-game restriction.
   hideAvailableActions();
 
+  // Chi with an explicitly selected combination.
+  if(a&&typeof a==='object'&&a.type==='Chi'){
+    const combo=Array.isArray(a.combo)?a.combo:null;
+    if(!combo||combo.length!==3)return;
+
+    if(isMultiplayerMode&&!mp.host){
+      mpSend('action',{
+        action:{
+          type:'call',
+          action:'Chi',
+          combo:combo
+        }
+      });
+      return;
+    }
+
+    const q=mpPendingCalls.find(
+      x=>x.seat===(mp.seat??0)
+    );
+    if(!q)return;
+
+    const act=q.actions.find(x=>x.type==='Chi');
+    if(!act||!Array.isArray(act.combos))return;
+
+    const validCombo=act.combos.some(
+      c=>Array.isArray(c)&&
+         c.length===combo.length&&
+         c.every((n,i)=>n===combo[i])
+    );
+    if(!validCombo)return;
+
+    const chosen={type:'Chi',combo:[...combo]};
+    pendingCallChoice={
+      seat:mp.seat??0,
+      action:chosen
+    };
+
+    const best=highestPendingCall();
+    if(!best||callPriority(chosen)>=callPriority(best.action)){
+      resolveCallChoice(mp.seat??0,chosen);
+    }else{
+      showAvailableActions(['Skip']);
+      setText(
+        'hand-status-sub',
+        `Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`
+      );
+    }
+    return;
+  }
+
+  // Normal multiplayer action from a guest.
   if(isMultiplayerMode&&!mp.host){
     mpSend('action',{action:{type:'call',action:a}});
     return;
   }
+
   if(a==='Skip'){
-    const q=mpPendingCalls.find(x=>x.seat===(mp.seat??0));
+    const q=mpPendingCalls.find(
+      x=>x.seat===(mp.seat??0)
+    );
     if(q)mpPendingCalls=mpPendingCalls.filter(x=>x!==q);
     pendingCallChoice=null;
     stopCallWindow();
     promptNextCall();
     return;
   }
+
   if(a==='Tsumo'){
     stopCallWindow();
     const e=checkCurrentWin(mp.seat,null,true);
@@ -1590,25 +1857,43 @@ function triggerAction(a){
     else startTurnTimer();
     return;
   }
-  const q=mpPendingCalls.find(x=>x.seat===(mp.seat??0));
+
+  const q=mpPendingCalls.find(
+    x=>x.seat===(mp.seat??0)
+  );
+
   if(q){
     const act=q.actions.find(x=>x.type===a);
-    if(!act){hideAvailableActions();return;}
-    pendingCallChoice={seat:mp.seat??0,action:act};
+    if(!act){
+      hideAvailableActions();
+      return;
+    }
+
+    pendingCallChoice={
+      seat:mp.seat??0,
+      action:act
+    };
+
     const best=highestPendingCall();
     if(!best||callPriority(act)>=callPriority(best.action)){
       resolveCallChoice(mp.seat??0,act);
     }else{
-      // The lower-priority choice remains pending, but the old action buttons
-      // must not remain visible as if they were still immediately clickable.
       showAvailableActions(['Skip']);
-      setText('hand-status-sub',`Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`);
+      setText(
+        'hand-status-sub',
+        `Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`
+      );
     }
     return;
   }
+
+  // Self Kan during the player's own turn.
   if(a==='Kan'){
     const opt=getSelfKanOptions(mp.seat??0)[0];
-    if(opt){stopCallWindow();executeSelfKan(mp.seat??0,opt);}
+    if(opt){
+      stopCallWindow();
+      executeSelfKan(mp.seat??0,opt);
+    }
   }
 }
 
@@ -1924,15 +2209,78 @@ function mpApplyRemoteState(state){
   }
 }
 function roomCanAct(seat){return!!mp.room?.players?.[seat]}
-function mpHandlePlayerAction(seat,action){if(!mp.host||!roundActive||!roomCanAct(seat))return;if(action.type==='discard'){
-  const i=playerHands[seat].findIndex(t=>t.uniqueId===action.uniqueId);
-  if(i>=0&&currentTurn===seat&&roundActive){
-    const t=playerHands[seat].splice(i,1)[0];
-    isDiscardable=false;
-    commitDiscard(seat,t);
+function mpHandlePlayerAction(seat,action){
+  if(!mp.host||!roundActive||!roomCanAct(seat))return;
+
+  if(action.type==='discard'){
+    const i=playerHands[seat].findIndex(
+      t=>t.uniqueId===action.uniqueId
+    );
+
+    if(i>=0&&currentTurn===seat&&roundActive){
+      const t=playerHands[seat].splice(i,1)[0];
+      isDiscardable=false;
+      commitDiscard(seat,t);
+    }
+    return;
   }
-  return;
-}if(action.type==='call'){const a=action.action,q=mpPendingCalls.find(x=>x.seat===seat);if(a==='Tsumo'&&seat===currentTurn){const e=checkCurrentWin(seat,null,true);if(e?.valid){stopCallWindow();resolveWin(seat,e,true)}return}if(!q)return;if(a==='Skip'){mpPendingCalls=mpPendingCalls.filter(x=>x!==q);if(mpPendingCalls.length)promptNextCall();else finishCallWindow();return}const act=q.actions.find(x=>x.type===a);if(!act)return;pendingCallChoice={seat,action:act};const best=highestPendingCall();if(!best||callPriority(act)>=callPriority(best.action))resolveCallChoice(seat,act)}}
+
+  if(action.type!=='call')return;
+
+  const a=action.action;
+  const q=mpPendingCalls.find(x=>x.seat===seat);
+
+  // Tsumo is a turn action, not a discard-call action.
+  if(a==='Tsumo'&&seat===currentTurn){
+    const e=checkCurrentWin(seat,null,true);
+    if(e?.valid){
+      stopCallWindow();
+      resolveWin(seat,e,true);
+    }
+    return;
+  }
+
+  if(!q)return;
+
+  if(a==='Skip'){
+    mpPendingCalls=mpPendingCalls.filter(x=>x!==q);
+    if(mpPendingCalls.length)promptNextCall();
+    else finishCallWindow();
+    return;
+  }
+
+  const act=q.actions.find(x=>x.type===a);
+  if(!act)return;
+
+  // Chi must use the exact combination selected by the guest.
+  if(a==='Chi'){
+    const combo=Array.isArray(action.combo)?action.combo:null;
+    if(!combo||combo.length!==3)return;
+    if(!Array.isArray(act.combos))return;
+
+    const validCombo=act.combos.some(
+      c=>Array.isArray(c)&&
+         c.length===combo.length&&
+         c.every((n,i)=>n===combo[i])
+    );
+
+    if(!validCombo)return;
+
+    pendingCallChoice={
+      seat,
+      action:{type:'Chi',combo:[...combo]}
+    };
+  }else{
+    pendingCallChoice={seat,action:act};
+  }
+
+  const best=highestPendingCall();
+  const chosen=pendingCallChoice.action;
+
+  if(!best||callPriority(chosen)>=callPriority(best.action)){
+    resolveCallChoice(seat,chosen);
+  }
+}
 function mpTapRemoteDiscard(t){mpSend('action',{action:{type:'discard',uniqueId:t.uniqueId}})}
 function mpCopyRoomInfo(){mpCopyRoomLink()}
 function mpReconnect(){
