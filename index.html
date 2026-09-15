@@ -5,8 +5,8 @@
     <meta name="app-version" content="25.0-mahyong-dj-actionfix">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
-    <meta name="description" content="Majong DJ - HongKong Mahjong dengan AI dan Cloudflare multiplayer.">
-    <title>Majong DJ - HongKong</title>
+    <meta name="description" content="Majong DJ - HongKong Mahjong dengan Cloudflare.">
+    <title>Majong DJ - HK</title>
     <style>
 :root{color-scheme:dark;--bg:#050505;--panel:rgba(18,15,11,.94);--line:rgba(212,164,76,.16);--text:#f6f0e4;--muted:#a99f91;--gold:#d7a64a;--green:#55c79a;--red:#d9655a;--brown:#241914;--table:#17130f;--table2:#0c0a08;--tileW:clamp(27px,min(4.9vw,7.6vh),48px);--tileH:clamp(40px,min(6.9vw,11vh),61px);--discW:clamp(16px,min(2.55vw,3.8vh),27px);--discH:clamp(24px,min(3.85vw,5.5vh),38px)}
 *{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 50% 42%,#12313b 0%,#08171f 48%,#050a10 100%);color:var(--text);-webkit-font-smoothing:antialiased;user-select:none}button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -1497,6 +1497,18 @@ function promptNextCall(){
   const actions=q.actions.map(x=>x.type);
 
   if(!aiSeats.has(best.seat)){
+    // A remote/local human may already have sent the intended call while a
+    // higher-priority AI call was being resolved. As soon as that higher
+    // priority call disappears, apply the waiting human choice immediately
+    // instead of forcing the player to wait for another timer cycle.
+    if(pendingCallChoice&&pendingCallChoice.seat===best.seat){
+      const chosen=pendingCallChoice.action;
+      pendingCallChoice=null;
+      if(callPriority(chosen)>=callPriority(best.action)){
+        resolveCallChoice(best.seat,chosen);
+        return;
+      }
+    }
     if(best.seat===(mp.seat??0)){
       showAvailableActions([...actions,'Skip']);
       startActionWindow(finishCallWindow,best.seat,'discard-call');
@@ -1892,6 +1904,13 @@ function mpApplyRemoteState(state){
   if(state.remoteActions?.seat===(mp.seat??0)&&Array.isArray(state.remoteActions.actions)&&state.remoteActions.actions.length){
     isDiscardable=false;
     showAvailableActions(state.remoteActions.actions);
+    // Remote guests must own their own visible call timer. Previously the host
+    // only broadcast the buttons, leaving the guest without a local action
+    // window and making stale/late call clicks possible.
+    startActionWindow(()=>{
+      hideAvailableActions();
+      mpSend('action',{action:{type:'call',action:'Skip'}});
+    },mp.seat??0,'discard-call');
   }else{
     hideAvailableActions();
     if(currentTurn===(mp.seat??0) && roundActive){
