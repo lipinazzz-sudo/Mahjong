@@ -272,11 +272,6 @@ min-width:14px;min-height:33px;padding:2px;display:flex;align-items:center;justi
                     <button class="btn btn-primary" onclick="mpCreateRoom()">Buat Room</button>
                     <button class="btn btn-secondary" onclick="mpShowJoinForm()">Masukkan Kode</button>
                 </div>
-                <div id="mp-reconnect-card" class="reconnect-card" hidden>
-                    <strong id="mp-reconnect-title">Menyambungkan kembali</strong>
-                    <span id="mp-reconnect-text">Sesi room tersimpan.</span>
-                    <button class="btn btn-secondary btn-compact" onclick="mpReconnect()">Sambungkan Kembali</button>
-                </div>
                 <div id="mp-host-invite" class="p2p-card" hidden>
                     <div class="p2p-card-title">Bagikan Room</div>
                     <div class="room-share-big"><span class="hud-label">ROOM CODE</span><strong id="mp-host-room-code">-----</strong></div>
@@ -291,6 +286,11 @@ min-width:14px;min-height:33px;padding:2px;display:flex;align-items:center;justi
                     <input class="field-input" id="mp-room-code" maxlength="5" inputmode="numeric" placeholder="12345">
                     <button class="btn btn-primary btn-wide" onclick="mpJoinRoom()">Gabung Sekarang</button>
                     <div class="mp-hint">Masukan Kode Room akan Masuk otomatis.</div>
+                    <div id="mp-reconnect-card" class="reconnect-card" hidden>
+                        <strong id="mp-reconnect-title">Menyambungkan kembali</strong>
+                        <span id="mp-reconnect-text">Sesi room tersimpan.</span>
+                        <button class="btn btn-secondary btn-compact" onclick="mpReconnect()">Sambungkan Kembali</button>
+                    </div>
                 </div>
                 <div class="mp-hint">Mode multiplayer Memakai Link ,semua pemain cukup menggunakan link yang sama.</div>
             </div>
@@ -1772,41 +1772,22 @@ function mpRoomUrl(code){const u=new URL(location.href);u.searchParams.set(MP_RO
 async function mpCopyRoomLink(){const link=byId('mp-room-link')?.value||mpRoomUrl(mp.room?.code||'');if(!link)return;try{if(navigator.share){await navigator.share({title:'Mahjong DJ',text:'Gabung ke room Mahjong DJ',url:link});setText('mp-invite-help','Link room berhasil dibagikan.');return;}}catch(e){if(e?.name==='AbortError')return}try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(link);setText('mp-invite-help','Link room berhasil disalin.');return}}catch(e){}const input=byId('mp-room-link');if(input){input.removeAttribute('readonly');input.focus();input.select();try{document.execCommand('copy')}catch(e){}input.setAttribute('readonly','readonly');setText('mp-invite-help','Link room siap disalin.')}}
 function mpRenderRoomQr(code){setText('mp-host-room-code',code||'-----');const input=byId('mp-room-link');if(input)input.value=mpRoomUrl(code);const canvas=byId('mp-offer-qr');if(!canvas)return;canvas.classList.remove('visible');const draw=()=>{try{if(window.QRCode?.toCanvas){QRCode.toCanvas(canvas,mpRoomUrl(code),{width:180,margin:1},()=>canvas.classList.add('visible'));return true}}catch(e){}return false};if(!draw()){let tries=0;const t=setInterval(()=>{if(draw()||++tries>40)clearInterval(t)},150)}}
 function mpEnsureToken(){if(!mp.token){try{mp.token=(crypto.randomUUID?crypto.randomUUID():('tok-'+Math.random().toString(36).slice(2)+Date.now().toString(36)))}catch(e){mp.token='tok-'+Math.random().toString(36).slice(2)+Date.now().toString(36)}}return mp.token}
-function mpReconnectCardShow(title,text){setText('mp-reconnect-title',title);setText('mp-reconnect-text',text);setDisplay('mp-reconnect-card','grid')}
-function mpReconnectCardHide(){setDisplay('mp-reconnect-card','none')}
-function mpSessionIsResumable(saved){return !!(saved&&saved.room&&/^\d{5}$/.test(saved.room)&&saved.updatedAt&&(Date.now()-saved.updatedAt)<6*60*60*1000)}
 function mpConnect(code='',role='',isReconnect=false){const c=String(code||mp.room?.code||'').trim();if(!/^\d{5}$/.test(c)){mpSetConnection(false);return false}const workerUrl=mpServerUrl(c);if(!workerUrl){mpSetConnection(false);setText('lobby-help','URL Cloudflare Worker belum dikonfigurasi.');return false}if(mp.ws&&(mp.ws.readyState===WebSocket.OPEN||mp.ws.readyState===WebSocket.CONNECTING))return true;try{const desiredRole=role||(mp.host?'host':'guest');const ws=new WebSocket(`${workerUrl}&name=${encodeURIComponent(mp.playerName||'Player')}&role=${desiredRole}${mp.seat!=null?`&seat=${mp.seat}`:''}`);mp.ws=ws;ws.onopen=()=>{mp.connected=true;mpReconnectAttempts=0;mpReconnectDeadline=0;mpSetConnection(true);startMpPing();ws.send(JSON.stringify({type:isReconnect?'rejoin':(desiredRole==='host'?'createRoom':'joinRoom'),code:c,name:mp.playerName||'Player',seat:mp.seat,token:mp.token,avatar:mp.playerAvatar||selectedAvatar}))};ws.onmessage=e=>{try{mpHandle(JSON.parse(e.data))}catch(err){console.error('MP message error',err)}};ws.onerror=()=>{mp.connected=false;mpSetConnection(false)};ws.onclose=()=>{mp.connected=false;stopMpPing();mpSetConnection(false);mp.ws=null;
     // Reconnect during a game too. The host keeps a local snapshot and sends
     // it again after the Worker accepts the restored room connection.
     if(mp.room?.code && isMultiplayerMode){
       if(!mpReconnectDeadline)mpReconnectDeadline=Date.now()+5*60*1000;
-      // A drop mid-round leaves the game screen showing with no visible sign
-      // anything is wrong (the lobby modal, where the status normally lives,
-      // isn't even open). Pop it open so the player can see what's happening
-      // and isn't just staring at a screen that looks frozen.
-      const lobbyEl=byId('modal-lobby');
-      if(lobbyEl&&getComputedStyle(lobbyEl).display==='none'){
-        setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');
-      }
-      if(Date.now()<mpReconnectDeadline){
-        const delay=Math.min(2500,700+mpReconnectAttempts*450);
-        mpReconnectAttempts++;
-        mpReconnectCardShow('Koneksi terputus — menyambungkan kembali…',`Room ${mp.room.code} • percobaan ke-${mpReconnectAttempts}.`);
-        clearTimeout(mpReconnectTimer);
-        mpReconnectTimer=setTimeout(()=>{if(!mp.connected)mpConnect(mp.room.code,mp.host?'host':'guest',true)},delay)
-      }else{
-        mpReconnectCardShow('Gagal tersambung otomatis','Periksa koneksi internet kamu, lalu tekan tombol di bawah untuk coba lagi.');
-      }
+      if(Date.now()<mpReconnectDeadline){const delay=Math.min(2500,700+mpReconnectAttempts*450);mpReconnectAttempts++;clearTimeout(mpReconnectTimer);mpReconnectTimer=setTimeout(()=>{if(!mp.connected)mpConnect(mp.room.code,mp.host?'host':'guest',true)},delay)}
     }
   };return true}catch(e){mp.connected=false;mpSetConnection(false);console.error(e);return false}}
 function mpSend(type,data={}){if(mp.ws?.readyState===WebSocket.OPEN)mp.ws.send(JSON.stringify({type,...data}))}
 let mpPingTimer=null;
 function startMpPing(){clearInterval(mpPingTimer);if(!mp.connected)return;mpPingTimer=setInterval(()=>{if(mp.ws?.readyState===WebSocket.OPEN)mpSend('ping',{clientTime:Date.now()});},8000)}
 function stopMpPing(){clearInterval(mpPingTimer);mpPingTimer=null}
-function openPlayerLobby(){isMultiplayerMode=true;mp.playerAvatar=selectedAvatar;clearTimeout(mpReconnectTimer);mpReconnectAttempts=0;mpReconnectDeadline=0;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');mpSetConnection(false);const code=new URL(location.href).searchParams.get(MP_ROOM_PARAM);if(code){mpReconnectCardHide();setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.host=false;mp.ready=true;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};setText('lobby-help','Menghubungkan ke Room '+code+'…');mpConnect(code,'guest')}else{const saved=mpLoadSession();if(mpSessionIsResumable(saved)){mpReconnectCardShow('Sesi room ditemukan',`Room ${saved.room} • ${saved.host?'sebagai Host':'sebagai Pemain'}. Sambungkan kembali?`)}else{mpReconnectCardHide()}}}
-function closeLobby(){clearTimeout(mpReconnectTimer);stopMpPing();mpReconnectCardHide();try{mpSend('leave')}catch(e){}try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}mp.ws=null;mp.connected=false;mpClearSession();mpClearActiveGameState();mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,token:null,playerName:mp.playerName||'Player',playerAvatar:selectedAvatar};isMultiplayerMode=false;setDisplay('modal-lobby','none');mpSetConnection(false)}
-function mpCreateRoom(){mpReconnectCardHide();mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.playerAvatar=selectedAvatar;const code=String(Math.floor(10000+Math.random()*90000));mp.host=true;mp.seat=0;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();isMultiplayerMode=true;mp.room={code,players:[null,null,null,null],started:false};setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('mp-room-code-display',code);setText('mp-host-room-code',code);setText('lobby-help','Membuat room di Cloudflare…');mpRenderRoomQr(code);mpSaveSession();mpConnect(code,'host')}
-function mpJoinRoom(){mpReconnectCardHide();mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code)){alert('Masukkan kode room 5 digit.');return}mp.host=false;mp.seat=null;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};isMultiplayerMode=true;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Menghubungkan ke Room '+code+'…');mpSaveSession();mpConnect(code,'guest')}
+function openPlayerLobby(){isMultiplayerMode=true;mp.playerAvatar=selectedAvatar;clearTimeout(mpReconnectTimer);mpReconnectAttempts=0;mpReconnectDeadline=0;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');mpSetConnection(false);const code=new URL(location.href).searchParams.get(MP_ROOM_PARAM);if(code){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.host=false;mp.ready=true;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};setText('lobby-help','Menghubungkan ke Room '+code+'…');mpConnect(code,'guest')}}
+function closeLobby(){clearTimeout(mpReconnectTimer);stopMpPing();try{mpSend('leave')}catch(e){}try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}mp.ws=null;mp.connected=false;mpClearSession();mpClearActiveGameState();mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,token:null,playerName:mp.playerName||'Player',playerAvatar:selectedAvatar};isMultiplayerMode=false;setDisplay('modal-lobby','none');mpSetConnection(false)}
+function mpCreateRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.playerAvatar=selectedAvatar;const code=String(Math.floor(10000+Math.random()*90000));mp.host=true;mp.seat=0;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();isMultiplayerMode=true;mp.room={code,players:[null,null,null,null],started:false};setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('mp-room-code-display',code);setText('mp-host-room-code',code);setText('lobby-help','Membuat room di Cloudflare…');mpRenderRoomQr(code);mpSaveSession();mpConnect(code,'host')}
+function mpJoinRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code)){alert('Masukkan kode room 5 digit.');return}mp.host=false;mp.seat=null;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};isMultiplayerMode=true;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Menghubungkan ke Room '+code+'…');mpSaveSession();mpConnect(code,'guest')}
 function mpShowJoinForm(){setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','block')}
 function togglePlayerReady(){if(!mp.room)return;mp.ready=!mp.ready;mpSend('ready',{ready:mp.ready});mpSaveSession();if(mp.host&&mp.room.players?.[0])mp.room.players[0].ready=mp.ready;mpRenderLobby(mp.room)}
 function mpStartGame(){
@@ -1830,7 +1811,6 @@ function mpHandle(msg){
   if(msg.type==='joined'){
     mp.room=msg.room;mpLastRoomView=msg.room;mp.seat=msg.seat;mp.host=!!msg.host;mp.started=!!msg.room.started;mp.ready=!!(msg.room.players?.[msg.seat]?.ready);mp.playerAvatar=msg.room.players?.[msg.seat]?.avatar||mp.playerAvatar||selectedAvatar;selectedAvatar=mp.playerAvatar;syncHumanAvatars(msg.room);if(msg.seat!=null)playerAvatars[msg.seat]=mp.playerAvatar;mpReconnectAttempts=0;mpReconnectDeadline=0;
     if(msg.token)mp.token=msg.token;
-    mpReconnectCardHide();
     setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('mp-room-code-display',msg.room.code);
     if(mp.host){setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('lobby-help','Room dibuat. Bagikan link/QR kepada pemain lain.');mpRenderRoomQr(msg.room.code)}
     else{setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Berhasil masuk room. Kamu otomatis READY.')}
@@ -1957,15 +1937,7 @@ function mpTapRemoteDiscard(t){mpSend('action',{action:{type:'discard',uniqueId:
 function mpCopyRoomInfo(){mpCopyRoomLink()}
 function mpReconnect(){
   const saved=mpLoadSession();
-  if(!saved?.room){
-    mpReconnectCardShow('Tidak ada sesi tersimpan','Buat room baru atau masukkan kode room di atas.');
-    return;
-  }
-  if(typeof navigator!=='undefined'&&navigator.onLine===false){
-    mpReconnectCardShow('Tidak ada koneksi internet','Aktifkan WiFi/data seluler, lalu tekan tombol ini lagi.');
-    return;
-  }
-  mpReconnectCardShow('Menyambungkan kembali…',`Room ${saved.room}.`);
+  if(!saved?.room)return;
   mp.playerName=saved.name||'Player';
   mp.playerAvatar=saved.avatar||selectedAvatar;selectedAvatar=mp.playerAvatar;
   mp.host=!!saved.host;
@@ -1974,7 +1946,6 @@ function mpReconnect(){
   mp.ready=true;
   mp.started=!!saved.started;
   mp.room={code:saved.room,players:[null,null,null,null],started:!!saved.started};
-  isMultiplayerMode=true;
   const savedGame=mp.host?mpLoadActiveGameState(saved.room):null;
   if(savedGame?.state){
     mp.started=true;
@@ -1986,16 +1957,6 @@ function mpReconnect(){
   }
   mpConnect(saved.room,mp.host?'host':'guest',true);
 }
-// If the OS/browser reports connectivity coming back, retry right away
-// instead of waiting for the next scheduled backoff — this is exactly the
-// "turned WiFi back on" moment a manual tap of Sambungkan Kembali is for.
-window.addEventListener('online',()=>{
-  if(isMultiplayerMode&&mp.room?.code&&!mp.connected){
-    mpReconnectCardShow('Koneksi kembali — menyambungkan…',`Room ${mp.room.code}.`);
-    clearTimeout(mpReconnectTimer);
-    mpConnect(mp.room.code,mp.host?'host':'guest',true);
-  }
-});
 window.mpConnect=mpConnect;window.mpSend=mpSend;window.openPlayerLobby=openPlayerLobby;window.mpCreateRoom=mpCreateRoom;window.mpJoinRoom=mpJoinRoom;window.mpShowJoinForm=mpShowJoinForm;window.togglePlayerReady=togglePlayerReady;window.mpStartGame=mpStartGame;window.closeLobby=closeLobby;window.mpCopyRoomLink=mpCopyRoomLink;window.mpCopyRoomInfo=mpCopyRoomInfo;
 </script>
 </body>
