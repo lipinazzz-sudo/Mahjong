@@ -2,13 +2,13 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="25.0-mahyong-dj-actionfix">
+    <meta name="app-version" content="26.0-mahjong-dj-multiplayer-stable">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
     <meta name="description" content="Majong DJ - HongKong Mahjong dengan AI dan Cloudflare multiplayer.">
     <title>Majong DJ - HongKong</title>
-        <link rel="apple-touch-icon" sizes="180x180" href="IMG_6682.PNG">
-    <link rel="icon" type="image/PNG" sizes="32x32" href="IMG_6682.PNG">
+        <link rel="apple-touch-icon" sizes="180x180" href="IMG_6682.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="IMG_6682.png">
     <style>
 :root{color-scheme:dark;--bg:#050505;--panel:rgba(18,15,11,.94);--line:rgba(212,164,76,.16);--text:#f6f0e4;--muted:#a99f91;--gold:#d7a64a;--green:#55c79a;--red:#d9655a;--brown:#241914;--table:#17130f;--table2:#0c0a08;--tileW:clamp(27px,min(4.9vw,7.6vh),48px);--tileH:clamp(40px,min(6.9vw,11vh),61px);--discW:clamp(16px,min(2.55vw,3.8vh),27px);--discH:clamp(24px,min(3.85vw,5.5vh),38px)}
 *{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 50% 42%,#12313b 0%,#08171f 48%,#050a10 100%);color:var(--text);-webkit-font-smoothing:antialiased;user-select:none}button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -1179,7 +1179,7 @@ function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKe
   currentTurn=currentDealerIdx;drawnTile=null;renderTable();processTurn();
 }
 function start4PGame(diff='Medium',multi=false){cancelAiTurn();if(!multi)stopMpGameWatchdog();
-  aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
+  aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);clearInterval(actionTimer);turnTimer=null;actionTimer=null;isDiscardable=false;isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
   if(!multi){
     mp.seat=0;mp.room=null;mp.host=true;mp.connected=false;mp.playerAvatar=selectedAvatar;
     aiSeats=new Set([1,2,3]);playerAvatars[0]=selectedAvatar;playerAvatars[1]='shiba';playerAvatars[2]='kucing';playerAvatars[3]='penguin';randomizeAiAvatars();
@@ -1360,7 +1360,30 @@ function scheduleAiTurn(seat,mode='discard'){
   },2800);
 }
 
-function autoDiscardCurrent(){if(!roundActive||roundEnding)return;const p=currentTurn;if(p===(mp.seat??0)){discardTile(selectedTileIndex>=0?selectedTileIndex:playerHands[p].length-1)}else aiDiscard(p)}
+function autoDiscardCurrent(){
+  if(!roundActive||roundEnding)return;
+  const p=currentTurn;
+  if(aiSeats.has(p)){
+    aiDiscard(p);
+    return;
+  }
+  if(isMultiplayerMode&&mp.host&&p!==(mp.seat??0)){
+    const hand=playerHands[p]||[];
+    if(!hand.length)return;
+    const idx=selectedTileIndex>=0&&selectedTileIndex<hand.length
+      ?selectedTileIndex
+      :hand.length-1;
+    const tile=hand.splice(idx,1)[0];
+    if(!tile)return;
+    selectedTileIndex=-1;
+    drawnTile=null;
+    commitDiscard(p,tile);
+    return;
+  }
+  if(p===(mp.seat??0)){
+    discardTile(selectedTileIndex>=0?selectedTileIndex:playerHands[p].length-1);
+  }
+}
 function processTurn(){
   if(!roundActive||roundEnding)return;
   clearInterval(turnTimer);selectedTileIndex=-1;
@@ -1468,15 +1491,16 @@ function executePon(p){
   selectedTileIndex=-1;
   renderTable();
 
-  // Only AI seats may auto-discard.
-  // A human guest must keep control of the hand after Pon.
+  // The host owns the authoritative turn timer. Only AI seats may decide
+  // a discard automatically; remote humans must receive the state and choose.
   if(aiSeats.has(p)){
-    aiDiscard(p);
-  }else if(p===(mp.seat??0)){
-    isDiscardable=true;
+    scheduleAiTurn(p,'discard');
+  }else if(isMultiplayerMode&&mp.host&&p!==(mp.seat??0)){
+    isDiscardable=false;
     startTurnTimer();
   }else{
-    isDiscardable=false;
+    isDiscardable=true;
+    startTurnTimer();
   }
 
   mpPendingCalls=[];
@@ -1512,15 +1536,16 @@ function executeChi(p,combo){
   selectedTileIndex=-1;
   renderTable();
 
-  // Only AI seats may auto-discard.
-  // A human guest must choose the discard after Chi.
+  // The host owns the authoritative turn timer. Only AI seats may decide
+  // a discard automatically; remote humans must receive the state and choose.
   if(aiSeats.has(p)){
-    aiDiscard(p);
-  }else if(p===(mp.seat??0)){
-    isDiscardable=true;
+    scheduleAiTurn(p,'discard');
+  }else if(isMultiplayerMode&&mp.host&&p!==(mp.seat??0)){
+    isDiscardable=false;
     startTurnTimer();
   }else{
-    isDiscardable=false;
+    isDiscardable=true;
+    startTurnTimer();
   }
 
   mpPendingCalls=[];
@@ -1597,15 +1622,16 @@ function executeSelfKan(p,opt){
   selectedTileIndex=-1;
   renderTable();
 
-  // Only AI seats may auto-discard.
-  // A human guest must choose the discard after self-Kan draw.
+  // The host owns the authoritative turn timer. Only AI seats may decide
+  // a discard automatically; remote humans must receive the state and choose.
   if(aiSeats.has(p)){
-    aiDiscard(p);
-  }else if(p===(mp.seat??0)){
-    isDiscardable=true;
+    scheduleAiTurn(p,'discard');
+  }else if(isMultiplayerMode&&mp.host&&p!==(mp.seat??0)){
+    isDiscardable=false;
     startTurnTimer();
   }else{
-    isDiscardable=false;
+    isDiscardable=true;
+    startTurnTimer();
   }
 
   mpBroadcastState();
@@ -1698,7 +1724,7 @@ function promptNextCall(){
     // The HOST is authoritative for every remote player's action timer.
     // Without a host-side timer, a disconnected/stalled guest could leave
     // mpPendingCalls waiting forever and freeze the entire room.
-    if(mp.host){
+    if(mp.host&&!actionTimer){
       startActionWindow(finishCallWindow,best.seat,'discard-call');
     }
 
@@ -2210,11 +2236,26 @@ function mpStateSnapshot(extra={}){return{currentRoundIndex,currentDealerIdx,cur
 function mpBroadcastState(extra={}){const state=mpStateSnapshot(extra);if(isMultiplayerMode&&mp.host)mpSaveActiveGameState(state);if(isMultiplayerMode&&mp.host&&mp.connected)mpSend('state',{state})}
 function mpApplyRemoteState(state){
   if(mp.host)return;
+  if(!state||mp.seat==null)return;
 
-  // A reconnected guest must remain in multiplayer mode.
+  // Guest clients are views + input endpoints only. The HOST is the single
+  // source of truth for the deck, turn timer, action timer and AI decisions.
   isMultiplayerMode=true;
   mp.state=state;
-  mp.seat=mp.seat??0;
+
+  // Never let an old guest-side timer continue after a reconnect/state sync.
+  clearInterval(turnTimer);
+  clearInterval(actionTimer);
+  clearTimeout(aiMoveTimer);
+  turnTimer=null;
+  actionTimer=null;
+  aiMoveTimer=null;
+  isActionPhase=false;
+  actionSecondsLeft=0;
+  actionTimeoutHandler=null;
+  actionSeat=-1;
+  actionMode='';
+  pendingCallChoice=null;
 
   playerScores=state.playerScores||playerScores;
   fullDeck=state.fullDeck||[];
@@ -2228,21 +2269,10 @@ function mpApplyRemoteState(state){
   lastDiscarderIdx=state.lastDiscarderIdx??-1;
   drawnTile=state.drawnTile||null;
   secondsLeft=state.secondsLeft??secondsLeft;
-  if(Array.isArray(state.timeBank))timeBank=state.timeBank;
-  actionSecondsLeft=state.actionSecondsLeft??actionSecondsLeft;
+  if(Array.isArray(state.timeBank))timeBank=state.timeBank.slice();
+  actionSecondsLeft=state.actionSecondsLeft??0;
   roundActive=!!state.roundActive;
   roundEnding=!!state.roundEnding;
-
-  if(state.remoteTimer&&state.remoteTimer.seat===mp.seat){
-    if(state.remoteTimer.isActionPhase){
-      setText('turn-timer-display',Math.max(0,state.remoteTimer.actionSeconds??0));
-    }else{
-      const visibleTimer=(state.remoteTimer.baseTime??0)>0
-        ?state.remoteTimer.baseTime
-        :(state.remoteTimer.timeBank??0);
-      setText('turn-timer-display',Math.max(0,visibleTimer));
-    }
-  }
 
   aiSeats=new Set(state.aiSeats||[]);
   if(Array.isArray(state.playerAvatars)&&state.playerAvatars.length===4){
@@ -2256,67 +2286,59 @@ function mpApplyRemoteState(state){
   nav('screen-game');
   if(state.roundActive||state.roundEnding)setDisplay('modal-lobby','none');
 
-  // Rebuild the guest's local control state from the synchronized table.
-  isDiscardable=
-    roundActive&&
-    !roundEnding&&
-    currentTurn===(mp.seat??0)&&
-    !state.remoteActions?.actions?.length;
+  const mySeat=mp.seat;
+  const myTurn=roundActive&&!roundEnding&&currentTurn===mySeat;
+  const remoteActions=state.remoteActions;
+  const hasMyActions=
+    remoteActions?.seat===mySeat&&
+    Array.isArray(remoteActions.actions)&&
+    remoteActions.actions.length>0;
 
+  isDiscardable=!!(myTurn&&!hasMyActions);
   renderTable();
 
-  if(
-    state.remoteActions?.seat===(mp.seat??0)&&
-    Array.isArray(state.remoteActions.actions)&&
-    state.remoteActions.actions.length
-  ){
-    isDiscardable=false;
-    showAvailableActions(state.remoteActions.actions);
-    startActionWindow(()=>{
-      hideAvailableActions();
-      mpSend('action',{action:{type:'call',action:'Skip'}});
-    },mp.seat??0,'discard-call');
-  }else if(currentTurn===(mp.seat??0)&&roundActive){
-    // Reconnect can happen during a normal turn without a fresh startGame
-    // message. Recreate the same Tsumo/Kan controls the player would have had.
-    const turnActions=[];
-    const win=checkCurrentWin(mp.seat,null,true);
-    if(win?.valid)turnActions.push('Tsumo');
-    if(getSelfKanOptions(mp.seat).length)turnActions.push('Kan');
-
-    hideAvailableActions();
-
-    if(turnActions.length){
-      showAvailableActions(turnActions);
-      startActionWindow(()=>{
-        hideAvailableActions();
-        if((timeBank[currentTurn]||0)>0){
-          secondsLeft=0;
-          startBankTimerOnly(currentTurn);
-        }else{
-          isDiscardable=true;
-          autoDiscardCurrent();
-        }
-      },currentTurn,'turn-action');
+  // The HOST timer is already running. Guest only mirrors its latest value;
+  // it must never start a competing interval locally.
+  if(state.remoteTimer?.seat===mySeat){
+    if(state.remoteTimer.isActionPhase){
+      setText('turn-timer-display',Math.max(0,state.remoteTimer.actionSeconds??0));
     }else{
-      isDiscardable=true;
-      startTurnTimer();
-      setText('hand-status-main','Giliran Anda');
-      setText('hand-status-sub','Pilih tile untuk membuang.');
+      const visibleTimer=(state.remoteTimer.baseTime??0)>0
+        ?state.remoteTimer.baseTime
+        :(state.remoteTimer.timeBank??0);
+      setText('turn-timer-display',Math.max(0,visibleTimer));
     }
+  }else if(myTurn){
+    setText('turn-timer-display',Math.max(0,secondsLeft));
+  }
+
+  if(hasMyActions){
+    isDiscardable=false;
+    showAvailableActions(remoteActions.actions);
+    setText('hand-status-main','Aksi tersedia');
+    setText('hand-status-sub','Pilih aksi sebelum waktu habis.');
+  }else if(myTurn){
+    hideAvailableActions();
+    setText('hand-status-main','Giliran Anda');
+    setText('hand-status-sub','Pilih tile untuk membuang.');
   }else{
     hideAvailableActions();
+    setText('hand-status-main',aiSeats.has(currentTurn)?`${playerName(currentTurn)} berpikir...`:'Giliran lawan');
+    setText('hand-status-sub',aiSeats.has(currentTurn)?'AI memilih langkah...':'Menunggu giliran Anda.');
   }
 
   if(state.phase==='result'&&state.result){
     renderResultModal(state.result.title,state.result.desc);
   }
 }
-function roomCanAct(seat){return!!mp.room?.players?.[seat]}
+function roomCanAct(seat){
+  return Number.isInteger(seat)&&seat>=0&&seat<4;
+}
 function mpHandlePlayerAction(seat,action){
   if(!mp.host||!roundActive||!roomCanAct(seat))return;
 
   if(action.type==='discard'){
+    if(aiSeats.has(seat)||currentTurn!==seat)return;
     const i=playerHands[seat].findIndex(
       t=>t.uniqueId===action.uniqueId
     );
