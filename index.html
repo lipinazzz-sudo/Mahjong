@@ -82,7 +82,8 @@
 @media (orientation:landscape) and (max-height:620px){.modal{padding:8px}.lobby-box{width:min(760px,96vw);padding:13px 16px;max-height:calc(100dvh - 16px)}.lobby-box .modal-copy{margin-top:2px}.lobby-box .mp-setup,.lobby-box .mp-room-panel,.lobby-box .lobby-actions{gap:6px}.lobby-box .p2p-card{gap:5px;padding:8px 10px}.lobby-box .field-input{padding:8px 10px}.lobby-box .signal-qr{width:132px;height:132px}.lobby-box .room-share-big strong{font-size:24px}.lobby-box .ready-player-list{gap:4px;margin-top:6px}.lobby-box .ready-item{padding:7px 9px}.lobby-box .btn{min-height:38px}.lobby-box .p2p-mini,.lobby-box .mp-hint{font-size:9px}.lobby-back-main{margin-top:6px}}
 
 #screen-game{padding:0}.game-shell{position:relative;width:100vw;height:100dvh;overflow:hidden;background:#0b0a09}.table-plane{position:absolute;left:5vw;right:5vw;top:5vh;bottom:4vh;transform:perspective(1200px) rotateX(5deg);transform-origin:center;pointer-events:none}.table-plane::before{content:"";position:absolute;inset:0;border-radius:26px;background:radial-gradient(ellipse at 50% 45%,rgba(89,113,79,.17),transparent 68%),linear-gradient(145deg,#3a281e,#241813 10%,#142218 25%,#101c16 58%,#080f0c);box-shadow:0 26px 58px rgba(0,0,0,.64),inset 0 0 0 2px rgba(231,202,145,.12),inset 0 0 0 8px rgba(0,0,0,.25),inset 0 -38px 62px rgba(0,0,0,.34)}.table-plane::after{content:"";position:absolute;inset:12px;border-radius:19px;border:1px solid rgba(226,188,111,.08);background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 24%,rgba(0,0,0,.10) 78%,rgba(0,0,0,.22));box-shadow:inset 0 0 42px rgba(0,0,0,.36),inset 0 0 0 1px rgba(214,164,74,.035)}
-#game-board{position:absolute;inset:0;overflow:hidden;--sideInset:clamp(78px,min(12vw,16vh),152px);--focus-pan-y:-8.5%}.topbar{position:absolute;left:12px;right:12px;top:9px;z-index:50;display:flex;justify-content:space-between;align-items:flex-start}.score-panel{width:clamp(191px,24.65vw,255px);padding:7.65px 9.35px;border-radius:11px;border:1px solid rgba(220,177,91,.18);background:linear-gradient(180deg,rgba(26,20,15,.95),rgba(10,9,8,.98));box-shadow:0 8px 20px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,235,192,.045);backdrop-filter:blur(10px)}.score-guide-title{display:flex;align-items:center;gap:4.25px;color:#d9cdbd;font-size:5.95px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;margin-bottom:5.1px}.score-guide-title span:first-child{font-size:8.5px;line-height:1}.score-guide-panel .score-guide-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-auto-flow:column;grid-template-rows:repeat(8,auto);column-gap:10.2px;row-gap:3.4px;margin-top:0}.score-guide-panel .score-guide-grid>div{display:grid;grid-template-columns:28.9px minmax(0,1fr);align-items:start;gap:3.4px;line-height:1.15;min-width:0}.score-guide-panel .score-guide-grid strong{min-width:0;overflow-wrap:anywhere;word-break:normal}.score-guide-panel .score-guide-grid span{min-width:0;color:#e0b45d;font-size:5.53px;font-weight:950;letter-spacing:.025em}.score-guide-panel .score-guide-grid strong{color:#c8bfb1;font-size:5.31px;font-weight:750;white-space:normal;overflow-wrap:anywhere;word-break:normal}.hud-label{font-size:7px;letter-spacing:.12em;color:#d6cabd;font-weight:900;text-transform:uppercase}.kan-info{display:none}.top-right-btns{display:flex;gap:6px}.icon-btn{width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:rgba(20,17,15,.8);color:#fff}
+#score-guide-drawer{position:fixed;left:0;top:0;bottom:0;width:min(33.333vw,430px);z-index:220;display:none;flex-direction:column;padding:18px 18px 20px;background:linear-gradient(180deg,rgba(27,21,16,.985),rgba(9,8,7,.995));border-right:1px solid rgba(225,179,88,.28);box-shadow:18px 0 46px rgba(0,0,0,.44),inset -1px 0 0 rgba(255,238,194,.04);backdrop-filter:blur(12px);overflow:auto}#score-guide-drawer.open{display:flex}.score-guide-drawer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid rgba(225,179,88,.16)}.score-guide-drawer-kicker{font-size:9px;letter-spacing:.18em;font-weight:900;color:#b99a61}.score-guide-drawer-title{margin-top:3px;font-size:20px;letter-spacing:.04em;font-weight:950;color:#f3d38d}.score-guide-close{flex:0 0 auto}.score-guide-launcher{position:relative;z-index:221}.score-guide-launcher-btn{display:flex;align-items:center;gap:5px;min-height:28px;padding:4px 8px;border-radius:8px;border:1px solid rgba(225,179,88,.22);background:linear-gradient(180deg,rgba(31,25,19,.94),rgba(12,10,8,.98));color:#f0d089;font-size:8px;font-weight:900;letter-spacing:.03em;box-shadow:0 6px 16px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,238,194,.06);white-space:nowrap;touch-action:manipulation}.score-guide-launcher-btn:active{transform:translateY(1px)}.score-guide-launcher-icon{display:inline-flex;align-items:center;justify-content:center;font-size:11px;line-height:1;color:#f3ca70}.score-guide-drawer .score-guide-grid{display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:row;gap:11px 14px;margin:0}.score-guide-drawer .score-guide-grid>div{display:grid;grid-template-columns:44px minmax(0,1fr);align-items:start;gap:7px;line-height:1.25;min-width:0}.score-guide-drawer .score-guide-grid span{color:#e0b45d;font-size:9px;font-weight:950;letter-spacing:.03em}.score-guide-drawer .score-guide-grid strong{color:#eee3d2;font-size:9px;font-weight:750;min-width:0;overflow-wrap:anywhere}.score-guide-drawer.open~*{ }
+#game-board{position:absolute;inset:0;overflow:hidden;--sideInset:clamp(78px,min(12vw,16vh),152px);--focus-pan-y:-6.5%}.topbar{position:absolute;left:12px;right:12px;top:9px;z-index:50;display:flex;justify-content:space-between;align-items:flex-start}.topbar-left-group{display:flex;align-items:center;gap:6px}.game-title-compact{font-size:7px;font-weight:950;letter-spacing:.09em;color:#d9cdbd;text-transform:uppercase;white-space:nowrap;padding:0 0 0 1px;text-shadow:0 1px 6px rgba(0,0,0,.45)}.hud-label{font-size:7px;letter-spacing:.12em;color:#d6cabd;font-weight:900;text-transform:uppercase}.kan-info{display:none}.top-right-btns{display:flex;gap:6px}.icon-btn{width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:rgba(20,17,15,.8);color:#fff}
 
 .player-seat{position:absolute;z-index:35;display:flex;flex-direction:column;align-items:center;text-align:center}.avatar-img{width:clamp(31px,min(4.7vw,5.8vh),44px);height:clamp(31px,min(4.7vw,5.8vh),44px);border-radius:10px;border:2px solid #dfb158;background:radial-gradient(circle at 34% 28%,#ffdb86,#8e4d27 50%,#261714 100%);box-shadow:0 6px 16px rgba(0,0,0,.34)}.avatar-name{margin-top:3px;padding:2px 6px;border-radius:6px;font-size:8px;font-weight:900;background:rgba(13,11,10,.86);border:1px solid rgba(255,255,255,.08);white-space:nowrap}.seat-direction{opacity:.65}.time-bank-tag{margin-top:2px;font-size:7px;color:#f0c66b}.pos-bottom{left:clamp(15px,7vw,92px);bottom:calc(var(--tileH) + 4px);transform:none;align-items:center}.pos-top{top:12px;right:clamp(46px,13vw,174px);left:auto;transform:none}.pos-left{left:clamp(12px,3vw,38px);top:45%;transform:translateY(-50%)}.pos-right{right:clamp(12px,3vw,38px);top:45%;transform:translateY(-50%)}
 .tile-back{display:block;border-radius:3px;border:1px solid #6c3b1e;background:linear-gradient(160deg,#d47d35,#8c3d12);box-shadow:inset 0 1px 0 rgba(255,236,197,.25),0 1px 3px rgba(0,0,0,.28)}.enemy-hand-count{display:flex;justify-content:center;gap:1px;margin-top:3px;min-height:12px;max-width:112px;overflow:hidden}.enemy-hand-count .mini-back{width:5px;height:9px;border-radius:1.5px;background:linear-gradient(160deg,#d47d35,#8c3d12);border:1px solid #6c3b1e;box-shadow:0 1px 2px rgba(0,0,0,.25)}.enemy-hand-count .hand-count-label{margin-left:3px;padding:2px 4px;border-radius:5px;background:rgba(13,11,10,.88);color:#f2d18b;font-size:9px;font-weight:900;line-height:11px;border:1px solid rgba(255,255,255,.08);white-space:nowrap}.enemy-meld-summary{display:none}.enemy-melds-visible{display:flex;justify-content:center;gap:3px;margin-top:3px;pointer-events:none}.enemy-meld-group{display:flex;gap:1px;padding:2px 2px 1px;border-radius:4px;background:rgba(11,9,8,.76);border:1px solid rgba(255,255,255,.10);box-shadow:0 2px 6px rgba(0,0,0,.22)}.enemy-meld-group .tile{width:clamp(12px,min(1.75vw,2.5vh),20px);height:clamp(18px,min(2.55vw,3.55vh),29px);cursor:default}.enemy-meld-group .tile .tile-char{font-size:.72em}.pos-left .enemy-hand-count,.pos-right .enemy-hand-count{max-width:94px}.pos-left .enemy-hand-count .mini-back,.pos-right .enemy-hand-count .mini-back{width:4px;height:8px}.pos-left .enemy-melds-visible,.pos-right .enemy-melds-visible{position:static;top:auto;left:auto;right:auto;transform:none;flex-direction:row;align-items:center;margin-top:3px;max-width:112px;overflow:visible}.pos-left .enemy-meld-group,.pos-right .enemy-meld-group{flex-direction:row}
@@ -108,7 +109,7 @@ min-width:14px;min-height:33px;padding:2px;display:flex;align-items:center;justi
 
 #action-overlay{position:absolute;left:auto;right:clamp(12px,3vw,48px);top:auto;bottom:calc(var(--tileH) + 14px);transform:none;z-index:60;display:none;flex-wrap:wrap;justify-content:flex-end;gap:6px;max-width:min(34vw,250px);padding:6px 8px;border-radius:12px;background:rgba(16,12,10,.95);border:1px solid rgba(229,179,88,.45);box-shadow:0 12px 28px rgba(0,0,0,.4);backdrop-filter:blur(10px)}.act-btn{min-width:54px;min-height:34px;padding:6px 9px;border:0;border-radius:8px;color:#fff;font-size:10px;font-weight:900}.btn-hu{background:#b74642}.btn-ron{background:#b74642}.btn-pon{background:#2c75b5}.btn-chi{background:#26945f}.btn-kan{background:#198c82}.btn-tsumo{background:#bf7a29}.btn-skip{background:#5d666b}
 .furiten-panel{display:none}.win-flash{animation:winflash .52s ease-out}.draw-flash{animation:drawflash .52s ease-out}@keyframes winflash{0%{box-shadow:0 14px 34px rgba(0,0,0,.44)}45%{box-shadow:0 0 0 8px rgba(246,211,116,.16),0 0 28px rgba(246,211,116,.38)}100%{box-shadow:0 14px 34px rgba(0,0,0,.44)}}@keyframes drawflash{45%{box-shadow:0 0 0 8px rgba(115,190,223,.12),0 0 24px rgba(115,190,223,.25)}}
-@media (orientation:portrait){#game-board{--centerSize:clamp(88px,15vw,104px);--riverGap:clamp(8px,1.5vh,13px);--focus-pan-y:-8.5%}.round-hud-shell{top:8px;min-width:76px;padding:4px 6px}.round-hud-title{font-size:6px}.round-hud-sub{font-size:5px}.score-panel{width:min(82vw,285px)}.pos-bottom{left:12px;bottom:calc(var(--tileH) + 5px)}.pos-top{top:10px;right:12px}.pos-left{left:7px;top:44%}.pos-right{right:7px;top:44%}.pos-left .enemy-melds-visible,.pos-right .enemy-melds-visible{left:auto;right:auto;transform:none}.melds-container{right:8px;max-width:42vw}.hand-tiles{gap:1px}.river-container{gap:2px}.score-guide-panel{width:min(66.3vw,242.25px)}.score-guide-panel .score-guide-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:repeat(8,auto);column-gap:7.65px;row-gap:2.55px}.score-guide-panel .score-guide-grid>div{grid-template-columns:27.2px minmax(0,1fr);gap:2.55px}.score-guide-panel .score-guide-grid span{font-size:5.1px}.score-guide-panel .score-guide-grid strong{font-size:4.93px}}
+@media (orientation:portrait){#game-board{--centerSize:clamp(88px,15vw,104px);--riverGap:clamp(8px,1.5vh,13px);--focus-pan-y:-6.5%}.round-hud-shell{top:8px;min-width:76px;padding:4px 6px}.round-hud-title{font-size:6px}.round-hud-sub{font-size:5px}.score-panel{width:min(82vw,285px)}.pos-bottom{left:12px;bottom:calc(var(--tileH) + 5px)}.pos-top{top:10px;right:12px}.pos-left{left:7px;top:44%}.pos-right{right:7px;top:44%}.pos-left .enemy-melds-visible,.pos-right .enemy-melds-visible{left:auto;right:auto;transform:none}.melds-container{right:8px;max-width:42vw}.hand-tiles{gap:1px}.river-container{gap:2px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 
@@ -348,8 +349,20 @@ min-width:14px;min-height:33px;padding:2px;display:flex;align-items:center;justi
     <main id="screen-game" class="screen" aria-label="Game board">
         <section id="game-board" aria-label="Hong Kong Mahjong table">
             <div class="topbar">
-                <div class="score-panel hud-card score-guide-panel">
-                    <div class="score-guide-title"><span aria-hidden="true">🀄</span><span>SCORE GUIDE</span></div>
+                <div class="topbar-left-group">
+                    <div class="score-guide-launcher">
+                        <button id="btn-score-guide" class="score-guide-launcher-btn" type="button" onclick="toggleScoreGuide()" aria-label="Buka Score Guide" aria-expanded="false"><span class="score-guide-launcher-icon" aria-hidden="true">▤</span><span>Score Guide</span></button>
+                    </div>
+                    <div class="game-title-compact" aria-label="Majong DJ - HongKong">MAJONG DJ - HongKONG</div>
+                </div>
+                <div class="score-guide-drawer" id="score-guide-drawer" aria-hidden="true">
+                    <div class="score-guide-drawer-head">
+                        <div>
+                            <div class="score-guide-drawer-kicker">MAHJONG-DJ</div>
+                            <div class="score-guide-drawer-title">SCORE GUIDE</div>
+                        </div>
+                        <button class="icon-btn score-guide-close" type="button" onclick="toggleScoreGuide(false)" aria-label="Tutup Score Guide">×</button>
+                    </div>
                     <div class="score-guide-grid">
                         <div><span>1 FAN</span><strong>All Chi</strong></div>
                         <div><span>3 FAN</span><strong>All Pung</strong></div>
@@ -613,6 +626,17 @@ document.addEventListener('DOMContentLoaded',initAudioSettingsUI);
 setTimeout(preloadTileAssets,0);
 function setText(id,v){const e=byId(id);if(e)e.textContent=v==null?'':String(v);return e}
 function setDisplay(id,v){const e=byId(id);if(e){e.hidden=v==='none';e.style.display=v}return e}
+function toggleScoreGuide(force){
+  const drawer=byId('score-guide-drawer');
+  const btn=byId('btn-score-guide');
+  if(!drawer||!btn)return;
+  const open=typeof force==='boolean'?force:!drawer.classList.contains('open');
+  drawer.classList.toggle('open',open);
+  drawer.setAttribute('aria-hidden',String(!open));
+  btn.setAttribute('aria-expanded',String(open));
+  btn.setAttribute('aria-label',open?'Tutup Score Guide':'Buka Score Guide');
+}
+
 function nav(id){
   const from=activeScreenId||'screen-main';
   document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
@@ -623,6 +647,7 @@ function nav(id){
     applyAudioSettings();
   }
 }
+document.addEventListener('keydown',e=>{if(e.key==='Escape')toggleScoreGuide(false)},{passive:true});
 document.addEventListener('click',e=>{
   const b=e.target.closest('button');
   if(!b)return;
@@ -702,6 +727,8 @@ let playerScores=[15000,15000,15000,15000],roundStartScores=[15000,15000,15000,1
 let currentRoundIndex=0,currentDealerIdx=1,currentTurn=0,lastDiscardedTile=null,lastDiscarderIdx=-1,drawnTile=null;
 const TURN_BASE_SECONDS=10,TIME_BANK_MAX=20,ACTION_WINDOW_SECONDS=5;
 let roundActive=false,roundEnding=false,isDiscardable=false,isActionPhase=false,selectedTileIndex=-1,aiMoveTimer=null,turnTimer=null,actionTimer=null,secondsLeft=10,timeBank=[20,20,20,20],actionSecondsLeft=0,pendingCallChoice=null,actionTimeoutHandler=null,actionSeat=-1,actionMode='';
+let gameTurnEpoch=0;
+let stateHasRemoteCallForLocalGuest=false;
 let aiDecisionToken=0;
 let autoSortSetting=true,activeScreenId='screen-main',previousScreenId='screen-main',isMultiplayerMode=false;try{autoSortSetting=localStorage.getItem('hk_auto_sort')!=='0'}catch{}
 const AVATAR_OPTIONS=[
@@ -1171,15 +1198,15 @@ function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKe
   for(let p=0;p<4;p++)sortHand(p);
   currentTurn=currentDealerIdx;drawnTile=null;renderTable();processTurn();
 }
-function start4PGame(diff='Medium',multi=false){cancelAiTurn();if(!multi)stopMpGameWatchdog();
+function start4PGame(diff='Medium',multi=false){cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi)stopMpGameWatchdog();
   aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
   if(!multi){
     mp.seat=0;mp.room=null;mp.host=true;mp.connected=false;mp.playerAvatar=selectedAvatar;
     aiSeats=new Set([1,2,3]);playerAvatars[0]=selectedAvatar;playerAvatars[1]='shiba';playerAvatars[2]='kucing';playerAvatars[3]='penguin';randomizeAiAvatars();
-    playerScores=[15000,15000,15000,15000];nav('screen-game');playGameMusic();setTimeout(setupRound,20);return
+    playerScores=[15000,15000,15000,15000];nav('screen-game');playGameMusic();setTimeout(()=>{startMpGameWatchdog();setupRound()},20);return
   }
   if(mp.host){
-    fillAiSeats();playerScores=[15000,15000,15000,15000];nav('screen-game');playGameMusic();setTimeout(setupRound,20);mpSaveSession({started:true});mpBroadcastState()
+    fillAiSeats();playerScores=[15000,15000,15000,15000];nav('screen-game');playGameMusic();setTimeout(()=>{startMpGameWatchdog();setupRound()},20);mpSaveSession({started:true});mpBroadcastState()
   }
 }
 function fillAiSeats(){
@@ -1228,79 +1255,106 @@ function updateTimeBankUI(p=currentTurn){
 function broadcastTimerState(extra={}){
   if(isMultiplayerMode&&mp.host&&mp.connected)mpBroadcastState({remoteTimer:{seat:currentTurn,baseTime:secondsLeft,timeBank:timeBank[currentTurn]??0,actionSeconds:actionSecondsLeft,isActionPhase,...extra}});
 }
+function clearGameTimers(){
+  clearInterval(turnTimer);
+  clearInterval(actionTimer);
+  turnTimer=null;
+  actionTimer=null;
+}
 function startTurnTimer(){
-  clearInterval(turnTimer);clearInterval(actionTimer);
-  isActionPhase=false;actionSecondsLeft=0;pendingCallChoice=null;actionTimeoutHandler=null;actionSeat=-1;actionMode='';
-  const p=currentTurn;
+  clearGameTimers();
+  isActionPhase=false; actionSecondsLeft=0; pendingCallChoice=null;
+  actionTimeoutHandler=null; actionSeat=-1; actionMode='';
+  const p=currentTurn, epoch=gameTurnEpoch;
   secondsLeft=TURN_BASE_SECONDS;
-  setText('turn-timer-display',secondsLeft);updateTurnTimerVisual();updateCriticalAssistant();
-  updateTimeBankUI(p);
-  broadcastTimerState();
+  setText('turn-timer-display',secondsLeft); updateTurnTimerVisual();
+  updateCriticalAssistant(); updateTimeBankUI(p); broadcastTimerState();
   turnTimer=setInterval(()=>{
-    if(!roundActive||roundEnding){clearInterval(turnTimer);return}
-    if(secondsLeft>0){
-      secondsLeft--;
-      setText('turn-timer-display',secondsLeft);updateTurnTimerVisual();updateCriticalAssistant();
-    }else if((timeBank[p]||0)>0){
-      timeBank[p]--;
-      setText('turn-timer-display',timeBank[p]);updateTurnTimerVisual();updateCriticalAssistant();
-      updateTimeBankUI(p);
-      if(timeBank[p]<=0){clearInterval(turnTimer);broadcastTimerState();autoDiscardCurrent();return}
-    }else{
-      clearInterval(turnTimer);
-      autoDiscardCurrent();
-      return;
+    if(!roundActive||roundEnding||epoch!==gameTurnEpoch||p!==currentTurn){
+      clearInterval(turnTimer); turnTimer=null; return;
     }
-    broadcastTimerState();
+    try{
+      if(secondsLeft>0){
+        secondsLeft--;
+        setText('turn-timer-display',secondsLeft);
+        updateTurnTimerVisual(); updateCriticalAssistant();
+      }else if((timeBank[p]||0)>0){
+        timeBank[p]--;
+        setText('turn-timer-display',timeBank[p]);
+        updateTurnTimerVisual(); updateCriticalAssistant(); updateTimeBankUI(p);
+        if(timeBank[p]<=0){
+          clearInterval(turnTimer); turnTimer=null;
+          broadcastTimerState(); autoDiscardCurrent(); return;
+        }
+      }else{
+        clearInterval(turnTimer); turnTimer=null; autoDiscardCurrent(); return;
+      }
+      broadcastTimerState();
+    }catch(err){
+      console.error('Turn timer recovery:',err);
+      clearInterval(turnTimer); turnTimer=null; autoDiscardCurrent();
+    }
   },1000);
 }
 function startActionWindow(timeoutHandler,seat=currentTurn,mode='call'){
-  clearInterval(turnTimer);clearInterval(actionTimer);
-  isActionPhase=true;actionSecondsLeft=ACTION_WINDOW_SECONDS;actionTimeoutHandler=timeoutHandler;actionSeat=seat;actionMode=mode;
+  clearGameTimers();
+  isActionPhase=true; actionSecondsLeft=ACTION_WINDOW_SECONDS;
+  actionTimeoutHandler=timeoutHandler; actionSeat=seat; actionMode=mode;
+  const epoch=gameTurnEpoch;
   setText('turn-timer-display',actionSecondsLeft);
-  updateTimeBankUI(seat);
-  broadcastTimerState({actionMode:mode,seat});
+  updateTimeBankUI(seat); broadcastTimerState({actionMode:mode,seat});
   actionTimer=setInterval(()=>{
-    if(!roundActive||roundEnding){clearInterval(actionTimer);return}
-    if(actionSecondsLeft>0){
-      actionSecondsLeft--;
-      setText('turn-timer-display',Math.max(0,actionSecondsLeft));
-      broadcastTimerState({actionMode:mode,seat});
-      return;
+    if(!roundActive||roundEnding||epoch!==gameTurnEpoch){
+      clearInterval(actionTimer); actionTimer=null; return;
     }
-    if((timeBank[seat]||0)>0){
-      timeBank[seat]--;
-      setText('turn-timer-display',timeBank[seat]);
-      updateTimeBankUI(seat);
-      broadcastTimerState({actionMode:mode,seat});
-      if(timeBank[seat]<=0){
-        clearInterval(actionTimer);actionTimer=null;isActionPhase=false;
-        const cb=actionTimeoutHandler;actionTimeoutHandler=null;actionSeat=-1;actionMode='';
-        cb?.();
+    try{
+      if(actionSecondsLeft>0){
+        actionSecondsLeft--;
+        setText('turn-timer-display',Math.max(0,actionSecondsLeft));
+        broadcastTimerState({actionMode:mode,seat}); return;
       }
-      return;
+      if((timeBank[seat]||0)>0){
+        timeBank[seat]--;
+        setText('turn-timer-display',timeBank[seat]); updateTimeBankUI(seat);
+        broadcastTimerState({actionMode:mode,seat});
+        if(timeBank[seat]<=0){
+          clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
+          const cb=actionTimeoutHandler; actionTimeoutHandler=null;
+          actionSeat=-1; actionMode=''; cb?.();
+        }
+        return;
+      }
+      clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
+      const cb=actionTimeoutHandler; actionTimeoutHandler=null;
+      actionSeat=-1; actionMode=''; cb?.();
+    }catch(err){
+      console.error('Action timer recovery:',err);
+      clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
+      const cb=actionTimeoutHandler; actionTimeoutHandler=null;
+      actionSeat=-1; actionMode=''; cb?.();
     }
-    clearInterval(actionTimer);actionTimer=null;isActionPhase=false;
-    const cb=actionTimeoutHandler;actionTimeoutHandler=null;actionSeat=-1;actionMode='';
-    cb?.();
   },1000);
 }
 function startBankTimerOnly(p=currentTurn){
-  clearInterval(turnTimer);
-  secondsLeft=0;
-  setText('turn-timer-display',timeBank[p]||0);
-  updateTimeBankUI(p);
+  clearGameTimers(); secondsLeft=0;
+  const epoch=gameTurnEpoch;
+  setText('turn-timer-display',timeBank[p]||0); updateTimeBankUI(p);
   broadcastTimerState({phase:'bank-only',seat:p});
   turnTimer=setInterval(()=>{
-    if(!roundActive||roundEnding){clearInterval(turnTimer);return}
-    if((timeBank[p]||0)>0){
-      timeBank[p]--;
-      setText('turn-timer-display',timeBank[p]);updateTurnTimerVisual();updateCriticalAssistant();
-      updateTimeBankUI(p);
-      broadcastTimerState({phase:'bank-only',seat:p});
-      if(timeBank[p]<=0){clearInterval(turnTimer);autoDiscardCurrent();}
-    }else{
-      clearInterval(turnTimer);autoDiscardCurrent();
+    if(!roundActive||roundEnding||epoch!==gameTurnEpoch||p!==currentTurn){
+      clearInterval(turnTimer); turnTimer=null; return;
+    }
+    try{
+      if((timeBank[p]||0)>0){
+        timeBank[p]--;
+        setText('turn-timer-display',timeBank[p]);
+        updateTurnTimerVisual(); updateCriticalAssistant(); updateTimeBankUI(p);
+        broadcastTimerState({phase:'bank-only',seat:p});
+        if(timeBank[p]<=0){clearInterval(turnTimer);turnTimer=null;autoDiscardCurrent();}
+      }else{clearInterval(turnTimer);turnTimer=null;autoDiscardCurrent();}
+    }catch(err){
+      console.error('Bank timer recovery:',err);
+      clearInterval(turnTimer); turnTimer=null; autoDiscardCurrent();
     }
   },1000);
 }
@@ -1353,10 +1407,25 @@ function scheduleAiTurn(seat,mode='discard'){
   },2800);
 }
 
-function autoDiscardCurrent(){if(!roundActive||roundEnding)return;const p=currentTurn;if(p===(mp.seat??0)){discardTile(selectedTileIndex>=0?selectedTileIndex:playerHands[p].length-1)}else aiDiscard(p)}
+function autoDiscardCurrent(){
+  if(!roundActive||roundEnding)return;
+  const p=currentTurn;
+  if(aiSeats.has(p)){aiDiscard(p);return;}
+  const idx=selectedTileIndex>=0?selectedTileIndex:playerHands[p]?.length-1;
+  const tile=playerHands[p]?.[idx];
+  if(!tile)return;
+  if(isMultiplayerMode&&!mp.host&&p===(mp.seat??0)){
+    mpSend('action',{action:{type:'discard',uniqueId:tile.uniqueId}});
+    return;
+  }
+  playerHands[p].splice(idx,1);
+  selectedTileIndex=-1;
+  drawnTile=null;
+  commitDiscard(p,tile);
+}
 function processTurn(){
   if(!roundActive||roundEnding)return;
-  clearInterval(turnTimer);selectedTileIndex=-1;
+  clearGameTimers(); selectedTileIndex=-1;
   if(fullDeck.length===0){const r=settleExhaustiveDraw();renderTable();endRound(r.changed?'DRAW • TENPAI BONUS':'DRAW',r.desc);return}
   const t=drawTile();if(!t){const r=settleExhaustiveDraw();renderTable();endRound(r.changed?'DRAW • TENPAI BONUS':'DRAW',r.desc);return}playerHands[currentTurn].push(t);drawnTile=t;playSfx('draw');sortHand(currentTurn);renderTable();
   const turnActions=[];const win=checkCurrentWin(currentTurn,null,true);if(win?.valid)turnActions.push('Tsumo');
@@ -1465,8 +1534,8 @@ function executePon(p){
   // A human guest must keep control of the hand after Pon.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(p===(mp.seat??0)){
-    isDiscardable=true;
+  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+    isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
     isDiscardable=false;
@@ -1509,8 +1578,8 @@ function executeChi(p,combo){
   // A human guest must choose the discard after Chi.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(p===(mp.seat??0)){
-    isDiscardable=true;
+  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+    isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
     isDiscardable=false;
@@ -1551,8 +1620,8 @@ function executeKan(p){
   // A human guest must choose the discard after Kan draw.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(p===(mp.seat??0)){
-    isDiscardable=true;
+  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+    isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
     isDiscardable=false;
@@ -1594,8 +1663,8 @@ function executeSelfKan(p,opt){
   // A human guest must choose the discard after self-Kan draw.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(p===(mp.seat??0)){
-    isDiscardable=true;
+  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+    isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
     isDiscardable=false;
@@ -1921,7 +1990,14 @@ function triggerAction(a){
     }
   }
 }
-function nextTurn(){if(!roundActive||roundEnding)return;currentTurn=(currentTurn+1)%4;processTurn()}
+function nextTurn(){
+  if(!roundActive||roundEnding)return;
+  clearGameTimers(); cancelAiTurn(); pendingCallChoice=null; mpPendingCalls=[];
+  selectedTileIndex=-1;
+  currentTurn=(currentTurn+1)%4;
+  gameTurnEpoch++;
+  setTimeout(()=>{if(roundActive&&!roundEnding)processTurn()},0);
+}
 function renderResultModal(title,desc){
   setText('res-title',title);setText('res-desc','');setText('res-round-label',getRoundName());
   const summary=byId('res-summary');
@@ -1940,7 +2016,7 @@ function renderResultModal(title,desc){
   requestAnimationFrame(()=>{if(box)box.querySelectorAll('[data-target-score]').forEach((el,i)=>animateScoreValue(el,Number(el.dataset.targetScore),700+i*80));});
 }
 function endRound(title,desc){smartAssistantHide();
-  roundEnding=true;roundActive=false;clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);
+  roundEnding=true;roundActive=false;clearGameTimers();clearTimeout(aiMoveTimer);
   renderResultModal(title,desc);
   mpBroadcastState({phase:'result',result:{title,desc},playerScores});
   mpClearActiveGameState();
@@ -2069,6 +2145,7 @@ function mpRestoreHostGameState(state){
   roundActive=true;
   nav('screen-game');
   renderTable();
+  gameTurnEpoch++;
   if(mpPendingCalls.length)promptNextCall();
   else if(aiSeats.has(currentTurn))scheduleAiTurn(currentTurn,'discard');
   else {
@@ -2169,31 +2246,29 @@ function mpRenderLobby(room){
 function startMpGameWatchdog(){
   clearInterval(mpGameWatchdogTimer);
   mpGameWatchdogTimer=setInterval(()=>{
-    if(!mp.host||!isMultiplayerMode||!roundActive||roundEnding)return;
+    if(!isMultiplayerMode||!roundActive||roundEnding)return;
 
-    // A pending discard-call must ALWAYS have an authoritative host timer.
-    if(mpPendingCalls.length&&!actionTimer&&!aiMoveTimer){
-      promptNextCall();
+    if(mp.host){
+      if(mpPendingCalls.length&&!actionTimer&&!aiMoveTimer){
+        promptNextCall();
+        return;
+      }
+      if(!mpPendingCalls.length&&aiSeats.has(currentTurn)&&!turnTimer&&!actionTimer&&!aiMoveTimer){
+        scheduleAiTurn(currentTurn,'discard');
+        return;
+      }
+      if(!mpPendingCalls.length&&!aiSeats.has(currentTurn)&&!turnTimer&&!actionTimer){
+        startTurnTimer();
+      }
       return;
     }
 
-    // Recover a normal turn if its timer was accidentally lost.
-    if(!mpPendingCalls.length&&!aiSeats.has(currentTurn)&&!turnTimer&&!actionTimer){
-      if(currentTurn!==mp.seat){
-        // Remote human turn: host owns the timer.
-        startTurnTimer();
-      }else{
-        // Host's own turn.
-        isDiscardable=true;
-        startTurnTimer();
-      }
+    // Guest never creates or owns an authoritative game timer.
+    // It only restores local input permission from the latest host state.
+    if(currentTurn===(mp.seat??0)&&roundActive&&!roundEnding&&!stateHasRemoteCallForLocalGuest){
+      isDiscardable=true;
     }
-
-    // Recover an AI turn if its decision timer was lost.
-    if(!mpPendingCalls.length&&aiSeats.has(currentTurn)&&!turnTimer&&!actionTimer&&!aiMoveTimer){
-      scheduleAiTurn(currentTurn,'discard');
-    }
-  },1500);
+  },1000);
 }
 function stopMpGameWatchdog(){
   clearInterval(mpGameWatchdogTimer);
@@ -2250,11 +2325,16 @@ function mpApplyRemoteState(state){
   if(state.roundActive||state.roundEnding)setDisplay('modal-lobby','none');
 
   // Rebuild the guest's local control state from the synchronized table.
+  stateHasRemoteCallForLocalGuest=!!(
+    state.remoteActions?.seat===(mp.seat??0)&&
+    Array.isArray(state.remoteActions.actions)&&
+    state.remoteActions.actions.length
+  );
   isDiscardable=
     roundActive&&
     !roundEnding&&
     currentTurn===(mp.seat??0)&&
-    !state.remoteActions?.actions?.length;
+    !stateHasRemoteCallForLocalGuest;
 
   renderTable();
 
@@ -2265,10 +2345,8 @@ function mpApplyRemoteState(state){
   ){
     isDiscardable=false;
     showAvailableActions(state.remoteActions.actions);
-    startActionWindow(()=>{
-      hideAvailableActions();
-      mpSend('action',{action:{type:'call',action:'Skip'}});
-    },mp.seat??0,'discard-call');
+    setText('hand-status-main','Aksi tersedia');
+    setText('hand-status-sub','Pilih aksi sebelum waktu habis.');
   }else if(currentTurn===(mp.seat??0)&&roundActive){
     // Reconnect can happen during a normal turn without a fresh startGame
     // message. Recreate the same Tsumo/Kan controls the player would have had.
@@ -2281,19 +2359,10 @@ function mpApplyRemoteState(state){
 
     if(turnActions.length){
       showAvailableActions(turnActions);
-      startActionWindow(()=>{
-        hideAvailableActions();
-        if((timeBank[currentTurn]||0)>0){
-          secondsLeft=0;
-          startBankTimerOnly(currentTurn);
-        }else{
-          isDiscardable=true;
-          autoDiscardCurrent();
-        }
-      },currentTurn,'turn-action');
+      setText('hand-status-main','Giliran Anda');
+      setText('hand-status-sub','Pilih aksi atau tile untuk dibuang.');
     }else{
       isDiscardable=true;
-      startTurnTimer();
       setText('hand-status-main','Giliran Anda');
       setText('hand-status-sub','Pilih tile untuk membuang.');
     }
@@ -2305,7 +2374,7 @@ function mpApplyRemoteState(state){
     renderResultModal(state.result.title,state.result.desc);
   }
 }
-function roomCanAct(seat){return!!mp.room?.players?.[seat]}
+function roomCanAct(seat){return !!(mp.room?.players?.[seat] || seat===mp.seat || (mp.host&&seat===0))}
 function mpHandlePlayerAction(seat,action){
   if(!mp.host||!roundActive||!roomCanAct(seat))return;
 
