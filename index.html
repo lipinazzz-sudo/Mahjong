@@ -728,6 +728,7 @@ let currentRoundIndex=0,currentDealerIdx=1,currentTurn=0,lastDiscardedTile=null,
 const TURN_BASE_SECONDS=10,TIME_BANK_MAX=20,ACTION_WINDOW_SECONDS=5;
 let roundActive=false,roundEnding=false,isDiscardable=false,isActionPhase=false,selectedTileIndex=-1,aiMoveTimer=null,turnTimer=null,actionTimer=null,secondsLeft=10,timeBank=[20,20,20,20],actionSecondsLeft=0,pendingCallChoice=null,actionTimeoutHandler=null,actionSeat=-1,actionMode='';
 let gameTurnEpoch=0;
+let actionEpoch=0;
 let stateHasRemoteCallForLocalGuest=false;
 let aiDecisionToken=0;
 let autoSortSetting=true,activeScreenId='screen-main',previousScreenId='screen-main',isMultiplayerMode=false;try{autoSortSetting=localStorage.getItem('hk_auto_sort')!=='0'}catch{}
@@ -1256,6 +1257,7 @@ function broadcastTimerState(extra={}){
   if(isMultiplayerMode&&mp.host&&mp.connected)mpBroadcastState({remoteTimer:{seat:currentTurn,baseTime:secondsLeft,timeBank:timeBank[currentTurn]??0,actionSeconds:actionSecondsLeft,isActionPhase,...extra}});
 }
 function clearGameTimers(){
+  actionEpoch++;
   clearInterval(turnTimer);
   clearInterval(actionTimer);
   turnTimer=null;
@@ -1301,17 +1303,21 @@ function startActionWindow(timeoutHandler,seat=currentTurn,mode='call'){
   isActionPhase=true; actionSecondsLeft=ACTION_WINDOW_SECONDS;
   actionTimeoutHandler=timeoutHandler; actionSeat=seat; actionMode=mode;
   const epoch=gameTurnEpoch;
+  const myActionEpoch=++actionEpoch;
   setText('turn-timer-display',actionSecondsLeft);
   updateTimeBankUI(seat); broadcastTimerState({actionMode:mode,seat});
   actionTimer=setInterval(()=>{
-    if(!roundActive||roundEnding||epoch!==gameTurnEpoch){
-      clearInterval(actionTimer); actionTimer=null; return;
+    if(!roundActive||roundEnding||epoch!==gameTurnEpoch||myActionEpoch!==actionEpoch){
+      clearInterval(actionTimer);
+      actionTimer=null;
+      return;
     }
     try{
       if(actionSecondsLeft>0){
         actionSecondsLeft--;
         setText('turn-timer-display',Math.max(0,actionSecondsLeft));
-        broadcastTimerState({actionMode:mode,seat}); return;
+        broadcastTimerState({actionMode:mode,seat});
+        return;
       }
       if((timeBank[seat]||0)>0){
         timeBank[seat]--;
@@ -1320,18 +1326,21 @@ function startActionWindow(timeoutHandler,seat=currentTurn,mode='call'){
         if(timeBank[seat]<=0){
           clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
           const cb=actionTimeoutHandler; actionTimeoutHandler=null;
-          actionSeat=-1; actionMode=''; cb?.();
+          actionSeat=-1; actionMode='';
+          if(myActionEpoch===actionEpoch)cb?.();
         }
         return;
       }
       clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
       const cb=actionTimeoutHandler; actionTimeoutHandler=null;
-      actionSeat=-1; actionMode=''; cb?.();
+      actionSeat=-1; actionMode='';
+      if(myActionEpoch===actionEpoch)cb?.();
     }catch(err){
       console.error('Action timer recovery:',err);
       clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
       const cb=actionTimeoutHandler; actionTimeoutHandler=null;
-      actionSeat=-1; actionMode=''; cb?.();
+      actionSeat=-1; actionMode='';
+      if(myActionEpoch===actionEpoch)cb?.();
     }
   },1000);
 }
@@ -1438,14 +1447,14 @@ function processTurn(){
     if(currentTurn===(mp.seat??0)){
       setText('hand-status-main','Giliran Anda');
       setText('hand-status-sub',turnActions.length?`Pilih aksi: ${turnActions.join(' / ')} atau pilih tile.`:'Pilih tile untuk membuang.');
-      if(turnActions.length){showAvailableActions(turnActions);startActionWindow(()=>{hideAvailableActions();mpBroadcastState({remoteActions:[]});if((timeBank[currentTurn]||0)>0){secondsLeft=0;startBankTimerOnly(currentTurn)}else autoDiscardCurrent();},currentTurn,'turn-action');}
+      if(turnActions.length){showAvailableActions(turnActions);startActionWindow(()=>{hideAvailableActions();mpPendingCalls=[];pendingCallChoice=null;mpBroadcastState({remoteActions:[]});if((timeBank[currentTurn]||0)>0){secondsLeft=0;startBankTimerOnly(currentTurn)}else autoDiscardCurrent();},currentTurn,'turn-action');}
       else startTurnTimer();
     }else if(isMultiplayerMode&&mp.host){
       // Host remains authoritative for a guest turn. If that guest has optional
       // self-actions (Tsumo/Kan), expose them for 5 seconds first, then consume
       // that player's round time bank. A normal discard may still arrive at any time.
       if(turnActions.length){
-        startActionWindow(()=>{mpBroadcastState({remoteActions:[]});if((timeBank[currentTurn]||0)>0){secondsLeft=0;startBankTimerOnly(currentTurn)}else autoDiscardCurrent();},currentTurn,'turn-action');
+        startActionWindow(()=>{mpBroadcastState({remoteActions:[]});mpPendingCalls=[];pendingCallChoice=null;if((timeBank[currentTurn]||0)>0){secondsLeft=0;startBankTimerOnly(currentTurn)}else autoDiscardCurrent();},currentTurn,'turn-action');
       }else{
         startTurnTimer();
       }
@@ -1514,7 +1523,7 @@ function executePon(p){
   cancelAiTurn();
   playSfx('pon');
   stopCallWindow();
-  clearInterval(turnTimer);
+  clearInterval(turnTimer); turnTimer=null;
 
   const tile=lastDiscardedTile;
   if(!tile)return;
@@ -1542,13 +1551,14 @@ function executePon(p){
   }
 
   mpPendingCalls=[];
+  pendingCallChoice=null;
   mpBroadcastState();
 }
 function executeChi(p,combo){
   cancelAiTurn();
   playSfx('chi');
   stopCallWindow();
-  clearInterval(turnTimer);
+  clearInterval(turnTimer); turnTimer=null;
 
   const tile=lastDiscardedTile;
   if(!tile||!Array.isArray(combo)||combo.length!==3)return;
@@ -1586,13 +1596,14 @@ function executeChi(p,combo){
   }
 
   mpPendingCalls=[];
+  pendingCallChoice=null;
   mpBroadcastState();
 }
 function executeKan(p){
   cancelAiTurn();
   playSfx('kan');
   stopCallWindow();
-  clearInterval(turnTimer);
+  clearInterval(turnTimer); turnTimer=null;
 
   const tile=lastDiscardedTile;
   if(!tile)return;
@@ -1628,6 +1639,7 @@ function executeKan(p){
   }
 
   mpPendingCalls=[];
+  pendingCallChoice=null;
   mpBroadcastState();
 }
 function executeSelfKan(p,opt){
@@ -1670,6 +1682,8 @@ function executeSelfKan(p,opt){
     isDiscardable=false;
   }
 
+  mpPendingCalls=[];
+  pendingCallChoice=null;
   mpBroadcastState();
   return true;
 }
@@ -1686,17 +1700,26 @@ function highestPendingCall(){
   return best;
 }
 function stopCallWindow(){
-  clearInterval(actionTimer);actionTimer=null;isActionPhase=false;actionSecondsLeft=0;actionTimeoutHandler=null;actionSeat=-1;actionMode='';
+  actionEpoch++;
+  clearInterval(actionTimer);
+  actionTimer=null;
+  isActionPhase=false;
+  actionSecondsLeft=0;
+  actionTimeoutHandler=null;
+  actionSeat=-1;
+  actionMode='';
 }
 function resolveCallChoice(seat,action){
   const q=mpPendingCalls.find(x=>x.seat===seat);
   if(!q||!action)return;
-  stopCallWindow();pendingCallChoice=null;
+  mpPendingCalls=mpPendingCalls.filter(x=>x!==q);
+  stopCallWindow();
+  pendingCallChoice=null;
   if(action.type==='Ron'){resolveWin(seat,action.score,false);return}
   if(action.type==='Kan'){executeKan(seat);return}
   if(action.type==='Pon'){executePon(seat);return}
   if(action.type==='Chi'){executeChi(seat,action.combo);return}
-  mpPendingCalls=mpPendingCalls.filter(x=>x!==q);promptNextCall();
+  promptNextCall();
 }
 function finishCallWindow(){
   const best=highestPendingCall();
@@ -1870,73 +1893,68 @@ function showAvailableActions(actions){
   });
 }
 function triggerAction(a){
-  hideAvailableActions();
+  const type=(a&&typeof a==='object')?a.type:a;
 
-  // Chi with an explicitly selected combination.
-  if(a&&typeof a==='object'&&a.type==='Chi'){
-    const combo=Array.isArray(a.combo)?a.combo:null;
-    if(!combo||combo.length!==3)return;
+  // Guests send actions to the authoritative host. Do this before touching
+  // local call state so a remote action can never be swallowed by a stale q.
+  if(isMultiplayerMode&&!mp.host){
+    if(type==='Chi'&&a&&typeof a==='object'&&Array.isArray(a.combo)){
+      mpSend('action',{action:{type:'call',action:'Chi',combo:[...a.combo]}});
+    }else{
+      mpSend('action',{action:{type:'call',action:type}});
+    }
+    hideAvailableActions();
+    return;
+  }
 
-    if(isMultiplayerMode&&!mp.host){
-      mpSend('action',{
-        action:{
-          type:'call',
-          action:'Chi',
-          combo:[...combo]
-        }
-      });
+  // Self actions are turn actions, not discard-claim actions. Resolve them
+  // first so a stale mpPendingCalls entry can never block Tsumo/Kan.
+  if(type==='Tsumo'){
+    hideAvailableActions();
+    stopCallWindow();
+    const p=mp.seat??0;
+    if(currentTurn===p){
+      const e=checkCurrentWin(p,null,true);
+      if(e?.valid)resolveWin(p,e,true);
+      else startTurnTimer();
+    }
+    return;
+  }
+
+  if(type==='Kan'&&!((a&&typeof a==='object'&&a.fromDiscard)===true)){
+    const p=mp.seat??0;
+    if(currentTurn===p&&getSelfKanOptions(p).length){
+      hideAvailableActions();
+      stopCallWindow();
+      executeSelfKan(p,getSelfKanOptions(p)[0]);
       return;
     }
+  }
 
-    const q=mpPendingCalls.find(
-      x=>x.seat===(mp.seat??0)
-    );
+  // Chi with an explicitly selected combination.
+  if(type==='Chi'&&a&&typeof a==='object'){
+    const combo=Array.isArray(a.combo)?a.combo:null;
+    if(!combo||combo.length!==3)return;
+    const q=mpPendingCalls.find(x=>x.seat===(mp.seat??0));
     if(!q)return;
-
     const act=q.actions.find(x=>x.type==='Chi');
     if(!act||!Array.isArray(act.combos))return;
-
-    const validCombo=act.combos.some(
-      c=>Array.isArray(c)&&
-         c.length===combo.length&&
-         c.every((n,i)=>n===combo[i])
-    );
+    const validCombo=act.combos.some(c=>Array.isArray(c)&&c.length===combo.length&&c.every((n,i)=>n===combo[i]));
     if(!validCombo)return;
-
     const chosen={type:'Chi',combo:[...combo]};
-    pendingCallChoice={
-      seat:mp.seat??0,
-      action:chosen
-    };
-
+    pendingCallChoice={seat:mp.seat??0,action:chosen};
     const best=highestPendingCall();
     if(!best||callPriority(chosen)>=callPriority(best.action)){
       resolveCallChoice(mp.seat??0,chosen);
     }else{
       showAvailableActions(['Skip']);
-      setText(
-        'hand-status-sub',
-        `Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`
-      );
+      setText('hand-status-sub',`Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`);
     }
     return;
   }
 
-  // Guest always sends turn/call actions to the authoritative host.
-  if(isMultiplayerMode&&!mp.host){
-    mpSend('action',{
-      action:{
-        type:'call',
-        action:a
-      }
-    });
-    return;
-  }
-
-  if(a==='Skip'){
-    const q=mpPendingCalls.find(
-      x=>x.seat===(mp.seat??0)
-    );
+  if(type==='Skip'){
+    const q=mpPendingCalls.find(x=>x.seat===(mp.seat??0));
     if(q)mpPendingCalls=mpPendingCalls.filter(x=>x!==q);
     pendingCallChoice=null;
     stopCallWindow();
@@ -1944,49 +1962,17 @@ function triggerAction(a){
     return;
   }
 
-  if(a==='Tsumo'){
-    stopCallWindow();
-    const e=checkCurrentWin(mp.seat,null,true);
-    if(e)resolveWin(mp.seat,e,true);
-    else startTurnTimer();
-    return;
-  }
-
-  const q=mpPendingCalls.find(
-    x=>x.seat===(mp.seat??0)
-  );
-
+  const q=mpPendingCalls.find(x=>x.seat===(mp.seat??0));
   if(q){
-    const act=q.actions.find(x=>x.type===a);
-    if(!act){
-      hideAvailableActions();
-      return;
-    }
-
-    pendingCallChoice={
-      seat:mp.seat??0,
-      action:act
-    };
-
+    const act=q.actions.find(x=>x.type===type);
+    if(!act)return;
+    pendingCallChoice={seat:mp.seat??0,action:act};
     const best=highestPendingCall();
     if(!best||callPriority(act)>=callPriority(best.action)){
       resolveCallChoice(mp.seat??0,act);
     }else{
       showAvailableActions(['Skip']);
-      setText(
-        'hand-status-sub',
-        `Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`
-      );
-    }
-    return;
-  }
-
-  // Self-Kan during the player's own draw turn.
-  if(a==='Kan'){
-    const opt=getSelfKanOptions(mp.seat??0)[0];
-    if(opt){
-      stopCallWindow();
-      executeSelfKan(mp.seat??0,opt);
+      setText('hand-status-sub',`Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`);
     }
   }
 }
