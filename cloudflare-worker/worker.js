@@ -1,18 +1,22 @@
 import { DurableObject } from "cloudflare:workers";
 
 // ---------------------------------------------------------------------------
-// Mahjong DJ — Room Relay
-// Cloudflare Worker + Durable Object
+// Mahjong DJ — room relay (Cloudflare Worker + Durable Object)
 //
-// HOST = satu-satunya authoritative game engine.
-// Worker hanya menangani:
-// - room
-// - seat
-// - token identity
-// - reconnect
-// - lobby / ready
-// - relay state dari host ke guest
-// - relay action dari guest ke host
+// One Durable Object instance == one room code. The HOST's browser is the
+// only authoritative game engine (it owns the deck, hands, timers, scoring);
+// this Worker just relays JSON messages between the host and up to 3 guests,
+// plus tracks lobby/ready state.
+//
+// Key design points:
+//   - Every player gets a random token the first time they join a room.
+//     The token (not the WebSocket) is that player's identity.
+//   - A dropped WebSocket does NOT free the seat immediately.
+//     The seat is marked disconnected so the same player can rejoin.
+//   - `rejoin` is the only path allowed while the room is already started.
+//   - `rematch` is host-only and reopens the same room code.
+//   - Durable Object owns the authoritative state revision.
+//   - Game state is broadcast immediately; storage persistence is coalesced.
 // ---------------------------------------------------------------------------
 
 const MAX_PLAYERS = 4;
@@ -22,6 +26,10 @@ const ROOM_IDLE_TTL_MS = 6 * 60 * 60 * 1000;
 const SEAT_GRACE_MS = 5 * 60 * 1000;
 
 const STORAGE_KEY = "roomStateV2";
+
+// ---------------------------------------------------------------------------
+// BASIC HELPERS
+// ---------------------------------------------------------------------------
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -33,9 +41,11 @@ function json(data, status = 200) {
 }
 
 function cleanName(name) {
-  return String(name || "Player")
-    .trim()
-    .slice(0, 20) || "Player";
+  return (
+    String(name || "Player")
+      .trim()
+      .slice(0, 20) || "Player"
+  );
 }
 
 const AVATAR_IDS = new Set([
@@ -51,11 +61,15 @@ function cleanAvatar(avatar) {
     .trim()
     .toLowerCase();
 
-  return AVATAR_IDS.has(a) ? a : "panda";
+  return AVATAR_IDS.has(a)
+    ? a
+    : "panda";
 }
 
 function validCode(code) {
-  return /^\d{5}$/.test(String(code || ""));
+  return /^\d{5}$/.test(
+    String(code || "")
+  );
 }
 
 function cleanToken(token) {
@@ -66,11 +80,15 @@ function cleanToken(token) {
     : "";
 }
 
+// ---------------------------------------------------------------------------
+// WORKER ENTRY
+// ---------------------------------------------------------------------------
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Health check
+    // Health endpoint
     if (url.pathname === "/health") {
       return json({
         ok: true,
@@ -82,8 +100,8 @@ export default {
     // WebSocket endpoint
     if (url.pathname === "/ws") {
       if (
-        (request.headers.get("Upgrade") || "").toLowerCase() !==
-        "websocket"
+        (request.headers.get("Upgrade") || "")
+          .toLowerCase() !== "websocket"
       ) {
         return new Response(
           "Expected WebSocket upgrade",
@@ -97,13 +115,19 @@ export default {
 
       if (!validCode(code)) {
         return json(
-          { error: "Room code harus 5 digit." },
+          {
+            error:
+              "Room code harus 5 digit.",
+          },
           400
         );
       }
 
-      const id = env.MAHJONG_ROOMS.idFromName(code);
-      const stub = env.MAHJONG_ROOMS.get(id);
+      const id =
+        env.MAHJONG_ROOMS.idFromName(code);
+
+      const stub =
+        env.MAHJONG_ROOMS.get(id);
 
       return stub.fetch(request);
     }
@@ -115,7 +139,7 @@ export default {
         service: "Mahjong DJ room server",
         endpoints: [
           "/health",
-          "/ws?room=12345&role=host|guest&name=..."
+          "/ws?room=12345&role=host|guest&name=...",
         ],
       });
     }
@@ -126,6 +150,10 @@ export default {
     );
   },
 };
+
+// ---------------------------------------------------------------------------
+// DURABLE OBJECT
+// ---------------------------------------------------------------------------
 
 export class MahjongRoom extends DurableObject {
   constructor(ctx, env) {
@@ -154,29 +182,39 @@ export class MahjongRoom extends DurableObject {
       null,
     ];
 
-    // WebSocket -> metadata
+    // WebSocket ->
+    // {
+    //   seat,
+    //   id,
+    //   role,
+    //   name,
+    //   avatar,
+    //   token
+    // }
     this.connections = new Map();
 
-    // Most recent authoritative game state
+    // Latest authoritative state from host
     this.lastState = null;
 
     this.started = false;
 
-    this.lastActivity = Date.now();
+    this.lastActivity =
+      Date.now();
 
     this.loaded = false;
     this.loading = null;
 
-    // Monotonic state revision.
+    // Durable Object server-side state revision.
+    // This MUST NOT depend on a browser-generated counter.
     this.stateRevision = 0;
 
-    // Durable Object storage write coalescing.
+    // Coalesced persistence.
     this.persistTimer = null;
     this.persistPending = false;
   }
 
   // -------------------------------------------------------------------------
-  // STORAGE
+  // LOAD FROM DURABLE STORAGE
   // -------------------------------------------------------------------------
 
   async ensureLoaded() {
@@ -191,35 +229,57 @@ export class MahjongRoom extends DurableObject {
     this.loading = (async () => {
       try {
         const saved =
-          await this.ctx.storage.get(STORAGE_KEY);
+          await this.ctx.storage.get(
+            STORAGE_KEY
+          );
 
-        if (saved && typeof saved === "object") {
+        if (
+          saved &&
+          typeof saved === "object"
+        ) {
           this.roomCode =
             saved.roomCode ||
             this.roomCode;
 
           this.hostSeat =
-            Number.isInteger(saved.hostSeat)
+            Number.isInteger(
+              saved.hostSeat
+            )
               ? saved.hostSeat
               : HOST_SEAT;
 
           this.players =
             Array.isArray(saved.players) &&
-            saved.players.length === MAX_PLAYERS
-              ? saved.players.map((p) =>
-                  p && typeof p === "object"
-                    ? {
-                        id: p.id || "",
-                        token: cleanToken(p.token),
-                        name: cleanName(p.name),
-                        avatar: cleanAvatar(p.avatar),
-                        ready: !!p.ready,
-                        connected: false,
-                        disconnectedAt:
-                          Number(p.disconnectedAt) ||
-                          null,
-                      }
-                    : null
+            saved.players.length ===
+              MAX_PLAYERS
+              ? saved.players.map(
+                  (p) =>
+                    p &&
+                    typeof p === "object"
+                      ? {
+                          id: p.id || "",
+                          token:
+                            cleanToken(
+                              p.token
+                            ),
+                          name:
+                            cleanName(
+                              p.name
+                            ),
+                          avatar:
+                            cleanAvatar(
+                              p.avatar
+                            ),
+                          ready:
+                            !!p.ready,
+                          connected: false,
+                          disconnectedAt:
+                            Number(
+                              p.disconnectedAt
+                            ) ||
+                            null,
+                        }
+                      : null
                 )
               : [
                   null,
@@ -230,25 +290,32 @@ export class MahjongRoom extends DurableObject {
 
           this.lastState =
             saved.lastState &&
-            typeof saved.lastState === "object"
+            typeof saved.lastState ===
+              "object"
               ? saved.lastState
               : null;
 
           this.stateRevision =
-            Number(saved.stateRevision) ||
-            Number(this.lastState?._stateSeq) ||
+            Number(
+              saved.stateRevision
+            ) ||
+            Number(
+              this.lastState?._serverSeq
+            ) ||
             0;
 
           this.started =
             !!saved.started;
 
           this.lastActivity =
-            Number(saved.lastActivity) ||
+            Number(
+              saved.lastActivity
+            ) ||
             Date.now();
         }
       } catch (err) {
         console.error(
-          "Failed to load room state:",
+          "Failed to load room state",
           err
         );
       } finally {
@@ -260,6 +327,10 @@ export class MahjongRoom extends DurableObject {
     return this.loading;
   }
 
+  // -------------------------------------------------------------------------
+  // PERSIST
+  // -------------------------------------------------------------------------
+
   async persist() {
     await this.ensureLoaded();
 
@@ -270,38 +341,45 @@ export class MahjongRoom extends DurableObject {
         hostSeat: this.hostSeat,
         players: this.players,
         lastState: this.lastState,
-        stateRevision: this.stateRevision,
+        stateRevision:
+          this.stateRevision,
         started: this.started,
-        lastActivity: this.lastActivity,
+        lastActivity:
+          this.lastActivity,
       }
     );
   }
 
   touch() {
-    this.lastActivity = Date.now();
+    this.lastActivity =
+      Date.now();
   }
 
   // -------------------------------------------------------------------------
-  // WEBSOCKET
+  // WEBSOCKET CONNECTION
   // -------------------------------------------------------------------------
 
   async fetch(request) {
     await this.ensureLoaded();
 
-    const url = new URL(request.url);
+    const url =
+      new URL(request.url);
 
     const room = (
-      url.searchParams.get("room") || ""
+      url.searchParams.get("room") ||
+      ""
     ).trim();
 
     const role =
-      url.searchParams.get("role") === "host"
+      url.searchParams.get("role") ===
+      "host"
         ? "host"
         : "guest";
 
-    const name = cleanName(
-      url.searchParams.get("name")
-    );
+    const name =
+      cleanName(
+        url.searchParams.get("name")
+      );
 
     if (!validCode(room)) {
       return new Response(
@@ -349,7 +427,10 @@ export class MahjongRoom extends DurableObject {
         let msg;
 
         try {
-          msg = JSON.parse(event.data);
+          msg =
+            JSON.parse(
+              event.data
+            );
         } catch {
           this.send(
             server,
@@ -364,7 +445,10 @@ export class MahjongRoom extends DurableObject {
         }
 
         Promise.resolve(
-          this.handle(server, msg)
+          this.handle(
+            server,
+            msg
+          )
         ).catch((err) => {
           this.send(
             server,
@@ -383,7 +467,10 @@ export class MahjongRoom extends DurableObject {
       "close",
       () => {
         Promise.resolve(
-          this.detach(server, false)
+          this.detach(
+            server,
+            false
+          )
         ).catch((err) =>
           console.error(err)
         );
@@ -394,7 +481,10 @@ export class MahjongRoom extends DurableObject {
       "error",
       () => {
         Promise.resolve(
-          this.detach(server, false)
+          this.detach(
+            server,
+            false
+          )
         ).catch((err) =>
           console.error(err)
         );
@@ -434,7 +524,8 @@ export class MahjongRoom extends DurableObject {
     if (
       !meta ||
       !msg ||
-      typeof msg.type !== "string"
+      typeof msg.type !==
+        "string"
     ) {
       return;
     }
@@ -470,10 +561,14 @@ export class MahjongRoom extends DurableObject {
         );
 
       case "start":
-        return this.startGame(ws);
+        return this.startGame(
+          ws
+        );
 
       case "rematch":
-        return this.rematch(ws);
+        return this.rematch(
+          ws
+        );
 
       case "state":
         return this.forwardState(
@@ -515,17 +610,21 @@ export class MahjongRoom extends DurableObject {
   }
 
   // -------------------------------------------------------------------------
-  // HOST LOOKUP
+  // FIND HOST
   // -------------------------------------------------------------------------
 
   findHostSocket() {
-    for (const [
-      ws,
-      meta,
-    ] of this.connections) {
+    for (
+      const [
+        ws,
+        meta,
+      ] of this.connections
+    ) {
       if (
-        meta.seat === this.hostSeat &&
-        meta.role === "host"
+        meta.seat ===
+          this.hostSeat &&
+        meta.role ===
+          "host"
       ) {
         return ws;
       }
@@ -538,11 +637,17 @@ export class MahjongRoom extends DurableObject {
   // CREATE ROOM
   // -------------------------------------------------------------------------
 
-  async createRoom(ws, meta, msg) {
+  async createRoom(
+    ws,
+    meta,
+    msg
+  ) {
     await this.ensureLoaded();
 
     const existingHost =
-      this.players[this.hostSeat];
+      this.players[
+        this.hostSeat
+      ];
 
     if (
       existingHost &&
@@ -570,12 +675,14 @@ export class MahjongRoom extends DurableObject {
 
     const name =
       cleanName(
-        msg.name || meta.name
+        msg.name ||
+          meta.name
       );
 
     const avatar =
       cleanAvatar(
-        msg.avatar || meta.avatar
+        msg.avatar ||
+          meta.avatar
       );
 
     const token =
@@ -584,19 +691,25 @@ export class MahjongRoom extends DurableObject {
 
     if (
       meta.seat !== null &&
-      meta.seat !== this.hostSeat
+      meta.seat !==
+        this.hostSeat
     ) {
-      this.players[meta.seat] = null;
+      this.players[
+        meta.seat
+      ] = null;
     }
 
-    this.players[this.hostSeat] = {
+    this.players[
+      this.hostSeat
+    ] = {
       id: meta.id,
       name,
       avatar,
       ready: true,
       token,
       connected: true,
-      disconnectedAt: null,
+      disconnectedAt:
+        null,
     };
 
     meta.seat =
@@ -614,11 +727,14 @@ export class MahjongRoom extends DurableObject {
     meta.token =
       token;
 
-    this.started = false;
+    this.started =
+      false;
 
-    this.lastState = null;
+    this.lastState =
+      null;
 
-    this.stateRevision = 0;
+    this.stateRevision =
+      0;
 
     this.touch();
 
@@ -637,7 +753,11 @@ export class MahjongRoom extends DurableObject {
   // JOIN ROOM
   // -------------------------------------------------------------------------
 
-  async joinRoom(ws, meta, msg) {
+  async joinRoom(
+    ws,
+    meta,
+    msg
+  ) {
     await this.ensureLoaded();
 
     if (this.started) {
@@ -662,12 +782,14 @@ export class MahjongRoom extends DurableObject {
 
     let seat = null;
 
-    // Guest seats only: 1..3
     if (
       requested !== null &&
       requested >= 1 &&
-      requested < MAX_PLAYERS &&
-      !this.players[requested]
+      requested <
+        MAX_PLAYERS &&
+      !this.players[
+        requested
+      ]
     ) {
       seat = requested;
     }
@@ -678,7 +800,9 @@ export class MahjongRoom extends DurableObject {
         i < MAX_PLAYERS;
         i++
       ) {
-        if (!this.players[i]) {
+        if (
+          !this.players[i]
+        ) {
           seat = i;
           break;
         }
@@ -700,27 +824,31 @@ export class MahjongRoom extends DurableObject {
 
     const name =
       cleanName(
-        msg.name || meta.name
+        msg.name ||
+          meta.name
       );
 
     const avatar =
       cleanAvatar(
-        msg.avatar || meta.avatar
+        msg.avatar ||
+          meta.avatar
       );
 
     const token =
       cleanToken(msg.token) ||
       crypto.randomUUID();
 
-    this.players[seat] = {
-      id: meta.id,
-      name,
-      avatar,
-      ready: true,
-      token,
-      connected: true,
-      disconnectedAt: null,
-    };
+    this.players[seat] =
+      {
+        id: meta.id,
+        name,
+        avatar,
+        ready: true,
+        token,
+        connected: true,
+        disconnectedAt:
+          null,
+      };
 
     meta.seat = seat;
     meta.role = "guest";
@@ -744,10 +872,14 @@ export class MahjongRoom extends DurableObject {
   }
 
   // -------------------------------------------------------------------------
-  // REJOIN
+  // REJOIN EXISTING SEAT
   // -------------------------------------------------------------------------
 
-  async rejoin(ws, meta, msg) {
+  async rejoin(
+    ws,
+    meta,
+    msg
+  ) {
     await this.ensureLoaded();
 
     const seat =
@@ -758,7 +890,9 @@ export class MahjongRoom extends DurableObject {
         : null;
 
     const token =
-      cleanToken(msg.token);
+      cleanToken(
+        msg.token
+      );
 
     const existing =
       seat !== null
@@ -768,7 +902,8 @@ export class MahjongRoom extends DurableObject {
     const matches =
       existing &&
       token &&
-      existing.token === token;
+      existing.token ===
+        token;
 
     // No matching reservation
     if (!matches) {
@@ -786,7 +921,8 @@ export class MahjongRoom extends DurableObject {
       }
 
       if (
-        seat === this.hostSeat
+        seat ===
+        this.hostSeat
       ) {
         return this.createRoom(
           ws,
@@ -802,14 +938,17 @@ export class MahjongRoom extends DurableObject {
       );
     }
 
-    // Remove stale socket using same seat.
-    for (const [
-      oldWs,
-      oldMeta,
-    ] of this.connections) {
+    // Close stale connection for same seat
+    for (
+      const [
+        oldWs,
+        oldMeta,
+      ] of this.connections
+    ) {
       if (
         oldWs !== ws &&
-        oldMeta.seat === seat
+        oldMeta.seat ===
+          seat
       ) {
         this.connections.delete(
           oldWs
@@ -818,37 +957,58 @@ export class MahjongRoom extends DurableObject {
         try {
           oldWs.close();
         } catch {
-          // already closed
+          // Already closed
         }
       }
     }
 
     const name =
-      cleanName(msg.name) ||
+      cleanName(
+        msg.name
+      ) ||
       existing.name;
 
     const avatar =
       cleanAvatar(
         msg.avatar ||
-        existing.avatar
+          existing.avatar
       );
 
-    existing.connected = true;
-    existing.disconnectedAt = null;
-    existing.name = name;
-    existing.avatar = avatar;
-    existing.id = meta.id;
+    existing.connected =
+      true;
+
+    existing.disconnectedAt =
+      null;
+
+    existing.name =
+      name;
+
+    existing.avatar =
+      avatar;
+
+    existing.id =
+      meta.id;
 
     const role =
-      seat === this.hostSeat
+      seat ===
+      this.hostSeat
         ? "host"
         : "guest";
 
-    meta.seat = seat;
-    meta.role = role;
-    meta.name = name;
-    meta.avatar = avatar;
-    meta.token = token;
+    meta.seat =
+      seat;
+
+    meta.role =
+      role;
+
+    meta.name =
+      name;
+
+    meta.avatar =
+      avatar;
+
+    meta.token =
+      token;
 
     this.touch();
 
@@ -862,7 +1022,7 @@ export class MahjongRoom extends DurableObject {
 
     this.broadcastLobby();
 
-    // Send latest game state immediately
+    // Immediately restore latest state.
     if (this.lastState) {
       this.send(
         ws,
@@ -873,6 +1033,7 @@ export class MahjongRoom extends DurableObject {
       );
     }
 
+    // Tell reconnecting client the room is active.
     if (this.started) {
       this.send(
         ws,
@@ -895,7 +1056,9 @@ export class MahjongRoom extends DurableObject {
     }
 
     const players =
-      this.players.filter(Boolean);
+      this.players.filter(
+        Boolean
+      );
 
     if (
       players.length !==
@@ -912,7 +1075,8 @@ export class MahjongRoom extends DurableObject {
       return false;
     }
 
-    this.started = true;
+    this.started =
+      true;
 
     this.touch();
 
@@ -935,17 +1099,18 @@ export class MahjongRoom extends DurableObject {
     token
   ) {
     const meta =
-      this.connections.get(ws);
+      this.connections.get(
+        ws
+      );
 
     this.send(
       ws,
       {
         type: "joined",
         room: this.roomView(),
-        seat:
-          meta
-            ? meta.seat
-            : null,
+        seat: meta
+          ? meta.seat
+          : null,
         host: !!host,
         token,
       }
@@ -958,25 +1123,32 @@ export class MahjongRoom extends DurableObject {
 
   roomView() {
     return {
-      code: this.roomCode,
+      code:
+        this.roomCode,
 
       started:
         this.started,
 
       players:
-        this.players.map((p) =>
-          p
-            ? {
-                id: p.id,
-                name: p.name,
-                avatar:
-                  cleanAvatar(p.avatar),
-                ready:
-                  !!p.ready,
-                connected:
-                  p.connected !== false,
-              }
-            : null
+        this.players.map(
+          (p) =>
+            p
+              ? {
+                  id:
+                    p.id,
+                  name:
+                    p.name,
+                  avatar:
+                    cleanAvatar(
+                      p.avatar
+                    ),
+                  ready:
+                    !!p.ready,
+                  connected:
+                    p.connected !==
+                    false,
+                }
+              : null
         ),
     };
   }
@@ -985,11 +1157,16 @@ export class MahjongRoom extends DurableObject {
   // READY
   // -------------------------------------------------------------------------
 
-  async setReady(ws, ready) {
+  async setReady(
+    ws,
+    ready
+  ) {
     await this.ensureLoaded();
 
     const meta =
-      this.connections.get(ws);
+      this.connections.get(
+        ws
+      );
 
     if (
       !meta ||
@@ -999,7 +1176,9 @@ export class MahjongRoom extends DurableObject {
     }
 
     const p =
-      this.players[meta.seat];
+      this.players[
+        meta.seat
+      ];
 
     if (!p) {
       return;
@@ -1025,20 +1204,28 @@ export class MahjongRoom extends DurableObject {
     await this.ensureLoaded();
 
     const meta =
-      this.connections.get(ws);
+      this.connections.get(
+        ws
+      );
 
     if (
       !meta ||
-      meta.seat !== this.hostSeat ||
-      meta.role !== "host"
+      meta.seat !==
+        this.hostSeat ||
+      meta.role !==
+        "host"
     ) {
       return;
     }
 
     const humans =
-      this.players.filter(Boolean);
+      this.players.filter(
+        Boolean
+      );
 
-    if (humans.length < 1) {
+    if (
+      humans.length < 1
+    ) {
       return this.send(
         ws,
         {
@@ -1064,7 +1251,8 @@ export class MahjongRoom extends DurableObject {
       );
     }
 
-    this.started = true;
+    this.started =
+      true;
 
     this.touch();
 
@@ -1083,27 +1271,35 @@ export class MahjongRoom extends DurableObject {
     await this.ensureLoaded();
 
     const meta =
-      this.connections.get(ws);
+      this.connections.get(
+        ws
+      );
 
     if (
       !meta ||
-      meta.seat !== this.hostSeat ||
-      meta.role !== "host"
+      meta.seat !==
+        this.hostSeat ||
+      meta.role !==
+        "host"
     ) {
       return;
     }
 
-    this.started = false;
+    this.started =
+      false;
 
-    this.lastState = null;
+    this.lastState =
+      null;
 
-    this.stateRevision = 0;
+    this.stateRevision =
+      0;
 
     for (
       const p of this.players
     ) {
       if (p) {
-        p.ready = false;
+        p.ready =
+          false;
       }
     }
 
@@ -1118,69 +1314,79 @@ export class MahjongRoom extends DurableObject {
   // HOST -> GUEST STATE
   // -------------------------------------------------------------------------
 
-  async forwardState(ws, state) {
+  async forwardState(
+    ws,
+    state
+  ) {
     await this.ensureLoaded();
 
     const meta =
-      this.connections.get(ws);
+      this.connections.get(
+        ws
+      );
 
-    // Only host may publish game state.
     if (
       !meta ||
-      meta.seat !== this.hostSeat ||
-      meta.role !== "host"
+      meta.seat !==
+        this.hostSeat ||
+      meta.role !==
+        "host"
     ) {
       return;
     }
 
     if (
       !state ||
-      typeof state !== "object"
+      typeof state !==
+        "object"
     ) {
       return;
     }
 
-    const incomingRevision =
-      Number(state._stateSeq) ||
-      (this.stateRevision + 1);
+    // The Durable Object, not the browser,
+    // owns the authoritative state sequence.
+    this.stateRevision += 1;
 
-    // Ignore stale / duplicated state.
-    if (
-      incomingRevision <=
-      this.stateRevision
-    ) {
-      return;
-    }
+    const publishedState =
+      {
+        ...state,
 
-    this.stateRevision =
-      incomingRevision;
+        _serverSeq:
+          this.stateRevision,
+      };
 
     this.lastState =
-      state;
+      publishedState;
 
     this.touch();
 
     // IMPORTANT:
     // Broadcast immediately.
-    // Do not wait for Durable Object storage.
+    // Do not wait for storage.
     this.broadcast(
       {
         type: "state",
-        state,
+        state:
+          publishedState,
       },
       ws
     );
 
-    // Persist asynchronously/coalesced.
+    // Persist separately.
     this.queueStatePersist();
   }
+
+  // -------------------------------------------------------------------------
+  // COALESCED STATE PERSISTENCE
+  // -------------------------------------------------------------------------
 
   queueStatePersist() {
     if (this.persistPending) {
       return;
     }
 
-    this.persistPending = true;
+    this.persistPending =
+      true;
 
     clearTimeout(
       this.persistTimer
@@ -1188,13 +1394,16 @@ export class MahjongRoom extends DurableObject {
 
     this.persistTimer =
       setTimeout(() => {
-        this.persistPending = false;
-        this.persistTimer = null;
+        this.persistPending =
+          false;
+
+        this.persistTimer =
+          null;
 
         this.persist()
           .catch((err) =>
             console.error(
-              "State persist failed:",
+              "State persist failed",
               err
             )
           );
@@ -1212,7 +1421,9 @@ export class MahjongRoom extends DurableObject {
     await this.ensureLoaded();
 
     const meta =
-      this.connections.get(ws);
+      this.connections.get(
+        ws
+      );
 
     if (
       !meta ||
@@ -1223,8 +1434,10 @@ export class MahjongRoom extends DurableObject {
 
     // Host processes its own actions locally.
     if (
-      meta.seat === this.hostSeat &&
-      meta.role === "host"
+      meta.seat ===
+        this.hostSeat &&
+      meta.role ===
+        "host"
     ) {
       return;
     }
@@ -1245,25 +1458,29 @@ export class MahjongRoom extends DurableObject {
       return;
     }
 
-    // Send guest action to host.
     this.send(
       hostWs,
       {
-        type: "playerAction",
-        seat: meta.seat,
+        type:
+          "playerAction",
+
+        seat:
+          meta.seat,
+
         action,
       }
     );
   }
 
   // -------------------------------------------------------------------------
-  // LOBBY BROADCAST
+  // LOBBY
   // -------------------------------------------------------------------------
 
   broadcastLobby() {
     this.broadcast({
       type: "lobby",
-      room: this.roomView(),
+      room:
+        this.roomView(),
     });
   }
 
@@ -1290,9 +1507,13 @@ export class MahjongRoom extends DurableObject {
     }
 
     for (
-      const [ws] of this.connections
+      const [
+        ws,
+      ] of this.connections
     ) {
-      if (ws === except) {
+      if (
+        ws === except
+      ) {
         continue;
       }
 
@@ -1333,7 +1554,7 @@ export class MahjongRoom extends DurableObject {
   }
 
   // -------------------------------------------------------------------------
-  // DETACH
+  // DISCONNECT / LEAVE
   // -------------------------------------------------------------------------
 
   async detach(
@@ -1343,13 +1564,17 @@ export class MahjongRoom extends DurableObject {
     await this.ensureLoaded();
 
     const meta =
-      this.connections.get(ws);
+      this.connections.get(
+        ws
+      );
 
     if (!meta) {
       return;
     }
 
-    this.connections.delete(ws);
+    this.connections.delete(
+      ws
+    );
 
     const seat =
       meta.seat;
@@ -1357,18 +1582,25 @@ export class MahjongRoom extends DurableObject {
     if (
       seat !== null &&
       this.players[seat] &&
-      this.players[seat].id === meta.id
+      this.players[seat].id ===
+        meta.id
     ) {
       if (explicit) {
-        // User intentionally leaves.
-        this.players[seat] = null;
+        // Explicit leave:
+        // immediately free the seat.
+        this.players[seat] =
+          null;
       } else {
-        // Network disconnect.
-        // Keep seat reserved for reconnect.
-        this.players[seat].connected =
+        // Network disconnect:
+        // reserve the seat.
+        this.players[
+          seat
+        ].connected =
           false;
 
-        this.players[seat].disconnectedAt =
+        this.players[
+          seat
+        ].disconnectedAt =
           Date.now();
 
         await this.scheduleCleanup();
@@ -1383,17 +1615,18 @@ export class MahjongRoom extends DurableObject {
   }
 
   // -------------------------------------------------------------------------
-  // SEAT CLEANUP ALARM
+  // CLEANUP ALARM
   // -------------------------------------------------------------------------
 
   async scheduleCleanup() {
     try {
       await this.ctx.storage.setAlarm(
-        Date.now() + SEAT_GRACE_MS
+        Date.now() +
+          SEAT_GRACE_MS
       );
     } catch (err) {
       console.error(
-        "Unable to schedule room alarm:",
+        "Unable to schedule room alarm",
         err
       );
     }
@@ -1409,10 +1642,10 @@ export class MahjongRoom extends DurableObject {
     const now =
       Date.now();
 
-    let changed = false;
+    let changed =
+      false;
 
-    // Free disconnected seats
-    // after grace period.
+    // Free expired disconnected seats.
     for (
       let i = 0;
       i < MAX_PLAYERS;
@@ -1423,19 +1656,25 @@ export class MahjongRoom extends DurableObject {
 
       if (
         p &&
-        p.connected === false &&
+        p.connected ===
+          false &&
         p.disconnectedAt &&
-        now - p.disconnectedAt >
+        now -
+            p.disconnectedAt >
           SEAT_GRACE_MS
       ) {
-        this.players[i] = null;
-        changed = true;
+        this.players[i] =
+          null;
+
+        changed =
+          true;
       }
     }
 
-    // Reset fully idle room.
+    // Fully reset a stale room.
     if (
-      now - this.lastActivity >
+      now -
+        this.lastActivity >
       ROOM_IDLE_TTL_MS
     ) {
       this.players = [
@@ -1445,13 +1684,17 @@ export class MahjongRoom extends DurableObject {
         null,
       ];
 
-      this.started = false;
+      this.started =
+        false;
 
-      this.lastState = null;
+      this.lastState =
+        null;
 
-      this.stateRevision = 0;
+      this.stateRevision =
+        0;
 
-      changed = true;
+      changed =
+        true;
     }
 
     if (changed) {
@@ -1460,13 +1703,14 @@ export class MahjongRoom extends DurableObject {
       await this.persist();
 
       if (
-        this.connections.size > 0
+        this.connections.size >
+        0
       ) {
         this.broadcastLobby();
       }
     }
 
-    // Keep alarm active.
+    // Keep the cleanup alarm alive.
     await this.scheduleCleanup();
   }
 }
