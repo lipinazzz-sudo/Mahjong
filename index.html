@@ -1531,7 +1531,11 @@ function executePon(p){
   const a=takeTilesById(playerHands[p],tile.id,2);
   if(a.length<2)return;
 
-  a.push(tile);
+  
+  // Consume the old discard-claim state BEFORE continuation.
+  mpPendingCalls=[];
+  pendingCallChoice=null;
+a.push(tile);
   playerMelds[p].push(a);
   removeLastDiscard();
   currentTurn=p;
@@ -1550,8 +1554,6 @@ function executePon(p){
     isDiscardable=false;
   }
 
-  mpPendingCalls=[];
-  pendingCallChoice=null;
   mpBroadcastState();
 }
 function executeChi(p,combo){
@@ -1575,7 +1577,11 @@ function executeChi(p,combo){
     a.push(playerHands[p].splice(idx,1)[0]);
   }
 
-  a.push(tile);
+  
+  // Consume the old discard-claim state BEFORE continuation.
+  mpPendingCalls=[];
+  pendingCallChoice=null;
+a.push(tile);
   a.sort((x,y)=>x.num-y.num);
   playerMelds[p].push(a);
   removeLastDiscard();
@@ -1595,8 +1601,6 @@ function executeChi(p,combo){
     isDiscardable=false;
   }
 
-  mpPendingCalls=[];
-  pendingCallChoice=null;
   mpBroadcastState();
 }
 function executeKan(p){
@@ -1611,7 +1615,11 @@ function executeKan(p){
   const a=takeTilesById(playerHands[p],tile.id,3);
   if(a.length<3)return;
 
-  a.push(tile);
+  
+  // Consume the old discard-claim state BEFORE replacement draw/continuation.
+  mpPendingCalls=[];
+  pendingCallChoice=null;
+a.push(tile);
   playerMelds[p].push(a);
   removeLastDiscard();
 
@@ -1638,8 +1646,6 @@ function executeKan(p){
     isDiscardable=false;
   }
 
-  mpPendingCalls=[];
-  pendingCallChoice=null;
   mpBroadcastState();
 }
 function executeSelfKan(p,opt){
@@ -1647,7 +1653,11 @@ function executeSelfKan(p,opt){
   playSfx('kan');
   if(!opt)return false;
 
-  if(opt.type==='closed'){
+  
+  // Consume any stale action state before the replacement draw/continuation.
+  mpPendingCalls=[];
+  pendingCallChoice=null;
+if(opt.type==='closed'){
     const a=takeTilesById(playerHands[p],opt.id,4);
     if(a.length!==4)return false;
     playerMelds[p].push(a);
@@ -1682,8 +1692,6 @@ function executeSelfKan(p,opt){
     isDiscardable=false;
   }
 
-  mpPendingCalls=[];
-  pendingCallChoice=null;
   mpBroadcastState();
   return true;
 }
