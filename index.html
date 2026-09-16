@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="26.0-mahjong-dj-multiplayer-stable">
+    <meta name="app-version" content="25.0-mahyong-dj-actionfix">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
     <meta name="description" content="Majong DJ - HongKong Mahjong dengan AI dan Cloudflare multiplayer.">
@@ -82,10 +82,10 @@
 @media (orientation:landscape) and (max-height:620px){.modal{padding:8px}.lobby-box{width:min(760px,96vw);padding:13px 16px;max-height:calc(100dvh - 16px)}.lobby-box .modal-copy{margin-top:2px}.lobby-box .mp-setup,.lobby-box .mp-room-panel,.lobby-box .lobby-actions{gap:6px}.lobby-box .p2p-card{gap:5px;padding:8px 10px}.lobby-box .field-input{padding:8px 10px}.lobby-box .signal-qr{width:132px;height:132px}.lobby-box .room-share-big strong{font-size:24px}.lobby-box .ready-player-list{gap:4px;margin-top:6px}.lobby-box .ready-item{padding:7px 9px}.lobby-box .btn{min-height:38px}.lobby-box .p2p-mini,.lobby-box .mp-hint{font-size:9px}.lobby-back-main{margin-top:6px}}
 
 #screen-game{padding:0}.game-shell{position:relative;width:100vw;height:100dvh;overflow:hidden;background:#0b0a09}.table-plane{position:absolute;left:5vw;right:5vw;top:5vh;bottom:4vh;transform:perspective(1200px) rotateX(5deg);transform-origin:center;pointer-events:none}.table-plane::before{content:"";position:absolute;inset:0;border-radius:26px;background:radial-gradient(ellipse at 50% 45%,rgba(89,113,79,.17),transparent 68%),linear-gradient(145deg,#3a281e,#241813 10%,#142218 25%,#101c16 58%,#080f0c);box-shadow:0 26px 58px rgba(0,0,0,.64),inset 0 0 0 2px rgba(231,202,145,.12),inset 0 0 0 8px rgba(0,0,0,.25),inset 0 -38px 62px rgba(0,0,0,.34)}.table-plane::after{content:"";position:absolute;inset:12px;border-radius:19px;border:1px solid rgba(226,188,111,.08);background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 24%,rgba(0,0,0,.10) 78%,rgba(0,0,0,.22));box-shadow:inset 0 0 42px rgba(0,0,0,.36),inset 0 0 0 1px rgba(214,164,74,.035)}
-#game-board{position:absolute;inset:0;overflow:hidden;--sideInset:clamp(78px,min(12vw,16vh),152px);--focus-pan-y:-1vh}.topbar{position:absolute;left:12px;right:12px;top:9px;z-index:50;display:flex;justify-content:space-between;align-items:flex-start}.score-panel{width:clamp(191px,24.65vw,255px);padding:7.65px 9.35px;border-radius:11px;border:1px solid rgba(220,177,91,.18);background:linear-gradient(180deg,rgba(26,20,15,.95),rgba(10,9,8,.98));box-shadow:0 8px 20px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,235,192,.045);backdrop-filter:blur(10px)}.score-guide-title{display:flex;align-items:center;gap:4.25px;color:#d9cdbd;font-size:5.95px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;margin-bottom:5.1px}.score-guide-title span:first-child{font-size:8.5px;line-height:1}.score-guide-panel .score-guide-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-auto-flow:column;grid-template-rows:repeat(8,auto);column-gap:10.2px;row-gap:3.4px;margin-top:0}.score-guide-panel .score-guide-grid>div{display:grid;grid-template-columns:28.9px minmax(0,1fr);align-items:start;gap:3.4px;line-height:1.15;min-width:0}.score-guide-panel .score-guide-grid strong{min-width:0;overflow-wrap:anywhere;word-break:normal}.score-guide-panel .score-guide-grid span{min-width:0;color:#e0b45d;font-size:5.53px;font-weight:950;letter-spacing:.025em}.score-guide-panel .score-guide-grid strong{color:#c8bfb1;font-size:5.31px;font-weight:750;white-space:normal;overflow-wrap:anywhere;word-break:normal}.hud-label{font-size:7px;letter-spacing:.12em;color:#d6cabd;font-weight:900;text-transform:uppercase}.kan-info{display:none}.top-right-btns{display:flex;gap:6px}.icon-btn{width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:rgba(20,17,15,.8);color:#fff}
-.round-hud-shell{position:absolute;top:11px;left:50%;right:auto;transform:translateX(-50%);z-index:48;min-width:82px;text-align:center;padding:4px 7px;border-radius:9px;background:rgba(13,11,9,.78);border:1px solid rgba(218,175,91,.13);box-shadow:0 7px 16px rgba(0,0,0,.28)}.round-hud-title{font-size:7px;font-weight:950;letter-spacing:.11em}.round-hud-sub{font-size:5px;letter-spacing:.14em;color:#a79c92;margin-top:2px}
+#game-board{position:absolute;inset:0;overflow:hidden;--sideInset:clamp(78px,min(12vw,16vh),152px);--focus-pan-y:-8.5%}.topbar{position:absolute;left:12px;right:12px;top:9px;z-index:50;display:flex;justify-content:space-between;align-items:flex-start}.score-panel{width:clamp(191px,24.65vw,255px);padding:7.65px 9.35px;border-radius:11px;border:1px solid rgba(220,177,91,.18);background:linear-gradient(180deg,rgba(26,20,15,.95),rgba(10,9,8,.98));box-shadow:0 8px 20px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,235,192,.045);backdrop-filter:blur(10px)}.score-guide-title{display:flex;align-items:center;gap:4.25px;color:#d9cdbd;font-size:5.95px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;margin-bottom:5.1px}.score-guide-title span:first-child{font-size:8.5px;line-height:1}.score-guide-panel .score-guide-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-auto-flow:column;grid-template-rows:repeat(8,auto);column-gap:10.2px;row-gap:3.4px;margin-top:0}.score-guide-panel .score-guide-grid>div{display:grid;grid-template-columns:28.9px minmax(0,1fr);align-items:start;gap:3.4px;line-height:1.15;min-width:0}.score-guide-panel .score-guide-grid strong{min-width:0;overflow-wrap:anywhere;word-break:normal}.score-guide-panel .score-guide-grid span{min-width:0;color:#e0b45d;font-size:5.53px;font-weight:950;letter-spacing:.025em}.score-guide-panel .score-guide-grid strong{color:#c8bfb1;font-size:5.31px;font-weight:750;white-space:normal;overflow-wrap:anywhere;word-break:normal}.hud-label{font-size:7px;letter-spacing:.12em;color:#d6cabd;font-weight:900;text-transform:uppercase}.kan-info{display:none}.top-right-btns{display:flex;gap:6px}.icon-btn{width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:rgba(20,17,15,.8);color:#fff}
+
 .player-seat{position:absolute;z-index:35;display:flex;flex-direction:column;align-items:center;text-align:center}.avatar-img{width:clamp(31px,min(4.7vw,5.8vh),44px);height:clamp(31px,min(4.7vw,5.8vh),44px);border-radius:10px;border:2px solid #dfb158;background:radial-gradient(circle at 34% 28%,#ffdb86,#8e4d27 50%,#261714 100%);box-shadow:0 6px 16px rgba(0,0,0,.34)}.avatar-name{margin-top:3px;padding:2px 6px;border-radius:6px;font-size:8px;font-weight:900;background:rgba(13,11,10,.86);border:1px solid rgba(255,255,255,.08);white-space:nowrap}.seat-direction{opacity:.65}.time-bank-tag{margin-top:2px;font-size:7px;color:#f0c66b}.pos-bottom{left:clamp(15px,7vw,92px);bottom:calc(var(--tileH) + 4px);transform:none;align-items:center}.pos-top{top:12px;right:clamp(46px,13vw,174px);left:auto;transform:none}.pos-left{left:clamp(12px,3vw,38px);top:45%;transform:translateY(-50%)}.pos-right{right:clamp(12px,3vw,38px);top:45%;transform:translateY(-50%)}
-.tile-back{display:block;border-radius:3px;border:1px solid #6c3b1e;background:linear-gradient(160deg,#d47d35,#8c3d12);box-shadow:inset 0 1px 0 rgba(255,236,197,.25),0 1px 3px rgba(0,0,0,.28)}.enemy-hand-count{display:flex;justify-content:center;gap:1px;margin-top:3px;min-height:12px;max-width:112px;overflow:hidden}.enemy-hand-count .mini-back{width:5px;height:9px;border-radius:1.5px;background:linear-gradient(160deg,#d47d35,#8c3d12);border:1px solid #6c3b1e;box-shadow:0 1px 2px rgba(0,0,0,.25)}.enemy-hand-count .hand-count-label{margin-left:3px;padding:2px 4px;border-radius:5px;background:rgba(13,11,10,.88);color:#f2d18b;font-size:9px;font-weight:900;line-height:11px;border:1px solid rgba(255,255,255,.08);white-space:nowrap}.enemy-meld-summary{display:none}.enemy-melds-visible{display:flex;justify-content:center;gap:3px;margin-top:3px;pointer-events:none}.enemy-meld-group{display:flex;gap:1px;padding:2px 2px 1px;border-radius:4px;background:rgba(11,9,8,.76);border:1px solid rgba(255,255,255,.10);box-shadow:0 2px 6px rgba(0,0,0,.22)}.enemy-meld-group .tile{width:clamp(12px,min(1.75vw,2.5vh),20px);height:clamp(18px,min(2.55vw,3.55vh),29px);cursor:default}.enemy-meld-group .tile .tile-char{font-size:.72em}.pos-left .enemy-hand-count,.pos-right .enemy-hand-count{max-width:94px}.pos-left .enemy-hand-count .mini-back,.pos-right .enemy-hand-count .mini-back{width:4px;height:8px}.pos-left .enemy-melds-visible,.pos-right .enemy-melds-visible{position:absolute;top:50%;flex-direction:column;align-items:center;margin-top:0}.pos-left .enemy-melds-visible{left:calc(100% + clamp(48px,8vw,112px));transform:translateY(-50%)}.pos-right .enemy-melds-visible{right:calc(100% + clamp(48px,8vw,112px));transform:translateY(-50%)}.pos-left .enemy-meld-group,.pos-right .enemy-meld-group{flex-direction:row}
+.tile-back{display:block;border-radius:3px;border:1px solid #6c3b1e;background:linear-gradient(160deg,#d47d35,#8c3d12);box-shadow:inset 0 1px 0 rgba(255,236,197,.25),0 1px 3px rgba(0,0,0,.28)}.enemy-hand-count{display:flex;justify-content:center;gap:1px;margin-top:3px;min-height:12px;max-width:112px;overflow:hidden}.enemy-hand-count .mini-back{width:5px;height:9px;border-radius:1.5px;background:linear-gradient(160deg,#d47d35,#8c3d12);border:1px solid #6c3b1e;box-shadow:0 1px 2px rgba(0,0,0,.25)}.enemy-hand-count .hand-count-label{margin-left:3px;padding:2px 4px;border-radius:5px;background:rgba(13,11,10,.88);color:#f2d18b;font-size:9px;font-weight:900;line-height:11px;border:1px solid rgba(255,255,255,.08);white-space:nowrap}.enemy-meld-summary{display:none}.enemy-melds-visible{display:flex;justify-content:center;gap:3px;margin-top:3px;pointer-events:none}.enemy-meld-group{display:flex;gap:1px;padding:2px 2px 1px;border-radius:4px;background:rgba(11,9,8,.76);border:1px solid rgba(255,255,255,.10);box-shadow:0 2px 6px rgba(0,0,0,.22)}.enemy-meld-group .tile{width:clamp(12px,min(1.75vw,2.5vh),20px);height:clamp(18px,min(2.55vw,3.55vh),29px);cursor:default}.enemy-meld-group .tile .tile-char{font-size:.72em}.pos-left .enemy-hand-count,.pos-right .enemy-hand-count{max-width:94px}.pos-left .enemy-hand-count .mini-back,.pos-right .enemy-hand-count .mini-back{width:4px;height:8px}.pos-left .enemy-melds-visible,.pos-right .enemy-melds-visible{position:static;top:auto;left:auto;right:auto;transform:none;flex-direction:row;align-items:center;margin-top:3px;max-width:112px;overflow:visible}.pos-left .enemy-meld-group,.pos-right .enemy-meld-group{flex-direction:row}
 /* Compact four-sided river around a protected center, matching a digital Mahjong table. */
 #game-board{--centerSize:clamp(86px,min(10vw,12.5vh),110px);--centerHalf:calc(var(--centerSize)/2);--riverGap:clamp(12.5px,1.65vh,16.5px);--riverRowsH:calc(var(--discH)*3 + 8px);--riverRowsH-TB:calc(var(--discH)*4 + 10px);--riverColsW:calc(var(--discW)*6 + 15px);--riverColsW-TB:calc(var(--discW)*8 + 17px);--sideGap:clamp(12px,2vw,22px)}
 .river-container{position:absolute;z-index:18;display:grid;grid-template-columns:repeat(6,var(--discW));grid-template-rows:repeat(3,var(--discH));gap:2px;justify-content:center;align-content:start;width:var(--riverColsW);height:var(--riverRowsH)}
@@ -108,15 +108,13 @@ min-width:14px;min-height:33px;padding:2px;display:flex;align-items:center;justi
 
 #action-overlay{position:absolute;left:auto;right:clamp(12px,3vw,48px);top:auto;bottom:calc(var(--tileH) + 14px);transform:none;z-index:60;display:none;flex-wrap:wrap;justify-content:flex-end;gap:6px;max-width:min(34vw,250px);padding:6px 8px;border-radius:12px;background:rgba(16,12,10,.95);border:1px solid rgba(229,179,88,.45);box-shadow:0 12px 28px rgba(0,0,0,.4);backdrop-filter:blur(10px)}.act-btn{min-width:54px;min-height:34px;padding:6px 9px;border:0;border-radius:8px;color:#fff;font-size:10px;font-weight:900}.btn-hu{background:#b74642}.btn-ron{background:#b74642}.btn-pon{background:#2c75b5}.btn-chi{background:#26945f}.btn-kan{background:#198c82}.btn-tsumo{background:#bf7a29}.btn-skip{background:#5d666b}
 .furiten-panel{display:none}.win-flash{animation:winflash .52s ease-out}.draw-flash{animation:drawflash .52s ease-out}@keyframes winflash{0%{box-shadow:0 14px 34px rgba(0,0,0,.44)}45%{box-shadow:0 0 0 8px rgba(246,211,116,.16),0 0 28px rgba(246,211,116,.38)}100%{box-shadow:0 14px 34px rgba(0,0,0,.44)}}@keyframes drawflash{45%{box-shadow:0 0 0 8px rgba(115,190,223,.12),0 0 24px rgba(115,190,223,.25)}}
-@media (orientation:portrait){#game-board{--centerSize:clamp(88px,15vw,104px);--riverGap:clamp(8px,1.5vh,13px);--focus-pan-y:-3vh}.round-hud-shell{top:8px;min-width:76px;padding:4px 6px}.round-hud-title{font-size:6px}.round-hud-sub{font-size:5px}.score-panel{width:min(82vw,285px)}.pos-bottom{left:12px;bottom:calc(var(--tileH) + 5px)}.pos-top{top:10px;right:12px}.pos-left{left:7px;top:44%}.pos-right{right:7px;top:44%}.pos-left .enemy-melds-visible{left:calc(100% + 28px)}.pos-right .enemy-melds-visible{right:calc(100% + 28px)}.melds-container{right:8px;max-width:42vw}.hand-tiles{gap:1px}.river-container{gap:2px}.score-guide-panel{width:min(66.3vw,242.25px)}.score-guide-panel .score-guide-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:repeat(8,auto);column-gap:7.65px;row-gap:2.55px}.score-guide-panel .score-guide-grid>div{grid-template-columns:27.2px minmax(0,1fr);gap:2.55px}.score-guide-panel .score-guide-grid span{font-size:5.1px}.score-guide-panel .score-guide-grid strong{font-size:4.93px}}
+@media (orientation:portrait){#game-board{--centerSize:clamp(88px,15vw,104px);--riverGap:clamp(8px,1.5vh,13px);--focus-pan-y:-8.5%}.round-hud-shell{top:8px;min-width:76px;padding:4px 6px}.round-hud-title{font-size:6px}.round-hud-sub{font-size:5px}.score-panel{width:min(82vw,285px)}.pos-bottom{left:12px;bottom:calc(var(--tileH) + 5px)}.pos-top{top:10px;right:12px}.pos-left{left:7px;top:44%}.pos-right{right:7px;top:44%}.pos-left .enemy-melds-visible,.pos-right .enemy-melds-visible{left:auto;right:auto;transform:none}.melds-container{right:8px;max-width:42vw}.hand-tiles{gap:1px}.river-container{gap:2px}.score-guide-panel{width:min(66.3vw,242.25px)}.score-guide-panel .score-guide-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:repeat(8,auto);column-gap:7.65px;row-gap:2.55px}.score-guide-panel .score-guide-grid>div{grid-template-columns:27.2px minmax(0,1fr);gap:2.55px}.score-guide-panel .score-guide-grid span{font-size:5.1px}.score-guide-panel .score-guide-grid strong{font-size:4.93px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 
 .tile-svg-img.tile-asset{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:fill;pointer-events:none;-webkit-user-drag:none;}
  .tile-asset-error{opacity:0}
 
-/* v3: reduce in-game HUD title only */
-.round-hud-title{font-size:6px;}
 
 .avatar-picker-box{width:min(92vw,620px);max-height:min(88dvh,650px);overflow:auto;border-color:rgba(225,189,111,.22);background:radial-gradient(circle at 50% 0%,rgba(197,146,54,.10),transparent 42%),linear-gradient(180deg,#241b14,#0f0c09);box-shadow:0 30px 95px rgba(0,0,0,.68),inset 0 1px 0 rgba(255,238,204,.05)}
 .avatar-grid-picker{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:15px}
@@ -380,11 +378,6 @@ min-width:14px;min-height:33px;padding:2px;display:flex;align-items:center;justi
             </div>
 
             <div class="table-plane" aria-hidden="true"></div>
-
-            <div class="round-hud-shell" aria-hidden="true">
-                <div class="round-hud-title">Majong DJ - HongKong</div>
-                <div class="round-hud-sub">HONG KONG TABLE</div>
-            </div>
 
             <div class="player-seat pos-bottom">
                 <div class="avatar-img" aria-hidden="true"></div>
@@ -1179,7 +1172,7 @@ function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKe
   currentTurn=currentDealerIdx;drawnTile=null;renderTable();processTurn();
 }
 function start4PGame(diff='Medium',multi=false){cancelAiTurn();if(!multi)stopMpGameWatchdog();
-  aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);clearInterval(actionTimer);turnTimer=null;actionTimer=null;isDiscardable=false;isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
+  aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
   if(!multi){
     mp.seat=0;mp.room=null;mp.host=true;mp.connected=false;mp.playerAvatar=selectedAvatar;
     aiSeats=new Set([1,2,3]);playerAvatars[0]=selectedAvatar;playerAvatars[1]='shiba';playerAvatars[2]='kucing';playerAvatars[3]='penguin';randomizeAiAvatars();
@@ -1360,30 +1353,7 @@ function scheduleAiTurn(seat,mode='discard'){
   },2800);
 }
 
-function autoDiscardCurrent(){
-  if(!roundActive||roundEnding)return;
-  const p=currentTurn;
-  if(aiSeats.has(p)){
-    aiDiscard(p);
-    return;
-  }
-  if(isMultiplayerMode&&mp.host&&p!==(mp.seat??0)){
-    const hand=playerHands[p]||[];
-    if(!hand.length)return;
-    const idx=selectedTileIndex>=0&&selectedTileIndex<hand.length
-      ?selectedTileIndex
-      :hand.length-1;
-    const tile=hand.splice(idx,1)[0];
-    if(!tile)return;
-    selectedTileIndex=-1;
-    drawnTile=null;
-    commitDiscard(p,tile);
-    return;
-  }
-  if(p===(mp.seat??0)){
-    discardTile(selectedTileIndex>=0?selectedTileIndex:playerHands[p].length-1);
-  }
-}
+function autoDiscardCurrent(){if(!roundActive||roundEnding)return;const p=currentTurn;if(p===(mp.seat??0)){discardTile(selectedTileIndex>=0?selectedTileIndex:playerHands[p].length-1)}else aiDiscard(p)}
 function processTurn(){
   if(!roundActive||roundEnding)return;
   clearInterval(turnTimer);selectedTileIndex=-1;
@@ -1491,16 +1461,15 @@ function executePon(p){
   selectedTileIndex=-1;
   renderTable();
 
-  // The host owns the authoritative turn timer. Only AI seats may decide
-  // a discard automatically; remote humans must receive the state and choose.
+  // Only AI seats may auto-discard.
+  // A human guest must keep control of the hand after Pon.
   if(aiSeats.has(p)){
-    scheduleAiTurn(p,'discard');
-  }else if(isMultiplayerMode&&mp.host&&p!==(mp.seat??0)){
-    isDiscardable=false;
-    startTurnTimer();
-  }else{
+    aiDiscard(p);
+  }else if(p===(mp.seat??0)){
     isDiscardable=true;
     startTurnTimer();
+  }else{
+    isDiscardable=false;
   }
 
   mpPendingCalls=[];
@@ -1536,16 +1505,15 @@ function executeChi(p,combo){
   selectedTileIndex=-1;
   renderTable();
 
-  // The host owns the authoritative turn timer. Only AI seats may decide
-  // a discard automatically; remote humans must receive the state and choose.
+  // Only AI seats may auto-discard.
+  // A human guest must choose the discard after Chi.
   if(aiSeats.has(p)){
-    scheduleAiTurn(p,'discard');
-  }else if(isMultiplayerMode&&mp.host&&p!==(mp.seat??0)){
-    isDiscardable=false;
-    startTurnTimer();
-  }else{
+    aiDiscard(p);
+  }else if(p===(mp.seat??0)){
     isDiscardable=true;
     startTurnTimer();
+  }else{
+    isDiscardable=false;
   }
 
   mpPendingCalls=[];
@@ -1622,16 +1590,15 @@ function executeSelfKan(p,opt){
   selectedTileIndex=-1;
   renderTable();
 
-  // The host owns the authoritative turn timer. Only AI seats may decide
-  // a discard automatically; remote humans must receive the state and choose.
+  // Only AI seats may auto-discard.
+  // A human guest must choose the discard after self-Kan draw.
   if(aiSeats.has(p)){
-    scheduleAiTurn(p,'discard');
-  }else if(isMultiplayerMode&&mp.host&&p!==(mp.seat??0)){
-    isDiscardable=false;
-    startTurnTimer();
-  }else{
+    aiDiscard(p);
+  }else if(p===(mp.seat??0)){
     isDiscardable=true;
     startTurnTimer();
+  }else{
+    isDiscardable=false;
   }
 
   mpBroadcastState();
@@ -1724,7 +1691,7 @@ function promptNextCall(){
     // The HOST is authoritative for every remote player's action timer.
     // Without a host-side timer, a disconnected/stalled guest could leave
     // mpPendingCalls waiting forever and freeze the entire room.
-    if(mp.host&&!actionTimer){
+    if(mp.host){
       startActionWindow(finishCallWindow,best.seat,'discard-call');
     }
 
@@ -2236,26 +2203,11 @@ function mpStateSnapshot(extra={}){return{currentRoundIndex,currentDealerIdx,cur
 function mpBroadcastState(extra={}){const state=mpStateSnapshot(extra);if(isMultiplayerMode&&mp.host)mpSaveActiveGameState(state);if(isMultiplayerMode&&mp.host&&mp.connected)mpSend('state',{state})}
 function mpApplyRemoteState(state){
   if(mp.host)return;
-  if(!state||mp.seat==null)return;
 
-  // Guest clients are views + input endpoints only. The HOST is the single
-  // source of truth for the deck, turn timer, action timer and AI decisions.
+  // A reconnected guest must remain in multiplayer mode.
   isMultiplayerMode=true;
   mp.state=state;
-
-  // Never let an old guest-side timer continue after a reconnect/state sync.
-  clearInterval(turnTimer);
-  clearInterval(actionTimer);
-  clearTimeout(aiMoveTimer);
-  turnTimer=null;
-  actionTimer=null;
-  aiMoveTimer=null;
-  isActionPhase=false;
-  actionSecondsLeft=0;
-  actionTimeoutHandler=null;
-  actionSeat=-1;
-  actionMode='';
-  pendingCallChoice=null;
+  mp.seat=mp.seat??0;
 
   playerScores=state.playerScores||playerScores;
   fullDeck=state.fullDeck||[];
@@ -2269,10 +2221,21 @@ function mpApplyRemoteState(state){
   lastDiscarderIdx=state.lastDiscarderIdx??-1;
   drawnTile=state.drawnTile||null;
   secondsLeft=state.secondsLeft??secondsLeft;
-  if(Array.isArray(state.timeBank))timeBank=state.timeBank.slice();
-  actionSecondsLeft=state.actionSecondsLeft??0;
+  if(Array.isArray(state.timeBank))timeBank=state.timeBank;
+  actionSecondsLeft=state.actionSecondsLeft??actionSecondsLeft;
   roundActive=!!state.roundActive;
   roundEnding=!!state.roundEnding;
+
+  if(state.remoteTimer&&state.remoteTimer.seat===mp.seat){
+    if(state.remoteTimer.isActionPhase){
+      setText('turn-timer-display',Math.max(0,state.remoteTimer.actionSeconds??0));
+    }else{
+      const visibleTimer=(state.remoteTimer.baseTime??0)>0
+        ?state.remoteTimer.baseTime
+        :(state.remoteTimer.timeBank??0);
+      setText('turn-timer-display',Math.max(0,visibleTimer));
+    }
+  }
 
   aiSeats=new Set(state.aiSeats||[]);
   if(Array.isArray(state.playerAvatars)&&state.playerAvatars.length===4){
@@ -2286,59 +2249,67 @@ function mpApplyRemoteState(state){
   nav('screen-game');
   if(state.roundActive||state.roundEnding)setDisplay('modal-lobby','none');
 
-  const mySeat=mp.seat;
-  const myTurn=roundActive&&!roundEnding&&currentTurn===mySeat;
-  const remoteActions=state.remoteActions;
-  const hasMyActions=
-    remoteActions?.seat===mySeat&&
-    Array.isArray(remoteActions.actions)&&
-    remoteActions.actions.length>0;
+  // Rebuild the guest's local control state from the synchronized table.
+  isDiscardable=
+    roundActive&&
+    !roundEnding&&
+    currentTurn===(mp.seat??0)&&
+    !state.remoteActions?.actions?.length;
 
-  isDiscardable=!!(myTurn&&!hasMyActions);
   renderTable();
 
-  // The HOST timer is already running. Guest only mirrors its latest value;
-  // it must never start a competing interval locally.
-  if(state.remoteTimer?.seat===mySeat){
-    if(state.remoteTimer.isActionPhase){
-      setText('turn-timer-display',Math.max(0,state.remoteTimer.actionSeconds??0));
-    }else{
-      const visibleTimer=(state.remoteTimer.baseTime??0)>0
-        ?state.remoteTimer.baseTime
-        :(state.remoteTimer.timeBank??0);
-      setText('turn-timer-display',Math.max(0,visibleTimer));
-    }
-  }else if(myTurn){
-    setText('turn-timer-display',Math.max(0,secondsLeft));
-  }
-
-  if(hasMyActions){
+  if(
+    state.remoteActions?.seat===(mp.seat??0)&&
+    Array.isArray(state.remoteActions.actions)&&
+    state.remoteActions.actions.length
+  ){
     isDiscardable=false;
-    showAvailableActions(remoteActions.actions);
-    setText('hand-status-main','Aksi tersedia');
-    setText('hand-status-sub','Pilih aksi sebelum waktu habis.');
-  }else if(myTurn){
+    showAvailableActions(state.remoteActions.actions);
+    startActionWindow(()=>{
+      hideAvailableActions();
+      mpSend('action',{action:{type:'call',action:'Skip'}});
+    },mp.seat??0,'discard-call');
+  }else if(currentTurn===(mp.seat??0)&&roundActive){
+    // Reconnect can happen during a normal turn without a fresh startGame
+    // message. Recreate the same Tsumo/Kan controls the player would have had.
+    const turnActions=[];
+    const win=checkCurrentWin(mp.seat,null,true);
+    if(win?.valid)turnActions.push('Tsumo');
+    if(getSelfKanOptions(mp.seat).length)turnActions.push('Kan');
+
     hideAvailableActions();
-    setText('hand-status-main','Giliran Anda');
-    setText('hand-status-sub','Pilih tile untuk membuang.');
+
+    if(turnActions.length){
+      showAvailableActions(turnActions);
+      startActionWindow(()=>{
+        hideAvailableActions();
+        if((timeBank[currentTurn]||0)>0){
+          secondsLeft=0;
+          startBankTimerOnly(currentTurn);
+        }else{
+          isDiscardable=true;
+          autoDiscardCurrent();
+        }
+      },currentTurn,'turn-action');
+    }else{
+      isDiscardable=true;
+      startTurnTimer();
+      setText('hand-status-main','Giliran Anda');
+      setText('hand-status-sub','Pilih tile untuk membuang.');
+    }
   }else{
     hideAvailableActions();
-    setText('hand-status-main',aiSeats.has(currentTurn)?`${playerName(currentTurn)} berpikir...`:'Giliran lawan');
-    setText('hand-status-sub',aiSeats.has(currentTurn)?'AI memilih langkah...':'Menunggu giliran Anda.');
   }
 
   if(state.phase==='result'&&state.result){
     renderResultModal(state.result.title,state.result.desc);
   }
 }
-function roomCanAct(seat){
-  return Number.isInteger(seat)&&seat>=0&&seat<4;
-}
+function roomCanAct(seat){return!!mp.room?.players?.[seat]}
 function mpHandlePlayerAction(seat,action){
   if(!mp.host||!roundActive||!roomCanAct(seat))return;
 
   if(action.type==='discard'){
-    if(aiSeats.has(seat)||currentTurn!==seat)return;
     const i=playerHands[seat].findIndex(
       t=>t.uniqueId===action.uniqueId
     );
