@@ -5,7 +5,7 @@
     <meta name="app-version" content="25.0-mahyong-dj-actionfix">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
-    <meta name="description" content="Majong DJ - HongKong Mahjong dengan AI dan Cloudflare multiplayer.">
+    <meta name="description" content="Majong DJ - HongKong Mahjong Cloudflare multiplayer.">
     <title>Majong DJ - HongKong</title>
         <link rel="apple-touch-icon" sizes="180x180" href="IMG_6682.PNG">
     <link rel="icon" type="image/PNG" sizes="32x32" href="IMG_6682.PNG">
@@ -729,7 +729,6 @@ const TURN_BASE_SECONDS=10,TIME_BANK_MAX=20,ACTION_WINDOW_SECONDS=5;
 let roundActive=false,roundEnding=false,isDiscardable=false,isActionPhase=false,selectedTileIndex=-1,aiMoveTimer=null,turnTimer=null,actionTimer=null,secondsLeft=10,timeBank=[20,20,20,20],actionSecondsLeft=0,pendingCallChoice=null,actionTimeoutHandler=null,actionSeat=-1,actionMode='';
 let gameTurnEpoch=0;
 let actionEpoch=0;
-let actionBusy=false;
 let stateHasRemoteCallForLocalGuest=false;
 let aiDecisionToken=0;
 let autoSortSetting=true,activeScreenId='screen-main',previousScreenId='screen-main',isMultiplayerMode=false;try{autoSortSetting=localStorage.getItem('hk_auto_sort')!=='0'}catch{}
@@ -1254,8 +1253,22 @@ function updateTimeBankUI(p=currentTurn){
   const el=byId('player-time-bank');
   if(el)el.textContent=`+${Math.max(0,timeBank[p]??0)}s`;
 }
+function getRemoteActionStateForTimer(){
+  if(!isActionPhase||actionMode!=='discard-call'||actionSeat<0)return null;
+  const q=mpPendingCalls.find(x=>x.seat===actionSeat);
+  if(!q)return null;
+  const actions=(q.actions||[]).map(x=>{
+    if(x.type==='Chi')return {type:'Chi',combos:Array.isArray(x.combos)?x.combos.map(c=>[...c]):[]};
+    return x.type;
+  });
+  actions.push('Skip');
+  return {seat:actionSeat,actions,actionWindow:Math.max(0,actionSecondsLeft)};
+}
 function broadcastTimerState(extra={}){
-  if(isMultiplayerMode&&mp.host&&mp.connected)mpBroadcastState({remoteTimer:{seat:currentTurn,baseTime:secondsLeft,timeBank:timeBank[currentTurn]??0,actionSeconds:actionSecondsLeft,isActionPhase,...extra}});
+  if(isMultiplayerMode&&mp.host&&mp.connected){
+    const remoteActions=extra.remoteActions??getRemoteActionStateForTimer()??[];
+    mpBroadcastState({remoteTimer:{seat:currentTurn,baseTime:secondsLeft,timeBank:timeBank[currentTurn]??0,actionSeconds:actionSecondsLeft,isActionPhase,...extra},remoteActions});
+  }
 }
 function clearGameTimers(){
   actionEpoch++;
@@ -1328,20 +1341,29 @@ function startActionWindow(timeoutHandler,seat=currentTurn,mode='call'){
           clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
           const cb=actionTimeoutHandler; actionTimeoutHandler=null;
           actionSeat=-1; actionMode='';
-          if(myActionEpoch===actionEpoch)cb?.();
+          if(myActionEpoch===actionEpoch){
+            if(isMultiplayerMode&&mp.host)mpBroadcastState({remoteActions:[]});
+            cb?.();
+          }
         }
         return;
       }
       clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
       const cb=actionTimeoutHandler; actionTimeoutHandler=null;
       actionSeat=-1; actionMode='';
-      if(myActionEpoch===actionEpoch)cb?.();
+      if(myActionEpoch===actionEpoch){
+        if(isMultiplayerMode&&mp.host)mpBroadcastState({remoteActions:[]});
+        cb?.();
+      }
     }catch(err){
       console.error('Action timer recovery:',err);
       clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
       const cb=actionTimeoutHandler; actionTimeoutHandler=null;
       actionSeat=-1; actionMode='';
-      if(myActionEpoch===actionEpoch)cb?.();
+      if(myActionEpoch===actionEpoch){
+        if(isMultiplayerMode&&mp.host)mpBroadcastState({remoteActions:[]});
+        cb?.();
+      }
     }
   },1000);
 }
@@ -1522,13 +1544,13 @@ function removeLastDiscard(){const p=lastDiscarderIdx;if(p<0)return;playerRivers
 function takeTilesById(hand,id,n){const out=[];for(let i=hand.length-1;i>=0&&out.length<n;i--)if(hand[i].id===id)out.push(hand.splice(i,1)[0]);return out}
 function executePon(p){
   cancelAiTurn();
-  stopCallWindow();
-  mpPendingCalls=mpPendingCalls.filter(x=>x.seat!==p);
-  pendingCallChoice=null;
   playSfx('pon');
+  stopCallWindow();
+  clearInterval(turnTimer); turnTimer=null;
 
   const tile=lastDiscardedTile;
   if(!tile)return;
+
   const a=takeTilesById(playerHands[p],tile.id,2);
   if(a.length<2)return;
 
@@ -1538,27 +1560,28 @@ function executePon(p){
   currentTurn=p;
   drawnTile=null;
   selectedTileIndex=-1;
-  gameTurnEpoch++;
   renderTable();
 
+  // Only AI seats may auto-discard.
+  // A human guest must keep control of the hand after Pon.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)){
-    isDiscardable=true;
+  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+    isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
     isDiscardable=false;
   }
 
+  mpPendingCalls=[];
+  pendingCallChoice=null;
   mpBroadcastState();
 }
-
 function executeChi(p,combo){
   cancelAiTurn();
-  stopCallWindow();
-  mpPendingCalls=mpPendingCalls.filter(x=>x.seat!==p);
-  pendingCallChoice=null;
   playSfx('chi');
+  stopCallWindow();
+  clearInterval(turnTimer); turnTimer=null;
 
   const tile=lastDiscardedTile;
   if(!tile||!Array.isArray(combo)||combo.length!==3)return;
@@ -1566,7 +1589,11 @@ function executeChi(p,combo){
   const a=[];
   for(const n of combo){
     if(n===tile.num)continue;
-    const idx=playerHands[p].findIndex(t=>t.type===tile.type&&t.num===n);
+
+    const idx=playerHands[p].findIndex(
+      t=>t.type===tile.type&&t.num===n
+    );
+
     if(idx<0)return;
     a.push(playerHands[p].splice(idx,1)[0]);
   }
@@ -1578,63 +1605,68 @@ function executeChi(p,combo){
   currentTurn=p;
   drawnTile=null;
   selectedTileIndex=-1;
-  gameTurnEpoch++;
   renderTable();
 
+  // Only AI seats may auto-discard.
+  // A human guest must choose the discard after Chi.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)){
-    isDiscardable=true;
+  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+    isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
     isDiscardable=false;
   }
 
+  mpPendingCalls=[];
+  pendingCallChoice=null;
   mpBroadcastState();
 }
-
 function executeKan(p){
   cancelAiTurn();
-  stopCallWindow();
-  mpPendingCalls=mpPendingCalls.filter(x=>x.seat!==p);
-  pendingCallChoice=null;
   playSfx('kan');
+  stopCallWindow();
+  clearInterval(turnTimer); turnTimer=null;
 
   const tile=lastDiscardedTile;
   if(!tile)return;
+
   const a=takeTilesById(playerHands[p],tile.id,3);
   if(a.length<3)return;
 
   a.push(tile);
   playerMelds[p].push(a);
   removeLastDiscard();
+
   const t=drawTile();
-  if(!t){endRound('DRAW','Tidak ada tile.');return;}
+  if(!t){
+    endRound('DRAW','Tidak ada tile.');
+    return;
+  }
 
   playerHands[p].push(t);
   drawnTile=t;
   currentTurn=p;
   selectedTileIndex=-1;
-  gameTurnEpoch++;
   renderTable();
 
+  // Only AI seats may auto-discard.
+  // A human guest must choose the discard after Kan draw.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)){
-    isDiscardable=true;
+  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+    isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
     isDiscardable=false;
   }
 
-  mpBroadcastState();
-}
-
-function executeSelfKan(p,opt){
-  cancelAiTurn();
-  stopCallWindow();
   mpPendingCalls=[];
   pendingCallChoice=null;
+  mpBroadcastState();
+}
+function executeSelfKan(p,opt){
+  cancelAiTurn();
   playSfx('kan');
   if(!opt)return false;
 
@@ -1651,30 +1683,34 @@ function executeSelfKan(p,opt){
   }else return false;
 
   const t=drawTile();
-  if(!t){endRound('DRAW','Tidak ada tile.');return true;}
+  if(!t){
+    endRound('DRAW','Tidak ada tile.');
+    return true;
+  }
 
   playerHands[p].push(t);
   drawnTile=t;
-  currentTurn=p;
   sortHand(p);
   selectedTileIndex=-1;
-  gameTurnEpoch++;
   renderTable();
 
+  // Only AI seats may auto-discard.
+  // A human guest must choose the discard after self-Kan draw.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)){
-    isDiscardable=true;
+  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+    isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
     isDiscardable=false;
   }
 
+  mpPendingCalls=[];
+  pendingCallChoice=null;
   mpBroadcastState();
   return true;
 }
-
-function chooseAiCall(actions){if(!actions.length)return null;const ron=actions.find(a=>a.type==='Ron');if(ron)return ron;if(actions.some(a=>a.type==='Kan')&&Math.random()<.45)return actions.find(a=>a.type==='Kan');if(actions.some(a=>a.type==='Pon')&&Math.random()<.35)return actions.find(a=>a.type==='Pon');const chi=actions.find(a=>a.type==='Chi');if(chi&&Math.random()<.22){const combos=Array.isArray(chi.combos)?chi.combos:[];if(combos.length)return {type:'Chi',combo:[...combos[Math.floor(Math.random()*combos.length)]]};}return null}
+function chooseAiCall(actions){if(!actions.length)return null;const ron=actions.find(a=>a.type==='Ron');if(ron)return ron;if(actions.some(a=>a.type==='Kan')&&Math.random()<.45)return actions.find(a=>a.type==='Kan');if(actions.some(a=>a.type==='Pon')&&Math.random()<.35)return actions.find(a=>a.type==='Pon');if(actions.some(a=>a.type==='Chi')&&Math.random()<.22)return actions.find(a=>a.type==='Chi');return null}
 const CALL_PRIORITY={Ron:4,Kan:3,Pon:2,Chi:1};
 function callPriority(action){return CALL_PRIORITY[action?.type]||0}
 function highestPendingCall(){
@@ -1771,6 +1807,9 @@ function promptNextCall(){
     // Without a host-side timer, a disconnected/stalled guest could leave
     // mpPendingCalls waiting forever and freeze the entire room.
     if(mp.host){
+      // The host owns the 5-second action window. Every timer tick keeps the
+      // same remoteActions payload so the guest buttons stay visible until
+      // the guest chooses an action or the window really expires.
       startActionWindow(finishCallWindow,best.seat,'discard-call');
     }
 
@@ -1820,17 +1859,9 @@ function hideAvailableActions(){
   const o=byId('action-overlay');
   if(o){o.innerHTML='';o.style.display='none';o.hidden=true;}
   isActionPhase=false;
+  showCurrentWaitAdvisor();
 }
-
 function showAvailableActions(actions){
-  const o=byId('action-overlay');
-  if(!o||!Array.isArray(actions)||!actions.length)return;
-
-  o.innerHTML='';
-  o.hidden=false;
-  o.style.display='flex';
-  isActionPhase=true;
-
   if((actions||[]).some(a=>(typeof a==='string'?a:a?.type)==='Ron')){
     smartAssistantShow(
       'RON TERSEDIA',
@@ -1839,24 +1870,46 @@ function showAvailableActions(actions){
     );
   }
 
+  const o=byId('action-overlay');
+  hideAvailableActions();
+
+  if(!o||!Array.isArray(actions)||!actions.length)return;
+
+  isActionPhase=true;
+  o.hidden=false;
+  o.style.display='flex';
+
   actions.forEach(a=>{
     const type=typeof a==='string'?a:a?.type;
+
     if(type==='Chi'&&a?.combos?.length){
       if(a.combos.length===1){
         const b=document.createElement('button');
-        b.type='button'; b.className='act-btn btn-chi'; b.textContent='Chi';
-        b.onclick=()=>triggerAction({type:'Chi',combo:[...a.combos[0]]});
-        o.appendChild(b); return;
+        b.type='button';
+        b.className='act-btn btn-chi';
+        b.textContent='Chi';
+        b.onclick=()=>triggerAction({
+          type:'Chi',
+          combo:a.combos[0]
+        });
+        o.appendChild(b);
+        return;
       }
+
       a.combos.forEach(combo=>{
         const b=document.createElement('button');
-        b.type='button'; b.className='act-btn btn-chi';
+        b.type='button';
+        b.className='act-btn btn-chi';
         b.textContent=`Chi ${combo.join('-')}`;
-        b.onclick=()=>triggerAction({type:'Chi',combo:[...combo]});
+        b.onclick=()=>triggerAction({
+          type:'Chi',
+          combo:[...combo]
+        });
         o.appendChild(b);
       });
       return;
     }
+
     const b=document.createElement('button');
     b.type='button';
     b.className=`act-btn btn-${String(type).toLowerCase()}`;
@@ -1865,103 +1918,92 @@ function showAvailableActions(actions){
     o.appendChild(b);
   });
 }
-
 function triggerAction(a){
-  if(actionBusy)return;
   const type=(a&&typeof a==='object')?a.type:a;
 
-  // The visible action belongs to the current action window. Remove it
-  // immediately so a second click cannot race the resolution.
-  actionBusy=true;
-  hideAvailableActions();
-  stopCallWindow();
-
-  // Guests send the selected action to the authoritative host. The guest
-  // never mutates the shared game state locally.
+  // Guests send actions to the authoritative host. Do this before touching
+  // local call state so a remote action can never be swallowed by a stale q.
   if(isMultiplayerMode&&!mp.host){
     if(type==='Chi'&&a&&typeof a==='object'&&Array.isArray(a.combo)){
       mpSend('action',{action:{type:'call',action:'Chi',combo:[...a.combo]}});
     }else{
       mpSend('action',{action:{type:'call',action:type}});
     }
-    actionBusy=false;
+    hideAvailableActions();
     return;
   }
 
-  try{
-    if(type==='Tsumo'){
-      const p=mp.seat??0;
-      if(currentTurn===p){
-        const e=checkCurrentWin(p,null,true);
-        if(e?.valid)resolveWin(p,e,true);
-        else startTurnTimer();
-      }
-      return;
-    }
-
-    if(type==='Kan'&&!(a&&typeof a==='object'&&a.fromDiscard)){
-      const p=mp.seat??0;
-      if(currentTurn===p){
-        const opt=getSelfKanOptions(p)[0];
-        if(opt)executeSelfKan(p,opt);
-      }
-      return;
-    }
-
-    if(type==='Chi'&&a&&typeof a==='object'){
-      const combo=Array.isArray(a.combo)?a.combo:null;
-      if(!combo||combo.length!==3)return;
-      const p=mp.seat??0;
-      const q=mpPendingCalls.find(x=>x.seat===p);
-      if(!q)return;
-      const act=q.actions.find(x=>x.type==='Chi');
-      if(!act||!Array.isArray(act.combos))return;
-      const validCombo=act.combos.some(c=>Array.isArray(c)&&c.length===combo.length&&c.every((n,i)=>n===combo[i]));
-      if(!validCombo)return;
-      const chosen={type:'Chi',combo:[...combo]};
-      const best=highestPendingCall();
-      if(!best||callPriority(chosen)>=callPriority(best.action)){
-        resolveCallChoice(p,chosen);
-      }else{
-        pendingCallChoice={seat:p,action:chosen};
-        showAvailableActions(['Skip']);
-        if(mp.host)startActionWindow(finishCallWindow,best.seat,'discard-call');
-      }
-      return;
-    }
-
-    if(type==='Skip'){
-      const p=mp.seat??0;
-      const q=mpPendingCalls.find(x=>x.seat===p);
-      if(q)mpPendingCalls=mpPendingCalls.filter(x=>x!==q);
-      pendingCallChoice=null;
-      promptNextCall();
-      return;
-    }
-
+  // Self actions are turn actions, not discard-claim actions. Resolve them
+  // first so a stale mpPendingCalls entry can never block Tsumo/Kan.
+  if(type==='Tsumo'){
+    hideAvailableActions();
+    stopCallWindow();
     const p=mp.seat??0;
-    const q=mpPendingCalls.find(x=>x.seat===p);
-    if(q){
-      const act=q.actions.find(x=>x.type===type);
-      if(!act)return;
-      const best=highestPendingCall();
-      if(!best||callPriority(act)>=callPriority(best.action)){
-        resolveCallChoice(p,act);
-      }else{
-        pendingCallChoice={seat:p,action:act};
-        showAvailableActions(['Skip']);
-        if(mp.host)startActionWindow(finishCallWindow,best.seat,'discard-call');
-      }
+    if(currentTurn===p){
+      const e=checkCurrentWin(p,null,true);
+      if(e?.valid)resolveWin(p,e,true);
+      else startTurnTimer();
     }
-  }finally{
-    actionBusy=false;
+    return;
+  }
+
+  if(type==='Kan'&&!((a&&typeof a==='object'&&a.fromDiscard)===true)){
+    const p=mp.seat??0;
+    if(currentTurn===p&&getSelfKanOptions(p).length){
+      hideAvailableActions();
+      stopCallWindow();
+      executeSelfKan(p,getSelfKanOptions(p)[0]);
+      return;
+    }
+  }
+
+  // Chi with an explicitly selected combination.
+  if(type==='Chi'&&a&&typeof a==='object'){
+    const combo=Array.isArray(a.combo)?a.combo:null;
+    if(!combo||combo.length!==3)return;
+    const q=mpPendingCalls.find(x=>x.seat===(mp.seat??0));
+    if(!q)return;
+    const act=q.actions.find(x=>x.type==='Chi');
+    if(!act||!Array.isArray(act.combos))return;
+    const validCombo=act.combos.some(c=>Array.isArray(c)&&c.length===combo.length&&c.every((n,i)=>n===combo[i]));
+    if(!validCombo)return;
+    const chosen={type:'Chi',combo:[...combo]};
+    pendingCallChoice={seat:mp.seat??0,action:chosen};
+    const best=highestPendingCall();
+    if(!best||callPriority(chosen)>=callPriority(best.action)){
+      resolveCallChoice(mp.seat??0,chosen);
+    }else{
+      showAvailableActions(['Skip']);
+      setText('hand-status-sub',`Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`);
+    }
+    return;
+  }
+
+  if(type==='Skip'){
+    const q=mpPendingCalls.find(x=>x.seat===(mp.seat??0));
+    if(q)mpPendingCalls=mpPendingCalls.filter(x=>x!==q);
+    pendingCallChoice=null;
+    stopCallWindow();
+    promptNextCall();
+    return;
+  }
+
+  const q=mpPendingCalls.find(x=>x.seat===(mp.seat??0));
+  if(q){
+    const act=q.actions.find(x=>x.type===type);
+    if(!act)return;
+    pendingCallChoice={seat:mp.seat??0,action:act};
+    const best=highestPendingCall();
+    if(!best||callPriority(act)>=callPriority(best.action)){
+      resolveCallChoice(mp.seat??0,act);
+    }else{
+      showAvailableActions(['Skip']);
+      setText('hand-status-sub',`Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`);
+    }
   }
 }
-
 function nextTurn(){
   if(!roundActive||roundEnding)return;
-  actionBusy=false;
-  hideAvailableActions();
   clearGameTimers(); cancelAiTurn(); pendingCallChoice=null; mpPendingCalls=[];
   selectedTileIndex=-1;
   currentTurn=(currentTurn+1)%4;
