@@ -1674,7 +1674,7 @@ function executeSelfKan(p,opt){
   return true;
 }
 
-function chooseAiCall(actions){if(!actions.length)return null;const ron=actions.find(a=>a.type==='Ron');if(ron)return ron;if(actions.some(a=>a.type==='Kan')&&Math.random()<.45)return actions.find(a=>a.type==='Kan');if(actions.some(a=>a.type==='Pon')&&Math.random()<.35)return actions.find(a=>a.type==='Pon');if(actions.some(a=>a.type==='Chi')&&Math.random()<.22)return actions.find(a=>a.type==='Chi');return null}
+function chooseAiCall(actions){if(!actions.length)return null;const ron=actions.find(a=>a.type==='Ron');if(ron)return ron;if(actions.some(a=>a.type==='Kan')&&Math.random()<.45)return actions.find(a=>a.type==='Kan');if(actions.some(a=>a.type==='Pon')&&Math.random()<.35)return actions.find(a=>a.type==='Pon');const chi=actions.find(a=>a.type==='Chi');if(chi&&Math.random()<.22){const combos=Array.isArray(chi.combos)?chi.combos:[];if(combos.length)return {type:'Chi',combo:[...combos[Math.floor(Math.random()*combos.length)]]};}return null}
 const CALL_PRIORITY={Ron:4,Kan:3,Pon:2,Chi:1};
 function callPriority(action){return CALL_PRIORITY[action?.type]||0}
 function highestPendingCall(){
