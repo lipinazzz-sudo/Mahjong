@@ -1700,6 +1700,10 @@ function highestPendingCall(){
 }
 function stopCallWindow(){
   clearInterval(actionTimer);actionTimer=null;isActionPhase=false;actionSecondsLeft=0;actionTimeoutHandler=null;actionSeat=-1;actionMode='';
+  // The host must clear the cached guest action immediately when the action
+  // has been resolved. Otherwise a later state/timer broadcast can recreate
+  // buttons for an action that has already been taken.
+  if(mp.host)activeRemoteActions=null;
 }
 function resolveCallChoice(seat,action){
   const q=mpPendingCalls.find(x=>x.seat===seat);
