@@ -729,6 +729,7 @@ const TURN_BASE_SECONDS=10,TIME_BANK_MAX=20,ACTION_WINDOW_SECONDS=5;
 let roundActive=false,roundEnding=false,isDiscardable=false,isActionPhase=false,selectedTileIndex=-1,aiMoveTimer=null,turnTimer=null,actionTimer=null,secondsLeft=10,timeBank=[20,20,20,20],actionSecondsLeft=0,pendingCallChoice=null,actionTimeoutHandler=null,actionSeat=-1,actionMode='';
 let gameTurnEpoch=0;
 let stateHasRemoteCallForLocalGuest=false;
+let activeRemoteActions=null;
 let aiDecisionToken=0;
 let autoSortSetting=true,activeScreenId='screen-main',previousScreenId='screen-main',isMultiplayerMode=false;try{autoSortSetting=localStorage.getItem('hk_auto_sort')!=='0'}catch{}
 const AVATAR_OPTIONS=[
@@ -1198,7 +1199,7 @@ function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKe
   for(let p=0;p<4;p++)sortHand(p);
   currentTurn=currentDealerIdx;drawnTile=null;renderTable();processTurn();
 }
-function start4PGame(diff='Medium',multi=false){cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
+function start4PGame(diff='Medium',multi=false){activeRemoteActions=null;cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
   aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
   if(!multi){
     mp.seat=0;mp.room=null;mp.host=true;mp.connected=false;mp.playerAvatar=selectedAvatar;
@@ -1386,6 +1387,7 @@ function scheduleAiTurn(seat,mode='discard'){
       const pick=chooseAiCall(live.actions);
       if(pick){resolveCallChoice(seat,pick);return}
       mpPendingCalls=mpPendingCalls.filter(x=>x!==live);
+      mpBroadcastState({remoteActions:[]});
       promptNextCall();
       return;
     }
@@ -1673,7 +1675,18 @@ function executeSelfKan(p,opt){
   mpBroadcastState();
   return true;
 }
-function chooseAiCall(actions){if(!actions.length)return null;const ron=actions.find(a=>a.type==='Ron');if(ron)return ron;if(actions.some(a=>a.type==='Kan')&&Math.random()<.45)return actions.find(a=>a.type==='Kan');if(actions.some(a=>a.type==='Pon')&&Math.random()<.35)return actions.find(a=>a.type==='Pon');if(actions.some(a=>a.type==='Chi')&&Math.random()<.22)return actions.find(a=>a.type==='Chi');return null}
+function chooseAiCall(actions){
+  if(!Array.isArray(actions)||!actions.length)return null;
+  const ron=actions.find(a=>a?.type==='Ron');
+  if(ron)return ron;
+  const kan=actions.find(a=>a?.type==='Kan');
+  if(kan)return kan;
+  const pon=actions.find(a=>a?.type==='Pon');
+  if(pon)return pon;
+  const chi=actions.find(a=>a?.type==='Chi'&&Array.isArray(a.combos)&&a.combos.length);
+  if(chi)return {type:'Chi',combo:[...chi.combos[0]]};
+  return null;
+}
 const CALL_PRIORITY={Ron:4,Kan:3,Pon:2,Chi:1};
 function callPriority(action){return CALL_PRIORITY[action?.type]||0}
 function highestPendingCall(){
@@ -1787,9 +1800,17 @@ function promptNextCall(){
   }
 
   if(aiSeats.has(best.seat)){
+    // AI calls are automatic: no 5-second human action window and no time-bank use.
     stopCallWindow();
-    if(mp.host)mpBroadcastState({remoteActions:[]});
-    scheduleAiTurn(best.seat,'call');
+    const pick=chooseAiCall(q.actions);
+    if(pick){
+      resolveCallChoice(best.seat,pick);
+      return;
+    }
+    // Never leave the room waiting on a stale/invalid AI call.
+    mpPendingCalls=mpPendingCalls.filter(x=>x!==q);
+    mpBroadcastState({remoteActions:[]});
+    promptNextCall();
     return;
   }
 
@@ -1993,6 +2014,7 @@ function triggerAction(a){
 }
 function nextTurn(){
   if(!roundActive||roundEnding)return;
+  activeRemoteActions=null;
   clearGameTimers(); cancelAiTurn(); pendingCallChoice=null; mpPendingCalls=[];
   selectedTileIndex=-1;
   currentTurn=(currentTurn+1)%4;
@@ -2275,61 +2297,7 @@ function stopMpGameWatchdog(){
   clearInterval(mpGameWatchdogTimer);
   mpGameWatchdogTimer=null;
 }
-function getActiveRemoteActions(){
-  const best=highestPendingCall();
-  if(!best||aiSeats.has(best.seat))return null;
-  const q=mpPendingCalls.find(x=>x.seat===best.seat);
-  if(!q)return null;
-
-  if(pendingCallChoice&&pendingCallChoice.seat===best.seat){
-    return {
-      seat:best.seat,
-      actions:['Skip'],
-      actionWindow:ACTION_WINDOW_SECONDS
-    };
-  }
-
-  const actions=q.actions.map(x=>{
-    if(x.type==='Chi'){
-      return {
-        type:'Chi',
-        combos:Array.isArray(x.combos)?x.combos.map(c=>[...c]):[]
-      };
-    }
-    return x.type;
-  });
-
-  actions.push('Skip');
-
-  if(best.seat===(mp.seat??0))return {
-    seat:best.seat,
-    actions,
-    actionWindow:ACTION_WINDOW_SECONDS
-  };
-
-  if(mp.host){
-    const roomPlayer=mp.room?.players?.[best.seat];
-    if(roomPlayer)return {
-      seat:best.seat,
-      actions,
-      actionWindow:ACTION_WINDOW_SECONDS
-    };
-  }
-
-  return null;
-}
-function mpStateSnapshot(extra={}){
-  const remoteActions=getActiveRemoteActions();
-  return {
-    currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,playerHands,playerRivers,
-    playerMelds,playerScores,lastDiscardedTile,lastDiscarderIdx,drawnTile,
-    secondsLeft,timeBank,actionSecondsLeft,isActionPhase,isDiscardable,
-    pendingCalls:mpPendingCalls,roundActive,roundEnding,roomPlayers:mp.room?.players||[],
-    aiSeats:[...aiSeats],playerAvatars:[...playerAvatars],
-    ...(remoteActions?{remoteActions}:{}),
-    ...extra
-  };
-}
+function mpStateSnapshot(extra={}){const hasRemote=Object.prototype.hasOwnProperty.call(extra,'remoteActions');if(hasRemote)activeRemoteActions=extra.remoteActions;return{currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,playerHands,playerRivers,playerMelds,playerScores,lastDiscardedTile,lastDiscarderIdx,drawnTile,secondsLeft,timeBank,actionSecondsLeft,isActionPhase,isDiscardable,pendingCalls:mpPendingCalls,roundActive,roundEnding,roomPlayers:mp.room?.players||[],aiSeats:[...aiSeats],playerAvatars:[...playerAvatars],remoteActions:activeRemoteActions,...extra}}
 function mpBroadcastState(extra={}){const state=mpStateSnapshot(extra);if(isMultiplayerMode&&mp.host)mpSaveActiveGameState(state);if(isMultiplayerMode&&mp.host&&mp.connected)mpSend('state',{state})}
 function mpApplyRemoteState(state){
   if(mp.host)return;
