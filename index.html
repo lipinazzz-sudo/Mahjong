@@ -1863,10 +1863,10 @@ function promptNextCall(){
       showAvailableActions([...q.actions,{type:'Skip'}]);
     }
 
-    // The HOST is authoritative for every remote player's action timer.
-    // Without a host-side timer, a disconnected/stalled guest could leave
-    // mpPendingCalls waiting forever and freeze the entire room.
-    if(mp.host){
+    // In single-player the local human also needs the same action-window
+    // timeout. Multiplayer hosts are authoritative for remote players, while
+    // the solo game must run its own timer or the call window can wait forever.
+    if(!isMultiplayerMode||mp.host){
       startActionWindow(finishCallWindow,best.seat,'discard-call');
     }
 
