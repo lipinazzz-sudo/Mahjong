@@ -726,9 +726,8 @@ let fullDeck=[],playerHands=[[],[],[],[]],playerRivers=[[],[],[],[]],playerMelds
 let playerScores=[15000,15000,15000,15000],roundStartScores=[15000,15000,15000,15000];
 let currentRoundIndex=0,currentDealerIdx=1,currentTurn=0,lastDiscardedTile=null,lastDiscarderIdx=-1,drawnTile=null;
 const TURN_BASE_SECONDS=10,TIME_BANK_MAX=20,ACTION_WINDOW_SECONDS=5;
-let roundActive=false,roundEnding=false,isDiscardable=false,isActionPhase=false,selectedTileIndex=-1,aiMoveTimer=null,turnTimer=null,actionTimer=null,secondsLeft=10,timeBank=[20,20,20,20],actionSecondsLeft=0,actionBankActive=false,pendingCallChoice=null,actionTimeoutHandler=null,actionSeat=-1,actionMode='';
+let roundActive=false,roundEnding=false,isDiscardable=false,isActionPhase=false,selectedTileIndex=-1,aiMoveTimer=null,turnTimer=null,actionTimer=null,secondsLeft=10,timeBank=[20,20,20,20],actionSecondsLeft=0,pendingCallChoice=null,actionTimeoutHandler=null,actionSeat=-1,actionMode='';
 let gameTurnEpoch=0;
-let actionEpoch=0;
 let stateHasRemoteCallForLocalGuest=false;
 let aiDecisionToken=0;
 let autoSortSetting=true,activeScreenId='screen-main',previousScreenId='screen-main',isMultiplayerMode=false;try{autoSortSetting=localStorage.getItem('hk_auto_sort')!=='0'}catch{}
@@ -746,7 +745,7 @@ let avatarPickerMode='';
 let playerAvatars=['panda','shiba','kucing','penguin'];
 
 let mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,playerName:'Player',token:null,playerAvatar:selectedAvatar};
-let mpClientId=null,mpReconnectTimer=null,mpAutoStartTimer=null,mpPendingCalls=[];let mpReconnectAttempts=0,mpReconnectDeadline=0,mpLastRoomView=null;let mpGameWatchdogTimer=null;let lastHostServerSeq=0;let mpStateSendSeq=0;let mpGameStateSeq=0;let mpLastRemoteGameSeq=0;let mpHasRemoteState=false;let mpSequenceRoomCode='';let mpConnectionGeneration=0;let mpLastPongAt=0;let mpStateFlushTimer=null;let mpPendingStatePayload=null;let mpLastGameStateSaveAt=0;let mpActionSerial=0;const mpHandledActionIds=new Set();const MP_WS_BUFFER_LIMIT=512*1024;const MP_GAME_SAVE_INTERVAL=3000;const MP_WORKER_URL='https://mahjong-room.mahjongjong.workers.dev',MP_ROOM_PARAM='room',MP_SESSION_KEY='mahjongHKRoomV1',MP_GAME_STATE_KEY='mahjongHKActiveGameV1';
+let mpClientId=null,mpReconnectTimer=null,mpAutoStartTimer=null,mpPendingCalls=[];let mpReconnectAttempts=0,mpReconnectDeadline=0,mpLastRoomView=null;let mpGameWatchdogTimer=null;let lastHostServerSeq=0;const MP_WORKER_URL='https://mahjong-room.mahjongjong.workers.dev',MP_ROOM_PARAM='room',MP_SESSION_KEY='mahjongHKRoomV1',MP_GAME_STATE_KEY='mahjongHKActiveGameV1';
 let aiSeats=new Set();
 const HUMAN_NAMES=['Player','Player 2','Player 3','Player 4'];
 
@@ -1199,7 +1198,7 @@ function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKe
   for(let p=0;p<4;p++)sortHand(p);
   currentTurn=currentDealerIdx;drawnTile=null;renderTable();processTurn();
 }
-function start4PGame(diff='Medium',multi=false){cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;mpStateSendSeq=0;}
+function start4PGame(diff='Medium',multi=false){cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
   aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
   if(!multi){
     mp.seat=0;mp.room=null;mp.host=true;mp.connected=false;mp.playerAvatar=selectedAvatar;
@@ -1253,35 +1252,10 @@ function updateTimeBankUI(p=currentTurn){
   const el=byId('player-time-bank');
   if(el)el.textContent=`+${Math.max(0,timeBank[p]??0)}s`;
 }
-function getActiveRemoteActions(){
-  if(!mp.host||!isMultiplayerMode||!isActionPhase||actionSeat<0)return [];
-  if(actionMode==='discard-call'){
-    const q=mpPendingCalls.find(x=>x.seat===actionSeat);
-    if(!q)return [];
-    const out=q.actions.map(x=>x?.type==='Chi'?{type:'Chi',combos:Array.isArray(x.combos)?x.combos.map(c=>[...c]):[]}:x?.type||x);
-    out.push('Skip');
-    return {seat:actionSeat,actions:out,actionWindow:ACTION_WINDOW_SECONDS};
-  }
-  if(actionMode==='turn-action'){
-    const acts=[];
-    const win=checkCurrentWin(actionSeat,null,true);
-    if(win?.valid)acts.push('Tsumo');
-    if(getSelfKanOptions(actionSeat).length)acts.push('Kan');
-    if(acts.length)return {seat:actionSeat,actions:acts,actionWindow:ACTION_WINDOW_SECONDS};
-  }
-  return [];
-}
-function broadcastTimerState(extra={},options={}){
-  if(isMultiplayerMode&&mp.host&&mp.connected){
-    const remoteActions=getActiveRemoteActions();
-    mpBroadcastState({
-      remoteTimer:{seat:currentTurn,baseTime:secondsLeft,timeBank:timeBank[currentTurn]??0,actionSeconds:actionSecondsLeft,isActionPhase,...extra},
-      ...(remoteActions&&remoteActions.seat!=null?{remoteActions}:{}),
-    },{gameChange:options.gameChange===true,persist:options.persist!==false,throttlePersist:true});
-  }
+function broadcastTimerState(extra={}){
+  if(isMultiplayerMode&&mp.host&&mp.connected)mpBroadcastState({remoteTimer:{seat:currentTurn,baseTime:secondsLeft,timeBank:timeBank[currentTurn]??0,actionSeconds:actionSecondsLeft,isActionPhase,...extra}});
 }
 function clearGameTimers(){
-  actionEpoch++;
   clearInterval(turnTimer);
   clearInterval(actionTimer);
   turnTimer=null;
@@ -1324,88 +1298,40 @@ function startTurnTimer(){
 }
 function startActionWindow(timeoutHandler,seat=currentTurn,mode='call'){
   clearGameTimers();
-  isActionPhase=true;
-  actionSecondsLeft=ACTION_WINDOW_SECONDS;
-  actionBankActive=false;
-  actionTimeoutHandler=timeoutHandler;
-  actionSeat=seat;
-  actionMode=mode;
+  isActionPhase=true; actionSecondsLeft=ACTION_WINDOW_SECONDS;
+  actionTimeoutHandler=timeoutHandler; actionSeat=seat; actionMode=mode;
   const epoch=gameTurnEpoch;
-  const myActionEpoch=++actionEpoch;
   setText('turn-timer-display',actionSecondsLeft);
-  updateTimeBankUI(seat);
-  broadcastTimerState({actionMode:mode,seat,actionBankActive:false},{gameChange:true});
+  updateTimeBankUI(seat); broadcastTimerState({actionMode:mode,seat});
   actionTimer=setInterval(()=>{
-    if(!roundActive||roundEnding||epoch!==gameTurnEpoch||myActionEpoch!==actionEpoch){
-      clearInterval(actionTimer);
-      actionTimer=null;
-      return;
+    if(!roundActive||roundEnding||epoch!==gameTurnEpoch){
+      clearInterval(actionTimer); actionTimer=null; return;
     }
     try{
-      // Phase 1: fixed action window. The buttons remain visible for all 5 seconds.
-      if(!actionBankActive&&actionSecondsLeft>0){
+      if(actionSecondsLeft>0){
         actionSecondsLeft--;
         setText('turn-timer-display',Math.max(0,actionSecondsLeft));
-        updateTurnTimerVisual();
-        broadcastTimerState({actionMode:mode,seat,actionBankActive:false});
-        return;
+        broadcastTimerState({actionMode:mode,seat}); return;
       }
-
-      // Phase 2: after the first 5 seconds, the same action buttons remain
-      // available while this player's remaining time bank is consumed.
-      // Do not consume the first bank second on the exact 5-second boundary:
-      // the player receives the full remaining bank (up to 20 seconds).
-      if(!actionBankActive){
-        if((timeBank[seat]||0)>0){
-          actionBankActive=true;
-          actionSecondsLeft=0;
-          setText('turn-timer-display',timeBank[seat]);
-          updateTurnTimerVisual();
-          updateTimeBankUI(seat);
-          broadcastTimerState({actionMode:mode,seat,actionBankActive:true});
-          return;
-        }
-
-        // No bank remains: the action window ends after the initial 5 seconds.
-        clearInterval(actionTimer); actionTimer=null; isActionPhase=false; actionSecondsLeft=0; actionBankActive=false;
-        const cb=actionTimeoutHandler; actionTimeoutHandler=null;
-        actionSeat=-1; actionMode='';
-        hideAvailableActions();
-        broadcastTimerState({actionMode:mode,seat,actionBankActive:false},{gameChange:true});
-        if(myActionEpoch===actionEpoch)cb?.();
-        return;
-      }
-
       if((timeBank[seat]||0)>0){
         timeBank[seat]--;
-        setText('turn-timer-display',timeBank[seat]);
-        updateTurnTimerVisual();
-        updateTimeBankUI(seat);
-        broadcastTimerState({actionMode:mode,seat,actionBankActive:true});
+        setText('turn-timer-display',timeBank[seat]); updateTimeBankUI(seat);
+        broadcastTimerState({actionMode:mode,seat});
         if(timeBank[seat]<=0){
-          clearInterval(actionTimer); actionTimer=null; isActionPhase=false; actionSecondsLeft=0; actionBankActive=false;
+          clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
           const cb=actionTimeoutHandler; actionTimeoutHandler=null;
-          actionSeat=-1; actionMode='';
-          hideAvailableActions();
-          broadcastTimerState({actionMode:mode,seat,actionBankActive:false},{gameChange:true});
-          if(myActionEpoch===actionEpoch)cb?.();
+          actionSeat=-1; actionMode=''; cb?.();
         }
         return;
       }
-
-      clearInterval(actionTimer); actionTimer=null; isActionPhase=false; actionSecondsLeft=0; actionBankActive=false;
+      clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
       const cb=actionTimeoutHandler; actionTimeoutHandler=null;
-      actionSeat=-1; actionMode='';
-      hideAvailableActions();
-      broadcastTimerState({actionMode:mode,seat,actionBankActive:false},{gameChange:true});
-      if(myActionEpoch===actionEpoch)cb?.();
+      actionSeat=-1; actionMode=''; cb?.();
     }catch(err){
       console.error('Action timer recovery:',err);
-      clearInterval(actionTimer); actionTimer=null; isActionPhase=false; actionSecondsLeft=0; actionBankActive=false;
+      clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
       const cb=actionTimeoutHandler; actionTimeoutHandler=null;
-      actionSeat=-1; actionMode='';
-      hideAvailableActions();
-      if(myActionEpoch===actionEpoch)cb?.();
+      actionSeat=-1; actionMode=''; cb?.();
     }
   },1000);
 }
@@ -1512,14 +1438,14 @@ function processTurn(){
     if(currentTurn===(mp.seat??0)){
       setText('hand-status-main','Giliran Anda');
       setText('hand-status-sub',turnActions.length?`Pilih aksi: ${turnActions.join(' / ')} atau pilih tile.`:'Pilih tile untuk membuang.');
-      if(turnActions.length){showAvailableActions(turnActions);startActionWindow(()=>{hideAvailableActions();mpPendingCalls=[];pendingCallChoice=null;mpBroadcastState({remoteActions:[]});if((timeBank[currentTurn]||0)>0){secondsLeft=0;startBankTimerOnly(currentTurn)}else autoDiscardCurrent();},currentTurn,'turn-action');}
+      if(turnActions.length){showAvailableActions(turnActions);startActionWindow(()=>{hideAvailableActions();mpBroadcastState({remoteActions:[]});if((timeBank[currentTurn]||0)>0){secondsLeft=0;startBankTimerOnly(currentTurn)}else autoDiscardCurrent();},currentTurn,'turn-action');}
       else startTurnTimer();
     }else if(isMultiplayerMode&&mp.host){
       // Host remains authoritative for a guest turn. If that guest has optional
       // self-actions (Tsumo/Kan), expose them for 5 seconds first, then consume
       // that player's round time bank. A normal discard may still arrive at any time.
       if(turnActions.length){
-        startActionWindow(()=>{mpBroadcastState({remoteActions:[]});mpPendingCalls=[];pendingCallChoice=null;if((timeBank[currentTurn]||0)>0){secondsLeft=0;startBankTimerOnly(currentTurn)}else autoDiscardCurrent();},currentTurn,'turn-action');
+        startActionWindow(()=>{mpBroadcastState({remoteActions:[]});if((timeBank[currentTurn]||0)>0){secondsLeft=0;startBankTimerOnly(currentTurn)}else autoDiscardCurrent();},currentTurn,'turn-action');
       }else{
         startTurnTimer();
       }
@@ -1585,19 +1511,16 @@ function getSelfKanOptions(p){
 function removeLastDiscard(){const p=lastDiscarderIdx;if(p<0)return;playerRivers[p].pop();lastDiscardedTile=null;lastDiscarderIdx=-1;renderTable()}
 function takeTilesById(hand,id,n){const out=[];for(let i=hand.length-1;i>=0&&out.length<n;i--)if(hand[i].id===id)out.push(hand.splice(i,1)[0]);return out}
 function executePon(p){
-  const tile=lastDiscardedTile;
-  if(!tile)return;
-  const hand=playerHands[p]||[];
-  if(hand.filter(t=>t.id===tile.id).length<2)return;
-  const a=takeTilesById(hand,tile.id,2);
-  if(a.length!==2)return;
-
   cancelAiTurn();
   playSfx('pon');
   stopCallWindow();
-  clearInterval(turnTimer); turnTimer=null;
-  mpPendingCalls=[];
-  pendingCallChoice=null;
+  clearInterval(turnTimer);
+
+  const tile=lastDiscardedTile;
+  if(!tile)return;
+
+  const a=takeTilesById(playerHands[p],tile.id,2);
+  if(a.length<2)return;
 
   a.push(tile);
   playerMelds[p].push(a);
@@ -1611,7 +1534,7 @@ function executePon(p){
   // A human guest must keep control of the hand after Pon.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)){
+  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
     isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
@@ -1619,33 +1542,28 @@ function executePon(p){
   }
 
   mpPendingCalls=[];
-  pendingCallChoice=null;
   mpBroadcastState();
 }
 function executeChi(p,combo){
-  const tile=lastDiscardedTile;
-  if(!tile||!Array.isArray(combo)||combo.length!==3)return;
-  const hand=playerHands[p]||[];
-  const needed=new Map();
-  for(const n of combo)if(n!==tile.num)needed.set(n,(needed.get(n)||0)+1);
-  for(const [n,count] of needed){if(hand.filter(t=>t.type===tile.type&&t.num===n).length<count)return}
-
-  const a=[];
-  for(const [n,count] of needed){
-    let remaining=count;
-    for(let i=hand.length-1;i>=0&&remaining>0;i--){
-      const t=hand[i];
-      if(t.type===tile.type&&t.num===n){a.push(hand.splice(i,1)[0]);remaining--}
-    }
-  }
-  if(a.length!==2)return;
-
   cancelAiTurn();
   playSfx('chi');
   stopCallWindow();
-  clearInterval(turnTimer); turnTimer=null;
-  mpPendingCalls=[];
-  pendingCallChoice=null;
+  clearInterval(turnTimer);
+
+  const tile=lastDiscardedTile;
+  if(!tile||!Array.isArray(combo)||combo.length!==3)return;
+
+  const a=[];
+  for(const n of combo){
+    if(n===tile.num)continue;
+
+    const idx=playerHands[p].findIndex(
+      t=>t.type===tile.type&&t.num===n
+    );
+
+    if(idx<0)return;
+    a.push(playerHands[p].splice(idx,1)[0]);
+  }
 
   a.push(tile);
   a.sort((x,y)=>x.num-y.num);
@@ -1660,7 +1578,7 @@ function executeChi(p,combo){
   // A human guest must choose the discard after Chi.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)){
+  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
     isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
@@ -1668,23 +1586,19 @@ function executeChi(p,combo){
   }
 
   mpPendingCalls=[];
-  pendingCallChoice=null;
   mpBroadcastState();
 }
 function executeKan(p){
-  const tile=lastDiscardedTile;
-  if(!tile)return;
-  const hand=playerHands[p]||[];
-  if(hand.filter(t=>t.id===tile.id).length<3)return;
-  const a=takeTilesById(hand,tile.id,3);
-  if(a.length!==3)return;
-
   cancelAiTurn();
   playSfx('kan');
   stopCallWindow();
-  clearInterval(turnTimer); turnTimer=null;
-  mpPendingCalls=[];
-  pendingCallChoice=null;
+  clearInterval(turnTimer);
+
+  const tile=lastDiscardedTile;
+  if(!tile)return;
+
+  const a=takeTilesById(playerHands[p],tile.id,3);
+  if(a.length<3)return;
 
   a.push(tile);
   playerMelds[p].push(a);
@@ -1706,7 +1620,7 @@ function executeKan(p){
   // A human guest must choose the discard after Kan draw.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)){
+  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
     isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
@@ -1714,7 +1628,6 @@ function executeKan(p){
   }
 
   mpPendingCalls=[];
-  pendingCallChoice=null;
   mpBroadcastState();
 }
 function executeSelfKan(p,opt){
@@ -1750,15 +1663,13 @@ function executeSelfKan(p,opt){
   // A human guest must choose the discard after self-Kan draw.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)){
+  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
     isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
     isDiscardable=false;
   }
 
-  mpPendingCalls=[];
-  pendingCallChoice=null;
   mpBroadcastState();
   return true;
 }
@@ -1775,34 +1686,17 @@ function highestPendingCall(){
   return best;
 }
 function stopCallWindow(){
-  actionEpoch++;
-  clearInterval(actionTimer);
-  actionTimer=null;
-  isActionPhase=false;
-  actionSecondsLeft=0;
-  actionBankActive=false;
-  actionTimeoutHandler=null;
-  actionSeat=-1;
-  actionMode='';
-  hideAvailableActions();
-}
-function canResolveCallChoice(seat,action,best){
-  // A player may choose any of their own available calls (e.g. Chi instead of Pon).
-  // Priority only blocks when another seat has a higher-priority call.
-  return !best||best.seat===seat||callPriority(action)>=callPriority(best.action);
+  clearInterval(actionTimer);actionTimer=null;isActionPhase=false;actionSecondsLeft=0;actionTimeoutHandler=null;actionSeat=-1;actionMode='';
 }
 function resolveCallChoice(seat,action){
   const q=mpPendingCalls.find(x=>x.seat===seat);
   if(!q||!action)return;
-  mpPendingCalls=mpPendingCalls.filter(x=>x!==q);
-  stopCallWindow();
-  hideAvailableActions();
-  pendingCallChoice=null;
+  stopCallWindow();pendingCallChoice=null;
   if(action.type==='Ron'){resolveWin(seat,action.score,false);return}
   if(action.type==='Kan'){executeKan(seat);return}
   if(action.type==='Pon'){executePon(seat);return}
   if(action.type==='Chi'){executeChi(seat,action.combo);return}
-  promptNextCall();
+  mpPendingCalls=mpPendingCalls.filter(x=>x!==q);promptNextCall();
 }
 function finishCallWindow(){
   const best=highestPendingCall();
@@ -1853,7 +1747,7 @@ function promptNextCall(){
     if(pendingCallChoice&&pendingCallChoice.seat===best.seat){
       const chosen=pendingCallChoice.action;
       pendingCallChoice=null;
-      if(canResolveCallChoice(best.seat,chosen,best)){
+      if(callPriority(chosen)>=callPriority(best.action)){
         resolveCallChoice(best.seat,chosen);
         return;
       }
@@ -1863,10 +1757,10 @@ function promptNextCall(){
       showAvailableActions([...q.actions,{type:'Skip'}]);
     }
 
-    // In single-player the local human also needs the same action-window
-    // timeout. Multiplayer hosts are authoritative for remote players, while
-    // the solo game must run its own timer or the call window can wait forever.
-    if(!isMultiplayerMode||mp.host){
+    // The HOST is authoritative for every remote player's action timer.
+    // Without a host-side timer, a disconnected/stalled guest could leave
+    // mpPendingCalls waiting forever and freeze the entire room.
+    if(mp.host){
       startActionWindow(finishCallWindow,best.seat,'discard-call');
     }
 
@@ -1894,6 +1788,7 @@ function promptNextCall(){
 
   if(aiSeats.has(best.seat)){
     stopCallWindow();
+    if(mp.host)mpBroadcastState({remoteActions:[]});
     scheduleAiTurn(best.seat,'call');
     return;
   }
@@ -1976,68 +1871,73 @@ function showAvailableActions(actions){
   });
 }
 function triggerAction(a){
-  const type=(a&&typeof a==='object')?a.type:a;
-
-  // Guests send actions to the authoritative host. Do this before touching
-  // local call state so a remote action can never be swallowed by a stale q.
-  if(isMultiplayerMode&&!mp.host){
-    if(type==='Chi'&&a&&typeof a==='object'&&Array.isArray(a.combo)){
-      mpSend('action',{action:{type:'call',action:'Chi',combo:[...a.combo]}});
-    }else{
-      mpSend('action',{action:{type:'call',action:type}});
-    }
-    hideAvailableActions();
-    return;
-  }
-
-  // Self actions are turn actions, not discard-claim actions. Resolve them
-  // first so a stale mpPendingCalls entry can never block Tsumo/Kan.
-  if(type==='Tsumo'){
-    hideAvailableActions();
-    stopCallWindow();
-    const p=mp.seat??0;
-    if(currentTurn===p){
-      const e=checkCurrentWin(p,null,true);
-      if(e?.valid)resolveWin(p,e,true);
-      else startTurnTimer();
-    }
-    return;
-  }
-
-  if(type==='Kan'&&!((a&&typeof a==='object'&&a.fromDiscard)===true)){
-    const p=mp.seat??0;
-    if(currentTurn===p&&getSelfKanOptions(p).length){
-      hideAvailableActions();
-      stopCallWindow();
-      executeSelfKan(p,getSelfKanOptions(p)[0]);
-      return;
-    }
-  }
+  hideAvailableActions();
 
   // Chi with an explicitly selected combination.
-  if(type==='Chi'&&a&&typeof a==='object'){
+  if(a&&typeof a==='object'&&a.type==='Chi'){
     const combo=Array.isArray(a.combo)?a.combo:null;
     if(!combo||combo.length!==3)return;
-    const q=mpPendingCalls.find(x=>x.seat===(mp.seat??0));
+
+    if(isMultiplayerMode&&!mp.host){
+      mpSend('action',{
+        action:{
+          type:'call',
+          action:'Chi',
+          combo:[...combo]
+        }
+      });
+      return;
+    }
+
+    const q=mpPendingCalls.find(
+      x=>x.seat===(mp.seat??0)
+    );
     if(!q)return;
+
     const act=q.actions.find(x=>x.type==='Chi');
     if(!act||!Array.isArray(act.combos))return;
-    const validCombo=act.combos.some(c=>Array.isArray(c)&&c.length===combo.length&&c.every((n,i)=>n===combo[i]));
+
+    const validCombo=act.combos.some(
+      c=>Array.isArray(c)&&
+         c.length===combo.length&&
+         c.every((n,i)=>n===combo[i])
+    );
     if(!validCombo)return;
+
     const chosen={type:'Chi',combo:[...combo]};
-    pendingCallChoice={seat:mp.seat??0,action:chosen};
+    pendingCallChoice={
+      seat:mp.seat??0,
+      action:chosen
+    };
+
     const best=highestPendingCall();
-    if(canResolveCallChoice(mp.seat??0,chosen,best)){
+    if(!best||callPriority(chosen)>=callPriority(best.action)){
       resolveCallChoice(mp.seat??0,chosen);
     }else{
       showAvailableActions(['Skip']);
-      setText('hand-status-sub',`Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`);
+      setText(
+        'hand-status-sub',
+        `Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`
+      );
     }
     return;
   }
 
-  if(type==='Skip'){
-    const q=mpPendingCalls.find(x=>x.seat===(mp.seat??0));
+  // Guest always sends turn/call actions to the authoritative host.
+  if(isMultiplayerMode&&!mp.host){
+    mpSend('action',{
+      action:{
+        type:'call',
+        action:a
+      }
+    });
+    return;
+  }
+
+  if(a==='Skip'){
+    const q=mpPendingCalls.find(
+      x=>x.seat===(mp.seat??0)
+    );
     if(q)mpPendingCalls=mpPendingCalls.filter(x=>x!==q);
     pendingCallChoice=null;
     stopCallWindow();
@@ -2045,17 +1945,49 @@ function triggerAction(a){
     return;
   }
 
-  const q=mpPendingCalls.find(x=>x.seat===(mp.seat??0));
+  if(a==='Tsumo'){
+    stopCallWindow();
+    const e=checkCurrentWin(mp.seat,null,true);
+    if(e)resolveWin(mp.seat,e,true);
+    else startTurnTimer();
+    return;
+  }
+
+  const q=mpPendingCalls.find(
+    x=>x.seat===(mp.seat??0)
+  );
+
   if(q){
-    const act=q.actions.find(x=>x.type===type);
-    if(!act)return;
-    pendingCallChoice={seat:mp.seat??0,action:act};
+    const act=q.actions.find(x=>x.type===a);
+    if(!act){
+      hideAvailableActions();
+      return;
+    }
+
+    pendingCallChoice={
+      seat:mp.seat??0,
+      action:act
+    };
+
     const best=highestPendingCall();
-    if(canResolveCallChoice(mp.seat??0,act,best)){
+    if(!best||callPriority(act)>=callPriority(best.action)){
       resolveCallChoice(mp.seat??0,act);
     }else{
       showAvailableActions(['Skip']);
-      setText('hand-status-sub',`Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`);
+      setText(
+        'hand-status-sub',
+        `Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`
+      );
+    }
+    return;
+  }
+
+  // Self-Kan during the player's own draw turn.
+  if(a==='Kan'){
+    const opt=getSelfKanOptions(mp.seat??0)[0];
+    if(opt){
+      stopCallWindow();
+      executeSelfKan(mp.seat??0,opt);
     }
   }
 }
@@ -2178,11 +2110,9 @@ function mpServerUrl(code=''){const base=String(MP_WORKER_URL||'').replace(/\/$/
 function mpSaveSession(extra={}){try{const room=mp.room||null;localStorage.setItem(MP_SESSION_KEY,JSON.stringify({room:room?.code||'',seat:mp.seat??null,name:mp.playerName||'Player',avatar:mp.playerAvatar||selectedAvatar,host:!!mp.host,ready:!!mp.ready,started:!!mp.started,players:room?.players||null,roomStarted:!!room?.started,token:mp.token||null,updatedAt:Date.now(),...extra}))}catch(e){}}
 function mpLoadSession(){try{return JSON.parse(localStorage.getItem(MP_SESSION_KEY)||'null')}catch(e){return null}}
 function mpClearSession(){try{localStorage.removeItem(MP_SESSION_KEY)}catch(e){}}
-function mpSaveActiveGameState(state,throttle=false){
+function mpSaveActiveGameState(state){
   if(!mp.host||!mp.room?.code||!state?.roundActive)return;
-  const now=Date.now();
-  if(throttle&&now-mpLastGameStateSaveAt<MP_GAME_SAVE_INTERVAL)return;
-  try{localStorage.setItem(MP_GAME_STATE_KEY,JSON.stringify({room:mp.room.code,savedAt:now,state}));mpLastGameStateSaveAt=now}catch(e){}
+  try{localStorage.setItem(MP_GAME_STATE_KEY,JSON.stringify({room:mp.room.code,savedAt:Date.now(),state}))}catch(e){}
 }
 function mpLoadActiveGameState(code){
   try{
@@ -2191,7 +2121,7 @@ function mpLoadActiveGameState(code){
     return saved;
   }catch(e){return null}
 }
-function mpClearActiveGameState(){try{localStorage.removeItem(MP_GAME_STATE_KEY)}catch(e){}mpLastGameStateSaveAt=0}
+function mpClearActiveGameState(){try{localStorage.removeItem(MP_GAME_STATE_KEY)}catch(e){}}
 function mpRestoreHostGameState(state){
   if(!state?.roundActive)return false;
   fullDeck=state.fullDeck||[];
@@ -2211,7 +2141,6 @@ function mpRestoreHostGameState(state){
   aiSeats=new Set(state.aiSeats||[]);
   if(Array.isArray(state.playerAvatars)&&state.playerAvatars.length===4)playerAvatars=state.playerAvatars.slice();
   mpPendingCalls=Array.isArray(state.pendingCalls)?state.pendingCalls:[];
-  mpGameStateSeq=Number(state._gameSeq)||0;
   pendingCallChoice=null;
   roundEnding=false;
   roundActive=true;
@@ -2230,7 +2159,7 @@ function mpRoomUrl(code){const u=new URL(location.href);u.searchParams.set(MP_RO
 async function mpCopyRoomLink(){const link=byId('mp-room-link')?.value||mpRoomUrl(mp.room?.code||'');if(!link)return;try{if(navigator.share){await navigator.share({title:'Mahjong DJ',text:'Gabung ke room Mahjong DJ',url:link});setText('mp-invite-help','Link room berhasil dibagikan.');return;}}catch(e){if(e?.name==='AbortError')return}try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(link);setText('mp-invite-help','Link room berhasil disalin.');return}}catch(e){}const input=byId('mp-room-link');if(input){input.removeAttribute('readonly');input.focus();input.select();try{document.execCommand('copy')}catch(e){}input.setAttribute('readonly','readonly');setText('mp-invite-help','Link room siap disalin.')}}
 function mpRenderRoomQr(code){setText('mp-host-room-code',code||'-----');const input=byId('mp-room-link');if(input)input.value=mpRoomUrl(code);const canvas=byId('mp-offer-qr');if(!canvas)return;canvas.classList.remove('visible');const draw=()=>{try{if(window.QRCode?.toCanvas){QRCode.toCanvas(canvas,mpRoomUrl(code),{width:180,margin:1},()=>canvas.classList.add('visible'));return true}}catch(e){}return false};if(!draw()){let tries=0;const t=setInterval(()=>{if(draw()||++tries>40)clearInterval(t)},150)}}
 function mpEnsureToken(){if(!mp.token){try{mp.token=(crypto.randomUUID?crypto.randomUUID():('tok-'+Math.random().toString(36).slice(2)+Date.now().toString(36)))}catch(e){mp.token='tok-'+Math.random().toString(36).slice(2)+Date.now().toString(36)}}return mp.token}
-function mpConnect(code='',role='',isReconnect=false){const c=String(code||mp.room?.code||'').trim();if(!/^\d{5}$/.test(c)){mpSetConnection(false);return false}const workerUrl=mpServerUrl(c);if(!workerUrl){mpSetConnection(false);setText('lobby-help','URL Cloudflare Worker belum dikonfigurasi.');return false}if(mp.ws&&(mp.ws.readyState===WebSocket.OPEN||mp.ws.readyState===WebSocket.CONNECTING))return true;try{const desiredRole=role||(mp.host?'host':'guest');if(!isReconnect||mpSequenceRoomCode!==c){lastHostServerSeq=0;mpLastRemoteGameSeq=0;mpHasRemoteState=false;mpSequenceRoomCode=c}const connectionId=++mpConnectionGeneration;const ws=new WebSocket(`${workerUrl}&name=${encodeURIComponent(mp.playerName||'Player')}&role=${desiredRole}${mp.seat!=null?`&seat=${mp.seat}`:''}`);mp.ws=ws;ws.onopen=()=>{if(connectionId!==mpConnectionGeneration||mp.ws!==ws)return;mp.connected=true;mpReconnectAttempts=0;mpReconnectDeadline=0;mpSetConnection(true);startMpPing();ws.send(JSON.stringify({type:isReconnect?'rejoin':(desiredRole==='host'?'createRoom':'joinRoom'),code:c,name:mp.playerName||'Player',seat:mp.seat,token:mp.token,avatar:mp.playerAvatar||selectedAvatar}))};ws.onmessage=e=>{if(connectionId!==mpConnectionGeneration||mp.ws!==ws)return;try{mpHandle(JSON.parse(e.data))}catch(err){console.error('MP message error',err)}};ws.onerror=()=>{if(connectionId!==mpConnectionGeneration||mp.ws!==ws)return;mp.connected=false;mpSetConnection(false)};ws.onclose=()=>{if(connectionId!==mpConnectionGeneration||mp.ws!==ws)return;mp.connected=false;stopMpPing();mpSetConnection(false);mp.ws=null;mpPendingStatePayload=null;clearTimeout(mpStateFlushTimer);mpStateFlushTimer=null;
+function mpConnect(code='',role='',isReconnect=false){const c=String(code||mp.room?.code||'').trim();if(!/^\d{5}$/.test(c)){mpSetConnection(false);return false}const workerUrl=mpServerUrl(c);if(!workerUrl){mpSetConnection(false);setText('lobby-help','URL Cloudflare Worker belum dikonfigurasi.');return false}if(mp.ws&&(mp.ws.readyState===WebSocket.OPEN||mp.ws.readyState===WebSocket.CONNECTING))return true;try{const desiredRole=role||(mp.host?'host':'guest');const ws=new WebSocket(`${workerUrl}&name=${encodeURIComponent(mp.playerName||'Player')}&role=${desiredRole}${mp.seat!=null?`&seat=${mp.seat}`:''}`);mp.ws=ws;ws.onopen=()=>{mp.connected=true;mpReconnectAttempts=0;mpReconnectDeadline=0;mpSetConnection(true);startMpPing();lastHostServerSeq=0;ws.send(JSON.stringify({type:isReconnect?'rejoin':(desiredRole==='host'?'createRoom':'joinRoom'),code:c,name:mp.playerName||'Player',seat:mp.seat,token:mp.token,avatar:mp.playerAvatar||selectedAvatar}))};ws.onmessage=e=>{try{mpHandle(JSON.parse(e.data))}catch(err){console.error('MP message error',err)}};ws.onerror=()=>{mp.connected=false;mpSetConnection(false)};ws.onclose=()=>{mp.connected=false;stopMpPing();mpSetConnection(false);mp.ws=null;
     // Reconnect during a game too. The host keeps a local snapshot and sends
     // it again after the Worker accepts the restored room connection.
     if(mp.room?.code && isMultiplayerMode){
@@ -2238,15 +2167,13 @@ function mpConnect(code='',role='',isReconnect=false){const c=String(code||mp.ro
       if(Date.now()<mpReconnectDeadline){const delay=Math.min(2500,700+mpReconnectAttempts*450);mpReconnectAttempts++;clearTimeout(mpReconnectTimer);mpReconnectTimer=setTimeout(()=>{if(!mp.connected)mpConnect(mp.room.code,mp.host?'host':'guest',true)},delay)}
     }
   };return true}catch(e){mp.connected=false;mpSetConnection(false);console.error(e);return false}}
-function mpScheduleStateFlush(){if(mpStateFlushTimer||!mpPendingStatePayload)return;mpStateFlushTimer=setTimeout(()=>{mpStateFlushTimer=null;const ws=mp.ws;if(!ws||ws.readyState!==WebSocket.OPEN||!mpPendingStatePayload){mpPendingStatePayload=null;return}if(ws.bufferedAmount>MP_WS_BUFFER_LIMIT){mpScheduleStateFlush();return}const state=mpPendingStatePayload;mpPendingStatePayload=null;try{ws.send(JSON.stringify({type:'state',state}))}catch(e){mpPendingStatePayload=state;mpScheduleStateFlush()}},100)}
-function mpSendState(state){const ws=mp.ws;if(!mp.connected||!ws||ws.readyState!==WebSocket.OPEN)return false;if(ws.bufferedAmount>MP_WS_BUFFER_LIMIT){mpPendingStatePayload=state;mpScheduleStateFlush();return false}mpPendingStatePayload=null;clearTimeout(mpStateFlushTimer);mpStateFlushTimer=null;try{ws.send(JSON.stringify({type:'state',state}));return true}catch(e){mpPendingStatePayload=state;mpScheduleStateFlush();return false}}
-function mpSend(type,data={}){const ws=mp.ws;if(!mp.connected||!ws||ws.readyState!==WebSocket.OPEN)return false;const payload={type,...data};if(type==='action'&&!mp.host){payload.actionId=`${mp.token||mp.seat||'p'}-${Date.now().toString(36)}-${(++mpActionSerial).toString(36)}`}try{ws.send(JSON.stringify(payload));return true}catch(e){console.error('MP send error',e);return false}}
+function mpSend(type,data={}){if(mp.ws?.readyState===WebSocket.OPEN)mp.ws.send(JSON.stringify({type,...data}))}
 let mpPingTimer=null;
-function startMpPing(){clearInterval(mpPingTimer);mpLastPongAt=Date.now();if(!mp.connected)return;mpPingTimer=setInterval(()=>{const ws=mp.ws;if(!ws||ws.readyState!==WebSocket.OPEN)return;const now=Date.now();if(now-mpLastPongAt>24000){try{ws.close()}catch(e){}return}mpSend('ping',{clientTime:now});},8000)}
+function startMpPing(){clearInterval(mpPingTimer);if(!mp.connected)return;mpPingTimer=setInterval(()=>{if(mp.ws?.readyState===WebSocket.OPEN)mpSend('ping',{clientTime:Date.now()});},8000)}
 function stopMpPing(){clearInterval(mpPingTimer);mpPingTimer=null}
 function openPlayerLobby(){isMultiplayerMode=true;mp.playerAvatar=selectedAvatar;clearTimeout(mpReconnectTimer);mpReconnectAttempts=0;mpReconnectDeadline=0;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');mpSetConnection(false);const code=new URL(location.href).searchParams.get(MP_ROOM_PARAM);if(code){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.host=false;mp.ready=true;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};setText('lobby-help','Menghubungkan ke Room '+code+'…');mpConnect(code,'guest')}}
 function closeLobby(){clearTimeout(mpReconnectTimer);stopMpGameWatchdog();stopMpPing();try{mpSend('leave')}catch(e){}try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}mp.ws=null;mp.connected=false;mpClearSession();mpClearActiveGameState();mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,token:null,playerName:mp.playerName||'Player',playerAvatar:selectedAvatar};isMultiplayerMode=false;setDisplay('modal-lobby','none');mpSetConnection(false)}
-function mpCreateRoom(){lastHostServerSeq=0;mpLastRemoteGameSeq=0;mpHasRemoteState=false;mpSequenceRoomCode='';mpGameStateSeq=0;mpStateSendSeq=0;mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.playerAvatar=selectedAvatar;const code=String(Math.floor(10000+Math.random()*90000));mp.host=true;mp.seat=0;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();isMultiplayerMode=true;mp.room={code,players:[null,null,null,null],started:false};setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('mp-room-code-display',code);setText('mp-host-room-code',code);setText('lobby-help','Membuat room di Cloudflare…');mpRenderRoomQr(code);mpSaveSession();mpConnect(code,'host')}
+function mpCreateRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.playerAvatar=selectedAvatar;const code=String(Math.floor(10000+Math.random()*90000));mp.host=true;mp.seat=0;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();isMultiplayerMode=true;mp.room={code,players:[null,null,null,null],started:false};setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('mp-room-code-display',code);setText('mp-host-room-code',code);setText('lobby-help','Membuat room di Cloudflare…');mpRenderRoomQr(code);mpSaveSession();mpConnect(code,'host')}
 function mpJoinRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code)){alert('Masukkan kode room 5 digit.');return}mp.host=false;mp.seat=null;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};isMultiplayerMode=true;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Menghubungkan ke Room '+code+'…');mpSaveSession();mpConnect(code,'guest')}
 function mpShowJoinForm(){setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','block')}
 function togglePlayerReady(){if(!mp.room)return;mp.ready=!mp.ready;mpSend('ready',{ready:mp.ready});mpSaveSession();if(mp.host&&mp.room.players?.[0])mp.room.players[0].ready=mp.ready;mpRenderLobby(mp.room)}
@@ -2257,7 +2184,6 @@ function mpStartGame(){
   // The host is the authoritative game engine. For solo-host testing,
   // start locally so the existing AI seats can fill the empty chairs.
   if(!mp.started){
-    mpGameStateSeq=0;mpStateSendSeq=0;mpLastRemoteGameSeq=0;mpHasRemoteState=false;
     mp.started=true;
     if(mp.room)mp.room.started=true;
     setDisplay('modal-lobby','none');
@@ -2269,7 +2195,6 @@ function mpStartGame(){
 }
 function mpHandle(msg){
   if(msg.type==='hello'){mpClientId=msg.clientId;return}
-  if(msg.type==='pong'){mpLastPongAt=Date.now();return}
   if(msg.type==='error'){setText('lobby-help',msg.message||'Room error');mpSetConnection(false);return}
   if(msg.type==='joined'){
     mp.room=msg.room;mpLastRoomView=msg.room;mp.seat=msg.seat;mp.host=!!msg.host;mp.started=!!msg.room.started;mp.ready=!!(msg.room.players?.[msg.seat]?.ready);mp.playerAvatar=msg.room.players?.[msg.seat]?.avatar||mp.playerAvatar||selectedAvatar;selectedAvatar=mp.playerAvatar;syncHumanAvatars(msg.room);if(msg.seat!=null)playerAvatars[msg.seat]=mp.playerAvatar;mpReconnectAttempts=0;mpReconnectDeadline=0;
@@ -2290,7 +2215,6 @@ function mpHandle(msg){
     mp.room=msg.room||mp.room;mpLastRoomView=mp.room;mp.started=!!(msg.room?.started);mpRenderLobby(mp.room);mpSaveSession();
     if(mp.host&&roundActive)mpBroadcastState();
     if(wasStarted&&!mp.started){
-      lastHostServerSeq=0;mpLastRemoteGameSeq=0;mpHasRemoteState=false;mpGameStateSeq=0;mpStateSendSeq=0;
       // The host just triggered a rematch: the room is back in lobby mode
       // with the same seats. Pop the ready-up lobby open for EVERYONE,
       // whether or not they had already clicked "Main Lagi" themselves.
@@ -2334,7 +2258,7 @@ function startMpGameWatchdog(){
         scheduleAiTurn(currentTurn,'discard');
         return;
       }
-      if(!mpPendingCalls.length&&!aiSeats.has(currentTurn)&&!turnTimer&&!actionTimer && (!isMultiplayerMode || currentTurn===(mp.seat??0))){
+      if(!mpPendingCalls.length&&!aiSeats.has(currentTurn)&&!turnTimer&&!actionTimer){
         startTurnTimer();
       }
       return;
@@ -2351,18 +2275,68 @@ function stopMpGameWatchdog(){
   clearInterval(mpGameWatchdogTimer);
   mpGameWatchdogTimer=null;
 }
-function mpStateSnapshot(extra={}){return{currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,playerHands,playerRivers,playerMelds,playerScores,lastDiscardedTile,lastDiscarderIdx,drawnTile,secondsLeft,timeBank,actionSecondsLeft,isActionPhase,isDiscardable,pendingCalls:mpPendingCalls,roundActive,roundEnding,roomPlayers:mp.room?.players||[],aiSeats:[...aiSeats],playerAvatars:[...playerAvatars],...extra}}
-function mpBroadcastState(extra={},options={}){const state=mpStateSnapshot(extra);if(isMultiplayerMode&&mp.host){if(options.gameChange!==false)mpGameStateSeq++;state._gameSeq=mpGameStateSeq;state._stateSeq=++mpStateSendSeq;if(options.persist!==false)mpSaveActiveGameState(state,options.throttlePersist===true)}if(isMultiplayerMode&&mp.host&&mp.connected)mpSendState(state)}
+function getActiveRemoteActions(){
+  const best=highestPendingCall();
+  if(!best||aiSeats.has(best.seat))return null;
+  const q=mpPendingCalls.find(x=>x.seat===best.seat);
+  if(!q)return null;
+
+  if(pendingCallChoice&&pendingCallChoice.seat===best.seat){
+    return {
+      seat:best.seat,
+      actions:['Skip'],
+      actionWindow:ACTION_WINDOW_SECONDS
+    };
+  }
+
+  const actions=q.actions.map(x=>{
+    if(x.type==='Chi'){
+      return {
+        type:'Chi',
+        combos:Array.isArray(x.combos)?x.combos.map(c=>[...c]):[]
+      };
+    }
+    return x.type;
+  });
+
+  actions.push('Skip');
+
+  if(best.seat===(mp.seat??0))return {
+    seat:best.seat,
+    actions,
+    actionWindow:ACTION_WINDOW_SECONDS
+  };
+
+  if(mp.host){
+    const roomPlayer=mp.room?.players?.[best.seat];
+    if(roomPlayer)return {
+      seat:best.seat,
+      actions,
+      actionWindow:ACTION_WINDOW_SECONDS
+    };
+  }
+
+  return null;
+}
+function mpStateSnapshot(extra={}){
+  const remoteActions=getActiveRemoteActions();
+  return {
+    currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,playerHands,playerRivers,
+    playerMelds,playerScores,lastDiscardedTile,lastDiscarderIdx,drawnTile,
+    secondsLeft,timeBank,actionSecondsLeft,isActionPhase,isDiscardable,
+    pendingCalls:mpPendingCalls,roundActive,roundEnding,roomPlayers:mp.room?.players||[],
+    aiSeats:[...aiSeats],playerAvatars:[...playerAvatars],
+    ...(remoteActions?{remoteActions}:{}),
+    ...extra
+  };
+}
+function mpBroadcastState(extra={}){const state=mpStateSnapshot(extra);if(isMultiplayerMode&&mp.host)mpSaveActiveGameState(state);if(isMultiplayerMode&&mp.host&&mp.connected)mpSend('state',{state})}
 function mpApplyRemoteState(state){
   if(mp.host)return;
   if(!state||typeof state!=='object')return;
-  const incomingSeq=Number(state._serverSeq)||Number(state._stateSeq)||0;
-  if(incomingSeq&&incomingSeq<=lastHostServerSeq)return;
+  const incomingSeq=Number(state._serverSeq)||0;
+  if(incomingSeq&&incomingSeq<lastHostServerSeq)return;
   if(incomingSeq)lastHostServerSeq=incomingSeq;
-  const incomingGameSeq=Number(state._gameSeq)||incomingSeq||1;
-  const gameStateChanged=!mpHasRemoteState||incomingGameSeq!==mpLastRemoteGameSeq;
-  mpLastRemoteGameSeq=incomingGameSeq;
-  mpHasRemoteState=true;
 
   // A reconnected guest must remain in multiplayer mode.
   isMultiplayerMode=true;
@@ -2421,9 +2395,9 @@ function mpApplyRemoteState(state){
     currentTurn===(mp.seat??0)&&
     !stateHasRemoteCallForLocalGuest;
 
-  if(gameStateChanged)renderTable();
+  renderTable();
 
-  if(gameStateChanged&&
+  if(
     state.remoteActions?.seat===(mp.seat??0)&&
     Array.isArray(state.remoteActions.actions)&&
     state.remoteActions.actions.length
@@ -2432,7 +2406,7 @@ function mpApplyRemoteState(state){
     showAvailableActions(state.remoteActions.actions);
     setText('hand-status-main','Aksi tersedia');
     setText('hand-status-sub','Pilih aksi sebelum waktu habis.');
-  }else if(gameStateChanged&&currentTurn===(mp.seat??0)&&roundActive){
+  }else if(currentTurn===(mp.seat??0)&&roundActive){
     // Reconnect can happen during a normal turn without a fresh startGame
     // message. Recreate the same Tsumo/Kan controls the player would have had.
     const turnActions=[];
@@ -2451,23 +2425,17 @@ function mpApplyRemoteState(state){
       setText('hand-status-main','Giliran Anda');
       setText('hand-status-sub','Pilih tile untuk membuang.');
     }
-  }else if(gameStateChanged){
+  }else{
     hideAvailableActions();
   }
 
-  if(gameStateChanged&&state.phase==='result'&&state.result){
+  if(state.phase==='result'&&state.result){
     renderResultModal(state.result.title,state.result.desc);
   }
 }
 function roomCanAct(seat){return !!(mp.room?.players?.[seat] || seat===mp.seat || (mp.host&&seat===0))}
 function mpHandlePlayerAction(seat,action){
-  if(!mp.host||!roundActive||!roomCanAct(seat)||!action||typeof action!=='object')return;
-  const actionId=String(action.actionId||'');
-  if(actionId){
-    if(mpHandledActionIds.has(actionId))return;
-    mpHandledActionIds.add(actionId);
-    if(mpHandledActionIds.size>64){const first=mpHandledActionIds.values().next().value;mpHandledActionIds.delete(first)}
-  }
+  if(!mp.host||!roundActive||!roomCanAct(seat))return;
 
   if(action.type==='discard'){
     const i=playerHands[seat].findIndex(
@@ -2546,7 +2514,7 @@ function mpHandlePlayerAction(seat,action){
   const best=highestPendingCall();
   const chosen=pendingCallChoice.action;
 
-  if(canResolveCallChoice(seat,chosen,best)){
+  if(!best||callPriority(chosen)>=callPriority(best.action)){
     resolveCallChoice(seat,chosen);
   }
 }
