@@ -746,7 +746,7 @@ let avatarPickerMode='';
 let playerAvatars=['panda','shiba','kucing','penguin'];
 
 let mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,playerName:'Player',token:null,playerAvatar:selectedAvatar};
-let mpClientId=null,mpReconnectTimer=null,mpAutoStartTimer=null,mpPendingCalls=[];let mpReconnectAttempts=0,mpReconnectDeadline=0,mpLastRoomView=null;let mpGameWatchdogTimer=null;let lastHostServerSeq=0;let mpStateSendSeq=0;const MP_WORKER_URL='https://mahjong-room.mahjongjong.workers.dev',MP_ROOM_PARAM='room',MP_SESSION_KEY='mahjongHKRoomV1',MP_GAME_STATE_KEY='mahjongHKActiveGameV1';
+let mpClientId=null,mpReconnectTimer=null,mpAutoStartTimer=null,mpPendingCalls=[];let mpReconnectAttempts=0,mpReconnectDeadline=0,mpLastRoomView=null;let mpGameWatchdogTimer=null;let lastHostServerSeq=0;let mpStateSendSeq=0;let mpGameStateSeq=0;let mpLastRemoteGameSeq=0;let mpHasRemoteState=false;let mpSequenceRoomCode='';let mpConnectionGeneration=0;let mpLastPongAt=0;let mpStateFlushTimer=null;let mpPendingStatePayload=null;let mpLastGameStateSaveAt=0;let mpActionSerial=0;const mpHandledActionIds=new Set();const MP_WS_BUFFER_LIMIT=512*1024;const MP_GAME_SAVE_INTERVAL=3000;const MP_WORKER_URL='https://mahjong-room.mahjongjong.workers.dev',MP_ROOM_PARAM='room',MP_SESSION_KEY='mahjongHKRoomV1',MP_GAME_STATE_KEY='mahjongHKActiveGameV1';
 let aiSeats=new Set();
 const HUMAN_NAMES=['Player','Player 2','Player 3','Player 4'];
 
@@ -1271,13 +1271,13 @@ function getActiveRemoteActions(){
   }
   return [];
 }
-function broadcastTimerState(extra={}){
+function broadcastTimerState(extra={},options={}){
   if(isMultiplayerMode&&mp.host&&mp.connected){
     const remoteActions=getActiveRemoteActions();
     mpBroadcastState({
       remoteTimer:{seat:currentTurn,baseTime:secondsLeft,timeBank:timeBank[currentTurn]??0,actionSeconds:actionSecondsLeft,isActionPhase,...extra},
       ...(remoteActions&&remoteActions.seat!=null?{remoteActions}:{}),
-    });
+    },{gameChange:options.gameChange===true,persist:options.persist!==false,throttlePersist:true});
   }
 }
 function clearGameTimers(){
@@ -1329,7 +1329,7 @@ function startActionWindow(timeoutHandler,seat=currentTurn,mode='call'){
   const epoch=gameTurnEpoch;
   const myActionEpoch=++actionEpoch;
   setText('turn-timer-display',actionSecondsLeft);
-  updateTimeBankUI(seat); broadcastTimerState({actionMode:mode,seat});
+  updateTimeBankUI(seat); broadcastTimerState({actionMode:mode,seat},{gameChange:true});
   actionTimer=setInterval(()=>{
     if(!roundActive||roundEnding||epoch!==gameTurnEpoch||myActionEpoch!==actionEpoch){
       clearInterval(actionTimer);
@@ -1544,18 +1544,19 @@ function getSelfKanOptions(p){
 function removeLastDiscard(){const p=lastDiscarderIdx;if(p<0)return;playerRivers[p].pop();lastDiscardedTile=null;lastDiscarderIdx=-1;renderTable()}
 function takeTilesById(hand,id,n){const out=[];for(let i=hand.length-1;i>=0&&out.length<n;i--)if(hand[i].id===id)out.push(hand.splice(i,1)[0]);return out}
 function executePon(p){
+  const tile=lastDiscardedTile;
+  if(!tile)return;
+  const hand=playerHands[p]||[];
+  if(hand.filter(t=>t.id===tile.id).length<2)return;
+  const a=takeTilesById(hand,tile.id,2);
+  if(a.length!==2)return;
+
   cancelAiTurn();
   playSfx('pon');
   stopCallWindow();
   clearInterval(turnTimer); turnTimer=null;
-
-  const tile=lastDiscardedTile;
-  if(!tile)return;
-
   mpPendingCalls=[];
   pendingCallChoice=null;
-  const a=takeTilesById(playerHands[p],tile.id,2);
-  if(a.length<2)return;
 
   a.push(tile);
   playerMelds[p].push(a);
@@ -1581,27 +1582,29 @@ function executePon(p){
   mpBroadcastState();
 }
 function executeChi(p,combo){
+  const tile=lastDiscardedTile;
+  if(!tile||!Array.isArray(combo)||combo.length!==3)return;
+  const hand=playerHands[p]||[];
+  const needed=new Map();
+  for(const n of combo)if(n!==tile.num)needed.set(n,(needed.get(n)||0)+1);
+  for(const [n,count] of needed){if(hand.filter(t=>t.type===tile.type&&t.num===n).length<count)return}
+
+  const a=[];
+  for(const [n,count] of needed){
+    let remaining=count;
+    for(let i=hand.length-1;i>=0&&remaining>0;i--){
+      const t=hand[i];
+      if(t.type===tile.type&&t.num===n){a.push(hand.splice(i,1)[0]);remaining--}
+    }
+  }
+  if(a.length!==2)return;
+
   cancelAiTurn();
   playSfx('chi');
   stopCallWindow();
   clearInterval(turnTimer); turnTimer=null;
-
-  const tile=lastDiscardedTile;
-  if(!tile||!Array.isArray(combo)||combo.length!==3)return;
-
   mpPendingCalls=[];
   pendingCallChoice=null;
-  const a=[];
-  for(const n of combo){
-    if(n===tile.num)continue;
-
-    const idx=playerHands[p].findIndex(
-      t=>t.type===tile.type&&t.num===n
-    );
-
-    if(idx<0)return;
-    a.push(playerHands[p].splice(idx,1)[0]);
-  }
 
   a.push(tile);
   a.sort((x,y)=>x.num-y.num);
@@ -1628,18 +1631,19 @@ function executeChi(p,combo){
   mpBroadcastState();
 }
 function executeKan(p){
+  const tile=lastDiscardedTile;
+  if(!tile)return;
+  const hand=playerHands[p]||[];
+  if(hand.filter(t=>t.id===tile.id).length<3)return;
+  const a=takeTilesById(hand,tile.id,3);
+  if(a.length!==3)return;
+
   cancelAiTurn();
   playSfx('kan');
   stopCallWindow();
   clearInterval(turnTimer); turnTimer=null;
-
-  const tile=lastDiscardedTile;
-  if(!tile)return;
-
   mpPendingCalls=[];
   pendingCallChoice=null;
-  const a=takeTilesById(playerHands[p],tile.id,3);
-  if(a.length<3)return;
 
   a.push(tile);
   playerMelds[p].push(a);
@@ -2130,9 +2134,11 @@ function mpServerUrl(code=''){const base=String(MP_WORKER_URL||'').replace(/\/$/
 function mpSaveSession(extra={}){try{const room=mp.room||null;localStorage.setItem(MP_SESSION_KEY,JSON.stringify({room:room?.code||'',seat:mp.seat??null,name:mp.playerName||'Player',avatar:mp.playerAvatar||selectedAvatar,host:!!mp.host,ready:!!mp.ready,started:!!mp.started,players:room?.players||null,roomStarted:!!room?.started,token:mp.token||null,updatedAt:Date.now(),...extra}))}catch(e){}}
 function mpLoadSession(){try{return JSON.parse(localStorage.getItem(MP_SESSION_KEY)||'null')}catch(e){return null}}
 function mpClearSession(){try{localStorage.removeItem(MP_SESSION_KEY)}catch(e){}}
-function mpSaveActiveGameState(state){
+function mpSaveActiveGameState(state,throttle=false){
   if(!mp.host||!mp.room?.code||!state?.roundActive)return;
-  try{localStorage.setItem(MP_GAME_STATE_KEY,JSON.stringify({room:mp.room.code,savedAt:Date.now(),state}))}catch(e){}
+  const now=Date.now();
+  if(throttle&&now-mpLastGameStateSaveAt<MP_GAME_SAVE_INTERVAL)return;
+  try{localStorage.setItem(MP_GAME_STATE_KEY,JSON.stringify({room:mp.room.code,savedAt:now,state}));mpLastGameStateSaveAt=now}catch(e){}
 }
 function mpLoadActiveGameState(code){
   try{
@@ -2141,7 +2147,7 @@ function mpLoadActiveGameState(code){
     return saved;
   }catch(e){return null}
 }
-function mpClearActiveGameState(){try{localStorage.removeItem(MP_GAME_STATE_KEY)}catch(e){}}
+function mpClearActiveGameState(){try{localStorage.removeItem(MP_GAME_STATE_KEY)}catch(e){}mpLastGameStateSaveAt=0}
 function mpRestoreHostGameState(state){
   if(!state?.roundActive)return false;
   fullDeck=state.fullDeck||[];
@@ -2161,6 +2167,7 @@ function mpRestoreHostGameState(state){
   aiSeats=new Set(state.aiSeats||[]);
   if(Array.isArray(state.playerAvatars)&&state.playerAvatars.length===4)playerAvatars=state.playerAvatars.slice();
   mpPendingCalls=Array.isArray(state.pendingCalls)?state.pendingCalls:[];
+  mpGameStateSeq=Number(state._gameSeq)||0;
   pendingCallChoice=null;
   roundEnding=false;
   roundActive=true;
@@ -2179,7 +2186,7 @@ function mpRoomUrl(code){const u=new URL(location.href);u.searchParams.set(MP_RO
 async function mpCopyRoomLink(){const link=byId('mp-room-link')?.value||mpRoomUrl(mp.room?.code||'');if(!link)return;try{if(navigator.share){await navigator.share({title:'Mahjong DJ',text:'Gabung ke room Mahjong DJ',url:link});setText('mp-invite-help','Link room berhasil dibagikan.');return;}}catch(e){if(e?.name==='AbortError')return}try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(link);setText('mp-invite-help','Link room berhasil disalin.');return}}catch(e){}const input=byId('mp-room-link');if(input){input.removeAttribute('readonly');input.focus();input.select();try{document.execCommand('copy')}catch(e){}input.setAttribute('readonly','readonly');setText('mp-invite-help','Link room siap disalin.')}}
 function mpRenderRoomQr(code){setText('mp-host-room-code',code||'-----');const input=byId('mp-room-link');if(input)input.value=mpRoomUrl(code);const canvas=byId('mp-offer-qr');if(!canvas)return;canvas.classList.remove('visible');const draw=()=>{try{if(window.QRCode?.toCanvas){QRCode.toCanvas(canvas,mpRoomUrl(code),{width:180,margin:1},()=>canvas.classList.add('visible'));return true}}catch(e){}return false};if(!draw()){let tries=0;const t=setInterval(()=>{if(draw()||++tries>40)clearInterval(t)},150)}}
 function mpEnsureToken(){if(!mp.token){try{mp.token=(crypto.randomUUID?crypto.randomUUID():('tok-'+Math.random().toString(36).slice(2)+Date.now().toString(36)))}catch(e){mp.token='tok-'+Math.random().toString(36).slice(2)+Date.now().toString(36)}}return mp.token}
-function mpConnect(code='',role='',isReconnect=false){const c=String(code||mp.room?.code||'').trim();if(!/^\d{5}$/.test(c)){mpSetConnection(false);return false}const workerUrl=mpServerUrl(c);if(!workerUrl){mpSetConnection(false);setText('lobby-help','URL Cloudflare Worker belum dikonfigurasi.');return false}if(mp.ws&&(mp.ws.readyState===WebSocket.OPEN||mp.ws.readyState===WebSocket.CONNECTING))return true;try{const desiredRole=role||(mp.host?'host':'guest');const ws=new WebSocket(`${workerUrl}&name=${encodeURIComponent(mp.playerName||'Player')}&role=${desiredRole}${mp.seat!=null?`&seat=${mp.seat}`:''}`);mp.ws=ws;ws.onopen=()=>{mp.connected=true;mpReconnectAttempts=0;mpReconnectDeadline=0;mpSetConnection(true);startMpPing();lastHostServerSeq=0;ws.send(JSON.stringify({type:isReconnect?'rejoin':(desiredRole==='host'?'createRoom':'joinRoom'),code:c,name:mp.playerName||'Player',seat:mp.seat,token:mp.token,avatar:mp.playerAvatar||selectedAvatar}))};ws.onmessage=e=>{try{mpHandle(JSON.parse(e.data))}catch(err){console.error('MP message error',err)}};ws.onerror=()=>{mp.connected=false;mpSetConnection(false)};ws.onclose=()=>{mp.connected=false;stopMpPing();mpSetConnection(false);mp.ws=null;
+function mpConnect(code='',role='',isReconnect=false){const c=String(code||mp.room?.code||'').trim();if(!/^\d{5}$/.test(c)){mpSetConnection(false);return false}const workerUrl=mpServerUrl(c);if(!workerUrl){mpSetConnection(false);setText('lobby-help','URL Cloudflare Worker belum dikonfigurasi.');return false}if(mp.ws&&(mp.ws.readyState===WebSocket.OPEN||mp.ws.readyState===WebSocket.CONNECTING))return true;try{const desiredRole=role||(mp.host?'host':'guest');if(!isReconnect||mpSequenceRoomCode!==c){lastHostServerSeq=0;mpLastRemoteGameSeq=0;mpHasRemoteState=false;mpSequenceRoomCode=c}const connectionId=++mpConnectionGeneration;const ws=new WebSocket(`${workerUrl}&name=${encodeURIComponent(mp.playerName||'Player')}&role=${desiredRole}${mp.seat!=null?`&seat=${mp.seat}`:''}`);mp.ws=ws;ws.onopen=()=>{if(connectionId!==mpConnectionGeneration||mp.ws!==ws)return;mp.connected=true;mpReconnectAttempts=0;mpReconnectDeadline=0;mpSetConnection(true);startMpPing();ws.send(JSON.stringify({type:isReconnect?'rejoin':(desiredRole==='host'?'createRoom':'joinRoom'),code:c,name:mp.playerName||'Player',seat:mp.seat,token:mp.token,avatar:mp.playerAvatar||selectedAvatar}))};ws.onmessage=e=>{if(connectionId!==mpConnectionGeneration||mp.ws!==ws)return;try{mpHandle(JSON.parse(e.data))}catch(err){console.error('MP message error',err)}};ws.onerror=()=>{if(connectionId!==mpConnectionGeneration||mp.ws!==ws)return;mp.connected=false;mpSetConnection(false)};ws.onclose=()=>{if(connectionId!==mpConnectionGeneration||mp.ws!==ws)return;mp.connected=false;stopMpPing();mpSetConnection(false);mp.ws=null;mpPendingStatePayload=null;clearTimeout(mpStateFlushTimer);mpStateFlushTimer=null;
     // Reconnect during a game too. The host keeps a local snapshot and sends
     // it again after the Worker accepts the restored room connection.
     if(mp.room?.code && isMultiplayerMode){
@@ -2187,13 +2194,15 @@ function mpConnect(code='',role='',isReconnect=false){const c=String(code||mp.ro
       if(Date.now()<mpReconnectDeadline){const delay=Math.min(2500,700+mpReconnectAttempts*450);mpReconnectAttempts++;clearTimeout(mpReconnectTimer);mpReconnectTimer=setTimeout(()=>{if(!mp.connected)mpConnect(mp.room.code,mp.host?'host':'guest',true)},delay)}
     }
   };return true}catch(e){mp.connected=false;mpSetConnection(false);console.error(e);return false}}
-function mpSend(type,data={}){if(mp.ws?.readyState===WebSocket.OPEN)mp.ws.send(JSON.stringify({type,...data}))}
+function mpScheduleStateFlush(){if(mpStateFlushTimer||!mpPendingStatePayload)return;mpStateFlushTimer=setTimeout(()=>{mpStateFlushTimer=null;const ws=mp.ws;if(!ws||ws.readyState!==WebSocket.OPEN||!mpPendingStatePayload){mpPendingStatePayload=null;return}if(ws.bufferedAmount>MP_WS_BUFFER_LIMIT){mpScheduleStateFlush();return}const state=mpPendingStatePayload;mpPendingStatePayload=null;try{ws.send(JSON.stringify({type:'state',state}))}catch(e){mpPendingStatePayload=state;mpScheduleStateFlush()}},100)}
+function mpSendState(state){const ws=mp.ws;if(!mp.connected||!ws||ws.readyState!==WebSocket.OPEN)return false;if(ws.bufferedAmount>MP_WS_BUFFER_LIMIT){mpPendingStatePayload=state;mpScheduleStateFlush();return false}mpPendingStatePayload=null;clearTimeout(mpStateFlushTimer);mpStateFlushTimer=null;try{ws.send(JSON.stringify({type:'state',state}));return true}catch(e){mpPendingStatePayload=state;mpScheduleStateFlush();return false}}
+function mpSend(type,data={}){const ws=mp.ws;if(!mp.connected||!ws||ws.readyState!==WebSocket.OPEN)return false;const payload={type,...data};if(type==='action'&&!mp.host){payload.actionId=`${mp.token||mp.seat||'p'}-${Date.now().toString(36)}-${(++mpActionSerial).toString(36)}`}try{ws.send(JSON.stringify(payload));return true}catch(e){console.error('MP send error',e);return false}}
 let mpPingTimer=null;
-function startMpPing(){clearInterval(mpPingTimer);if(!mp.connected)return;mpPingTimer=setInterval(()=>{if(mp.ws?.readyState===WebSocket.OPEN)mpSend('ping',{clientTime:Date.now()});},8000)}
+function startMpPing(){clearInterval(mpPingTimer);mpLastPongAt=Date.now();if(!mp.connected)return;mpPingTimer=setInterval(()=>{const ws=mp.ws;if(!ws||ws.readyState!==WebSocket.OPEN)return;const now=Date.now();if(now-mpLastPongAt>24000){try{ws.close()}catch(e){}return}mpSend('ping',{clientTime:now});},8000)}
 function stopMpPing(){clearInterval(mpPingTimer);mpPingTimer=null}
 function openPlayerLobby(){isMultiplayerMode=true;mp.playerAvatar=selectedAvatar;clearTimeout(mpReconnectTimer);mpReconnectAttempts=0;mpReconnectDeadline=0;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');mpSetConnection(false);const code=new URL(location.href).searchParams.get(MP_ROOM_PARAM);if(code){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.host=false;mp.ready=true;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};setText('lobby-help','Menghubungkan ke Room '+code+'…');mpConnect(code,'guest')}}
 function closeLobby(){clearTimeout(mpReconnectTimer);stopMpGameWatchdog();stopMpPing();try{mpSend('leave')}catch(e){}try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}mp.ws=null;mp.connected=false;mpClearSession();mpClearActiveGameState();mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,token:null,playerName:mp.playerName||'Player',playerAvatar:selectedAvatar};isMultiplayerMode=false;setDisplay('modal-lobby','none');mpSetConnection(false)}
-function mpCreateRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.playerAvatar=selectedAvatar;const code=String(Math.floor(10000+Math.random()*90000));mp.host=true;mp.seat=0;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();isMultiplayerMode=true;mp.room={code,players:[null,null,null,null],started:false};setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('mp-room-code-display',code);setText('mp-host-room-code',code);setText('lobby-help','Membuat room di Cloudflare…');mpRenderRoomQr(code);mpSaveSession();mpConnect(code,'host')}
+function mpCreateRoom(){lastHostServerSeq=0;mpLastRemoteGameSeq=0;mpHasRemoteState=false;mpSequenceRoomCode='';mpGameStateSeq=0;mpStateSendSeq=0;mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.playerAvatar=selectedAvatar;const code=String(Math.floor(10000+Math.random()*90000));mp.host=true;mp.seat=0;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();isMultiplayerMode=true;mp.room={code,players:[null,null,null,null],started:false};setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('mp-room-code-display',code);setText('mp-host-room-code',code);setText('lobby-help','Membuat room di Cloudflare…');mpRenderRoomQr(code);mpSaveSession();mpConnect(code,'host')}
 function mpJoinRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code)){alert('Masukkan kode room 5 digit.');return}mp.host=false;mp.seat=null;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};isMultiplayerMode=true;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Menghubungkan ke Room '+code+'…');mpSaveSession();mpConnect(code,'guest')}
 function mpShowJoinForm(){setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','block')}
 function togglePlayerReady(){if(!mp.room)return;mp.ready=!mp.ready;mpSend('ready',{ready:mp.ready});mpSaveSession();if(mp.host&&mp.room.players?.[0])mp.room.players[0].ready=mp.ready;mpRenderLobby(mp.room)}
@@ -2204,6 +2213,7 @@ function mpStartGame(){
   // The host is the authoritative game engine. For solo-host testing,
   // start locally so the existing AI seats can fill the empty chairs.
   if(!mp.started){
+    mpGameStateSeq=0;mpStateSendSeq=0;mpLastRemoteGameSeq=0;mpHasRemoteState=false;
     mp.started=true;
     if(mp.room)mp.room.started=true;
     setDisplay('modal-lobby','none');
@@ -2215,6 +2225,7 @@ function mpStartGame(){
 }
 function mpHandle(msg){
   if(msg.type==='hello'){mpClientId=msg.clientId;return}
+  if(msg.type==='pong'){mpLastPongAt=Date.now();return}
   if(msg.type==='error'){setText('lobby-help',msg.message||'Room error');mpSetConnection(false);return}
   if(msg.type==='joined'){
     mp.room=msg.room;mpLastRoomView=msg.room;mp.seat=msg.seat;mp.host=!!msg.host;mp.started=!!msg.room.started;mp.ready=!!(msg.room.players?.[msg.seat]?.ready);mp.playerAvatar=msg.room.players?.[msg.seat]?.avatar||mp.playerAvatar||selectedAvatar;selectedAvatar=mp.playerAvatar;syncHumanAvatars(msg.room);if(msg.seat!=null)playerAvatars[msg.seat]=mp.playerAvatar;mpReconnectAttempts=0;mpReconnectDeadline=0;
@@ -2235,6 +2246,7 @@ function mpHandle(msg){
     mp.room=msg.room||mp.room;mpLastRoomView=mp.room;mp.started=!!(msg.room?.started);mpRenderLobby(mp.room);mpSaveSession();
     if(mp.host&&roundActive)mpBroadcastState();
     if(wasStarted&&!mp.started){
+      lastHostServerSeq=0;mpLastRemoteGameSeq=0;mpHasRemoteState=false;mpGameStateSeq=0;mpStateSendSeq=0;
       // The host just triggered a rematch: the room is back in lobby mode
       // with the same seats. Pop the ready-up lobby open for EVERYONE,
       // whether or not they had already clicked "Main Lagi" themselves.
@@ -2296,13 +2308,17 @@ function stopMpGameWatchdog(){
   mpGameWatchdogTimer=null;
 }
 function mpStateSnapshot(extra={}){return{currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,playerHands,playerRivers,playerMelds,playerScores,lastDiscardedTile,lastDiscarderIdx,drawnTile,secondsLeft,timeBank,actionSecondsLeft,isActionPhase,isDiscardable,pendingCalls:mpPendingCalls,roundActive,roundEnding,roomPlayers:mp.room?.players||[],aiSeats:[...aiSeats],playerAvatars:[...playerAvatars],...extra}}
-function mpBroadcastState(extra={}){const state=mpStateSnapshot(extra);if(isMultiplayerMode&&mp.host){state._stateSeq=++mpStateSendSeq;mpSaveActiveGameState(state)}if(isMultiplayerMode&&mp.host&&mp.connected)mpSend('state',{state})}
+function mpBroadcastState(extra={},options={}){const state=mpStateSnapshot(extra);if(isMultiplayerMode&&mp.host){if(options.gameChange!==false)mpGameStateSeq++;state._gameSeq=mpGameStateSeq;state._stateSeq=++mpStateSendSeq;if(options.persist!==false)mpSaveActiveGameState(state,options.throttlePersist===true)}if(isMultiplayerMode&&mp.host&&mp.connected)mpSendState(state)}
 function mpApplyRemoteState(state){
   if(mp.host)return;
   if(!state||typeof state!=='object')return;
-  const incomingSeq=Number(state._stateSeq)||Number(state._serverSeq)||0;
-  if(incomingSeq&&incomingSeq<lastHostServerSeq)return;
+  const incomingSeq=Number(state._serverSeq)||Number(state._stateSeq)||0;
+  if(incomingSeq&&incomingSeq<=lastHostServerSeq)return;
   if(incomingSeq)lastHostServerSeq=incomingSeq;
+  const incomingGameSeq=Number(state._gameSeq)||incomingSeq||1;
+  const gameStateChanged=!mpHasRemoteState||incomingGameSeq!==mpLastRemoteGameSeq;
+  mpLastRemoteGameSeq=incomingGameSeq;
+  mpHasRemoteState=true;
 
   // A reconnected guest must remain in multiplayer mode.
   isMultiplayerMode=true;
@@ -2361,9 +2377,9 @@ function mpApplyRemoteState(state){
     currentTurn===(mp.seat??0)&&
     !stateHasRemoteCallForLocalGuest;
 
-  renderTable();
+  if(gameStateChanged)renderTable();
 
-  if(
+  if(gameStateChanged&&
     state.remoteActions?.seat===(mp.seat??0)&&
     Array.isArray(state.remoteActions.actions)&&
     state.remoteActions.actions.length
@@ -2372,7 +2388,7 @@ function mpApplyRemoteState(state){
     showAvailableActions(state.remoteActions.actions);
     setText('hand-status-main','Aksi tersedia');
     setText('hand-status-sub','Pilih aksi sebelum waktu habis.');
-  }else if(currentTurn===(mp.seat??0)&&roundActive){
+  }else if(gameStateChanged&&currentTurn===(mp.seat??0)&&roundActive){
     // Reconnect can happen during a normal turn without a fresh startGame
     // message. Recreate the same Tsumo/Kan controls the player would have had.
     const turnActions=[];
@@ -2391,17 +2407,23 @@ function mpApplyRemoteState(state){
       setText('hand-status-main','Giliran Anda');
       setText('hand-status-sub','Pilih tile untuk membuang.');
     }
-  }else{
+  }else if(gameStateChanged){
     hideAvailableActions();
   }
 
-  if(state.phase==='result'&&state.result){
+  if(gameStateChanged&&state.phase==='result'&&state.result){
     renderResultModal(state.result.title,state.result.desc);
   }
 }
 function roomCanAct(seat){return !!(mp.room?.players?.[seat] || seat===mp.seat || (mp.host&&seat===0))}
 function mpHandlePlayerAction(seat,action){
-  if(!mp.host||!roundActive||!roomCanAct(seat))return;
+  if(!mp.host||!roundActive||!roomCanAct(seat)||!action||typeof action!=='object')return;
+  const actionId=String(action.actionId||'');
+  if(actionId){
+    if(mpHandledActionIds.has(actionId))return;
+    mpHandledActionIds.add(actionId);
+    if(mpHandledActionIds.size>64){const first=mpHandledActionIds.values().next().value;mpHandledActionIds.delete(first)}
+  }
 
   if(action.type==='discard'){
     const i=playerHands[seat].findIndex(
