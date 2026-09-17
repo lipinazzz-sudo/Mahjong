@@ -5,7 +5,7 @@
     <meta name="app-version" content="25.0-mahyong-dj-actionfix">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
-    <meta name="description" content="Majong DJ - HongKong Mahjong Cloudflare multiplayer.">
+    <meta name="description" content="Majong DJ - HongKong Mahjong dengan AI dan Cloudflare multiplayer.">
     <title>Majong DJ - HongKong</title>
         <link rel="apple-touch-icon" sizes="180x180" href="IMG_6682.PNG">
     <link rel="icon" type="image/PNG" sizes="32x32" href="IMG_6682.PNG">
@@ -746,7 +746,7 @@ let avatarPickerMode='';
 let playerAvatars=['panda','shiba','kucing','penguin'];
 
 let mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,playerName:'Player',token:null,playerAvatar:selectedAvatar};
-let mpClientId=null,mpReconnectTimer=null,mpAutoStartTimer=null,mpPendingCalls=[];let mpReconnectAttempts=0,mpReconnectDeadline=0,mpLastRoomView=null;let mpGameWatchdogTimer=null;let lastHostServerSeq=0;const MP_WORKER_URL='https://mahjong-room.mahjongjong.workers.dev',MP_ROOM_PARAM='room',MP_SESSION_KEY='mahjongHKRoomV1',MP_GAME_STATE_KEY='mahjongHKActiveGameV1';
+let mpClientId=null,mpReconnectTimer=null,mpAutoStartTimer=null,mpPendingCalls=[];let mpReconnectAttempts=0,mpReconnectDeadline=0,mpLastRoomView=null;let mpGameWatchdogTimer=null;let lastHostServerSeq=0;let mpStateSendSeq=0;const MP_WORKER_URL='https://mahjong-room.mahjongjong.workers.dev',MP_ROOM_PARAM='room',MP_SESSION_KEY='mahjongHKRoomV1',MP_GAME_STATE_KEY='mahjongHKActiveGameV1';
 let aiSeats=new Set();
 const HUMAN_NAMES=['Player','Player 2','Player 3','Player 4'];
 
@@ -1199,7 +1199,7 @@ function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKe
   for(let p=0;p<4;p++)sortHand(p);
   currentTurn=currentDealerIdx;drawnTile=null;renderTable();processTurn();
 }
-function start4PGame(diff='Medium',multi=false){cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
+function start4PGame(diff='Medium',multi=false){cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;mpStateSendSeq=0;}
   aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
   if(!multi){
     mp.seat=0;mp.room=null;mp.host=true;mp.connected=false;mp.playerAvatar=selectedAvatar;
@@ -1253,21 +1253,31 @@ function updateTimeBankUI(p=currentTurn){
   const el=byId('player-time-bank');
   if(el)el.textContent=`+${Math.max(0,timeBank[p]??0)}s`;
 }
-function getRemoteActionStateForTimer(){
-  if(!isActionPhase||actionMode!=='discard-call'||actionSeat<0)return null;
-  const q=mpPendingCalls.find(x=>x.seat===actionSeat);
-  if(!q)return null;
-  const actions=(q.actions||[]).map(x=>{
-    if(x.type==='Chi')return {type:'Chi',combos:Array.isArray(x.combos)?x.combos.map(c=>[...c]):[]};
-    return x.type;
-  });
-  actions.push('Skip');
-  return {seat:actionSeat,actions,actionWindow:Math.max(0,actionSecondsLeft)};
+function getActiveRemoteActions(){
+  if(!mp.host||!isMultiplayerMode||!isActionPhase||actionSeat<0)return [];
+  if(actionMode==='discard-call'){
+    const q=mpPendingCalls.find(x=>x.seat===actionSeat);
+    if(!q)return [];
+    const out=q.actions.map(x=>x?.type==='Chi'?{type:'Chi',combos:Array.isArray(x.combos)?x.combos.map(c=>[...c]):[]}:x?.type||x);
+    out.push('Skip');
+    return {seat:actionSeat,actions:out,actionWindow:ACTION_WINDOW_SECONDS};
+  }
+  if(actionMode==='turn-action'){
+    const acts=[];
+    const win=checkCurrentWin(actionSeat,null,true);
+    if(win?.valid)acts.push('Tsumo');
+    if(getSelfKanOptions(actionSeat).length)acts.push('Kan');
+    if(acts.length)return {seat:actionSeat,actions:acts,actionWindow:ACTION_WINDOW_SECONDS};
+  }
+  return [];
 }
 function broadcastTimerState(extra={}){
   if(isMultiplayerMode&&mp.host&&mp.connected){
-    const remoteActions=extra.remoteActions??getRemoteActionStateForTimer()??[];
-    mpBroadcastState({remoteTimer:{seat:currentTurn,baseTime:secondsLeft,timeBank:timeBank[currentTurn]??0,actionSeconds:actionSecondsLeft,isActionPhase,...extra},remoteActions});
+    const remoteActions=getActiveRemoteActions();
+    mpBroadcastState({
+      remoteTimer:{seat:currentTurn,baseTime:secondsLeft,timeBank:timeBank[currentTurn]??0,actionSeconds:actionSecondsLeft,isActionPhase,...extra},
+      ...(remoteActions&&remoteActions.seat!=null?{remoteActions}:{}),
+    });
   }
 }
 function clearGameTimers(){
@@ -1341,29 +1351,20 @@ function startActionWindow(timeoutHandler,seat=currentTurn,mode='call'){
           clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
           const cb=actionTimeoutHandler; actionTimeoutHandler=null;
           actionSeat=-1; actionMode='';
-          if(myActionEpoch===actionEpoch){
-            if(isMultiplayerMode&&mp.host)mpBroadcastState({remoteActions:[]});
-            cb?.();
-          }
+          if(myActionEpoch===actionEpoch)cb?.();
         }
         return;
       }
       clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
       const cb=actionTimeoutHandler; actionTimeoutHandler=null;
       actionSeat=-1; actionMode='';
-      if(myActionEpoch===actionEpoch){
-        if(isMultiplayerMode&&mp.host)mpBroadcastState({remoteActions:[]});
-        cb?.();
-      }
+      if(myActionEpoch===actionEpoch)cb?.();
     }catch(err){
       console.error('Action timer recovery:',err);
       clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
       const cb=actionTimeoutHandler; actionTimeoutHandler=null;
       actionSeat=-1; actionMode='';
-      if(myActionEpoch===actionEpoch){
-        if(isMultiplayerMode&&mp.host)mpBroadcastState({remoteActions:[]});
-        cb?.();
-      }
+      if(myActionEpoch===actionEpoch)cb?.();
     }
   },1000);
 }
@@ -1551,6 +1552,8 @@ function executePon(p){
   const tile=lastDiscardedTile;
   if(!tile)return;
 
+  mpPendingCalls=[];
+  pendingCallChoice=null;
   const a=takeTilesById(playerHands[p],tile.id,2);
   if(a.length<2)return;
 
@@ -1566,7 +1569,7 @@ function executePon(p){
   // A human guest must keep control of the hand after Pon.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+  }else if(!isMultiplayerMode||p===(mp.seat??0)){
     isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
@@ -1586,6 +1589,8 @@ function executeChi(p,combo){
   const tile=lastDiscardedTile;
   if(!tile||!Array.isArray(combo)||combo.length!==3)return;
 
+  mpPendingCalls=[];
+  pendingCallChoice=null;
   const a=[];
   for(const n of combo){
     if(n===tile.num)continue;
@@ -1611,7 +1616,7 @@ function executeChi(p,combo){
   // A human guest must choose the discard after Chi.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+  }else if(!isMultiplayerMode||p===(mp.seat??0)){
     isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
@@ -1631,6 +1636,8 @@ function executeKan(p){
   const tile=lastDiscardedTile;
   if(!tile)return;
 
+  mpPendingCalls=[];
+  pendingCallChoice=null;
   const a=takeTilesById(playerHands[p],tile.id,3);
   if(a.length<3)return;
 
@@ -1654,7 +1661,7 @@ function executeKan(p){
   // A human guest must choose the discard after Kan draw.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+  }else if(!isMultiplayerMode||p===(mp.seat??0)){
     isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
@@ -1698,7 +1705,7 @@ function executeSelfKan(p,opt){
   // A human guest must choose the discard after self-Kan draw.
   if(aiSeats.has(p)){
     aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+  }else if(!isMultiplayerMode||p===(mp.seat??0)){
     isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
     startTurnTimer();
   }else{
@@ -1731,6 +1738,11 @@ function stopCallWindow(){
   actionTimeoutHandler=null;
   actionSeat=-1;
   actionMode='';
+}
+function canResolveCallChoice(seat,action,best){
+  // A player may choose any of their own available calls (e.g. Chi instead of Pon).
+  // Priority only blocks when another seat has a higher-priority call.
+  return !best||best.seat===seat||callPriority(action)>=callPriority(best.action);
 }
 function resolveCallChoice(seat,action){
   const q=mpPendingCalls.find(x=>x.seat===seat);
@@ -1793,7 +1805,7 @@ function promptNextCall(){
     if(pendingCallChoice&&pendingCallChoice.seat===best.seat){
       const chosen=pendingCallChoice.action;
       pendingCallChoice=null;
-      if(callPriority(chosen)>=callPriority(best.action)){
+      if(canResolveCallChoice(best.seat,chosen,best)){
         resolveCallChoice(best.seat,chosen);
         return;
       }
@@ -1807,9 +1819,6 @@ function promptNextCall(){
     // Without a host-side timer, a disconnected/stalled guest could leave
     // mpPendingCalls waiting forever and freeze the entire room.
     if(mp.host){
-      // The host owns the 5-second action window. Every timer tick keeps the
-      // same remoteActions payload so the guest buttons stay visible until
-      // the guest chooses an action or the window really expires.
       startActionWindow(finishCallWindow,best.seat,'discard-call');
     }
 
@@ -1970,7 +1979,7 @@ function triggerAction(a){
     const chosen={type:'Chi',combo:[...combo]};
     pendingCallChoice={seat:mp.seat??0,action:chosen};
     const best=highestPendingCall();
-    if(!best||callPriority(chosen)>=callPriority(best.action)){
+    if(canResolveCallChoice(mp.seat??0,chosen,best)){
       resolveCallChoice(mp.seat??0,chosen);
     }else{
       showAvailableActions(['Skip']);
@@ -1994,7 +2003,7 @@ function triggerAction(a){
     if(!act)return;
     pendingCallChoice={seat:mp.seat??0,action:act};
     const best=highestPendingCall();
-    if(!best||callPriority(act)>=callPriority(best.action)){
+    if(canResolveCallChoice(mp.seat??0,act,best)){
       resolveCallChoice(mp.seat??0,act);
     }else{
       showAvailableActions(['Skip']);
@@ -2269,7 +2278,7 @@ function startMpGameWatchdog(){
         scheduleAiTurn(currentTurn,'discard');
         return;
       }
-      if(!mpPendingCalls.length&&!aiSeats.has(currentTurn)&&!turnTimer&&!actionTimer){
+      if(!mpPendingCalls.length&&!aiSeats.has(currentTurn)&&!turnTimer&&!actionTimer && (!isMultiplayerMode || currentTurn===(mp.seat??0))){
         startTurnTimer();
       }
       return;
@@ -2287,11 +2296,11 @@ function stopMpGameWatchdog(){
   mpGameWatchdogTimer=null;
 }
 function mpStateSnapshot(extra={}){return{currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,playerHands,playerRivers,playerMelds,playerScores,lastDiscardedTile,lastDiscarderIdx,drawnTile,secondsLeft,timeBank,actionSecondsLeft,isActionPhase,isDiscardable,pendingCalls:mpPendingCalls,roundActive,roundEnding,roomPlayers:mp.room?.players||[],aiSeats:[...aiSeats],playerAvatars:[...playerAvatars],...extra}}
-function mpBroadcastState(extra={}){const state=mpStateSnapshot(extra);if(isMultiplayerMode&&mp.host)mpSaveActiveGameState(state);if(isMultiplayerMode&&mp.host&&mp.connected)mpSend('state',{state})}
+function mpBroadcastState(extra={}){const state=mpStateSnapshot(extra);if(isMultiplayerMode&&mp.host){state._stateSeq=++mpStateSendSeq;mpSaveActiveGameState(state)}if(isMultiplayerMode&&mp.host&&mp.connected)mpSend('state',{state})}
 function mpApplyRemoteState(state){
   if(mp.host)return;
   if(!state||typeof state!=='object')return;
-  const incomingSeq=Number(state._serverSeq)||0;
+  const incomingSeq=Number(state._stateSeq)||Number(state._serverSeq)||0;
   if(incomingSeq&&incomingSeq<lastHostServerSeq)return;
   if(incomingSeq)lastHostServerSeq=incomingSeq;
 
@@ -2471,7 +2480,7 @@ function mpHandlePlayerAction(seat,action){
   const best=highestPendingCall();
   const chosen=pendingCallChoice.action;
 
-  if(!best||callPriority(chosen)>=callPriority(best.action)){
+  if(canResolveCallChoice(seat,chosen,best)){
     resolveCallChoice(seat,chosen);
   }
 }
