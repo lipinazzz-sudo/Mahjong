@@ -726,7 +726,7 @@ let fullDeck=[],playerHands=[[],[],[],[]],playerRivers=[[],[],[],[]],playerMelds
 let playerScores=[15000,15000,15000,15000],roundStartScores=[15000,15000,15000,15000];
 let currentRoundIndex=0,currentDealerIdx=1,currentTurn=0,lastDiscardedTile=null,lastDiscarderIdx=-1,drawnTile=null;
 const TURN_BASE_SECONDS=10,TIME_BANK_MAX=20,ACTION_WINDOW_SECONDS=5;
-let roundActive=false,roundEnding=false,isDiscardable=false,isActionPhase=false,selectedTileIndex=-1,aiMoveTimer=null,turnTimer=null,actionTimer=null,secondsLeft=10,timeBank=[20,20,20,20],actionSecondsLeft=0,pendingCallChoice=null,actionTimeoutHandler=null,actionSeat=-1,actionMode='';
+let roundActive=false,roundEnding=false,isDiscardable=false,isActionPhase=false,selectedTileIndex=-1,aiMoveTimer=null,turnTimer=null,actionTimer=null,secondsLeft=10,timeBank=[20,20,20,20],actionSecondsLeft=0,actionBankActive=false,pendingCallChoice=null,actionTimeoutHandler=null,actionSeat=-1,actionMode='';
 let gameTurnEpoch=0;
 let actionEpoch=0;
 let stateHasRemoteCallForLocalGuest=false;
@@ -1324,12 +1324,17 @@ function startTurnTimer(){
 }
 function startActionWindow(timeoutHandler,seat=currentTurn,mode='call'){
   clearGameTimers();
-  isActionPhase=true; actionSecondsLeft=ACTION_WINDOW_SECONDS;
-  actionTimeoutHandler=timeoutHandler; actionSeat=seat; actionMode=mode;
+  isActionPhase=true;
+  actionSecondsLeft=ACTION_WINDOW_SECONDS;
+  actionBankActive=false;
+  actionTimeoutHandler=timeoutHandler;
+  actionSeat=seat;
+  actionMode=mode;
   const epoch=gameTurnEpoch;
   const myActionEpoch=++actionEpoch;
   setText('turn-timer-display',actionSecondsLeft);
-  updateTimeBankUI(seat); broadcastTimerState({actionMode:mode,seat},{gameChange:true});
+  updateTimeBankUI(seat);
+  broadcastTimerState({actionMode:mode,seat,actionBankActive:false},{gameChange:true});
   actionTimer=setInterval(()=>{
     if(!roundActive||roundEnding||epoch!==gameTurnEpoch||myActionEpoch!==actionEpoch){
       clearInterval(actionTimer);
@@ -1337,33 +1342,69 @@ function startActionWindow(timeoutHandler,seat=currentTurn,mode='call'){
       return;
     }
     try{
-      if(actionSecondsLeft>0){
+      // Phase 1: fixed action window. The buttons remain visible for all 5 seconds.
+      if(!actionBankActive&&actionSecondsLeft>0){
         actionSecondsLeft--;
         setText('turn-timer-display',Math.max(0,actionSecondsLeft));
-        broadcastTimerState({actionMode:mode,seat});
+        updateTurnTimerVisual();
+        broadcastTimerState({actionMode:mode,seat,actionBankActive:false});
         return;
       }
+
+      // Phase 2: after the first 5 seconds, the same action buttons remain
+      // available while this player's remaining time bank is consumed.
+      // Do not consume the first bank second on the exact 5-second boundary:
+      // the player receives the full remaining bank (up to 20 seconds).
+      if(!actionBankActive){
+        if((timeBank[seat]||0)>0){
+          actionBankActive=true;
+          actionSecondsLeft=0;
+          setText('turn-timer-display',timeBank[seat]);
+          updateTurnTimerVisual();
+          updateTimeBankUI(seat);
+          broadcastTimerState({actionMode:mode,seat,actionBankActive:true});
+          return;
+        }
+
+        // No bank remains: the action window ends after the initial 5 seconds.
+        clearInterval(actionTimer); actionTimer=null; isActionPhase=false; actionSecondsLeft=0; actionBankActive=false;
+        const cb=actionTimeoutHandler; actionTimeoutHandler=null;
+        actionSeat=-1; actionMode='';
+        hideAvailableActions();
+        broadcastTimerState({actionMode:mode,seat,actionBankActive:false},{gameChange:true});
+        if(myActionEpoch===actionEpoch)cb?.();
+        return;
+      }
+
       if((timeBank[seat]||0)>0){
         timeBank[seat]--;
-        setText('turn-timer-display',timeBank[seat]); updateTimeBankUI(seat);
-        broadcastTimerState({actionMode:mode,seat});
+        setText('turn-timer-display',timeBank[seat]);
+        updateTurnTimerVisual();
+        updateTimeBankUI(seat);
+        broadcastTimerState({actionMode:mode,seat,actionBankActive:true});
         if(timeBank[seat]<=0){
-          clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
+          clearInterval(actionTimer); actionTimer=null; isActionPhase=false; actionSecondsLeft=0; actionBankActive=false;
           const cb=actionTimeoutHandler; actionTimeoutHandler=null;
           actionSeat=-1; actionMode='';
+          hideAvailableActions();
+          broadcastTimerState({actionMode:mode,seat,actionBankActive:false},{gameChange:true});
           if(myActionEpoch===actionEpoch)cb?.();
         }
         return;
       }
-      clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
+
+      clearInterval(actionTimer); actionTimer=null; isActionPhase=false; actionSecondsLeft=0; actionBankActive=false;
       const cb=actionTimeoutHandler; actionTimeoutHandler=null;
       actionSeat=-1; actionMode='';
+      hideAvailableActions();
+      broadcastTimerState({actionMode:mode,seat,actionBankActive:false},{gameChange:true});
       if(myActionEpoch===actionEpoch)cb?.();
     }catch(err){
       console.error('Action timer recovery:',err);
-      clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
+      clearInterval(actionTimer); actionTimer=null; isActionPhase=false; actionSecondsLeft=0; actionBankActive=false;
       const cb=actionTimeoutHandler; actionTimeoutHandler=null;
       actionSeat=-1; actionMode='';
+      hideAvailableActions();
       if(myActionEpoch===actionEpoch)cb?.();
     }
   },1000);
@@ -1739,9 +1780,11 @@ function stopCallWindow(){
   actionTimer=null;
   isActionPhase=false;
   actionSecondsLeft=0;
+  actionBankActive=false;
   actionTimeoutHandler=null;
   actionSeat=-1;
   actionMode='';
+  hideAvailableActions();
 }
 function canResolveCallChoice(seat,action,best){
   // A player may choose any of their own available calls (e.g. Chi instead of Pon).
@@ -1753,6 +1796,7 @@ function resolveCallChoice(seat,action){
   if(!q||!action)return;
   mpPendingCalls=mpPendingCalls.filter(x=>x!==q);
   stopCallWindow();
+  hideAvailableActions();
   pendingCallChoice=null;
   if(action.type==='Ron'){resolveWin(seat,action.score,false);return}
   if(action.type==='Kan'){executeKan(seat);return}
