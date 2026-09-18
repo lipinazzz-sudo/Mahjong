@@ -1376,10 +1376,13 @@ function scheduleAiTurn(seat,mode='discard'){
   setText('hand-status-sub',mode==='call'?'AI mengevaluasi call...':'AI memilih buangan...');
 
   const run=()=>{
+    // Only the timer belonging to this exact AI decision may clear the handle.
+    // This prevents an obsolete callback from leaving aiMoveTimer truthy and
+    // blocking the multiplayer watchdog from recovering the AI.
+    if(token===aiDecisionToken)aiMoveTimer=null;
+
     if(token!==aiDecisionToken||!roundActive||roundEnding||!aiSeats.has(seat))return;
     if(mode==='discard'&&currentTurn!==seat)return;
-
-    aiMoveTimer=null;
 
     if(mode==='call'){
       const live=mpPendingCalls.find(x=>x.seat===seat);
@@ -1459,7 +1462,7 @@ function processTurn(){
 }
 function aiDiscard(p){if(!roundActive||roundEnding)return;const h=playerHands[p];if(!h.length)return;let best=0;for(let i=0;i<h.length;i++){const t=h[i];if(isSimple(t))best=i; if(t.type==='honor')best=i}const tile=h.splice(best,1)[0];drawnTile=null;commitDiscard(p,tile)}
 function handleTileTap(i,el){if(currentTurn!==(mp.seat??0)||!isDiscardable)return;const h=playerHands[mp.seat??0]||[],picked=h[i];if(!picked)return;document.querySelectorAll('#player-hand-tiles .tile, .discard-tile').forEach(x=>{x.classList.remove('selected-tile');x.classList.toggle('same-tile-highlight',Number(x.dataset.tileId)===picked.id)});el.classList.add('selected-tile');if(selectedTileIndex===i){discardTile(i);return}selectedTileIndex=i}
-function discardTile(i){if(currentTurn!==(mp.seat??0)||!isDiscardable)return;clearInterval(turnTimer);const tile=playerHands[currentTurn]?.[i];if(!tile)return;selectedTileIndex=-1;isDiscardable=false;drawnTile=null;if(isMultiplayerMode&&!mp.host){mpSend('action',{action:{type:'discard',uniqueId:tile.uniqueId}});return}playerHands[currentTurn].splice(i,1);sortHand(currentTurn);renderTable();commitDiscard(currentTurn,tile)}
+function discardTile(i){if(currentTurn!==(mp.seat??0)||!isDiscardable)return;clearInterval(turnTimer);const tile=playerHands[currentTurn]?.[i];if(!tile)return;if(isMultiplayerMode&&!mp.host){queueGuestAction({type:'discard',uniqueId:tile.uniqueId});return}selectedTileIndex=-1;isDiscardable=false;drawnTile=null;playerHands[currentTurn].splice(i,1);sortHand(currentTurn);renderTable();commitDiscard(currentTurn,tile)}
 function getDiscardCallOptions(p,tile){
   if(!tile||p===lastDiscarderIdx)return [];
 
@@ -1896,7 +1899,8 @@ function showAvailableActions(actions){
   });
 }
 function triggerAction(a){
-  hideAvailableActions();
+  const guestAction=isMultiplayerMode&&!mp.host;
+  if(!guestAction)hideAvailableActions();
 
   // Chi with an explicitly selected combination.
   if(a&&typeof a==='object'&&a.type==='Chi'){
@@ -1904,12 +1908,10 @@ function triggerAction(a){
     if(!combo||combo.length!==3)return;
 
     if(isMultiplayerMode&&!mp.host){
-      mpSend('action',{
-        action:{
-          type:'call',
-          action:'Chi',
-          combo:[...combo]
-        }
+      queueGuestAction({
+        type:'call',
+        action:'Chi',
+        combo:[...combo]
       });
       return;
     }
@@ -1950,11 +1952,9 @@ function triggerAction(a){
 
   // Guest always sends turn/call actions to the authoritative host.
   if(isMultiplayerMode&&!mp.host){
-    mpSend('action',{
-      action:{
-        type:'call',
-        action:a
-      }
+    queueGuestAction({
+      type:'call',
+      action:a
     });
     return;
   }
@@ -2185,7 +2185,7 @@ function mpRoomUrl(code){const u=new URL(location.href);u.searchParams.set(MP_RO
 async function mpCopyRoomLink(){const link=byId('mp-room-link')?.value||mpRoomUrl(mp.room?.code||'');if(!link)return;try{if(navigator.share){await navigator.share({title:'Mahjong DJ',text:'Gabung ke room Mahjong DJ',url:link});setText('mp-invite-help','Link room berhasil dibagikan.');return;}}catch(e){if(e?.name==='AbortError')return}try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(link);setText('mp-invite-help','Link room berhasil disalin.');return}}catch(e){}const input=byId('mp-room-link');if(input){input.removeAttribute('readonly');input.focus();input.select();try{document.execCommand('copy')}catch(e){}input.setAttribute('readonly','readonly');setText('mp-invite-help','Link room siap disalin.')}}
 function mpRenderRoomQr(code){setText('mp-host-room-code',code||'-----');const input=byId('mp-room-link');if(input)input.value=mpRoomUrl(code);const canvas=byId('mp-offer-qr');if(!canvas)return;canvas.classList.remove('visible');const draw=()=>{try{if(window.QRCode?.toCanvas){QRCode.toCanvas(canvas,mpRoomUrl(code),{width:180,margin:1},()=>canvas.classList.add('visible'));return true}}catch(e){}return false};if(!draw()){let tries=0;const t=setInterval(()=>{if(draw()||++tries>40)clearInterval(t)},150)}}
 function mpEnsureToken(){if(!mp.token){try{mp.token=(crypto.randomUUID?crypto.randomUUID():('tok-'+Math.random().toString(36).slice(2)+Date.now().toString(36)))}catch(e){mp.token='tok-'+Math.random().toString(36).slice(2)+Date.now().toString(36)}}return mp.token}
-function mpConnect(code='',role='',isReconnect=false){const c=String(code||mp.room?.code||'').trim();if(!/^\d{5}$/.test(c)){mpSetConnection(false);return false}const workerUrl=mpServerUrl(c);if(!workerUrl){mpSetConnection(false);setText('lobby-help','URL Cloudflare Worker belum dikonfigurasi.');return false}if(mp.ws&&(mp.ws.readyState===WebSocket.OPEN||mp.ws.readyState===WebSocket.CONNECTING))return true;try{const desiredRole=role||(mp.host?'host':'guest');const ws=new WebSocket(`${workerUrl}&name=${encodeURIComponent(mp.playerName||'Player')}&role=${desiredRole}${mp.seat!=null?`&seat=${mp.seat}`:''}`);mp.ws=ws;ws.onopen=()=>{mp.connected=true;mpReconnectAttempts=0;mpReconnectDeadline=0;mpSetConnection(true);startMpPing();lastHostServerSeq=0;ws.send(JSON.stringify({type:isReconnect?'rejoin':(desiredRole==='host'?'createRoom':'joinRoom'),code:c,name:mp.playerName||'Player',seat:mp.seat,token:mp.token,avatar:mp.playerAvatar||selectedAvatar}))};ws.onmessage=e=>{try{mpHandle(JSON.parse(e.data))}catch(err){console.error('MP message error',err)}};ws.onerror=()=>{mp.connected=false;mpSetConnection(false)};ws.onclose=()=>{mp.connected=false;stopMpPing();mpSetConnection(false);mp.ws=null;
+function mpConnect(code='',role='',isReconnect=false){const c=String(code||mp.room?.code||'').trim();if(!/^\d{5}$/.test(c)){mpSetConnection(false);return false}const workerUrl=mpServerUrl(c);if(!workerUrl){mpSetConnection(false);setText('lobby-help','URL Cloudflare Worker belum dikonfigurasi.');return false}if(mp.ws&&(mp.ws.readyState===WebSocket.OPEN||mp.ws.readyState===WebSocket.CONNECTING))return true;try{const desiredRole=role||(mp.host?'host':'guest');const ws=new WebSocket(`${workerUrl}&name=${encodeURIComponent(mp.playerName||'Player')}&role=${desiredRole}${mp.seat!=null?`&seat=${mp.seat}`:''}`);mp.ws=ws;ws.onopen=()=>{setTimeout(retryPendingGuestAction,0);mp.connected=true;mpReconnectAttempts=0;mpReconnectDeadline=0;mpSetConnection(true);startMpPing();lastHostServerSeq=0;ws.send(JSON.stringify({type:isReconnect?'rejoin':(desiredRole==='host'?'createRoom':'joinRoom'),code:c,name:mp.playerName||'Player',seat:mp.seat,token:mp.token,avatar:mp.playerAvatar||selectedAvatar}))};ws.onmessage=e=>{try{mpHandle(JSON.parse(e.data))}catch(err){console.error('MP message error',err)}};ws.onerror=()=>{mp.connected=false;mpSetConnection(false)};ws.onclose=()=>{mp.connected=false;stopMpPing();mpSetConnection(false);mp.ws=null;
     // Reconnect during a game too. The host keeps a local snapshot and sends
     // it again after the Worker accepts the restored room connection.
     if(mp.room?.code && isMultiplayerMode){
@@ -2193,12 +2193,55 @@ function mpConnect(code='',role='',isReconnect=false){const c=String(code||mp.ro
       if(Date.now()<mpReconnectDeadline){const delay=Math.min(2500,700+mpReconnectAttempts*450);mpReconnectAttempts++;clearTimeout(mpReconnectTimer);mpReconnectTimer=setTimeout(()=>{if(!mp.connected)mpConnect(mp.room.code,mp.host?'host':'guest',true)},delay)}
     }
   };return true}catch(e){mp.connected=false;mpSetConnection(false);console.error(e);return false}}
-function mpSend(type,data={}){if(mp.ws?.readyState===WebSocket.OPEN)mp.ws.send(JSON.stringify({type,...data}))}
+function mpSend(type,data={}){
+  if(mp.ws?.readyState!==WebSocket.OPEN)return false;
+  try{
+    mp.ws.send(JSON.stringify({type,...data}));
+    return true;
+  }catch(err){
+    console.warn('MP send failed:',err);
+    return false;
+  }
+}
+function clearGuestActionRetry(){
+  mpPendingGuestAction=null;
+  clearTimeout(mpGuestActionRetryTimer);
+  mpGuestActionRetryTimer=null;
+}
+function retryPendingGuestAction(){
+  clearTimeout(mpGuestActionRetryTimer);
+  mpGuestActionRetryTimer=null;
+
+  const pending=mpPendingGuestAction;
+  if(!pending||!isMultiplayerMode||mp.host)return;
+
+  if(mp.ws?.readyState===WebSocket.OPEN){
+    if(mpSend('action',{action:pending})){
+      hideAvailableActions();
+      clearGuestActionRetry();
+      return;
+    }
+  }
+
+  mpGuestActionRetryTimer=setTimeout(retryPendingGuestAction,350);
+}
+function queueGuestAction(action){
+  if(!action||typeof action!=='object')return false;
+
+  // Never queue a second action while the first one is still waiting for transport.
+  if(mpPendingGuestAction)return false;
+
+  mpPendingGuestAction={...action};
+  retryPendingGuestAction();
+  return true;
+}
 let mpPingTimer=null;
+let mpPendingGuestAction=null;
+let mpGuestActionRetryTimer=null;
 function startMpPing(){clearInterval(mpPingTimer);if(!mp.connected)return;mpPingTimer=setInterval(()=>{if(mp.ws?.readyState===WebSocket.OPEN)mpSend('ping',{clientTime:Date.now()});},8000)}
 function stopMpPing(){clearInterval(mpPingTimer);mpPingTimer=null}
 function openPlayerLobby(){isMultiplayerMode=true;mp.playerAvatar=selectedAvatar;clearTimeout(mpReconnectTimer);mpReconnectAttempts=0;mpReconnectDeadline=0;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');mpSetConnection(false);const code=new URL(location.href).searchParams.get(MP_ROOM_PARAM);if(code){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.host=false;mp.ready=true;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};setText('lobby-help','Menghubungkan ke Room '+code+'…');mpConnect(code,'guest')}}
-function closeLobby(){clearTimeout(mpReconnectTimer);stopMpGameWatchdog();stopMpPing();try{mpSend('leave')}catch(e){}try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}mp.ws=null;mp.connected=false;mpClearSession();mpClearActiveGameState();mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,token:null,playerName:mp.playerName||'Player',playerAvatar:selectedAvatar};isMultiplayerMode=false;setDisplay('modal-lobby','none');mpSetConnection(false)}
+function closeLobby(){clearGuestActionRetry();clearTimeout(mpReconnectTimer);stopMpGameWatchdog();stopMpPing();try{mpSend('leave')}catch(e){}try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}mp.ws=null;mp.connected=false;mpClearSession();mpClearActiveGameState();mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,token:null,playerName:mp.playerName||'Player',playerAvatar:selectedAvatar};isMultiplayerMode=false;setDisplay('modal-lobby','none');mpSetConnection(false)}
 function mpCreateRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.playerAvatar=selectedAvatar;const code=String(Math.floor(10000+Math.random()*90000));mp.host=true;mp.seat=0;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();isMultiplayerMode=true;mp.room={code,players:[null,null,null,null],started:false};setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('mp-room-code-display',code);setText('mp-host-room-code',code);setText('lobby-help','Membuat room di Cloudflare…');mpRenderRoomQr(code);mpSaveSession();mpConnect(code,'host')}
 function mpJoinRoom(){mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code)){alert('Masukkan kode room 5 digit.');return}mp.host=false;mp.seat=null;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};isMultiplayerMode=true;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Menghubungkan ke Room '+code+'…');mpSaveSession();mpConnect(code,'guest')}
 function mpShowJoinForm(){setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','block')}
@@ -2368,6 +2411,18 @@ function mpApplyRemoteState(state){
     !stateHasRemoteCallForLocalGuest;
 
   renderTable();
+
+  if(mpPendingGuestAction){
+    const localActionStillOpen=
+      state.remoteActions?.seat===(mp.seat??0)&&
+      Array.isArray(state.remoteActions.actions)&&
+      state.remoteActions.actions.length;
+    const localTurnStillActive=
+      currentTurn===(mp.seat??0)&&
+      roundActive&&
+      !roundEnding;
+    if(!localActionStillOpen&&!localTurnStillActive)clearGuestActionRetry();
+  }
 
   if(
     state.remoteActions?.seat===(mp.seat??0)&&
