@@ -968,6 +968,262 @@ body::after{
   #modal-lobby .ready-item{padding:6px 7px;font-size:9px;}
 }
 
+
+/* v13 UI-only precision fit:
+   - Select Mode back control stays on one horizontal line.
+   - Multiplayer lobby fits in one viewport without scrolling, including waiting/room states.
+   - Settings Audio and Auto-Sort cards are more compact without removing their text.
+   - Main menu slogan sits lower so it does not collide with Settings.
+*/
+#screen-main::after{
+  bottom:6px;
+  font-size:8.5px;
+}
+
+#screen-play .menu-actions .btn:nth-child(3){
+  flex-direction:row !important;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  white-space:nowrap;
+  padding:5px 14px;
+}
+#screen-play .menu-actions .btn:nth-child(3)::before{
+  position:relative;
+  left:auto;
+  top:auto;
+  transform:none;
+  width:auto;
+  height:auto;
+  margin:0 6px 0 0;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+}
+
+#modal-lobby{
+  padding:6px;
+  overflow:hidden;
+}
+#modal-lobby .lobby-box{
+  width:min(92vw,760px);
+  height:calc(100dvh - 12px);
+  max-height:calc(100dvh - 12px);
+  overflow:hidden;
+  padding:13px 15px 10px;
+}
+#modal-lobby .modal-head{
+  margin-bottom:5px;
+}
+#modal-lobby .modal-kicker{
+  font-size:8px;
+}
+#modal-lobby .modal-title{
+  font-size:18px;
+  margin-top:2px;
+}
+#modal-lobby .modal-copy{
+  font-size:9px;
+  line-height:1.25;
+  margin-top:3px;
+}
+#modal-lobby .mp-setup,
+#modal-lobby .mp-room-panel,
+#modal-lobby .lobby-actions{
+  gap:5px;
+}
+#modal-lobby .field-label{
+  font-size:9px;
+}
+#modal-lobby .field-input{
+  padding:7px 9px;
+  min-height:34px;
+  font-size:11px;
+  border-radius:8px;
+}
+#modal-lobby .mp-p2p-choice{
+  gap:6px;
+}
+#modal-lobby .p2p-card,
+#modal-lobby .room-share-card{
+  gap:5px;
+  padding:8px 9px;
+  border-radius:9px;
+}
+#modal-lobby .p2p-card-title{
+  font-size:8px;
+}
+#modal-lobby .room-share-big strong{
+  font-size:24px;
+  letter-spacing:3px;
+}
+#modal-lobby .signal-qr{
+  width:112px;
+  height:112px;
+  padding:4px;
+  border-radius:7px;
+}
+#modal-lobby .p2p-row{
+  gap:6px;
+}
+#modal-lobby .p2p-mini,
+#modal-lobby .mp-hint{
+  font-size:8px;
+  line-height:1.25;
+}
+#modal-lobby .ready-player-list{
+  gap:4px;
+  margin-top:7px;
+}
+#modal-lobby .ready-item{
+  padding:6px 8px;
+  min-height:32px;
+  font-size:10px;
+  border-radius:8px;
+}
+#modal-lobby .lobby-actions .btn,
+#modal-lobby .btn-wide{
+  min-height:34px;
+  padding:7px 10px;
+  font-size:10px;
+  border-radius:9px;
+}
+#modal-lobby .btn-compact{
+  min-height:30px;
+  padding:5px 8px;
+  font-size:9px;
+}
+#modal-lobby .reconnect-card{
+  gap:4px;
+  padding:7px 8px;
+  border-radius:8px;
+}
+#modal-lobby .reconnect-card strong{
+  font-size:10px;
+}
+#modal-lobby .reconnect-card span{
+  font-size:8px;
+}
+#modal-lobby .lobby-back-main{
+  margin-top:5px;
+}
+
+#screen-settings .settings-pair{
+  gap:7px;
+  margin-top:6px;
+}
+#screen-settings .settings-pair .settings-row{
+  padding:6px 8px;
+  min-height:58px;
+}
+#screen-settings .settings-pair .settings-label{
+  align-items:center;
+  gap:8px;
+}
+#screen-settings .settings-pair .settings-label > div{
+  min-width:0;
+}
+#screen-settings .settings-pair .settings-label strong{
+  display:block;
+  font-size:10px;
+  line-height:1.05;
+  white-space:nowrap;
+}
+#screen-settings .settings-pair .settings-label span{
+  display:block;
+  margin-top:2px;
+  font-size:7px;
+  line-height:1.15;
+  max-width:175px;
+}
+#screen-settings .settings-pair .toggle-btn{
+  min-width:48px;
+  min-height:30px;
+  padding:5px 7px;
+  font-size:9px;
+}
+#screen-settings .settings-actions{
+  gap:7px;
+  margin-top:6px;
+}
+#screen-settings .settings-actions .btn-wide{
+  min-height:36px;
+  padding:7px 9px;
+  font-size:10px;
+}
+
+@media (max-width:760px){
+  #modal-lobby .lobby-box{
+    width:96vw;
+    padding:11px 10px 9px;
+  }
+  #modal-lobby .signal-qr{
+    width:96px;
+    height:96px;
+  }
+  #modal-lobby .room-share-big strong{
+    font-size:22px;
+  }
+  #screen-settings .settings-pair{
+    gap:5px;
+  }
+  #screen-settings .settings-pair .settings-row{
+    padding:6px;
+  }
+  #screen-settings .settings-pair .settings-label span{
+    max-width:135px;
+    font-size:6.5px;
+  }
+}
+
+@media (max-width:430px){
+  #screen-play .menu-actions .btn:nth-child(3){
+    width:118px;
+    min-height:30px;
+    height:30px;
+    padding:4px 9px;
+    font-size:9px;
+  }
+  #modal-lobby .lobby-box{
+    height:calc(100dvh - 10px);
+    max-height:calc(100dvh - 10px);
+    padding:10px 8px 8px;
+  }
+  #modal-lobby .modal-title{
+    font-size:17px;
+  }
+  #modal-lobby .modal-copy{
+    font-size:8px;
+  }
+  #modal-lobby .field-input{
+    min-height:32px;
+    padding:6px 8px;
+    font-size:10px;
+  }
+  #modal-lobby .btn-wide,
+  #modal-lobby .lobby-actions .btn{
+    min-height:32px;
+    padding:6px 8px;
+    font-size:9px;
+  }
+  #modal-lobby .ready-item{
+    padding:5px 7px;
+    min-height:30px;
+    font-size:9px;
+  }
+  #modal-lobby .p2p-mini,
+  #modal-lobby .mp-hint{
+    font-size:7px;
+  }
+  #screen-settings .settings-pair .settings-row{
+    min-height:54px;
+  }
+  #screen-settings .settings-pair .settings-label span{
+    max-width:110px;
+  }
+}
+
 </style>
 </head>
 <body>
