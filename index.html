@@ -730,8 +730,36 @@ let roundActive=false,roundEnding=false,isDiscardable=false,isActionPhase=false,
 let gameTurnEpoch=0;
 let stateHasRemoteCallForLocalGuest=false;
 let activeRemoteActions=null;
+// Every multiplayer game interaction gets a context ID. For normal turns the
+// value is TURN-N; for discard-call windows it is CALL-N. All network actions
+// carry this ID as `callId`, so stale clicks from an older window are rejected.
+let activeCallId=null;
+let mpCallSeq=0;
+let mpActionSeq=0;
+let mpProcessedActionIds=new Set();
 let aiDecisionToken=0;
 let autoSortSetting=true,activeScreenId='screen-main',previousScreenId='screen-main',isMultiplayerMode=false;try{autoSortSetting=localStorage.getItem('hk_auto_sort')!=='0'}catch{}
+function nextMpCallId(prefix='TURN'){
+  mpCallSeq++;
+  return `${prefix}-${mpCallSeq}`;
+}
+function nextMpActionId(prefix='ACT'){
+  mpActionSeq++;
+  const client=mpClientId||'local';
+  return `${prefix}-${client}-${mpActionSeq}`;
+}
+function rememberMpAction(seat,actionId){
+  const id=String(actionId||'').trim();
+  if(!id)return false;
+  const key=`${seat}:${id}`;
+  if(mpProcessedActionIds.has(key))return false;
+  mpProcessedActionIds.add(key);
+  if(mpProcessedActionIds.size>512){
+    const first=mpProcessedActionIds.values().next().value;
+    if(first)mpProcessedActionIds.delete(first);
+  }
+  return true;
+}
 const AVATAR_OPTIONS=[
   {id:'panda',name:'Panda',file:'avatars/avatar-panda.jpg'},
   {id:'shiba',name:'Shiba',file:'avatars/avatar-shiba.jpg'},
@@ -1194,12 +1222,13 @@ function evaluateHK(pIdx,winningTile,isTsumo=false){
 }
 function drawTile(){if(!fullDeck.length)return null;return fullDeck.pop()}
 function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKey='';advisorKnownCache=null;
+  activeCallId=nextMpCallId('TURN');
   fullDeck=makeDeck();playerHands=[[],[],[],[]];playerRivers=[[],[],[],[]];playerMelds=[[],[],[],[]];lastDiscardedTile=null;lastDiscarderIdx=-1;selectedTileIndex=-1;roundEnding=false;roundActive=true;secondsLeft=TURN_BASE_SECONDS;timeBank=[TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX];actionSecondsLeft=0;pendingCallChoice=null;clearInterval(turnTimer);clearInterval(actionTimer);
   for(let n=0;n<13;n++)for(let p=0;p<4;p++)playerHands[p].push(fullDeck.pop());
   for(let p=0;p<4;p++)sortHand(p);
   currentTurn=currentDealerIdx;drawnTile=null;renderTable();processTurn();
 }
-function start4PGame(diff='Medium',multi=false){activeRemoteActions=null;cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
+function start4PGame(diff='Medium',multi=false){activeRemoteActions=null;activeCallId=null;mpCallSeq=0;mpActionSeq=0;mpProcessedActionIds=new Set();cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
   aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
   if(!multi){
     mp.seat=0;mp.room=null;mp.host=true;mp.connected=false;mp.playerAvatar=selectedAvatar;
@@ -1420,7 +1449,12 @@ function autoDiscardCurrent(){
   const tile=playerHands[p]?.[idx];
   if(!tile)return;
   if(isMultiplayerMode&&!mp.host&&p===(mp.seat??0)){
-    mpSend('action',{action:{type:'discard',uniqueId:tile.uniqueId}});
+    queueGuestAction({
+      type:'discard',
+      uniqueId:tile.uniqueId,
+      callId:activeCallId,
+      actionId:nextMpActionId('DISCARD')
+    });
     return;
   }
   playerHands[p].splice(idx,1);
@@ -1430,6 +1464,7 @@ function autoDiscardCurrent(){
 }
 function processTurn(){
   if(!roundActive||roundEnding)return;
+  if(!activeCallId)activeCallId=nextMpCallId('TURN');
   clearGameTimers(); selectedTileIndex=-1;
   if(fullDeck.length===0){const r=settleExhaustiveDraw();renderTable();endRound(r.changed?'DRAW • TENPAI BONUS':'DRAW',r.desc);return}
   const t=drawTile();if(!t){const r=settleExhaustiveDraw();renderTable();endRound(r.changed?'DRAW • TENPAI BONUS':'DRAW',r.desc);return}playerHands[currentTurn].push(t);drawnTile=t;playSfx('draw');sortHand(currentTurn);renderTable();
@@ -1462,7 +1497,11 @@ function processTurn(){
 }
 function aiDiscard(p){if(!roundActive||roundEnding)return;const h=playerHands[p];if(!h.length)return;let best=0;for(let i=0;i<h.length;i++){const t=h[i];if(isSimple(t))best=i; if(t.type==='honor')best=i}const tile=h.splice(best,1)[0];drawnTile=null;commitDiscard(p,tile)}
 function handleTileTap(i,el){if(currentTurn!==(mp.seat??0)||!isDiscardable)return;const h=playerHands[mp.seat??0]||[],picked=h[i];if(!picked)return;document.querySelectorAll('#player-hand-tiles .tile, .discard-tile').forEach(x=>{x.classList.remove('selected-tile');x.classList.toggle('same-tile-highlight',Number(x.dataset.tileId)===picked.id)});el.classList.add('selected-tile');if(selectedTileIndex===i){discardTile(i);return}selectedTileIndex=i}
-function discardTile(i){if(currentTurn!==(mp.seat??0)||!isDiscardable)return;clearInterval(turnTimer);const tile=playerHands[currentTurn]?.[i];if(!tile)return;if(isMultiplayerMode&&!mp.host){queueGuestAction({type:'discard',uniqueId:tile.uniqueId});return}selectedTileIndex=-1;isDiscardable=false;drawnTile=null;playerHands[currentTurn].splice(i,1);sortHand(currentTurn);renderTable();commitDiscard(currentTurn,tile)}
+function discardTile(i){if(currentTurn!==(mp.seat??0)||!isDiscardable)return;clearInterval(turnTimer);const tile=playerHands[currentTurn]?.[i];if(!tile)return;if(isMultiplayerMode&&!mp.host){
+    queueGuestAction({type:'discard',uniqueId:tile.uniqueId,callId:activeCallId,actionId:nextMpActionId('DISCARD')});
+    return;
+  }
+  selectedTileIndex=-1;isDiscardable=false;drawnTile=null;playerHands[currentTurn].splice(i,1);sortHand(currentTurn);renderTable();commitDiscard(currentTurn,tile)}
 function getDiscardCallOptions(p,tile){
   if(!tile||p===lastDiscarderIdx)return [];
 
@@ -1531,6 +1570,7 @@ function executePon(p){
   playerMelds[p].push(a);
   removeLastDiscard();
   currentTurn=p;
+  activeCallId=nextMpCallId('TURN');
   drawnTile=null;
   selectedTileIndex=-1;
   renderTable();
@@ -1575,6 +1615,7 @@ function executeChi(p,combo){
   playerMelds[p].push(a);
   removeLastDiscard();
   currentTurn=p;
+  activeCallId=nextMpCallId('TURN');
   drawnTile=null;
   selectedTileIndex=-1;
   renderTable();
@@ -1660,6 +1701,7 @@ function executeSelfKan(p,opt){
 
   playerHands[p].push(t);
   drawnTile=t;
+  activeCallId=nextMpCallId('TURN');
   sortHand(p);
   selectedTileIndex=-1;
   renderTable();
@@ -1696,21 +1738,25 @@ function highestPendingCall(){
   let best=null;
   for(const q of mpPendingCalls||[]){
     for(const a of q.actions||[]){
-      if(!best||callPriority(a)>callPriority(best.action))best={seat:q.seat,action:a};
+      if(!best||callPriority(a)>callPriority(best.action))best={seat:q.seat,action:a,callId:q.callId||null};
     }
   }
   return best;
 }
 function stopCallWindow(){
   clearInterval(actionTimer);actionTimer=null;isActionPhase=false;actionSecondsLeft=0;actionTimeoutHandler=null;actionSeat=-1;actionMode='';
-  // The host must clear the cached guest action immediately when the action
-  // has been resolved. Otherwise a later state/timer broadcast can recreate
-  // buttons for an action that has already been taken.
+  // Invalidate the previous decision context immediately. A new turn/call
+  // creates a new ID before another player can act.
+  activeCallId=null;
   if(mp.host)activeRemoteActions=null;
 }
 function resolveCallChoice(seat,action){
   const q=mpPendingCalls.find(x=>x.seat===seat);
   if(!q||!action)return;
+  const expectedCallId=q.callId||activeCallId;
+  const suppliedCallId=action.callId||expectedCallId;
+  if(expectedCallId&&suppliedCallId!==expectedCallId)return;
+  if(!action.callId)action={...action,callId:expectedCallId};
   stopCallWindow();pendingCallChoice=null;
   if(action.type==='Ron'){resolveWin(seat,action.score,false);return}
   if(action.type==='Kan'){executeKan(seat);return}
@@ -1740,10 +1786,12 @@ function commitDiscard(p,tile){
   clearInterval(turnTimer);stopCallWindow();isDiscardable=false;
   playerRivers[p].push(tile);lastDiscardedTile=tile;lastDiscarderIdx=p;playSfx('discard');renderTable();
   const claims=[];
+  const callId=nextMpCallId('CALL');
+  activeCallId=callId;
   for(const q of [0,1,2,3]){
     if(q===p)continue;
     const actions=getDiscardCallOptions(q,tile);
-    if(actions.length)claims.push({seat:q,actions});
+    if(actions.length)claims.push({seat:q,actions,callId});
   }
   mpPendingCalls=claims;pendingCallChoice=null;
   if(mpPendingCalls.length){promptNextCall();return}
@@ -1757,7 +1805,23 @@ function promptNextCall(){
     return;
   }
 
+  // Every player claim created by one discard belongs to the same callId.
+  // Normalize older/restored snapshots that may not have one yet.
+  let callId=mpPendingCalls.find(x=>x.callId)?.callId||activeCallId;
+  if(!callId||!String(callId).startsWith('CALL-'))callId=nextMpCallId('CALL');
+  if(mpPendingCalls.some(x=>x.callId!==callId)){
+    mpPendingCalls=mpPendingCalls.map(x=>({...x,callId}));
+  }
+  activeCallId=callId;
+
   const best=highestPendingCall();
+  if(!best){
+    mpPendingCalls=[];
+    stopCallWindow();
+    mpBroadcastState({remoteActions:[]});
+    nextTurn();
+    return;
+  }
   const q=mpPendingCalls.find(x=>x.seat===best.seat);
   if(!q){mpPendingCalls.shift();promptNextCall();return}
 
@@ -1798,6 +1862,7 @@ function promptNextCall(){
       mpBroadcastState({
         remoteActions:{
           seat:best.seat,
+          callId:q.callId,
           actions:remoteActions,
           actionWindow:ACTION_WINDOW_SECONDS
         }
@@ -1841,7 +1906,7 @@ function hideAvailableActions(){
   isActionPhase=false;
   showCurrentWaitAdvisor();
 }
-function showAvailableActions(actions){
+function showAvailableActions(actions,contextId=activeCallId){
   if((actions||[]).some(a=>(typeof a==='string'?a:a?.type)==='Ron')){
     smartAssistantShow(
       'RON TERSEDIA',
@@ -1861,6 +1926,7 @@ function showAvailableActions(actions){
 
   actions.forEach(a=>{
     const type=typeof a==='string'?a:a?.type;
+    const callId=(typeof a==='object'&&a?.callId)||contextId||null;
 
     if(type==='Chi'&&a?.combos?.length){
       if(a.combos.length===1){
@@ -1870,7 +1936,8 @@ function showAvailableActions(actions){
         b.textContent='Chi';
         b.onclick=()=>triggerAction({
           type:'Chi',
-          combo:a.combos[0]
+          combo:[...a.combos[0]],
+          callId
         });
         o.appendChild(b);
         return;
@@ -1883,7 +1950,8 @@ function showAvailableActions(actions){
         b.textContent=`Chi ${combo.join('-')}`;
         b.onclick=()=>triggerAction({
           type:'Chi',
-          combo:[...combo]
+          combo:[...combo],
+          callId
         });
         o.appendChild(b);
       });
@@ -1894,30 +1962,35 @@ function showAvailableActions(actions){
     b.type='button';
     b.className=`act-btn btn-${String(type).toLowerCase()}`;
     b.textContent=type==='Skip'?'Lewati':type;
-    b.onclick=()=>triggerAction(type);
+    b.onclick=()=>triggerAction({type,callId});
     o.appendChild(b);
   });
 }
 function triggerAction(a){
   const guestAction=isMultiplayerMode&&!mp.host;
+  const type=typeof a==='string'?a:a?.type;
+  const callId=(typeof a==='object'&&a?.callId)||activeCallId||null;
+
   if(!guestAction)hideAvailableActions();
 
   // Chi with an explicitly selected combination.
   if(a&&typeof a==='object'&&a.type==='Chi'){
     const combo=Array.isArray(a.combo)?a.combo:null;
-    if(!combo||combo.length!==3)return;
+    if(!combo||combo.length!==3||!callId)return;
 
     if(isMultiplayerMode&&!mp.host){
       queueGuestAction({
         type:'call',
         action:'Chi',
-        combo:[...combo]
+        combo:[...combo],
+        callId,
+        actionId:nextMpActionId('CALL')
       });
       return;
     }
 
     const q=mpPendingCalls.find(
-      x=>x.seat===(mp.seat??0)
+      x=>x.seat===(mp.seat??0)&&x.callId===callId
     );
     if(!q)return;
 
@@ -1931,7 +2004,7 @@ function triggerAction(a){
     );
     if(!validCombo)return;
 
-    const chosen={type:'Chi',combo:[...combo]};
+    const chosen={type:'Chi',combo:[...combo],callId};
     pendingCallChoice={
       seat:mp.seat??0,
       action:chosen
@@ -1941,7 +2014,7 @@ function triggerAction(a){
     if(!best||callPriority(chosen)>=callPriority(best.action)){
       resolveCallChoice(mp.seat??0,chosen);
     }else{
-      showAvailableActions(['Skip']);
+      showAvailableActions(['Skip'],callId);
       setText(
         'hand-status-sub',
         `Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`
@@ -1950,18 +2023,21 @@ function triggerAction(a){
     return;
   }
 
-  // Guest always sends turn/call actions to the authoritative host.
+  // Guest always sends game actions to the authoritative host with both the
+  // context ID and a unique action ID.
   if(isMultiplayerMode&&!mp.host){
     queueGuestAction({
       type:'call',
-      action:a
+      action:type,
+      callId,
+      actionId:nextMpActionId('CALL')
     });
     return;
   }
 
-  if(a==='Skip'){
+  if(type==='Skip'){
     const q=mpPendingCalls.find(
-      x=>x.seat===(mp.seat??0)
+      x=>x.seat===(mp.seat??0)&&x.callId===callId
     );
     if(q)mpPendingCalls=mpPendingCalls.filter(x=>x!==q);
     pendingCallChoice=null;
@@ -1970,7 +2046,8 @@ function triggerAction(a){
     return;
   }
 
-  if(a==='Tsumo'){
+  if(type==='Tsumo'){
+    if(callId!==activeCallId)return;
     stopCallWindow();
     const e=checkCurrentWin(mp.seat,null,true);
     if(e)resolveWin(mp.seat,e,true);
@@ -1979,36 +2056,43 @@ function triggerAction(a){
   }
 
   const q=mpPendingCalls.find(
-    x=>x.seat===(mp.seat??0)
+    x=>x.seat===(mp.seat??0)&&x.callId===callId
   );
 
   if(q){
-    const act=q.actions.find(x=>x.type===a);
+    const act=q.actions.find(x=>x.type===type);
     if(!act){
       hideAvailableActions();
       return;
     }
 
+    if(type==='Kan'){
+      // Discard-call Kan. Self-Kan is handled below.
+      const chosen={...act,callId};
+      pendingCallChoice={seat:mp.seat??0,action:chosen};
+      const best=highestPendingCall();
+      if(!best||callPriority(chosen)>=callPriority(best.action))resolveCallChoice(mp.seat??0,chosen);
+      return;
+    }
+
     pendingCallChoice={
       seat:mp.seat??0,
-      action:act
+      action:{...act,callId}
     };
 
     const best=highestPendingCall();
-    if(!best||callPriority(act)>=callPriority(best.action)){
-      resolveCallChoice(mp.seat??0,act);
+    const chosen=pendingCallChoice.action;
+    if(!best||callPriority(chosen)>=callPriority(best.action)){
+      resolveCallChoice(mp.seat??0,chosen);
     }else{
-      showAvailableActions(['Skip']);
-      setText(
-        'hand-status-sub',
-        `Menunggu call prioritas lebih tinggi... ${actionSecondsLeft}s`
-      );
+      showAvailableActions(['Skip'],callId);
     }
     return;
   }
 
   // Self-Kan during the player's own draw turn.
-  if(a==='Kan'){
+  if(type==='Kan'){
+    if(callId!==activeCallId)return;
     const opt=getSelfKanOptions(mp.seat??0)[0];
     if(opt){
       stopCallWindow();
@@ -2016,12 +2100,14 @@ function triggerAction(a){
     }
   }
 }
+
 function nextTurn(){
   if(!roundActive||roundEnding)return;
   activeRemoteActions=null;
   clearGameTimers(); cancelAiTurn(); pendingCallChoice=null; mpPendingCalls=[];
   selectedTileIndex=-1;
   currentTurn=(currentTurn+1)%4;
+  activeCallId=nextMpCallId('TURN');
   gameTurnEpoch++;
   setTimeout(()=>{if(roundActive&&!roundEnding)processTurn()},0);
 }
@@ -2043,6 +2129,7 @@ function renderResultModal(title,desc){
   requestAnimationFrame(()=>{if(box)box.querySelectorAll('[data-target-score]').forEach((el,i)=>animateScoreValue(el,Number(el.dataset.targetScore),700+i*80));});
 }
 function endRound(title,desc){smartAssistantHide();
+  activeCallId=null;
   roundEnding=true;roundActive=false;clearGameTimers();clearTimeout(aiMoveTimer);
   renderResultModal(title,desc);
   mpBroadcastState({phase:'result',result:{title,desc},playerScores});
@@ -2107,16 +2194,15 @@ function matchOverToMenu(){
 }
 function nextRoundOrFinish(){
   setDisplay('modal-result','none');
+  if(isMultiplayerMode&&!mp.host){
+    // Guests don't drive the shared game clock or round counter. The host
+    // remains authoritative and will broadcast the next round state.
+    setText('hand-status-main','Menunggu ronde berikutnya…');
+    return;
+  }
   currentRoundIndex++;
   if(currentRoundIndex>=4){
     showMatchOverScreen();
-    return;
-  }
-  if(isMultiplayerMode&&!mp.host){
-    // Guests don't drive the shared game clock — setupRound() would generate
-    // a deck locally and desync from the host. Just wait for the host's next
-    // state broadcast to repaint the table for the new round.
-    setText('hand-status-main','Menunggu ronde berikutnya…');
     return;
   }
   currentDealerIdx=(currentDealerIdx+1)%4;setupRound();mpBroadcastState();
@@ -2164,6 +2250,7 @@ function mpRestoreHostGameState(state){
   secondsLeft=state.secondsLeft??TURN_BASE_SECONDS;
   timeBank=Array.isArray(state.timeBank)?state.timeBank:[TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX];
   actionSecondsLeft=state.actionSecondsLeft??0;
+  activeCallId=state.actionContextId||null;
   aiSeats=new Set(state.aiSeats||[]);
   if(Array.isArray(state.playerAvatars)&&state.playerAvatars.length===4)playerAvatars=state.playerAvatars.slice();
   mpPendingCalls=Array.isArray(state.pendingCalls)?state.pendingCalls:[];
@@ -2344,7 +2431,7 @@ function stopMpGameWatchdog(){
   clearInterval(mpGameWatchdogTimer);
   mpGameWatchdogTimer=null;
 }
-function mpStateSnapshot(extra={}){const hasRemote=Object.prototype.hasOwnProperty.call(extra,'remoteActions');if(hasRemote)activeRemoteActions=extra.remoteActions;return{currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,playerHands,playerRivers,playerMelds,playerScores,lastDiscardedTile,lastDiscarderIdx,drawnTile,secondsLeft,timeBank,actionSecondsLeft,isActionPhase,isDiscardable,pendingCalls:mpPendingCalls,roundActive,roundEnding,roomPlayers:mp.room?.players||[],aiSeats:[...aiSeats],playerAvatars:[...playerAvatars],remoteActions:activeRemoteActions,...extra}}
+function mpStateSnapshot(extra={}){const hasRemote=Object.prototype.hasOwnProperty.call(extra,'remoteActions');if(hasRemote)activeRemoteActions=extra.remoteActions;return{currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,playerHands,playerRivers,playerMelds,playerScores,lastDiscardedTile,lastDiscarderIdx,drawnTile,secondsLeft,timeBank,actionSecondsLeft,isActionPhase,isDiscardable,pendingCalls:mpPendingCalls,roundActive,roundEnding,roomPlayers:mp.room?.players||[],aiSeats:[...aiSeats],playerAvatars:[...playerAvatars],actionContextId:activeCallId,remoteActions:activeRemoteActions,...extra}}
 function mpBroadcastState(extra={}){const state=mpStateSnapshot(extra);if(isMultiplayerMode&&mp.host)mpSaveActiveGameState(state);if(isMultiplayerMode&&mp.host&&mp.connected)mpSend('state',{state})}
 function mpApplyRemoteState(state){
   if(mp.host)return;
@@ -2374,6 +2461,7 @@ function mpApplyRemoteState(state){
   actionSecondsLeft=state.actionSecondsLeft??actionSecondsLeft;
   roundActive=!!state.roundActive;
   roundEnding=!!state.roundEnding;
+  activeCallId=state.actionContextId||state.remoteActions?.callId||null;
 
   if(state.remoteTimer&&state.remoteTimer.seat===mp.seat){
     if(state.remoteTimer.isActionPhase){
@@ -2399,10 +2487,13 @@ function mpApplyRemoteState(state){
   if(state.roundActive||state.roundEnding)setDisplay('modal-lobby','none');
 
   // Rebuild the guest's local control state from the synchronized table.
+  const remoteCallId=state.remoteActions?.callId||null;
   stateHasRemoteCallForLocalGuest=!!(
+    remoteCallId&&
     state.remoteActions?.seat===(mp.seat??0)&&
     Array.isArray(state.remoteActions.actions)&&
-    state.remoteActions.actions.length
+    state.remoteActions.actions.length&&
+    (!state.actionContextId||state.actionContextId===remoteCallId)
   );
   isDiscardable=
     roundActive&&
@@ -2414,6 +2505,7 @@ function mpApplyRemoteState(state){
 
   if(mpPendingGuestAction){
     const localActionStillOpen=
+      state.remoteActions?.callId===activeCallId&&
       state.remoteActions?.seat===(mp.seat??0)&&
       Array.isArray(state.remoteActions.actions)&&
       state.remoteActions.actions.length;
@@ -2425,12 +2517,13 @@ function mpApplyRemoteState(state){
   }
 
   if(
+    state.remoteActions?.callId===activeCallId&&
     state.remoteActions?.seat===(mp.seat??0)&&
     Array.isArray(state.remoteActions.actions)&&
     state.remoteActions.actions.length
   ){
     isDiscardable=false;
-    showAvailableActions(state.remoteActions.actions);
+    showAvailableActions(state.remoteActions.actions,state.remoteActions.callId);
     setText('hand-status-main','Aksi tersedia');
     setText('hand-status-sub','Pilih aksi sebelum waktu habis.');
   }else if(currentTurn===(mp.seat??0)&&roundActive){
@@ -2444,7 +2537,7 @@ function mpApplyRemoteState(state){
     hideAvailableActions();
 
     if(turnActions.length){
-      showAvailableActions(turnActions);
+      showAvailableActions(turnActions,activeCallId);
       setText('hand-status-main','Giliran Anda');
       setText('hand-status-sub','Pilih aksi atau tile untuk dibuang.');
     }else{
@@ -2463,8 +2556,16 @@ function mpApplyRemoteState(state){
 function roomCanAct(seat){return !!(mp.room?.players?.[seat] || seat===mp.seat || (mp.host&&seat===0))}
 function mpHandlePlayerAction(seat,action){
   if(!mp.host||!roundActive||!roomCanAct(seat))return;
+  if(!action||typeof action!=='object')return;
+
+  const incomingCallId=String(action.callId||'').trim();
+  const actionId=String(action.actionId||'').trim();
 
   if(action.type==='discard'){
+    // A discard must belong to this player's current turn context.
+    if(!incomingCallId||incomingCallId!==activeCallId||!String(activeCallId).startsWith('TURN-'))return;
+    if(actionId&&!rememberMpAction(seat,actionId))return;
+
     const i=playerHands[seat].findIndex(
       t=>t.uniqueId===action.uniqueId
     );
@@ -2478,6 +2579,9 @@ function mpHandlePlayerAction(seat,action){
   }
 
   if(action.type!=='call')return;
+
+  if(!incomingCallId||incomingCallId!==activeCallId)return;
+  if(actionId&&!rememberMpAction(seat,actionId))return;
 
   const a=action.action;
 
@@ -2493,7 +2597,7 @@ function mpHandlePlayerAction(seat,action){
 
   // Self-Kan is also a normal turn action and does not belong to
   // mpPendingCalls (which is reserved for discard calls).
-  if(a==='Kan'&&seat===currentTurn){
+  if(a==='Kan'&&seat===currentTurn&&String(activeCallId).startsWith('TURN-')){
     const options=getSelfKanOptions(seat);
     const opt=options[0];
     if(opt){
@@ -2503,7 +2607,7 @@ function mpHandlePlayerAction(seat,action){
     return;
   }
 
-  const q=mpPendingCalls.find(x=>x.seat===seat);
+  const q=mpPendingCalls.find(x=>x.seat===seat&&x.callId===incomingCallId);
   if(!q)return;
 
   if(a==='Skip'){
@@ -2532,10 +2636,10 @@ function mpHandlePlayerAction(seat,action){
 
     pendingCallChoice={
       seat,
-      action:{type:'Chi',combo:[...combo]}
+      action:{type:'Chi',combo:[...combo],callId:incomingCallId}
     };
   }else{
-    pendingCallChoice={seat,action:act};
+    pendingCallChoice={seat,action:{...act,callId:incomingCallId}};
   }
 
   const best=highestPendingCall();
@@ -2545,7 +2649,10 @@ function mpHandlePlayerAction(seat,action){
     resolveCallChoice(seat,chosen);
   }
 }
-function mpTapRemoteDiscard(t){mpSend('action',{action:{type:'discard',uniqueId:t.uniqueId}})}
+function mpTapRemoteDiscard(t){
+  if(!t)return;
+  queueGuestAction({type:'discard',uniqueId:t.uniqueId,callId:activeCallId,actionId:nextMpActionId('DISCARD')});
+}
 function mpCopyRoomInfo(){mpCopyRoomLink()}
 function mpReconnect(){
   const saved=mpLoadSession();
