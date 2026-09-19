@@ -670,6 +670,231 @@ body{background:#04110f;}
   #screen-play .menu-actions .btn{min-height:142px;height:142px;padding:61px 7px 7px;}
   #screen-play .menu-actions .btn:nth-child(3){min-height:30px;height:30px;padding:4px 11px;}
 }
+
+/* v11 UI-only polish:
+   - One persistent crisp menu background until the game board opens.
+   - Taller mode cards (~20% taller) while keeping both choices on one viewport.
+   - Audio and Auto-Sort controls share one row in Settings.
+*/
+body{
+  position:relative;
+  background:#04110f;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:-12px;
+  z-index:0;
+  pointer-events:none;
+  background:url('assets/backgrounds/bg-main.jpg') center/cover no-repeat;
+  filter:blur(1.8px) brightness(.72) saturate(.97);
+  transform:scale(1.015);
+}
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 32%,rgba(240,196,95,.055),transparent 34%),
+    linear-gradient(180deg,rgba(0,10,8,.06),rgba(0,8,7,.20));
+}
+.screen{
+  z-index:2;
+}
+.screen#screen-main,
+.screen#screen-play,
+.screen#screen-settings{
+  background:transparent !important;
+}
+.screen#screen-game{
+  z-index:10;
+  background:#0b0a09 !important;
+}
+.screen#screen-main::before,
+.screen#screen-play::before,
+.screen#screen-settings::before{
+  background:
+    radial-gradient(circle at 50% 30%,rgba(239,193,92,.045),transparent 34%),
+    linear-gradient(180deg,rgba(1,12,10,.025),rgba(1,9,8,.12));
+  backdrop-filter:blur(.6px) saturate(.98);
+}
+#screen-main .screen-card,
+#screen-play .screen-card{
+  background:linear-gradient(180deg,rgba(3,25,21,.28),rgba(2,14,12,.60));
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+}
+
+/* Select Mode: taller artwork without forcing page scrolling. */
+#screen-play .screen-card{
+  width:min(94vw,900px);
+  max-height:calc(100dvh - 16px);
+  padding:24px 26px 16px;
+}
+#screen-play .menu-actions{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+#screen-play .menu-actions .btn{
+  min-height:clamp(205px,34vh,285px);
+  height:clamp(205px,34vh,285px);
+  padding:0 14px 14px;
+  justify-content:flex-end;
+}
+#screen-play .menu-actions .btn:nth-child(1),
+#screen-play .menu-actions .btn:nth-child(2){
+  background-position:center;
+  background-size:cover;
+}
+#screen-play .menu-actions .btn:nth-child(1){
+  background-image:
+    linear-gradient(180deg,rgba(1,12,9,.00) 12%,rgba(1,8,7,.04) 46%,rgba(1,8,7,.56) 76%,rgba(0,6,5,.82) 100%),
+    url('assets/backgrounds/bg-ai-card.jpg');
+}
+#screen-play .menu-actions .btn:nth-child(2){
+  background-image:
+    linear-gradient(180deg,rgba(1,12,9,.00) 12%,rgba(1,8,7,.04) 46%,rgba(1,8,7,.56) 76%,rgba(0,6,5,.82) 100%),
+    url('assets/backgrounds/bg-multiplayer-card.jpg');
+}
+#screen-play .menu-actions .btn::after{
+  background:linear-gradient(180deg,rgba(0,0,0,.00),rgba(0,0,0,.04) 44%,rgba(0,0,0,.24) 100%);
+}
+
+#screen-play .menu-actions .btn::before{
+  margin-bottom:7px;
+}
+#screen-play .btn-note{
+  margin-top:4px;
+}
+
+/* Settings: keep every control and both exit actions visible without vertical scrolling. */
+#screen-settings .settings-card{
+  width:min(92vw,700px);
+  max-height:calc(100dvh - 18px);
+  overflow:hidden;
+  padding:13px 15px 12px;
+}
+#screen-settings .settings-row{
+  min-height:0;
+  padding:8px 10px;
+}
+#screen-settings .settings-label strong{
+  font-size:11px;
+}
+#screen-settings .settings-label span{
+  font-size:8px;
+}
+#screen-settings .range-wrap{
+  gap:2px;
+}
+#screen-settings .range-caption{
+  font-size:7px;
+}
+#screen-settings input[type="range"]{
+  height:17px;
+}
+.settings-pair{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-top:8px;
+}
+.settings-pair .settings-row{
+  border:1px solid rgba(223,180,88,.13);
+  border-radius:12px;
+  background:linear-gradient(180deg,rgba(13,40,34,.52),rgba(4,20,17,.60));
+}
+.settings-pair .settings-label{
+  width:100%;
+}
+.settings-pair .toggle-btn{
+  min-width:54px;
+}
+.settings-actions{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-top:8px;
+}
+.settings-actions .btn-wide{
+  margin-top:0 !important;
+  min-height:38px;
+}
+
+/* Preserve a compact two-column mode choice on shorter/mobile screens too. */
+@media (max-width:760px){
+  #screen-play .screen-card{
+    width:min(96vw,720px);
+    padding:18px 10px 10px;
+  }
+  #screen-play .menu-actions{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+  }
+  #screen-play .menu-actions .btn{
+    min-height:clamp(175px,29vh,225px);
+    height:clamp(175px,29vh,225px);
+    padding:0 8px 9px;
+  }
+  #screen-play .menu-actions .btn::before{
+    width:36px;
+    height:36px;
+    font-size:15px;
+  }
+  #screen-play .btn-note{
+    font-size:8px;
+  }
+  #screen-settings .settings-card{
+    width:min(96vw,620px);
+    padding:12px 10px 10px;
+  }
+  #screen-settings .settings-row{
+    padding:7px 8px;
+  }
+  .settings-actions .btn-wide{
+    font-size:10px;
+  }
+}
+@media (max-width:430px){
+  #screen-play .screen-card{
+    padding:13px 7px 8px;
+  }
+  #screen-play .brand-lockup{
+    margin-bottom:8px;
+  }
+  #screen-play .screen-heading{
+    font-size:24px;
+  }
+  #screen-play .menu-actions .btn{
+    min-height:165px;
+    height:165px;
+    padding:0 5px 7px;
+  }
+  #screen-play .menu-actions .btn::before{
+    width:31px;
+    height:31px;
+    font-size:13px;
+  }
+  .settings-pair{
+    gap:6px;
+  }
+  .settings-pair .settings-row{
+    padding:7px 6px;
+  }
+  .settings-pair .settings-label{
+    gap:6px;
+  }
+  .settings-pair .settings-label span{
+    font-size:7px;
+  }
+  .settings-pair .toggle-btn{
+    min-width:50px;
+    padding:5px 7px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -721,22 +946,26 @@ body{background:#04110f;}
                 </div>
             </div>
 
-            <div class="settings-row">
-                <div class="settings-label">
-                    <div><strong>Audio</strong><span>Mute semua suara.</span></div>
-                    <button class="btn btn-secondary btn-compact toggle-btn" id="btn-toggle-audio" onclick="toggleAudioMute()">ON</button>
+            <div class="settings-pair">
+                <div class="settings-row">
+                    <div class="settings-label">
+                        <div><strong>Audio</strong><span>Mute semua suara.</span></div>
+                        <button class="btn btn-secondary btn-compact toggle-btn" id="btn-toggle-audio" onclick="toggleAudioMute()">ON</button>
+                    </div>
+                </div>
+
+                <div class="settings-row">
+                    <div class="settings-label">
+                        <div><strong>Auto-Sort Hand</strong><span>Urutkan tile pemain secara otomatis.</span></div>
+                        <button class="btn btn-secondary btn-compact toggle-btn" id="btn-toggle-autosort" onclick="toggleAutoSortSetting()">ON</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="settings-row">
-                <div class="settings-label">
-                    <div><strong>Auto-Sort Hand</strong><span>Urutkan tile pemain secara otomatis.</span></div>
-                    <button class="btn btn-secondary btn-compact toggle-btn" id="btn-toggle-autosort" onclick="toggleAutoSortSetting()">ON</button>
-                </div>
+            <div class="settings-actions">
+                <button class="btn btn-primary btn-wide" onclick="returnToGameFromSettings()">Kembali ke Permainan</button>
+                <button class="btn btn-danger btn-wide" onclick="exitGameFromSettings()">Kembali ke Menu Utama</button>
             </div>
-
-            <button class="btn btn-primary btn-wide" onclick="returnToGameFromSettings()">Kembali ke Permainan</button>
-            <button class="btn btn-danger btn-wide" onclick="exitGameFromSettings()">Kembali ke Menu Utama</button>
         </section>
     </main>
 
