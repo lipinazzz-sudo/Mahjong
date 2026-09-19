@@ -5,8 +5,8 @@
     <meta name="app-version" content="25.0-mahyong-dj-actionfix">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
-    <meta name="description" content="Mahjong DJ - HongKong Mahjong dengan AI dan Cloudflare multiplayer.">
-    <title>Mahjong DJ - HongKong</title>
+    <meta name="description" content="MAHJONG DJ - HongKong MAHJONG dengan Cloudflare multiplayer.">
+    <title>MAHJONG DJ - HongKong</title>
         <link rel="apple-touch-icon" sizes="180x180" href="IMG_6682.PNG">
     <link rel="icon" type="image/PNG" sizes="32x32" href="IMG_6682.PNG">
     <style>
@@ -87,7 +87,7 @@
 
 .player-seat{position:absolute;z-index:35;display:flex;flex-direction:column;align-items:center;text-align:center}.avatar-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;width:max-content;height:max-content}.action-badge{position:absolute;top:50%;width:clamp(22px,3.2vw,25px);height:clamp(22px,3.2vw,25px);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:clamp(10px,1.5vw,12px);line-height:1;font-weight:950;letter-spacing:0;opacity:0;pointer-events:none;z-index:90;box-shadow:0 4px 12px rgba(0,0,0,.38),0 0 0 1px rgba(255,255,255,.10);transition:opacity .14s ease,transform .14s ease;transform:translateY(-50%) scale(.82)}.action-badge.show{opacity:1;transform:translateY(-50%) scale(1)}.pos-top .action-badge,.pos-right .action-badge{right:calc(100% + 6px);left:auto}.pos-bottom .action-badge,.pos-left .action-badge{left:calc(100% + 6px);right:auto}.action-badge-chi{background:#26945f;border:1px solid #72d8a2;color:#effff5}.action-badge-pon{background:#2c75b5;border:1px solid #73b9ef;color:#f1f8ff}.action-badge-kan{background:#198c82;border:1px solid #65d8d0;color:#ecfffd}.action-badge-ron{background:#b74642;border:1px solid #f08b84;color:#fff4f3}.action-badge-tsumo{background:#bf7a29;border:1px solid #f0c16e;color:#fff7df}.avatar-img{width:clamp(31px,min(4.7vw,5.8vh),44px);height:clamp(31px,min(4.7vw,5.8vh),44px);border-radius:10px;border:2px solid #dfb158;background:radial-gradient(circle at 34% 28%,#ffdb86,#8e4d27 50%,#261714 100%);box-shadow:0 6px 16px rgba(0,0,0,.34)}.avatar-name{margin-top:3px;padding:2px 6px;border-radius:6px;font-size:8px;font-weight:900;background:rgba(13,11,10,.86);border:1px solid rgba(255,255,255,.08);white-space:nowrap}.seat-direction{opacity:.65}.time-bank-tag{margin-top:2px;font-size:7px;color:#f0c66b}.pos-bottom{left:clamp(15px,7vw,92px);bottom:calc(var(--tileH) + 4px);transform:none;align-items:center}.pos-top{top:12px;right:clamp(46px,13vw,174px);left:auto;transform:none}.pos-left{left:clamp(12px,3vw,38px);top:45%;transform:translateY(-50%)}.pos-right{right:clamp(12px,3vw,38px);top:45%;transform:translateY(-50%)}
 .tile-back{display:block;border-radius:3px;border:1px solid #6c3b1e;background:linear-gradient(160deg,#d47d35,#8c3d12);box-shadow:inset 0 1px 0 rgba(255,236,197,.25),0 1px 3px rgba(0,0,0,.28)}.enemy-hand-count{display:flex;justify-content:center;gap:1px;margin-top:3px;min-height:12px;max-width:112px;overflow:hidden}.enemy-hand-count .mini-back{width:5px;height:9px;border-radius:1.5px;background:linear-gradient(160deg,#d47d35,#8c3d12);border:1px solid #6c3b1e;box-shadow:0 1px 2px rgba(0,0,0,.25)}.enemy-hand-count .hand-count-label{margin-left:3px;padding:2px 4px;border-radius:5px;background:rgba(13,11,10,.88);color:#f2d18b;font-size:9px;font-weight:900;line-height:11px;border:1px solid rgba(255,255,255,.08);white-space:nowrap}.enemy-meld-summary{display:none}.enemy-melds-visible{display:flex;justify-content:center;gap:3px;margin-top:3px;pointer-events:none}.enemy-meld-group{display:flex;gap:1px;padding:2px 2px 1px;border-radius:4px;background:rgba(11,9,8,.76);border:1px solid rgba(255,255,255,.10);box-shadow:0 2px 6px rgba(0,0,0,.22)}.enemy-meld-group .tile{width:clamp(12px,min(1.75vw,2.5vh),20px);height:clamp(18px,min(2.55vw,3.55vh),29px);cursor:default}.enemy-meld-group .tile .tile-char{font-size:.72em}.pos-left .enemy-hand-count,.pos-right .enemy-hand-count{max-width:94px}.pos-left .enemy-hand-count .mini-back,.pos-right .enemy-hand-count .mini-back{width:4px;height:8px}.pos-left .enemy-melds-visible,.pos-right .enemy-melds-visible{position:static;top:auto;left:auto;right:auto;transform:none;flex-direction:row;align-items:center;margin-top:3px;max-width:112px;overflow:visible}.pos-left .enemy-meld-group,.pos-right .enemy-meld-group{flex-direction:row}
-/* Compact four-sided river around a protected center, matching a digital Mahjong table. */
+/* Compact four-sided river around a protected center, matching a digital MAHJONG table. */
 #game-board{--centerSize:clamp(86px,min(10vw,12.5vh),110px);--centerHalf:calc(var(--centerSize)/2);--riverGap:clamp(12.5px,1.65vh,16.5px);--riverRowsH:calc(var(--discH)*3 + 8px);--riverRowsH-TB:calc(var(--discH)*4 + 10px);--riverColsW:calc(var(--discW)*6 + 15px);--riverColsW-TB:calc(var(--discW)*8 + 17px);--sideGap:clamp(12px,2vw,22px)}
 .river-container{position:absolute;z-index:18;display:grid;grid-template-columns:repeat(6,var(--discW));grid-template-rows:repeat(3,var(--discH));gap:2px;justify-content:center;align-content:start;width:var(--riverColsW);height:var(--riverRowsH)}
 .river-top,.river-bottom{grid-template-columns:repeat(8,var(--discW));grid-template-rows:repeat(4,var(--discH));width:var(--riverColsW-TB);height:var(--riverRowsH-TB)}
@@ -150,7 +150,7 @@ min-width:14px;min-height:33px;padding:2px;display:flex;align-items:center;justi
 .smart-assistant{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);display:grid;gap:2px;min-width:170px;max-width:min(58vw,330px);padding:6px 9px;border-radius:9px;border:1px solid rgba(224,180,93,.22);background:linear-gradient(180deg,rgba(25,20,15,.96),rgba(10,9,8,.98));box-shadow:0 10px 26px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,235,192,.05);backdrop-filter:blur(10px);pointer-events:none;animation:smartAssistantIn .18s ease-out}.smart-assistant[hidden]{display:none}.smart-assistant-title{font-size:8px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:#e0b45d}.smart-assistant-detail{font-size:7px;font-weight:750;line-height:1.25;color:#c8bfb1;white-space:normal;text-align:center}.smart-assistant.is-green{border-color:rgba(85,199,154,.32)}.smart-assistant.is-green .smart-assistant-title{color:#69d3ab}.smart-assistant.is-red{border-color:rgba(217,101,90,.36)}.smart-assistant.is-red .smart-assistant-title{color:#e26d61}@keyframes smartAssistantIn{from{opacity:0;transform:translate(-50%,4px) scale(.98)}to{opacity:1;transform:translate(-50%,0) scale(1)}}.hand-bottom-container{flex-wrap:wrap}.hand-status-bar{flex:0 0 100%;text-align:center;padding:0 10px;margin-bottom:3px}.hand-status-main{font-size:7.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#e0b45d}.hand-status-sub{font-size:6.5px;font-weight:650;line-height:1.25;color:#9f9587;margin-top:1px}
 
 /* ============================================================
-   Mahjong DJ HONGKONG — CINEMATIC UI THEME
+   MAHJONG DJ HONGKONG — CINEMATIC UI THEME
    Presentation-only layer. Game engine / IDs / handlers unchanged.
    ============================================================ */
 :root{
@@ -218,7 +218,7 @@ body{
   line-height:.96;
 }
 #screen-main h1::before{
-  content:"Mahjong DJ";
+  content:"MAHJONG DJ";
   display:block;
   font-size:clamp(42px,8.2vw,82px);
   font-weight:950;
@@ -1231,9 +1231,9 @@ body::after{
     <main id="screen-main" class="screen active" aria-labelledby="main-title">
         <section class="screen-card glass">
             <div class="brand-lockup">
-                <div class="brand-kicker"><span class="brand-dot"></span> Hong Kong Mahjong</div>
-                <h1 id="main-title">Mahjong DJ - HongKong</h1>
-                <p class="brand-subtitle">Simple, fast Hong Kong Mahjong table.</p>
+                <div class="brand-kicker"><span class="brand-dot"></span> Hong Kong MAHJONG</div>
+                <h1 id="main-title">MAHJONG DJ - HongKong</h1>
+                <p class="brand-subtitle">Simple, fast Hong Kong MAHJONG.</p>
             </div>
             <div class="menu-actions">
                 <button class="btn btn-primary" onclick="nav('screen-play')">Play Game</button>
@@ -1430,13 +1430,13 @@ body::after{
     </div>
 
     <main id="screen-game" class="screen" aria-label="Game board">
-        <section id="game-board" aria-label="Hong Kong Mahjong table">
+        <section id="game-board" aria-label="Hong Kong MAHJONG table">
             <div class="topbar">
                 <div class="topbar-left-group">
                     <div class="score-guide-launcher">
                         <button id="btn-score-guide" class="score-guide-launcher-btn" type="button" onclick="toggleScoreGuide()" aria-label="Buka Score Guide" aria-expanded="false"><span class="score-guide-launcher-icon" aria-hidden="true">▤</span><span>Score Guide</span></button>
                     </div>
-                    <div class="game-title-compact" aria-label="Mahjong DJ - HongKong">Mahjong DJ - HongKONG</div>
+                    <div class="game-title-compact" aria-label="MAHJONG DJ - HongKong">MAHJONG DJ - HongKONG</div>
                 </div>
                 <div class="score-guide-drawer" id="score-guide-drawer" aria-hidden="true">
                     <div class="score-guide-drawer-head">
@@ -1993,7 +1993,7 @@ let avatarPickerMode='';
 let playerAvatars=['panda','shiba','kucing','penguin'];
 
 let mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,playerName:'Player',token:null,playerAvatar:selectedAvatar};
-let mpClientId=null,mpReconnectTimer=null,mpAutoStartTimer=null,mpPendingCalls=[];let mpReconnectAttempts=0,mpReconnectDeadline=0,mpLastRoomView=null;let mpGameWatchdogTimer=null;let lastHostServerSeq=0;const MP_WORKER_URL='https://mahjong-room.mahjongjong.workers.dev',MP_ROOM_PARAM='room',MP_SESSION_KEY='mahjongHKRoomV1',MP_GAME_STATE_KEY='mahjongHKActiveGameV1';
+let mpClientId=null,mpReconnectTimer=null,mpAutoStartTimer=null,mpPendingCalls=[];let mpReconnectAttempts=0,mpReconnectDeadline=0,mpLastRoomView=null;let mpGameWatchdogTimer=null;let lastHostServerSeq=0;const MP_WORKER_URL='https://MAHJONG-room.MAHJONGjong.workers.dev',MP_ROOM_PARAM='room',MP_SESSION_KEY='MAHJONGHKRoomV1',MP_GAME_STATE_KEY='MAHJONGHKActiveGameV1';
 let aiSeats=new Set();
 const HUMAN_NAMES=['Player','Player 2','Player 3','Player 4'];
 
@@ -2169,7 +2169,7 @@ function showTileAdvisor(index){
     return;
   }
   setText('hand-status-main',`Buang ${name} → belum Tenpai`);
-  setText('hand-status-sub','Belum ada 1 kartu langsung menuju Mahjong dari buangan ini.');
+  setText('hand-status-sub','Belum ada 1 kartu langsung menuju MAHJONG dari buangan ini.');
 }
 let smartAssistantState={title:'',detail:'',tone:'',visible:false};
 function smartAssistantShow(title,detail,tone='gold'){
@@ -3589,7 +3589,7 @@ function mpRestoreHostGameState(state){
   return true;
 }
 function mpRoomUrl(code){const u=new URL(location.href);u.searchParams.set(MP_ROOM_PARAM,code);u.searchParams.delete('offer');u.searchParams.delete('answer');return u.href}
-async function mpCopyRoomLink(){const link=byId('mp-room-link')?.value||mpRoomUrl(mp.room?.code||'');if(!link)return;try{if(navigator.share){await navigator.share({title:'Mahjong DJ',text:'Gabung ke room Mahjong DJ',url:link});setText('mp-invite-help','Link room berhasil dibagikan.');return;}}catch(e){if(e?.name==='AbortError')return}try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(link);setText('mp-invite-help','Link room berhasil disalin.');return}}catch(e){}const input=byId('mp-room-link');if(input){input.removeAttribute('readonly');input.focus();input.select();try{document.execCommand('copy')}catch(e){}input.setAttribute('readonly','readonly');setText('mp-invite-help','Link room siap disalin.')}}
+async function mpCopyRoomLink(){const link=byId('mp-room-link')?.value||mpRoomUrl(mp.room?.code||'');if(!link)return;try{if(navigator.share){await navigator.share({title:'MAHJONG DJ',text:'Gabung ke room MAHJONG DJ',url:link});setText('mp-invite-help','Link room berhasil dibagikan.');return;}}catch(e){if(e?.name==='AbortError')return}try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(link);setText('mp-invite-help','Link room berhasil disalin.');return}}catch(e){}const input=byId('mp-room-link');if(input){input.removeAttribute('readonly');input.focus();input.select();try{document.execCommand('copy')}catch(e){}input.setAttribute('readonly','readonly');setText('mp-invite-help','Link room siap disalin.')}}
 function mpRenderRoomQr(code){setText('mp-host-room-code',code||'-----');const input=byId('mp-room-link');if(input)input.value=mpRoomUrl(code);const canvas=byId('mp-offer-qr');if(!canvas)return;canvas.classList.remove('visible');const draw=()=>{try{if(window.QRCode?.toCanvas){QRCode.toCanvas(canvas,mpRoomUrl(code),{width:180,margin:1},()=>canvas.classList.add('visible'));return true}}catch(e){}return false};if(!draw()){let tries=0;const t=setInterval(()=>{if(draw()||++tries>40)clearInterval(t)},150)}}
 function mpEnsureToken(){if(!mp.token){try{mp.token=(crypto.randomUUID?crypto.randomUUID():('tok-'+Math.random().toString(36).slice(2)+Date.now().toString(36)))}catch(e){mp.token='tok-'+Math.random().toString(36).slice(2)+Date.now().toString(36)}}return mp.token}
 function mpConnect(code='',role='',isReconnect=false){const c=String(code||mp.room?.code||'').trim();if(!/^\d{5}$/.test(c)){mpSetConnection(false);return false}const workerUrl=mpServerUrl(c);if(!workerUrl){mpSetConnection(false);setText('lobby-help','URL Cloudflare Worker belum dikonfigurasi.');return false}if(mp.ws&&(mp.ws.readyState===WebSocket.OPEN||mp.ws.readyState===WebSocket.CONNECTING))return true;try{const desiredRole=role||(mp.host?'host':'guest');const ws=new WebSocket(`${workerUrl}&name=${encodeURIComponent(mp.playerName||'Player')}&role=${desiredRole}${mp.seat!=null?`&seat=${mp.seat}`:''}`);mp.ws=ws;ws.onopen=()=>{setTimeout(retryPendingGuestAction,0);mp.connected=true;mpReconnectAttempts=0;mpReconnectDeadline=0;mpSetConnection(true);startMpPing();lastHostServerSeq=0;ws.send(JSON.stringify({type:isReconnect?'rejoin':(desiredRole==='host'?'createRoom':'joinRoom'),code:c,name:mp.playerName||'Player',seat:mp.seat,token:mp.token,avatar:mp.playerAvatar||selectedAvatar}))};ws.onmessage=e=>{try{mpHandle(JSON.parse(e.data))}catch(err){console.error('MP message error',err)}};ws.onerror=()=>{mp.connected=false;mpSetConnection(false)};ws.onclose=()=>{mp.connected=false;stopMpPing();mpSetConnection(false);mp.ws=null;
