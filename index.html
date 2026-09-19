@@ -416,7 +416,6 @@ body{
   font-weight:950;
   letter-spacing:.16em;
 }
-#screen-settings .settings-row:nth-of-type(2)::before{content:"AUDIO";}
 #screen-settings .settings-row:nth-of-type(4)::before{content:"GAMEPLAY";}
 #screen-settings .settings-row + .settings-row{border-top:1px solid rgba(223,180,88,.13);}
 #screen-settings .settings-label strong{font-size:12px;color:#f3ead9;}
@@ -1304,6 +1303,23 @@ body::after{
   margin-right:6px;
   font-size:15px;
 }
+#screen-main .screen-card{
+  position:relative;
+  z-index:10;
+}
+#screen-main .menu-actions{
+  position:relative;
+  z-index:20;
+  pointer-events:auto;
+}
+#screen-main .menu-actions .btn{
+  position:relative;
+  z-index:21;
+  display:block;
+  pointer-events:auto!important;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
 
 /* Settings pair: compact, aligned controls without label/button collisions. */
 #screen-settings .settings-pair{
@@ -1645,7 +1661,6 @@ body::after{
                         <button class="btn btn-secondary btn-compact toggle-btn" id="btn-toggle-audio" onclick="toggleAudioMute()">ON</button>
                     </div>
                 </div>
-
                 <div class="settings-row">
                     <div class="settings-label">
                         <div><strong>Auto-Sort Hand</strong><span>Urutkan tile pemain secara otomatis.</span></div>
