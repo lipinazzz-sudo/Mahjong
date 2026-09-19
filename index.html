@@ -2058,6 +2058,7 @@ function playSfx(type){
   const a=new Audio(src);
   a.preload='auto';
   a.volume=sfxVolume;
+  if(type==='draw'||type==='discard')a.volume=sfxVolume*0.60;
   activeSfx.add(a);
   a.addEventListener('ended',()=>activeSfx.delete(a),{once:true});
   const p=a.play();
@@ -2096,7 +2097,9 @@ function bindMusicPlaylist(){
   if(!audio||musicPlaylistBound)return;
   musicPlaylistBound=true;
   audio.addEventListener('ended',()=>{
-    if(!roundActive||audioMuted||musicVolume===0)return;
+    // Musik mengikuti sesi game/match, bukan hanya satu ronde.
+    // Jadi pergantian lagu tetap berjalan saat layar hasil ronde tampil.
+    if(!musicSessionActive||audioMuted||musicVolume===0)return;
     loadNextMusicTrack(true);
   });
 }
