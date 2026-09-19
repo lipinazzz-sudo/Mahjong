@@ -469,29 +469,6 @@ body{
 #modal-result .btn-primary,#modal-match-over .btn-primary{background:linear-gradient(180deg,#efc76f,#bc7a27);color:#1e1205;border-color:#f5d89b;}
 #modal-result .btn-secondary,#modal-match-over .btn-secondary{background:rgba(6,32,27,.78);border-color:rgba(226,183,89,.28);}
 
-
-/* Multiplayer History — local device only */
-#modal-history .history-box,
-#modal-history-detail .history-box{
-  width:min(94vw,920px);max-height:calc(100dvh - 28px);overflow:auto;
-  background:linear-gradient(180deg,rgba(3,27,23,.95),rgba(3,14,12,.98)),url('assets/backgrounds/bg-result.jpg') center/cover;
-  border:1px solid rgba(231,188,91,.48);box-shadow:0 32px 100px rgba(0,0,0,.72),inset 0 1px 0 rgba(255,243,206,.10);
-}
-.history-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}
-.history-head-copy{min-width:0}
-.history-kicker{font-size:10px;letter-spacing:.22em;color:#edc86e;font-weight:800;text-transform:uppercase;margin-bottom:4px}
-.history-title{font-size:26px;font-weight:900;line-height:1.05;color:#fff5dc}
-.history-subtitle{margin-top:5px;color:rgba(255,244,220,.66);font-size:12px}
-.history-empty{padding:34px 18px;text-align:center;color:rgba(255,244,220,.62);border:1px dashed rgba(231,188,91,.22);border-radius:14px;background:rgba(1,19,16,.42)}
-.history-list{display:grid;gap:7px}
-.history-row{display:grid;grid-template-columns:minmax(190px,1.8fr) minmax(80px,.7fr) minmax(110px,1fr) 52px 22px;align-items:center;gap:10px;padding:10px 12px;border:1px solid rgba(226,182,89,.18);border-radius:11px;background:rgba(1,19,16,.62);cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease}
-.history-row:hover{transform:translateY(-1px);border-color:rgba(231,188,91,.55);background:rgba(6,35,29,.78)}
-.history-main{min-width:0}.history-main strong{display:block;color:#fff4d8;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.history-main span,.history-meta{font-size:9px;color:rgba(255,244,220,.58);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.history-result{font-size:10px;color:#efcf87;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.history-score{text-align:right;font-weight:900;color:#f3c86e;font-size:11px;white-space:nowrap}.history-arrow{font-size:18px;color:#edc66b;text-align:center}
-.history-detail-grid{display:grid;grid-template-columns:1fr 1.55fr;gap:10px}.history-card{border:1px solid rgba(226,182,89,.18);border-radius:12px;background:rgba(1,19,16,.58);padding:12px}.history-card-title{font-size:9px;letter-spacing:.16em;color:#edcf87;font-weight:900;text-transform:uppercase;margin-bottom:8px}.history-info-list{display:grid;gap:6px}.history-info-row{display:flex;justify-content:space-between;gap:12px;font-size:10px;color:rgba(255,244,220,.70)}.history-info-row strong{color:#fff3d6;text-align:right}.history-player-row{display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:8px;padding:6px 0;border-top:1px solid rgba(226,182,89,.10)}.history-avatar{width:28px;height:28px;border-radius:50%;background-size:cover;background-position:center;border:1px solid rgba(232,190,93,.62)}.history-player-row span{font-size:10px;color:#f8edd4}.history-player-row strong{font-size:10px;color:#edc76d}.history-player-row small{display:block;font-size:8px;color:rgba(255,244,220,.48)}
-.history-round-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}.history-round-tabs{display:flex;gap:5px;overflow:auto;flex:1}.history-round-tab{border:1px solid rgba(226,182,89,.22);background:rgba(1,19,16,.62);color:#d9ccb0;border-radius:8px;padding:6px 9px;font-size:9px;font-weight:800;white-space:nowrap;cursor:pointer}.history-round-tab.active{background:linear-gradient(180deg,#eac56c,#b87524);color:#1d1104;border-color:#f2d494}.history-round-content{display:grid;gap:10px}.history-round-result{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:10px;border-radius:11px;border:1px solid rgba(226,182,89,.22);background:rgba(40,16,10,.32)}.history-trophy{font-size:24px}.history-round-result strong{display:block;color:#fff1d1;font-size:13px}.history-round-result span{font-size:9px;color:rgba(255,244,220,.62)}.history-points{font-size:17px;font-weight:900;color:#f2c86e;white-space:nowrap}.history-tiles{display:flex;align-items:flex-end;gap:3px;flex-wrap:wrap;padding:8px;border-radius:10px;background:rgba(1,19,16,.55);border:1px solid rgba(226,182,89,.13)}.history-tile{width:clamp(25px,5vw,42px);height:clamp(36px,7.4vw,58px);border-radius:4px;overflow:hidden}.history-tile img{width:100%;height:100%;display:block;object-fit:contain}.history-yaku{font-size:9px;color:rgba(255,244,220,.72);margin-top:6px}.history-score-table{display:grid;gap:4px}.history-score-line{display:flex;justify-content:space-between;gap:10px;padding:7px 8px;border-radius:7px;background:rgba(1,19,16,.46);font-size:9px;color:#e9ddc4}.history-score-line strong{color:#f0c86c}.history-close-row{display:flex;justify-content:flex-end;margin-top:10px}
-@media(max-width:760px){#modal-history .history-box,#modal-history-detail .history-box{width:96vw;max-height:calc(100dvh - 12px);padding:12px}.history-title{font-size:20px}.history-row{grid-template-columns:minmax(130px,1.7fr) minmax(65px,.7fr) 42px 18px;gap:6px;padding:8px}.history-row .history-meta:nth-child(3){display:none}.history-detail-grid{grid-template-columns:1fr}.history-round-result{grid-template-columns:auto 1fr}.history-points{grid-column:2}}
-
 /* Small screens: keep cards usable and game untouched */
 @media (max-width:760px){
   #screen-main .screen-card,#screen-play .screen-card{width:min(94vw,720px);padding:26px 18px;}
@@ -1245,170 +1222,9 @@ body::after{
   }
 }
 
-
-/* v18: small global cache refresh control. Never clears game data/history. */
-#btn-cache-refresh{
-  position:fixed;
-  top:12px;
-  right:12px;
-  z-index:99999;
-  width:34px;
-  height:34px;
-  padding:0;
-  border:1px solid rgba(220,180,86,.55);
-  border-radius:50%;
-  background:rgba(5,22,19,.82);
-  color:#f3d27b;
-  font-size:18px;
-  line-height:32px;
-  text-align:center;
-  cursor:pointer;
-  box-shadow:0 4px 14px rgba(0,0,0,.35);
-  backdrop-filter:blur(4px);
-  -webkit-backdrop-filter:blur(4px);
-}
-#btn-cache-refresh:hover{filter:brightness(1.12);transform:rotate(20deg)}
-#btn-cache-refresh:active{transform:scale(.94)}
-@media (max-width:600px){#btn-cache-refresh{top:8px;right:8px;width:30px;height:30px;line-height:28px;font-size:16px}}
-</style>
-<style>
-
-/* v17 UI-only polish: keep Main Menu controls visible and refine Settings toggles. */
-#screen-main .screen-card{
-  padding:clamp(20px,3.2vw,34px);
-}
-#screen-main .brand-lockup{
-  margin-bottom:22px;
-}
-#screen-main h1{
-  margin:10px 0 8px;
-}
-#screen-main h1::before{
-  font-size:clamp(36px,6.8vw,68px);
-}
-#screen-main h1::after{
-  margin-top:7px;
-  font-size:clamp(11px,1.5vw,17px);
-}
-#screen-main .menu-actions{
-  gap:8px;
-}
-#screen-main .btn{
-  min-height:50px;
-  padding:8px 12px;
-  font-size:clamp(13px,1.55vw,16px);
-}
-#screen-main .btn::before{
-  width:23px;
-  margin-right:6px;
-  font-size:15px;
-}
-
-/* Settings pair: compact, aligned controls without label/button collisions. */
-#screen-settings .settings-pair{
-  gap:8px;
-}
-#screen-settings .settings-pair .settings-row{
-  min-height:64px;
-  padding:7px 10px;
-}
-#screen-settings .settings-pair .settings-label{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-#screen-settings .settings-pair .settings-label > div{
-  flex:1 1 auto;
-  min-width:0;
-}
-#screen-settings .settings-pair .settings-label strong{
-  font-size:11px;
-  line-height:1.1;
-  white-space:nowrap;
-}
-#screen-settings .settings-pair .settings-label span{
-  max-width:none;
-  margin-top:3px;
-  font-size:8px;
-  line-height:1.2;
-}
-#screen-settings .settings-pair .toggle-btn{
-  flex:0 0 52px;
-  min-width:52px;
-  min-height:31px;
-  padding:5px 7px;
-  font-size:9px;
-}
-
-@media (max-width:760px){
-  #screen-main .screen-card{
-    padding:18px 14px 14px;
-  }
-  #screen-main .brand-lockup{
-    margin-bottom:16px;
-  }
-  #screen-main h1::before{
-    font-size:clamp(34px,7.2vw,60px);
-  }
-  #screen-main .btn{
-    min-height:46px;
-  }
-  #screen-settings .settings-pair{
-    gap:6px;
-  }
-  #screen-settings .settings-pair .settings-row{
-    min-height:60px;
-    padding:6px 8px;
-  }
-  #screen-settings .settings-pair .settings-label span{
-    font-size:7px;
-  }
-}
-
-@media (max-width:430px){
-  #screen-main .screen-card{
-    padding:15px 10px 11px;
-  }
-  #screen-main .brand-lockup{
-    margin-bottom:12px;
-  }
-  #screen-main h1::before{
-    font-size:clamp(31px,9vw,48px);
-  }
-  #screen-main h1::after{
-    font-size:10px;
-    letter-spacing:.34em;
-  }
-  #screen-main .btn{
-    min-height:42px;
-    padding:7px 10px;
-  }
-  #screen-settings .settings-pair .settings-row{
-    min-height:56px;
-    padding:6px;
-  }
-  #screen-settings .settings-pair .settings-label{
-    gap:6px;
-  }
-  #screen-settings .settings-pair .settings-label strong{
-    font-size:10px;
-  }
-  #screen-settings .settings-pair .settings-label span{
-    font-size:6.5px;
-  }
-  #screen-settings .settings-pair .toggle-btn{
-    flex-basis:48px;
-    min-width:48px;
-    min-height:29px;
-    font-size:8px;
-  }
-}
-
 </style>
 </head>
 <body>
-    <button id="btn-cache-refresh" type="button" onclick="forceFreshReload()" aria-label="Refresh dan ambil versi terbaru" title="Refresh versi terbaru">↻</button>
 
     <audio id="bg-music" loop preload="auto" aria-hidden="true"></audio>
 
@@ -1421,7 +1237,6 @@ body::after{
             </div>
             <div class="menu-actions">
                 <button class="btn btn-primary" onclick="nav('screen-play')">Play Game</button>
-                <button class="btn btn-secondary" onclick="openHistory()">History</button>
                 <button class="btn btn-secondary" onclick="nav('screen-settings')">Settings</button>
             </div>
         </section>
@@ -1573,27 +1388,6 @@ body::after{
                 </div>
             </div>
         </section>
-    </div>
-
-
-    <div id="modal-history" class="modal" role="dialog" aria-modal="true" aria-labelledby="history-title">
-      <section class="modal-box glass history-box">
-        <div class="history-head">
-          <div class="history-head-copy"><div class="history-kicker">MULTIPLAYER</div><div class="history-title" id="history-title">Game History</div><div class="history-subtitle">Riwayat pertandingan multiplayer yang tersimpan di perangkat ini.</div></div>
-          <button class="icon-btn" type="button" onclick="closeHistory()" aria-label="Tutup History">×</button>
-        </div>
-        <div id="history-list" class="history-list"></div>
-      </section>
-    </div>
-
-    <div id="modal-history-detail" class="modal" role="dialog" aria-modal="true" aria-labelledby="history-detail-title">
-      <section class="modal-box glass history-box">
-        <div class="history-head">
-          <div class="history-head-copy"><div class="history-kicker">MATCH HISTORY</div><div class="history-title" id="history-detail-title">Detail Pertandingan</div><div class="history-subtitle" id="history-detail-subtitle"></div></div>
-          <button class="icon-btn" type="button" onclick="closeHistoryDetail()" aria-label="Tutup Detail">×</button>
-        </div>
-        <div id="history-detail-body"></div>
-      </section>
     </div>
 
     <div id="modal-result" class="modal" role="dialog" aria-modal="true" aria-labelledby="res-title">
@@ -1771,8 +1565,15 @@ function byId(id){return document.getElementById(id)}
 /* ============================================================
    AUDIO MANAGER
    Local GitHub audio: ./audio/*.mp3
+   Playlist: bgm1-game.mp3 ... bgm5-game.mp3
+   Random track; the same track cannot repeat within the
+   previous 3 tracks, so it may return again after 3 tracks.
    ============================================================ */
-const GAME_BGM_SRC='audio/bgm-game.mp3';
+const GAME_BGM_TRACKS=[1,2,3,4,5].map(n=>`audio/bgm${n}-game.mp3`);
+let musicTrackIndex=-1;
+let musicRecentTracks=[];
+let musicPlaylistBound=false;
+let musicSessionActive=false;
 const SFX_SOURCES={
   draw:'audio/sfx-draw.mp3',
   discard:'audio/sfx-discard.mp3',
@@ -1877,11 +1678,49 @@ function playSfx(type){
   const p=a.play();
   if(p&&typeof p.catch==='function')p.catch(()=>activeSfx.delete(a));
 }
+function pickNextMusicTrack(){
+  if(!GAME_BGM_TRACKS.length)return null;
+  const blocked=new Set(musicRecentTracks.slice(-3));
+  let candidates=GAME_BGM_TRACKS.map((src,i)=>({src,index:i})).filter(x=>!blocked.has(x.index));
+  if(!candidates.length)candidates=GAME_BGM_TRACKS.map((src,i)=>({src,index:i}));
+  const pick=candidates[Math.floor(Math.random()*candidates.length)];
+  musicTrackIndex=pick.index;
+  musicRecentTracks.push(pick.index);
+  if(musicRecentTracks.length>3)musicRecentTracks=musicRecentTracks.slice(-3);
+  return pick.src;
+}
+function loadNextMusicTrack(autoplay=true){
+  const audio=byId('bg-music');
+  if(!audio)return false;
+  const src=pickNextMusicTrack();
+  if(!src)return false;
+  audio.loop=false;
+  audio.src=src;
+  audio.currentTime=0;
+  updateMusicIntensity();
+  applyAudioSettings();
+  if(audioMuted||musicVolume===0||!autoplay)return true;
+  const p=audio.play();
+  if(p&&typeof p.catch==='function')p.catch(()=>{});
+  return true;
+}
+function bindMusicPlaylist(){
+  const audio=byId('bg-music');
+  if(!audio||musicPlaylistBound)return;
+  musicPlaylistBound=true;
+  audio.addEventListener('ended',()=>{
+    if(!roundActive||audioMuted||musicVolume===0)return;
+    loadNextMusicTrack(true);
+  });
+}
 function unlockGameAudio(){
   const audio=byId('bg-music');
   if(!audio||audioUnlocked)return;
-  audio.src=GAME_BGM_SRC;
-  audio.loop=true;
+  bindMusicPlaylist();
+  const src=musicTrackIndex>=0?GAME_BGM_TRACKS[musicTrackIndex]:pickNextMusicTrack();
+  if(!src)return;
+  audio.src=src;
+  audio.loop=false;
   audio.volume=0;
   const p=audio.play();
   if(p&&typeof p.then==='function'){
@@ -1896,8 +1735,10 @@ function unlockGameAudio(){
 function playGameMusic(){
   const audio=byId('bg-music');
   if(!audio||audioMuted||musicVolume===0)return;
-  if(!audio.src)audio.src=GAME_BGM_SRC;
-  audio.loop=true;
+  bindMusicPlaylist();
+  if(!musicSessionActive||!audio.src||audio.ended)loadNextMusicTrack(false);
+  musicSessionActive=true;
+  audio.loop=false;
   updateMusicIntensity();
   applyAudioSettings();
   if(audio.volume===0)audio.volume=musicVolume;
@@ -1913,6 +1754,7 @@ function updateMusicIntensity(){
 function stopGameMusic(){
   const audio=byId('bg-music');
   if(audio){audio.pause();audio.currentTime=0;}
+  musicSessionActive=false;
   stopAllSfx();
 }
 function initAudioSettingsUI(){
@@ -1921,8 +1763,8 @@ function initAudioSettingsUI(){
   if(sv)sv.addEventListener('input',e=>setSfxVolume(e.target.value));
   applyAudioSettings();
 }
-document.addEventListener('pointerdown',unlockGameAudio,{once:true,passive:true});
-document.addEventListener('DOMContentLoaded',initAudioSettingsUI);
+document.addEventListener('pointerdown',()=>{bindMusicPlaylist();unlockGameAudio()},{once:true,passive:true});
+document.addEventListener('DOMContentLoaded',()=>{bindMusicPlaylist();initAudioSettingsUI()});
 
 setTimeout(preloadTileAssets,0);
 function setText(id,v){const e=byId(id);if(e)e.textContent=v==null?'':String(v);return e}
@@ -2043,43 +1885,7 @@ let lastActionFeedbackId='';
 let actionFeedbackTimer=null;
 let actionFeedbackToken=0;
 let aiDecisionToken=0;
-let autoSortSetting=true,activeScreenId='screen-main',previousScreenId='screen-main',isMultiplayerMode=false;
-let mpHistoryMatchStartedAt=null;
-let mpHistoryRounds=[];
-let mpHistorySavedKeys=new Set();
-let historyDetailMatch=null;
-let historyDetailRoundIndex=0;
-const HISTORY_DB_NAME='mahjong_dj_history_v1';
-const HISTORY_STORE='matches';
-function historyDb(){return new Promise((resolve,reject)=>{const r=indexedDB.open(HISTORY_DB_NAME,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(HISTORY_STORE)){const st=r.result.createObjectStore(HISTORY_STORE,{keyPath:'id'});st.createIndex('playedAt','playedAt')}};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
-async function historyGetAll(){try{const db=await historyDb();return await new Promise((resolve,reject)=>{const tx=db.transaction(HISTORY_STORE,'readonly'),st=tx.objectStore(HISTORY_STORE),r=st.getAll();r.onsuccess=()=>resolve((r.result||[]).sort((a,b)=>Number(b.playedAt)-Number(a.playedAt)));r.onerror=()=>reject(r.error)})}catch{return []}}
-async function historyPut(match){try{const db=await historyDb();await new Promise((resolve,reject)=>{const tx=db.transaction(HISTORY_STORE,'readwrite');tx.objectStore(HISTORY_STORE).put(match);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}catch(e){console.warn('History save failed',e)}}
-function historyDate(ts){try{return new Date(ts).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}catch{return '-'}}
-function historyRoomCode(){return String(mp.room?.code||'Multiplayer')}
-function historyPlayersSnapshot(){return [0,1,2,3].map(i=>({seat:i,name:playerName(i),avatar:playerAvatars[i]||'panda',wind:['South','East','North','West'][i]}))}
-function historyRoundRecord(title,desc,resultMeta){return {round:currentRoundIndex,name:getRoundName(),title:String(title||'Ronde Selesai'),desc:String(desc||''),scores:playerScores.map(x=>Math.round(Number(x)||0)),winner:resultMeta?.winner?JSON.parse(JSON.stringify(resultMeta.winner)):null,playedAt:Date.now()}}
-async function historyRecordRound(title,desc,resultMeta){
-  if(!isMultiplayerMode)return;
-  const key=`${historyRoomCode()}:${currentRoundIndex}`;
-  if(mpHistorySavedKeys.has(key))return;
-  mpHistorySavedKeys.add(key);
-  const rec=historyRoundRecord(title,desc,resultMeta);
-  mpHistoryRounds=mpHistoryRounds.filter(r=>r.round!==rec.round);mpHistoryRounds.push(rec);mpHistoryRounds.sort((a,b)=>a.round-b.round);
-  if(mpHistoryRounds.length>=4){
-    const match={id:`${historyRoomCode()}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,playedAt:Date.now(),startedAt:mpHistoryMatchStartedAt||rec.playedAt,room:historyRoomCode(),players:historyPlayersSnapshot(),rounds:mpHistoryRounds.slice(0,4),finalScores:rec.scores.slice(),winner:computeStandings().map(x=>({...x}))[0]||null,durationMs:Math.max(0,Date.now()-(mpHistoryMatchStartedAt||rec.playedAt))};
-    await historyPut(match);
-  }
-}
-function avatarUrl(id){const def=getAvatarDef(id||'panda');return def?.file||''}
-function historyTileHtml(tile){if(!tile)return '';const wrap=document.createElement('div');wrap.className='history-tile';wrap.innerHTML=tileMarkup(tile);const img=wrap.querySelector('img');if(img)img.removeAttribute('onerror');return wrap.outerHTML}
-async function openHistory(){setDisplay('modal-history-detail','none');setDisplay('modal-history','flex');await renderHistoryList()}
-function closeHistory(){setDisplay('modal-history','none')}
-function closeHistoryDetail(){setDisplay('modal-history-detail','none')}
-async function renderHistoryList(){const box=byId('history-list');if(!box)return;const list=await historyGetAll();if(!list.length){box.innerHTML='<div class="history-empty">Belum ada pertandingan multiplayer yang tersimpan di perangkat ini.</div>';return}box.innerHTML=list.map((m,i)=>{const winner=m.winner?.name||'Draw';const top=Number(m.winner?.score||0);return `<button class="history-row" type="button" onclick="openHistoryMatch(${i})" data-history-index="${i}"><span class="history-main"><strong>${esc(winner)}${winner!=='Draw'?' Menang':' • Draw'}</strong><span>${esc(historyDate(m.playedAt))} • Room ${esc(m.room)}</span></span><span class="history-meta">Multiplayer</span><span class="history-result">${(m.rounds||[]).length} Ronde</span><span class="history-score">${top.toLocaleString('id-ID')}</span><span class="history-arrow">›</span></button>`}).join('');window.__mahjongHistoryList=list}
-async function openHistoryMatch(index){const list=window.__mahjongHistoryList||await historyGetAll();const m=list[index];if(!m)return;historyDetailMatch=m;historyDetailRoundIndex=0;setDisplay('modal-history','none');setDisplay('modal-history-detail','flex');renderHistoryDetail()}
-function renderHistoryDetail(){const m=historyDetailMatch;if(!m)return;setText('history-detail-title','Detail Pertandingan');setText('history-detail-subtitle',`Room ${m.room} • ${historyDate(m.playedAt)} • ${m.rounds.length} ronde`);const body=byId('history-detail-body');if(!body)return;const players=(m.players||[]);const standings=(m.finalScores||[]).map((score,seat)=>({seat,name:players[seat]?.name||`Player ${seat+1}`,score})).sort((a,b)=>b.score-a.score);const phtml=players.map(p=>`<div class="history-player-row"><div class="history-avatar" style="background-image:url('${avatarUrl(p.avatar)}')"></div><span>${esc(p.name)}<small>${esc(p.wind)}</small></span><strong>${(m.finalScores?.[p.seat]||0).toLocaleString('id-ID')}</strong></div>`).join('');const rounds=(m.rounds||[]).map((r,i)=>`<button class="history-round-tab${i===historyDetailRoundIndex?' active':''}" onclick="selectHistoryRound(${i})">${esc(r.name||`Round ${i+1}`)}</button>`).join('');const r=m.rounds?.[historyDetailRoundIndex]||null;let winner=r?.winner;const winnerName=winner?.winnerName||(winner?.winnerSeat!==undefined?players[winner.winnerSeat]?.name:'Draw');const winTitle=r?.title||'DRAW';const points=String(r?.desc||'').split(' • ').slice(1).join(' • ');const tiles=winner?[...(winner.hand||[])]:[];if(winner?.winningTile&&!tiles.some(t=>t?.uniqueId===winner.winningTile.uniqueId))tiles.push(winner.winningTile);const tileHtml=tiles.map(historyTileHtml).join('');const yaku=winner?.yakuStr||r?.desc||'Tidak ada detail kemenangan.';body.innerHTML=`<div class="history-detail-grid"><div class="history-card"><div class="history-card-title">Pertandingan</div><div class="history-info-list"><div class="history-info-row"><span>Room</span><strong>${esc(m.room)}</strong></div><div class="history-info-row"><span>Durasi</span><strong>${Math.round((m.durationMs||0)/60000)} menit</strong></div><div class="history-info-row"><span>Ronde</span><strong>${m.rounds.length}</strong></div></div><div class="history-card-title" style="margin-top:14px">Pemain</div>${phtml}</div><div class="history-card"><div class="history-card-title">Hasil Akhir</div><div class="history-score-table">${standings.map((x,i)=>`<div class="history-score-line"><span>${i===0?'🏆 ':`#${i+1} `}${esc(x.name)}</span><strong>${x.score.toLocaleString('id-ID')}</strong></div>`).join('')}</div></div></div><div class="history-card" style="margin-top:10px"><div class="history-card-title">Lihat Per Round</div><div class="history-round-nav"><div class="history-round-tabs">${rounds}</div></div><div class="history-round-content">${r?`<div class="history-round-result"><div class="history-trophy">${winTitle.startsWith('DRAW')?'🀄':'🏆'}</div><div><strong>${esc(winTitle)}</strong><span>${esc(winnerName||'Tidak ada pemenang')} • ${esc(r.desc||'')}</span></div><div class="history-points">${esc(points)}</div></div>${tileHtml?`<div><div class="history-card-title">Tangan Kemenangan</div><div class="history-tiles">${tileHtml}</div><div class="history-yaku">${esc(yaku)}</div></div>`:''}<div><div class="history-card-title">Skor Setelah Ronde</div><div class="history-score-table">${(r.scores||[]).map((score,seat)=>`<div class="history-score-line"><span>${esc(players[seat]?.name||playerName(seat))}</span><strong>${Number(score).toLocaleString('id-ID')}</strong></div>`).join('')}</div></div>`:'<div class="history-empty">Detail ronde tidak tersedia.</div>'}</div></div><div class="history-close-row"><button class="btn btn-secondary" type="button" onclick="closeHistoryDetail();openHistory()">Kembali ke History</button></div>`}
-function selectHistoryRound(i){historyDetailRoundIndex=Math.max(0,Math.min(i,(historyDetailMatch?.rounds?.length||1)-1));renderHistoryDetail()}
-try{autoSortSetting=localStorage.getItem('hk_auto_sort')!=='0'}catch{}
+let autoSortSetting=true,activeScreenId='screen-main',previousScreenId='screen-main',isMultiplayerMode=false;try{autoSortSetting=localStorage.getItem('hk_auto_sort')!=='0'}catch{}
 function nextMpCallId(prefix='TURN'){
   mpCallSeq++;
   return `${prefix}-${mpCallSeq}`;
@@ -2647,7 +2453,7 @@ function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKe
   for(let p=0;p<4;p++)sortHand(p);
   currentTurn=currentDealerIdx;drawnTile=null;renderTable();processTurn();
 }
-function start4PGame(diff='Medium',multi=false){mpHistoryRounds=[];mpHistorySavedKeys=new Set();mpHistoryMatchStartedAt=Date.now();activeRemoteActions=null;mpPendingCalls=[];activeActionFeedback=null;actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;lastActionFeedbackId='';clearPlayerActionFeedback();activeCallId=null;mpCallSeq=0;mpActionSeq=0;mpProcessedActionIds=new Set();cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
+function start4PGame(diff='Medium',multi=false){activeRemoteActions=null;mpPendingCalls=[];activeActionFeedback=null;actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;lastActionFeedbackId='';clearPlayerActionFeedback();activeCallId=null;mpCallSeq=0;mpActionSeq=0;mpProcessedActionIds=new Set();cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
   aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
   if(!multi){
     mp.seat=0;mp.room=null;mp.host=true;mp.connected=false;mp.playerAvatar=selectedAvatar;
@@ -3639,7 +3445,6 @@ function renderResultModal(title,desc,resultMeta=null){
   requestAnimationFrame(()=>{if(box)box.querySelectorAll('[data-target-score]').forEach((el,i)=>animateScoreValue(el,Number(el.dataset.targetScore),700+i*80));});
 }
 function endRound(title,desc,resultMeta={}){smartAssistantHide();
-  historyRecordRound(title,desc,resultMeta);
   actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();
   activeCallId=null;
   mpPendingCalls=[];
@@ -3901,7 +3706,6 @@ function mpHandle(msg){
     return
   }
   if(msg.type==='startGame'){
-    mpHistoryRounds=[];mpHistorySavedKeys=new Set();mpHistoryMatchStartedAt=Date.now();
     mp.started=true;if(mp.room)mp.room.started=true;mpSaveSession({started:true});setDisplay('modal-lobby','none');setDisplay('modal-match-over','none');setDisplay('modal-result','none');nav('screen-game');playGameMusic();if(mp.host&&!roundActive)start4PGame('Medium',true);if(mp.host)startMpGameWatchdog();return
   }
   if(msg.type==='state'&&msg.state){mpApplyRemoteState(msg.state);return}
@@ -4079,9 +3883,7 @@ function mpApplyRemoteState(state){
     hideAvailableActions();
   }
 
-  if(state.roundActive&&state.currentRoundIndex===0&&!mpHistoryMatchStartedAt)mpHistoryMatchStartedAt=Date.now();
   if(state.phase==='result'&&state.result){
-    historyRecordRound(state.result.title,state.result.desc,state.result);
     renderResultModal(state.result.title,state.result.desc,state.result);
   }
 }
@@ -4230,25 +4032,6 @@ function mpReconnect(){
   mpConnect(saved.room,mp.host?'host':'guest',true);
 }
 window.mpConnect=mpConnect;window.mpSend=mpSend;window.openPlayerLobby=openPlayerLobby;window.mpCreateRoom=mpCreateRoom;window.mpJoinRoom=mpJoinRoom;window.mpShowJoinForm=mpShowJoinForm;window.togglePlayerReady=togglePlayerReady;window.mpStartGame=mpStartGame;window.closeLobby=closeLobby;window.mpCopyRoomLink=mpCopyRoomLink;window.mpCopyRoomInfo=mpCopyRoomInfo;
-
-function forceFreshReload(){
-  const btn=document.getElementById('btn-cache-refresh');
-  if(btn){btn.disabled=true;btn.textContent='↻';btn.style.opacity='.55'}
-  // Hanya bersihkan Cache Storage milik browser/service worker.
-  // localStorage dan IndexedDB TIDAK disentuh agar settings, session, dan History tetap aman.
-  const clearCaches=(async()=>{
-    try{
-      if(window.caches){
-        const keys=await caches.keys();
-        await Promise.all(keys.map(k=>caches.delete(k)));
-      }
-    }catch(e){}
-  })();
-  const sep=location.pathname.includes('?')?'&':'?';
-  const freshUrl=location.pathname+sep+'v='+Date.now()+location.hash;
-  clearCaches.finally(()=>{ location.replace(freshUrl); });
-}
-
 </script>
 </body>
 </html>
