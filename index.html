@@ -1245,6 +1245,31 @@ body::after{
   }
 }
 
+
+/* v18: small global cache refresh control. Never clears game data/history. */
+#btn-cache-refresh{
+  position:fixed;
+  top:12px;
+  right:12px;
+  z-index:99999;
+  width:34px;
+  height:34px;
+  padding:0;
+  border:1px solid rgba(220,180,86,.55);
+  border-radius:50%;
+  background:rgba(5,22,19,.82);
+  color:#f3d27b;
+  font-size:18px;
+  line-height:32px;
+  text-align:center;
+  cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,.35);
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+}
+#btn-cache-refresh:hover{filter:brightness(1.12);transform:rotate(20deg)}
+#btn-cache-refresh:active{transform:scale(.94)}
+@media (max-width:600px){#btn-cache-refresh{top:8px;right:8px;width:30px;height:30px;line-height:28px;font-size:16px}}
 </style>
 <style>
 
@@ -1383,6 +1408,7 @@ body::after{
 </style>
 </head>
 <body>
+    <button id="btn-cache-refresh" type="button" onclick="forceFreshReload()" aria-label="Refresh dan ambil versi terbaru" title="Refresh versi terbaru">↻</button>
 
     <audio id="bg-music" loop preload="auto" aria-hidden="true"></audio>
 
@@ -4204,6 +4230,25 @@ function mpReconnect(){
   mpConnect(saved.room,mp.host?'host':'guest',true);
 }
 window.mpConnect=mpConnect;window.mpSend=mpSend;window.openPlayerLobby=openPlayerLobby;window.mpCreateRoom=mpCreateRoom;window.mpJoinRoom=mpJoinRoom;window.mpShowJoinForm=mpShowJoinForm;window.togglePlayerReady=togglePlayerReady;window.mpStartGame=mpStartGame;window.closeLobby=closeLobby;window.mpCopyRoomLink=mpCopyRoomLink;window.mpCopyRoomInfo=mpCopyRoomInfo;
+
+function forceFreshReload(){
+  const btn=document.getElementById('btn-cache-refresh');
+  if(btn){btn.disabled=true;btn.textContent='↻';btn.style.opacity='.55'}
+  // Hanya bersihkan Cache Storage milik browser/service worker.
+  // localStorage dan IndexedDB TIDAK disentuh agar settings, session, dan History tetap aman.
+  const clearCaches=(async()=>{
+    try{
+      if(window.caches){
+        const keys=await caches.keys();
+        await Promise.all(keys.map(k=>caches.delete(k)));
+      }
+    }catch(e){}
+  })();
+  const sep=location.pathname.includes('?')?'&':'?';
+  const freshUrl=location.pathname+sep+'v='+Date.now()+location.hash;
+  clearCaches.finally(()=>{ location.replace(freshUrl); });
+}
+
 </script>
 </body>
 </html>
