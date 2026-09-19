@@ -5,8 +5,8 @@
     <meta name="app-version" content="25.0-mahyong-dj-actionfix">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
-    <meta name="description" content="Majong DJ - HongKong Mahjong dengan AI dan Cloudflare multiplayer.">
-    <title>Majong DJ - HongKong</title>
+    <meta name="description" content="MAHJONG DJ - HongKong Mahjong dengan AI dan Cloudflare multiplayer.">
+    <title>MAHJONG DJ - HongKong</title>
         <link rel="apple-touch-icon" sizes="180x180" href="IMG_6682.PNG">
     <link rel="icon" type="image/PNG" sizes="32x32" href="IMG_6682.PNG">
     <style>
@@ -150,7 +150,7 @@ min-width:14px;min-height:33px;padding:2px;display:flex;align-items:center;justi
 .smart-assistant{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);display:grid;gap:2px;min-width:170px;max-width:min(58vw,330px);padding:6px 9px;border-radius:9px;border:1px solid rgba(224,180,93,.22);background:linear-gradient(180deg,rgba(25,20,15,.96),rgba(10,9,8,.98));box-shadow:0 10px 26px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,235,192,.05);backdrop-filter:blur(10px);pointer-events:none;animation:smartAssistantIn .18s ease-out}.smart-assistant[hidden]{display:none}.smart-assistant-title{font-size:8px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:#e0b45d}.smart-assistant-detail{font-size:7px;font-weight:750;line-height:1.25;color:#c8bfb1;white-space:normal;text-align:center}.smart-assistant.is-green{border-color:rgba(85,199,154,.32)}.smart-assistant.is-green .smart-assistant-title{color:#69d3ab}.smart-assistant.is-red{border-color:rgba(217,101,90,.36)}.smart-assistant.is-red .smart-assistant-title{color:#e26d61}@keyframes smartAssistantIn{from{opacity:0;transform:translate(-50%,4px) scale(.98)}to{opacity:1;transform:translate(-50%,0) scale(1)}}.hand-bottom-container{flex-wrap:wrap}.hand-status-bar{flex:0 0 100%;text-align:center;padding:0 10px;margin-bottom:3px}.hand-status-main{font-size:7.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#e0b45d}.hand-status-sub{font-size:6.5px;font-weight:650;line-height:1.25;color:#9f9587;margin-top:1px}
 
 /* ============================================================
-   MAJONG DJ HONGKONG — CINEMATIC UI THEME
+   MAHJONG DJ HONGKONG — CINEMATIC UI THEME
    Presentation-only layer. Game engine / IDs / handlers unchanged.
    ============================================================ */
 :root{
@@ -218,7 +218,7 @@ body{
   line-height:.96;
 }
 #screen-main h1::before{
-  content:"MAJONG DJ";
+  content:"MAHJONG DJ";
   display:block;
   font-size:clamp(42px,8.2vw,82px);
   font-weight:950;
@@ -1406,17 +1406,195 @@ body::after{
 }
 
 </style>
+
+
+<!--
+/* ============================================================
+   PORTRAIT PLAYABILITY PATCH — ADDITIVE ONLY
+   Tidak mengubah atau menghapus rule lama. Patch ini hanya
+   menambahkan penyesuaian khusus layar portrait agar meja,
+   tangan, dan tombol game tetap terjangkau pada layar HP.
+   ============================================================ */
+-->
+<style id="portrait-playability-patch">
+@media (orientation:portrait){
+  html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    touch-action:manipulation!important;
+  }
+
+  #screen-game{
+    position:absolute;
+    inset:0;
+    width:100vw;
+    height:100dvh;
+    padding:0!important;
+    overflow:hidden!important;
+    touch-action:manipulation!important;
+  }
+
+  #screen-game.active{
+    display:flex;
+  }
+
+  #game-board{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    min-width:0;
+    min-height:0;
+    overflow:hidden;
+    isolation:isolate;
+    touch-action:manipulation!important;
+  }
+
+  /* Lapisan dekorasi tidak boleh pernah menangkap sentuhan. */
+  #game-board .table-plane,
+  #game-board .table-plane::before,
+  #game-board .table-plane::after,
+  #game-board .center-board::before{
+    pointer-events:none!important;
+  }
+
+  /* Kontrol utama dibuat selalu berada di atas elemen meja. */
+  #game-board .topbar{
+    z-index:500!important;
+    pointer-events:none;
+  }
+  #game-board .topbar button,
+  #game-board #btn-score-guide,
+  #game-board .score-guide-launcher{
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+  }
+
+  /* Ukuran tile portrait diperkecil agar 14 tile tangan tetap masuk viewport. */
+  #player-hand-tiles{
+    width:max-content;
+    max-width:100%;
+    gap:1px!important;
+    justify-content:center;
+    overflow:visible;
+  }
+  #player-hand-tiles .tile{
+    width:clamp(18px,5.55vw,27px)!important;
+    height:clamp(28px,8.55vw,40px)!important;
+    min-width:0;
+    touch-action:manipulation!important;
+    pointer-events:auto!important;
+  }
+
+  #game-board .hand-bottom-container{
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:180!important;
+    min-width:0;
+    padding-left:3px;
+    padding-right:3px;
+    padding-bottom:max(2px,env(safe-area-inset-bottom));
+    pointer-events:none;
+  }
+  #game-board .hand-bottom-container #player-hand-tiles,
+  #game-board .hand-bottom-container .hand-status-bar{
+    pointer-events:auto;
+  }
+
+  /* Posisi pemain dibuat sedikit keluar sehingga tidak menutup tangan. */
+  #game-board .pos-bottom{
+    left:6px;
+    bottom:calc(var(--tileH) + 7px);
+    z-index:170!important;
+  }
+  #game-board .pos-top{
+    top:6px;
+    right:7px;
+    z-index:170!important;
+  }
+  #game-board .pos-left{
+    left:2px;
+    top:45%;
+    z-index:170!important;
+  }
+  #game-board .pos-right{
+    right:2px;
+    top:45%;
+    z-index:170!important;
+  }
+
+  /* Tombol aksi selalu tampil di area yang aman untuk tap. */
+  #action-overlay{
+    left:50%!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:calc(var(--tileH) + 48px)!important;
+    transform:translateX(-50%)!important;
+    z-index:600!important;
+    width:auto;
+    max-width:94vw!important;
+    justify-content:center!important;
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+  }
+  #action-overlay .act-btn{
+    min-width:60px;
+    min-height:40px;
+    padding:8px 10px;
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+  }
+
+  /* Score Guide pada portrait menggunakan hampir seluruh lebar layar. */
+  #score-guide-drawer{
+    z-index:900!important;
+    width:min(92vw,430px)!important;
+    max-width:92vw;
+    touch-action:pan-y!important;
+  }
+  #score-guide-drawer .score-guide-close{
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+  }
+
+  /* Semua kontrol yang memang interaktif di papan tetap bisa ditap. */
+  #game-board button,
+  #game-board .tile,
+  #game-board input,
+  #game-board [role="button"]{
+    pointer-events:auto;
+    touch-action:manipulation!important;
+  }
+
+  /* Elemen status/dekorasi tidak menghalangi hit-area. */
+  #game-board .player-seat,
+  #game-board .river-container,
+  #game-board .melds-container,
+  #game-board .enemy-melds,
+  #game-board .center-board{
+    pointer-events:none;
+  }
+
+  #game-board .player-seat button,
+  #game-board .player-seat .tile,
+  #game-board .center-board button{
+    pointer-events:auto;
+  }
+}
+</style>
+
 </head>
 <body>
-    <button id="btn-cache-refresh" type="button" onclick="forceFreshReload()" aria-label="Refresh dan ambil versi terbaru" title="Refresh versi terbaru">↻</button>
-
     <audio id="bg-music" loop preload="auto" aria-hidden="true"></audio>
 
     <main id="screen-main" class="screen active" aria-labelledby="main-title">
+        <button id="btn-cache-refresh" type="button" onclick="forceFreshReload()" aria-label="Refresh dan ambil versi terbaru" title="Refresh versi terbaru">↻</button>
         <section class="screen-card glass">
             <div class="brand-lockup">
                 <div class="brand-kicker"><span class="brand-dot"></span> Hong Kong Mahjong</div>
-                <h1 id="main-title">MAJONG DJ - HongKong</h1>
+                <h1 id="main-title">MAHJONG DJ - HongKong</h1>
                 <p class="brand-subtitle">Simple, fast Hong Kong Mahjong table.</p>
             </div>
             <div class="menu-actions">
@@ -1642,7 +1820,7 @@ body::after{
                     <div class="score-guide-launcher">
                         <button id="btn-score-guide" class="score-guide-launcher-btn" type="button" onclick="toggleScoreGuide()" aria-label="Buka Score Guide" aria-expanded="false"><span class="score-guide-launcher-icon" aria-hidden="true">▤</span><span>Score Guide</span></button>
                     </div>
-                    <div class="game-title-compact" aria-label="Majong DJ - HongKong">MAJONG DJ - HongKONG</div>
+                    <div class="game-title-compact" aria-label="MAHJONG DJ - HongKong">MAHJONG DJ - HongKONG</div>
                 </div>
                 <div class="score-guide-drawer" id="score-guide-drawer" aria-hidden="true">
                     <div class="score-guide-drawer-head">
@@ -4320,5 +4498,30 @@ function forceFreshReload(){
 }
 
 </script>
+
+
+<script id="portrait-playability-runtime">
+/* Portrait runtime: hanya membantu browser mobile menghitung ulang layout
+   setelah rotasi/resize. Tidak menyentuh state permainan. */
+(function(){
+  function refreshPortraitViewport(){
+    const root=document.documentElement;
+    const h=window.visualViewport?.height||window.innerHeight||0;
+    if(h>0)root.style.setProperty('--portrait-vh',`${h*0.01}px`);
+    const game=document.getElementById('screen-game');
+    if(game&&game.classList.contains('active')){
+      game.getBoundingClientRect();
+    }
+  }
+  window.addEventListener('resize',refreshPortraitViewport,{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(refreshPortraitViewport,120),{passive:true});
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize',refreshPortraitViewport,{passive:true});
+  }
+  document.addEventListener('DOMContentLoaded',refreshPortraitViewport,{once:true});
+  refreshPortraitViewport();
+})();
+</script>
+
 </body>
 </html>
