@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="app-version" content="25.0-mahyong-dj-actionfix">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
-    <meta name="description" content="MAHJONG DJ - HongKong Mahjong dengan AI dan Cloudflare multiplayer.">
-    <title>MAHJONG DJ - HongKong</title>
+    <meta name="description" content="Majong DJ - HongKong Mahjong dengan AI dan Cloudflare multiplayer.">
+    <title>Majong DJ - HongKong</title>
         <link rel="apple-touch-icon" sizes="180x180" href="IMG_6682.PNG">
     <link rel="icon" type="image/PNG" sizes="32x32" href="IMG_6682.PNG">
     <style>
@@ -150,7 +150,7 @@ min-width:14px;min-height:33px;padding:2px;display:flex;align-items:center;justi
 .smart-assistant{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);display:grid;gap:2px;min-width:170px;max-width:min(58vw,330px);padding:6px 9px;border-radius:9px;border:1px solid rgba(224,180,93,.22);background:linear-gradient(180deg,rgba(25,20,15,.96),rgba(10,9,8,.98));box-shadow:0 10px 26px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,235,192,.05);backdrop-filter:blur(10px);pointer-events:none;animation:smartAssistantIn .18s ease-out}.smart-assistant[hidden]{display:none}.smart-assistant-title{font-size:8px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:#e0b45d}.smart-assistant-detail{font-size:7px;font-weight:750;line-height:1.25;color:#c8bfb1;white-space:normal;text-align:center}.smart-assistant.is-green{border-color:rgba(85,199,154,.32)}.smart-assistant.is-green .smart-assistant-title{color:#69d3ab}.smart-assistant.is-red{border-color:rgba(217,101,90,.36)}.smart-assistant.is-red .smart-assistant-title{color:#e26d61}@keyframes smartAssistantIn{from{opacity:0;transform:translate(-50%,4px) scale(.98)}to{opacity:1;transform:translate(-50%,0) scale(1)}}.hand-bottom-container{flex-wrap:wrap}.hand-status-bar{flex:0 0 100%;text-align:center;padding:0 10px;margin-bottom:3px}.hand-status-main{font-size:7.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#e0b45d}.hand-status-sub{font-size:6.5px;font-weight:650;line-height:1.25;color:#9f9587;margin-top:1px}
 
 /* ============================================================
-   MAHJONG DJ HONGKONG — CINEMATIC UI THEME
+   MAJONG DJ HONGKONG — CINEMATIC UI THEME
    Presentation-only layer. Game engine / IDs / handlers unchanged.
    ============================================================ */
 :root{
@@ -218,7 +218,7 @@ body{
   line-height:.96;
 }
 #screen-main h1::before{
-  content:"MAHJONG DJ";
+  content:"MAJONG DJ";
   display:block;
   font-size:clamp(42px,8.2vw,82px);
   font-weight:950;
@@ -343,9 +343,9 @@ body{
   position:relative;
   z-index:1;
 }
-#screen-play .menu-actions .btn:nth-child(1){background-image:linear-gradient(180deg,rgba(1,12,9,.03) 26%,rgba(1,8,7,.22) 46%,rgba(1,8,7,.92) 76%,rgba(0,6,5,.99) 100%),url('assets/backgrounds/bg-game.jpg');}
+#screen-play .menu-actions .btn:nth-child(1){background-image:linear-gradient(180deg,rgba(1,12,9,.04) 12%,rgba(1,8,7,.10) 44%,rgba(1,8,7,.78) 76%,rgba(0,6,5,.97) 100%),url('assets/backgrounds/bg-ai-card.jpg');}
 #screen-play .menu-actions .btn:nth-child(1)::before{content:"◉";}
-#screen-play .menu-actions .btn:nth-child(2){background-image:linear-gradient(180deg,rgba(1,12,9,.03) 26%,rgba(1,8,7,.22) 46%,rgba(1,8,7,.92) 76%,rgba(0,6,5,.99) 100%),url('assets/backgrounds/bg-lobby.jpg');}
+#screen-play .menu-actions .btn:nth-child(2){background-image:linear-gradient(180deg,rgba(1,12,9,.04) 12%,rgba(1,8,7,.10) 44%,rgba(1,8,7,.78) 76%,rgba(0,6,5,.97) 100%),url('assets/backgrounds/bg-multiplayer-card.jpg');}
 #screen-play .menu-actions .btn:nth-child(2)::before{content:"♟";}
 #screen-play .menu-actions .btn:nth-child(3){
   grid-column:1 / -1;
@@ -479,6 +479,197 @@ body{
   #screen-settings .settings-row{grid-template-columns:1fr;gap:9px;}
 }
 
+/* v9 precision UI fixes: sharper mode cards, compact dialogs, no pinch zoom. */
+html,body,#screen-main,#screen-play,#screen-settings,#modal-avatar-picker,#modal-lobby,#modal-result,#modal-match-over{touch-action:pan-y pinch-zoom;}
+html,body{touch-action:pan-x pan-y;overscroll-behavior:none;}
+@media (pointer:coarse){html,body{touch-action:pan-x pan-y;}}
+
+/* Mode cards: keep the artwork sharp and let the HTML labels remain crisp. */
+#screen-play .screen-card{backdrop-filter:none;-webkit-backdrop-filter:none;background:linear-gradient(180deg,rgba(3,25,21,.28),rgba(2,14,12,.58));}
+#screen-play .menu-actions .btn{backdrop-filter:none;-webkit-backdrop-filter:none;background-repeat:no-repeat;}
+#screen-play .menu-actions .btn::after{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.04) 42%,rgba(0,0,0,.42) 100%);pointer-events:none;}
+#screen-play .menu-actions .btn>*{position:relative;z-index:2;}
+#screen-play .menu-actions .btn::before{z-index:2;}
+#screen-play .menu-actions .btn:nth-child(1)::before{content:"AI";font-size:11px;letter-spacing:.04em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:950;}
+#screen-play .menu-actions .btn:nth-child(2)::before{content:"4P";font-size:11px;letter-spacing:.02em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:950;}
+
+/* Avatar picker: fit the complete picker in a single viewport. */
+#modal-avatar-picker{padding:10px;}
+#modal-avatar-picker .avatar-picker-box{width:min(94vw,760px);max-height:calc(100dvh - 20px);overflow:hidden;padding:14px 16px 12px;border-radius:18px;}
+#modal-avatar-picker .modal-head{margin-bottom:3px;}
+#modal-avatar-picker .modal-title{font-size:18px;}
+#modal-avatar-picker .modal-copy{font-size:9px;margin-top:3px;}
+#modal-avatar-picker .avatar-grid-picker{gap:7px;margin-top:9px;}
+#modal-avatar-picker .avatar-option-picker{padding:6px;border-radius:11px;min-width:0;}
+#modal-avatar-picker .avatar-option-picker img{width:clamp(48px,8.2vw,82px);height:clamp(48px,8.2vw,82px);margin:0 auto;}
+#modal-avatar-picker .avatar-option-picker .avatar-option-name{margin-top:4px;font-size:8px;}
+#modal-avatar-picker .avatar-picker-preview{gap:9px;margin-top:9px;padding:7px;border-radius:10px;}
+#modal-avatar-picker .avatar-picker-preview img{width:42px;height:42px;}
+#modal-avatar-picker .avatar-picker-preview strong{font-size:11px;}
+#modal-avatar-picker .avatar-picker-preview span{font-size:8px;}
+#modal-avatar-picker .avatar-picker-actions{gap:7px;margin-top:8px;}
+#modal-avatar-picker .avatar-picker-actions .btn{min-height:36px;padding:7px 11px;font-size:10px;}
+
+@media (max-width:600px){
+  #modal-avatar-picker .avatar-picker-box{width:min(96vw,520px);padding:12px 12px 10px;}
+  #modal-avatar-picker .avatar-grid-picker{gap:6px;margin-top:7px;}
+  #modal-avatar-picker .avatar-option-picker img{width:clamp(42px,16vw,68px);height:clamp(42px,16vw,68px);}
+  #modal-avatar-picker .avatar-option-picker .avatar-option-name{font-size:8px;margin-top:3px;}
+}
+
+/* Results: same information, denser composition so the full result is visible. */
+#modal-result,#modal-match-over{padding:8px;}
+#modal-result .result-modal-box,#modal-match-over .result-modal-box{width:min(94vw,700px);max-height:calc(100dvh - 16px);padding:13px 15px 12px;overflow:auto;}
+#modal-result .result-hero{padding:2px 2px 1px;}
+#modal-result .result-hero-icon{font-size:23px;margin-bottom:4px;}
+#modal-result .result-hero .modal-kicker{font-size:8px;margin-bottom:2px;}
+#modal-result .result-hero .modal-title{font-size:18px;}
+#modal-result .result-hero .modal-copy{margin-top:4px;font-size:9px;}
+#modal-result .result-summary{margin:8px 0 8px;padding:8px;border-radius:10px;}
+#modal-result .result-summary .result-win-points{margin-top:4px;font-size:18px;}
+#modal-result .result-summary .result-win-detail{margin-top:3px;font-size:8px;}
+#modal-result .result-section-title{margin:7px 0 4px;font-size:8px;}
+#modal-result .result-winning-hand{gap:3px;padding:7px 6px;border-radius:10px;}
+#modal-result .result-winning-player{font-size:9px;margin-bottom:1px;}
+#modal-result .result-winning-sub{font-size:7px;margin:0 0 2px;}
+#modal-result .result-winning-group{gap:1px;padding:2px 2px 1px;border-radius:5px;}
+#modal-result .result-winning-tile{width:clamp(18px,4vw,29px);height:clamp(26px,5.8vw,42px);border-radius:3px;}
+#modal-result .result-winning-divider{width:3px;height:28px;flex-basis:3px;}
+#modal-result .result-winning-legend{font-size:6px;margin-top:1px;}
+#modal-result .result-score-list{gap:4px;margin-bottom:8px;}
+#modal-result .result-score-list .ready-item{padding:7px 9px;font-size:10px;border-radius:8px;}
+#modal-result .btn-primary,#modal-match-over .btn-primary{min-height:38px;padding:8px 12px;font-size:10px;border-radius:10px;}
+#modal-match-over .modal-head{margin-bottom:7px;}
+#modal-match-over .modal-title{font-size:18px;}
+#modal-match-over .modal-copy{font-size:9px;margin-top:3px;}
+#modal-match-over .result-section-title{margin:7px 0 4px;font-size:8px;}
+#modal-match-over .result-score-list{gap:4px;margin-bottom:8px;}
+#modal-match-over .result-score-list .ready-item{padding:7px 9px;font-size:10px;border-radius:8px;}
+#modal-match-over .menu-actions{gap:7px;margin-top:9px!important;}
+#modal-match-over .btn-secondary{min-height:36px;}
+@media (max-width:600px){
+  #modal-result,#modal-match-over{padding:6px;}
+  #modal-result .result-modal-box,#modal-match-over .result-modal-box{width:96vw;max-height:calc(100dvh - 12px);padding:11px 11px 10px;}
+  #modal-result .result-winning-tile{width:clamp(17px,4.7vw,25px);height:clamp(25px,6.5vw,37px);}
+}
+
+/* Tenpai assistant: make the old notification visible while the player waits, not only on their own turn. */
+.smart-assistant{min-width:154px;max-width:min(72vw,300px);padding:6px 8px;z-index:45;}
+.smart-assistant-title{font-size:8px;}
+.smart-assistant-detail{font-size:7px;}
+
+
+/* v10: reference-inspired menu presentation; gameplay JS remains untouched. */
+html,body{touch-action:manipulation!important;-webkit-user-select:none;user-select:none;overscroll-behavior:none;}
+body{background:#04110f;}
+.screen#screen-main,.screen#screen-play,.screen#screen-settings{
+  overflow:hidden;
+  background-position:center;
+  background-size:cover;
+  background-repeat:no-repeat;
+}
+.screen#screen-main::before,.screen#screen-play::before,.screen#screen-settings::before{
+  background:
+    radial-gradient(circle at 50% 30%,rgba(240,196,95,.055),transparent 34%),
+    linear-gradient(180deg,rgba(0,12,10,.04),rgba(0,8,7,.26));
+  backdrop-filter:blur(1.6px) saturate(.96);
+}
+#screen-main .screen-card,#screen-play .screen-card{
+  max-height:calc(100dvh - 20px);
+  overflow:hidden;
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+}
+
+/* Select Mode: both choices remain visible together at every viewport size. */
+#screen-play{padding:8px;}
+#screen-play .screen-card{
+  width:min(94vw,900px);
+  min-height:0;
+  max-height:calc(100dvh - 16px);
+  padding:26px 28px 18px;
+}
+#screen-play .screen-card::before{inset:8px;border-radius:18px;}
+#screen-play .brand-lockup{margin-bottom:15px;}
+#screen-play .screen-heading{font-size:clamp(27px,4.2vw,42px);margin:7px 0 4px;}
+#screen-play .brand-subtitle{font-size:11px;}
+#screen-play .menu-actions{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  align-items:stretch;
+}
+#screen-play .menu-actions .btn{
+  min-height:clamp(184px,30vh,238px);
+  height:clamp(184px,30vh,238px);
+  padding:calc(clamp(184px,30vh,238px) - 94px) 12px 12px;
+  border-radius:17px;
+}
+#screen-play .menu-actions .btn::before{
+  width:42px;height:42px;font-size:18px;margin-bottom:6px;
+}
+#screen-play .btn-note{font-size:9px;margin-top:4px;}
+#screen-play .menu-actions .btn:nth-child(3){
+  grid-column:1 / -1;
+  width:150px;
+  min-height:36px;
+  height:36px;
+  padding:7px 16px;
+  justify-self:center;
+  border-radius:9px;
+  font-size:10px;
+}
+#screen-play .menu-actions .btn:nth-child(3)::before{font-size:13px;margin-right:5px;}
+
+/* Keep the chosen background visible rather than drowning it in a dark/blurred layer. */
+#screen-main,#screen-play,#screen-settings{isolation:isolate;}
+#screen-main .screen-card{backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
+
+@media (max-width:760px){
+  #screen-play .screen-card{
+    width:min(96vw,720px);
+    padding:20px 12px 12px;
+  }
+  #screen-play .brand-lockup{margin-bottom:10px;}
+  #screen-play .screen-heading{font-size:clamp(24px,7vw,33px);}
+  #screen-play .brand-subtitle{font-size:9px;}
+  #screen-play .menu-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+  #screen-play .menu-actions .btn{
+    min-height:clamp(152px,24vh,190px);
+    height:clamp(152px,24vh,190px);
+    padding:calc(clamp(152px,24vh,190px) - 82px) 8px 9px;
+    border-radius:14px;
+  }
+  #screen-play .menu-actions .btn::before{width:36px;height:36px;font-size:15px;margin-bottom:5px;}
+  #screen-play .menu-actions .btn:nth-child(3){width:136px;min-height:34px;height:34px;padding:6px 13px;}
+}
+@media (max-width:430px){
+  #screen-play{padding:5px;}
+  #screen-play .screen-card{padding:15px 8px 9px;max-height:calc(100dvh - 10px);}
+  #screen-play .screen-card::before{inset:6px;border-radius:15px;}
+  #screen-play .brand-lockup{margin-bottom:7px;}
+  #screen-play .brand-kicker{font-size:8px;}
+  #screen-play .screen-heading{font-size:25px;margin:5px 0 2px;}
+  #screen-play .brand-subtitle{font-size:8px;}
+  #screen-play .menu-actions{gap:7px;}
+  #screen-play .menu-actions .btn{
+    min-height:140px;
+    height:140px;
+    padding:58px 5px 7px;
+    border-radius:12px;
+  }
+  #screen-play .menu-actions .btn::before{width:32px;height:32px;font-size:13px;box-shadow:0 0 0 3px rgba(221,176,77,.08),0 0 15px rgba(227,183,92,.12);}
+  #screen-play .menu-actions .btn .btn-note{font-size:8px;}
+  #screen-play .menu-actions .btn:nth-child(3){width:122px;min-height:31px;height:31px;padding:5px 10px;font-size:9px;}
+}
+@media (orientation:landscape) and (max-height:560px){
+  #screen-play .screen-card{padding:12px 18px 8px;}
+  #screen-play .brand-lockup{margin-bottom:7px;}
+  #screen-play .screen-heading{font-size:24px;margin:4px 0 2px;}
+  #screen-play .brand-subtitle{font-size:8px;}
+  #screen-play .menu-actions{gap:7px;}
+  #screen-play .menu-actions .btn{min-height:142px;height:142px;padding:61px 7px 7px;}
+  #screen-play .menu-actions .btn:nth-child(3){min-height:30px;height:30px;padding:4px 11px;}
+}
 </style>
 </head>
 <body>
@@ -489,7 +680,7 @@ body{
         <section class="screen-card glass">
             <div class="brand-lockup">
                 <div class="brand-kicker"><span class="brand-dot"></span> Hong Kong Mahjong</div>
-                <h1 id="main-title">MAHJONG DJ - HongKong</h1>
+                <h1 id="main-title">MAJONG DJ - HongKong</h1>
                 <p class="brand-subtitle">Simple, fast Hong Kong Mahjong table.</p>
             </div>
             <div class="menu-actions">
@@ -690,7 +881,7 @@ body{
                     <div class="score-guide-launcher">
                         <button id="btn-score-guide" class="score-guide-launcher-btn" type="button" onclick="toggleScoreGuide()" aria-label="Buka Score Guide" aria-expanded="false"><span class="score-guide-launcher-icon" aria-hidden="true">▤</span><span>Score Guide</span></button>
                     </div>
-                    <div class="game-title-compact" aria-label="MAHJONG DJ - HongKong">MAHJONG DJ - HONGKONG</div>
+                    <div class="game-title-compact" aria-label="Majong DJ - HongKong">MAJONG DJ - HongKONG</div>
                 </div>
                 <div class="score-guide-drawer" id="score-guide-drawer" aria-hidden="true">
                     <div class="score-guide-drawer-head">
@@ -1339,6 +1530,7 @@ function advisorKnownCounts(excludeSeatHand=false){
   return known.slice();
 }
 function tileLabelById(id){const t=TILE_TYPES[id];return t?t.val:'?'}
+function tileFriendlyLabelById(id){const t=TILE_TYPES[id];if(!t)return'?';if(t.type==='sou')return `${t.num} Bambu`;if(t.type==='pin')return `${t.num} Lingkaran`;if(t.type==='man')return `${t.num} Karakter`;const honor={27:'Timur',28:'Selatan',29:'Barat',30:'Utara',31:'Naga Putih',32:'Naga Hijau',33:'Naga Merah'};return honor[id]||t.val}
 function formatWaitList(waitIds,known){
   return waitIds.map(id=>{
     const left=Math.max(0,4-(known[id]||0));
@@ -1405,6 +1597,8 @@ function showCurrentWaitAdvisor(){
   const p=mp.seat??0;
   const hand=playerHands[p]||[];
   const meldCount=(playerMelds[p]||[]).length;
+  const expectedDrawn=14-(meldCount*3);
+  const expectedReady=13-(meldCount*3);
   const handKey=hand.map(t=>t?.uniqueId||'').join(',');
   const known=advisorKnownCounts();
   const key=`${p}|${currentTurn}|${handKey}|${meldCount}|${known.join(',')}`;
@@ -1412,7 +1606,7 @@ function showCurrentWaitAdvisor(){
   if(key===assistantDecisionKey)return;
   assistantDecisionKey=key;
 
-  if(hand.length===14){
+  if(hand.length===expectedDrawn){
     const win=checkCurrentWin(p,null,true);
     if(win?.valid){
       smartAssistantShow('TSUMO TERSEDIA',`${win.fan} FAN • ${win.points.toLocaleString('id-ID')} poin`,'green');
@@ -1420,15 +1614,15 @@ function showCurrentWaitAdvisor(){
     }
   }
 
-  if(hand.length===13){
+  if(hand.length===expectedReady){
     const waits=getWaitIds(hand,meldCount);
     if(waits.length){
       const live=waits
         .map(id=>({id,left:Math.max(0,4-(known[id]||0))}))
         .filter(x=>x.left>0)
-        .map(x=>`${tileLabelById(x.id)} ×${x.left}`)
+        .map(x=>`${tileFriendlyLabelById(x.id)} ×${x.left}`)
         .join(' • ');
-      if(live)smartAssistantShow('TENPAI',`Menunggu: ${live}`,'gold');
+      if(live)smartAssistantShow('TENPAI READY',`Menunggu: ${live}`,'gold');
       else smartAssistantShow('TENPAI • WAIT HABIS','Semua tile tunggu yang diketahui sudah habis.','red');
       return;
     }
@@ -1444,7 +1638,7 @@ function renderHand(){const wrap=byId('player-hand-tiles');if(!wrap)return;const
 function renderEnemyHands(){const s=mp.seat??0,m=mappedSeats(s);[[`enemy-hand-top`,m[2]],[`enemy-hand-right`,m[1]],[`enemy-hand-left`,m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const count=Math.max(0,playerHands[p]?.length||0);for(let i=0;i<count;i++){const b=document.createElement('span');b.className='mini-back';e.appendChild(b)}const label=document.createElement('span');label.className='hand-count-label';label.textContent=`×${count}`;e.appendChild(label);})}
 function renderRivers(){const s=mp.seat??0,m=mappedSeats(s);const selectedId=(selectedTileIndex>=0&&playerHands[s]?.[selectedTileIndex])?playerHands[s][selectedTileIndex].id:null;[['river-bottom',m[0]],['river-right',m[1]],['river-top',m[2]],['river-left',m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const tiles=(playerRivers[p]||[]).slice(0,id==='river-top'||id==='river-bottom'?32:30);tiles.forEach(t=>{const d=document.createElement('div');d.className='discard-tile';if(selectedId!==null&&t.id===selectedId)d.classList.add('same-tile-highlight');d.dataset.tileId=t.id;d.innerHTML=tileMarkup(t);e.appendChild(d)})})}
 function renderMelds(){const s=mp.seat??0,m=mappedSeats(s);const own=byId('player-melds-container');if(own){own.innerHTML='';(playerMelds[m[0]]||[]).forEach(g=>{const box=document.createElement('div');box.className='meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});own.appendChild(box)})}const enemyMap=[['enemy-meld-top-label','enemy-meld-top-tiles',m[2]],['enemy-meld-right-label','enemy-meld-right-tiles',m[1]],['enemy-meld-left-label','enemy-meld-left-tiles',m[3]]];enemyMap.forEach(([labelId,tilesId,p])=>{const label=byId(labelId),wrap=byId(tilesId);const groups=playerMelds[p]||[];const labels=groups.map(g=>g.length===4?'Kan':(g.length===3&&g.every(t=>t.id===g[0].id)?'Pon':'Chow'));if(label)setText(labelId,labels.length?labels.join(' • '):'');if(!wrap)return;wrap.innerHTML='';groups.forEach(g=>{const box=document.createElement('div');box.className='enemy-meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});wrap.appendChild(box)})})}
-function renderTable(){advisorKnownCacheKey='';advisorKnownCache=null;renderNames();renderAvatars();renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);setText('tiles-remaining',`SISA ${fullDeck.length}`);updateMusicIntensity();if(currentTurn===(mp.seat??0))showCurrentWaitAdvisor();else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');}}
+function renderTable(){advisorKnownCacheKey='';advisorKnownCache=null;renderNames();renderAvatars();renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);setText('tiles-remaining',`SISA ${fullDeck.length}`);updateMusicIntensity();showCurrentWaitAdvisor();if(currentTurn===(mp.seat??0)){setText('hand-status-main','Giliran Anda');setText('hand-status-sub','Pilih tile untuk membuang.');}else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');}}
 
 function isSequenceGroup(group){
   if(!Array.isArray(group)||group.length!==3)return false;
@@ -1897,7 +2091,9 @@ function processTurn(){
   const turnActions=[];const win=checkCurrentWin(currentTurn,null,true);if(win?.valid)turnActions.push('Tsumo');
   const selfKans=getSelfKanOptions(currentTurn);if(selfKans.length)turnActions.push('Kan');
   if(aiSeats.has(currentTurn)){
-    smartAssistantHide();
+    const localHand=playerHands[mp.seat??0]||[];
+    const localTenpai=localHand.length===13&&getWaitIds(localHand,(playerMelds[mp.seat??0]||[]).length).length>0;
+    if(!localTenpai)smartAssistantHide();
     scheduleAiTurn(currentTurn,'discard');
   }else{
     isDiscardable=true;
