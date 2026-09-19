@@ -85,7 +85,7 @@
 #score-guide-drawer{position:fixed;left:0;top:0;bottom:0;width:min(33.333vw,430px);z-index:220;display:none;flex-direction:column;padding:18px 18px 20px;background:linear-gradient(180deg,rgba(27,21,16,.985),rgba(9,8,7,.995));border-right:1px solid rgba(225,179,88,.28);box-shadow:18px 0 46px rgba(0,0,0,.44),inset -1px 0 0 rgba(255,238,194,.04);backdrop-filter:blur(12px);overflow:auto}#score-guide-drawer.open{display:flex}.score-guide-drawer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid rgba(225,179,88,.16)}.score-guide-drawer-kicker{font-size:9px;letter-spacing:.18em;font-weight:900;color:#b99a61}.score-guide-drawer-title{margin-top:3px;font-size:20px;letter-spacing:.04em;font-weight:950;color:#f3d38d}.score-guide-close{flex:0 0 auto}.score-guide-launcher{position:relative;z-index:221}.score-guide-launcher-btn{display:flex;align-items:center;gap:5px;min-height:28px;padding:4px 8px;border-radius:8px;border:1px solid rgba(225,179,88,.22);background:linear-gradient(180deg,rgba(31,25,19,.94),rgba(12,10,8,.98));color:#f0d089;font-size:8px;font-weight:900;letter-spacing:.03em;box-shadow:0 6px 16px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,238,194,.06);white-space:nowrap;touch-action:manipulation}.score-guide-launcher-btn:active{transform:translateY(1px)}.score-guide-launcher-icon{display:inline-flex;align-items:center;justify-content:center;font-size:11px;line-height:1;color:#f3ca70}.score-guide-drawer .score-guide-grid{display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:row;gap:11px 14px;margin:0}.score-guide-drawer .score-guide-grid>div{display:grid;grid-template-columns:44px minmax(0,1fr);align-items:start;gap:7px;line-height:1.25;min-width:0}.score-guide-drawer .score-guide-grid span{color:#e0b45d;font-size:9px;font-weight:950;letter-spacing:.03em}.score-guide-drawer .score-guide-grid strong{color:#eee3d2;font-size:9px;font-weight:750;min-width:0;overflow-wrap:anywhere}.score-guide-drawer.open~*{ }
 #game-board{position:absolute;inset:0;overflow:hidden;--sideInset:clamp(78px,min(12vw,16vh),152px);--focus-pan-y:-6.5%}.topbar{position:absolute;left:12px;right:12px;top:9px;z-index:50;display:flex;justify-content:space-between;align-items:flex-start}.topbar-left-group{display:flex;align-items:center;gap:6px}.game-title-compact{font-size:7px;font-weight:950;letter-spacing:.09em;color:#d9cdbd;text-transform:uppercase;white-space:nowrap;padding:0 0 0 1px;text-shadow:0 1px 6px rgba(0,0,0,.45)}.hud-label{font-size:7px;letter-spacing:.12em;color:#d6cabd;font-weight:900;text-transform:uppercase}.kan-info{display:none}.top-right-btns{display:flex;gap:6px}.icon-btn{width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:rgba(20,17,15,.8);color:#fff}
 
-.player-seat{position:absolute;z-index:35;display:flex;flex-direction:column;align-items:center;text-align:center}.avatar-img{width:clamp(31px,min(4.7vw,5.8vh),44px);height:clamp(31px,min(4.7vw,5.8vh),44px);border-radius:10px;border:2px solid #dfb158;background:radial-gradient(circle at 34% 28%,#ffdb86,#8e4d27 50%,#261714 100%);box-shadow:0 6px 16px rgba(0,0,0,.34)}.avatar-name{margin-top:3px;padding:2px 6px;border-radius:6px;font-size:8px;font-weight:900;background:rgba(13,11,10,.86);border:1px solid rgba(255,255,255,.08);white-space:nowrap}.seat-direction{opacity:.65}.time-bank-tag{margin-top:2px;font-size:7px;color:#f0c66b}.pos-bottom{left:clamp(15px,7vw,92px);bottom:calc(var(--tileH) + 4px);transform:none;align-items:center}.pos-top{top:12px;right:clamp(46px,13vw,174px);left:auto;transform:none}.pos-left{left:clamp(12px,3vw,38px);top:45%;transform:translateY(-50%)}.pos-right{right:clamp(12px,3vw,38px);top:45%;transform:translateY(-50%)}
+.player-seat{position:absolute;z-index:35;display:flex;flex-direction:column;align-items:center;text-align:center}.avatar-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;width:max-content;height:max-content}.action-badge{position:absolute;top:50%;width:clamp(22px,3.2vw,25px);height:clamp(22px,3.2vw,25px);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:clamp(10px,1.5vw,12px);line-height:1;font-weight:950;letter-spacing:0;opacity:0;pointer-events:none;z-index:90;box-shadow:0 4px 12px rgba(0,0,0,.38),0 0 0 1px rgba(255,255,255,.10);transition:opacity .14s ease,transform .14s ease;transform:translateY(-50%) scale(.82)}.action-badge.show{opacity:1;transform:translateY(-50%) scale(1)}.pos-top .action-badge,.pos-right .action-badge{right:calc(100% + 6px);left:auto}.pos-bottom .action-badge,.pos-left .action-badge{left:calc(100% + 6px);right:auto}.action-badge-chi{background:#26945f;border:1px solid #72d8a2;color:#effff5}.action-badge-pon{background:#2c75b5;border:1px solid #73b9ef;color:#f1f8ff}.action-badge-kan{background:#198c82;border:1px solid #65d8d0;color:#ecfffd}.action-badge-ron{background:#b74642;border:1px solid #f08b84;color:#fff4f3}.action-badge-tsumo{background:#bf7a29;border:1px solid #f0c16e;color:#fff7df}.avatar-img{width:clamp(31px,min(4.7vw,5.8vh),44px);height:clamp(31px,min(4.7vw,5.8vh),44px);border-radius:10px;border:2px solid #dfb158;background:radial-gradient(circle at 34% 28%,#ffdb86,#8e4d27 50%,#261714 100%);box-shadow:0 6px 16px rgba(0,0,0,.34)}.avatar-name{margin-top:3px;padding:2px 6px;border-radius:6px;font-size:8px;font-weight:900;background:rgba(13,11,10,.86);border:1px solid rgba(255,255,255,.08);white-space:nowrap}.seat-direction{opacity:.65}.time-bank-tag{margin-top:2px;font-size:7px;color:#f0c66b}.pos-bottom{left:clamp(15px,7vw,92px);bottom:calc(var(--tileH) + 4px);transform:none;align-items:center}.pos-top{top:12px;right:clamp(46px,13vw,174px);left:auto;transform:none}.pos-left{left:clamp(12px,3vw,38px);top:45%;transform:translateY(-50%)}.pos-right{right:clamp(12px,3vw,38px);top:45%;transform:translateY(-50%)}
 .tile-back{display:block;border-radius:3px;border:1px solid #6c3b1e;background:linear-gradient(160deg,#d47d35,#8c3d12);box-shadow:inset 0 1px 0 rgba(255,236,197,.25),0 1px 3px rgba(0,0,0,.28)}.enemy-hand-count{display:flex;justify-content:center;gap:1px;margin-top:3px;min-height:12px;max-width:112px;overflow:hidden}.enemy-hand-count .mini-back{width:5px;height:9px;border-radius:1.5px;background:linear-gradient(160deg,#d47d35,#8c3d12);border:1px solid #6c3b1e;box-shadow:0 1px 2px rgba(0,0,0,.25)}.enemy-hand-count .hand-count-label{margin-left:3px;padding:2px 4px;border-radius:5px;background:rgba(13,11,10,.88);color:#f2d18b;font-size:9px;font-weight:900;line-height:11px;border:1px solid rgba(255,255,255,.08);white-space:nowrap}.enemy-meld-summary{display:none}.enemy-melds-visible{display:flex;justify-content:center;gap:3px;margin-top:3px;pointer-events:none}.enemy-meld-group{display:flex;gap:1px;padding:2px 2px 1px;border-radius:4px;background:rgba(11,9,8,.76);border:1px solid rgba(255,255,255,.10);box-shadow:0 2px 6px rgba(0,0,0,.22)}.enemy-meld-group .tile{width:clamp(12px,min(1.75vw,2.5vh),20px);height:clamp(18px,min(2.55vw,3.55vh),29px);cursor:default}.enemy-meld-group .tile .tile-char{font-size:.72em}.pos-left .enemy-hand-count,.pos-right .enemy-hand-count{max-width:94px}.pos-left .enemy-hand-count .mini-back,.pos-right .enemy-hand-count .mini-back{width:4px;height:8px}.pos-left .enemy-melds-visible,.pos-right .enemy-melds-visible{position:static;top:auto;left:auto;right:auto;transform:none;flex-direction:row;align-items:center;margin-top:3px;max-width:112px;overflow:visible}.pos-left .enemy-meld-group,.pos-right .enemy-meld-group{flex-direction:row}
 /* Compact four-sided river around a protected center, matching a digital Mahjong table. */
 #game-board{--centerSize:clamp(86px,min(10vw,12.5vh),110px);--centerHalf:calc(var(--centerSize)/2);--riverGap:clamp(12.5px,1.65vh,16.5px);--riverRowsH:calc(var(--discH)*3 + 8px);--riverRowsH-TB:calc(var(--discH)*4 + 10px);--riverColsW:calc(var(--discW)*6 + 15px);--riverColsW-TB:calc(var(--discW)*8 + 17px);--sideGap:clamp(12px,2vw,22px)}
@@ -393,24 +393,36 @@ min-width:14px;min-height:33px;padding:2px;display:flex;align-items:center;justi
             <div class="table-plane" aria-hidden="true"></div>
 
             <div class="player-seat pos-bottom">
-                <div class="avatar-img" aria-hidden="true"></div>
+                <div class="avatar-wrap">
+                    <div class="avatar-img" aria-hidden="true"></div>
+                    <div class="action-badge" aria-hidden="true"></div>
+                </div>
                 <div class="avatar-name" id="name-bottom">You <span class="seat-direction">• South</span></div>
                 <div class="time-bank-tag" id="player-time-bank">+20s</div>
             </div>
             <div class="player-seat pos-left">
-                <div class="avatar-img" aria-hidden="true"></div>
+                <div class="avatar-wrap">
+                    <div class="avatar-img" aria-hidden="true"></div>
+                    <div class="action-badge" aria-hidden="true"></div>
+                </div>
                 <div class="avatar-name" id="name-left">P3 <span class="seat-direction">• West</span></div>
                 <div class="enemy-hand-count" id="enemy-hand-left" aria-label="Kartu tersembunyi West"></div>
                 <div class="enemy-meld-summary" id="enemy-meld-left-label"></div><div class="enemy-melds-visible" id="enemy-meld-left-tiles"></div>
             </div>
             <div class="player-seat pos-top">
-                <div class="avatar-img" aria-hidden="true"></div>
+                <div class="avatar-wrap">
+                    <div class="avatar-img" aria-hidden="true"></div>
+                    <div class="action-badge" aria-hidden="true"></div>
+                </div>
                 <div class="avatar-name" id="name-top">P2 <span class="seat-direction">• North</span></div>
                 <div class="enemy-hand-count" id="enemy-hand-top" aria-label="Kartu tersembunyi North"></div>
                 <div class="enemy-meld-summary" id="enemy-meld-top-label"></div><div class="enemy-melds-visible" id="enemy-meld-top-tiles"></div>
             </div>
             <div class="player-seat pos-right">
-                <div class="avatar-img" aria-hidden="true"></div>
+                <div class="avatar-wrap">
+                    <div class="avatar-img" aria-hidden="true"></div>
+                    <div class="action-badge" aria-hidden="true"></div>
+                </div>
                 <div class="avatar-name" id="name-right">P1 <span class="seat-direction">• East</span></div>
                 <div class="enemy-hand-count" id="enemy-hand-right" aria-label="Kartu tersembunyi East"></div>
                 <div class="enemy-meld-summary" id="enemy-meld-right-label"></div><div class="enemy-melds-visible" id="enemy-meld-right-tiles"></div>
@@ -737,6 +749,10 @@ let activeCallId=null;
 let mpCallSeq=0;
 let mpActionSeq=0;
 let mpProcessedActionIds=new Set();
+let activeActionFeedback=null;
+let lastActionFeedbackId='';
+let actionFeedbackTimer=null;
+let actionFeedbackToken=0;
 let aiDecisionToken=0;
 let autoSortSetting=true,activeScreenId='screen-main',previousScreenId='screen-main',isMultiplayerMode=false;try{autoSortSetting=localStorage.getItem('hk_auto_sort')!=='0'}catch{}
 function nextMpCallId(prefix='TURN'){
@@ -759,6 +775,78 @@ function rememberMpAction(seat,actionId){
     if(first)mpProcessedActionIds.delete(first);
   }
   return true;
+}
+function actionFeedbackCode(type){
+  return ({Chi:'C',Pon:'P',Kan:'K',Ron:'R',Tsumo:'T'})[type]||'';
+}
+function actionFeedbackClass(type){
+  return ({Chi:'action-badge-chi',Pon:'action-badge-pon',Kan:'action-badge-kan',Ron:'action-badge-ron',Tsumo:'action-badge-tsumo'})[type]||'';
+}
+function actionFeedbackSlotForSeat(seat){
+  const m=mappedSeats(mp.seat??0);
+  if(m[0]===seat)return 'bottom';
+  if(m[1]===seat)return 'right';
+  if(m[2]===seat)return 'top';
+  if(m[3]===seat)return 'left';
+  return null;
+}
+function clearPlayerActionFeedback(){
+  document.querySelectorAll('.action-badge').forEach(el=>{
+    el.className='action-badge';
+    el.textContent='';
+    el.removeAttribute('aria-label');
+  });
+}
+function showPlayerActionFeedback(seat,type){
+  const code=actionFeedbackCode(type);
+  const cls=actionFeedbackClass(type);
+  const slot=actionFeedbackSlotForSeat(seat);
+  if(!code||!cls||!slot)return;
+  const badge=document.querySelector(`.pos-${slot} .action-badge`);
+  if(!badge)return;
+  clearPlayerActionFeedback();
+  badge.className=`action-badge ${cls} show`;
+  badge.textContent=code;
+  badge.setAttribute('aria-label',type);
+}
+function beginActionFeedback(seat,type,duration=2000,resume){
+  clearTimeout(actionFeedbackTimer);
+  actionFeedbackToken++;
+  const feedbackId=nextMpActionId('FEEDBACK');
+  activeActionFeedback={id:feedbackId,seat,type,duration,startedAt:Date.now()};
+  lastActionFeedbackId=feedbackId;
+  isDiscardable=false;
+  showPlayerActionFeedback(seat,type);
+  if(isMultiplayerMode&&mp.host)mpBroadcastState({actionFeedback:activeActionFeedback});
+
+  const token=actionFeedbackToken;
+  actionFeedbackTimer=setTimeout(()=>{
+    if(token!==actionFeedbackToken)return;
+    actionFeedbackTimer=null;
+    activeActionFeedback=null;
+    clearPlayerActionFeedback();
+    resume?.();
+  },Math.max(0,Number(duration)||0));
+}
+function resumeAfterAction(seat,type,resume){
+  beginActionFeedback(seat,type,2000,resume);
+}
+function restoreRemoteActionFeedback(feedback){
+  if(!feedback?.id||feedback.id===lastActionFeedbackId)return;
+  const duration=Math.max(0,Number(feedback.duration)||0);
+  const started=Number(feedback.startedAt)||Date.now();
+  const remaining=Math.max(0,duration-(Date.now()-started));
+  lastActionFeedbackId=feedback.id;
+  if(remaining<=0){clearPlayerActionFeedback();return;}
+  clearTimeout(actionFeedbackTimer);
+  actionFeedbackToken++;
+  showPlayerActionFeedback(feedback.seat,feedback.type);
+  const token=actionFeedbackToken;
+  actionFeedbackTimer=setTimeout(()=>{
+    if(token!==actionFeedbackToken)return;
+    clearPlayerActionFeedback();
+    actionFeedbackTimer=null;
+  },remaining);
 }
 const AVATAR_OPTIONS=[
   {id:'panda',name:'Panda',file:'avatars/avatar-panda.jpg'},
@@ -1222,13 +1310,14 @@ function evaluateHK(pIdx,winningTile,isTsumo=false){
 }
 function drawTile(){if(!fullDeck.length)return null;return fullDeck.pop()}
 function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKey='';advisorKnownCache=null;
+  actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();
   activeCallId=nextMpCallId('TURN');
   fullDeck=makeDeck();playerHands=[[],[],[],[]];playerRivers=[[],[],[],[]];playerMelds=[[],[],[],[]];lastDiscardedTile=null;lastDiscarderIdx=-1;selectedTileIndex=-1;roundEnding=false;roundActive=true;secondsLeft=TURN_BASE_SECONDS;timeBank=[TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX];actionSecondsLeft=0;pendingCallChoice=null;clearInterval(turnTimer);clearInterval(actionTimer);
   for(let n=0;n<13;n++)for(let p=0;p<4;p++)playerHands[p].push(fullDeck.pop());
   for(let p=0;p<4;p++)sortHand(p);
   currentTurn=currentDealerIdx;drawnTile=null;renderTable();processTurn();
 }
-function start4PGame(diff='Medium',multi=false){activeRemoteActions=null;activeCallId=null;mpCallSeq=0;mpActionSeq=0;mpProcessedActionIds=new Set();cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
+function start4PGame(diff='Medium',multi=false){activeRemoteActions=null;activeActionFeedback=null;actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;lastActionFeedbackId='';clearPlayerActionFeedback();activeCallId=null;mpCallSeq=0;mpActionSeq=0;mpProcessedActionIds=new Set();cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
   aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
   if(!multi){
     mp.seat=0;mp.room=null;mp.host=true;mp.connected=false;mp.playerAvatar=selectedAvatar;
@@ -1575,19 +1664,19 @@ function executePon(p){
   selectedTileIndex=-1;
   renderTable();
 
-  // Only AI seats may auto-discard.
-  // A human guest must keep control of the hand after Pon.
-  if(aiSeats.has(p)){
-    aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
-    isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
-    startTurnTimer();
-  }else{
-    isDiscardable=false;
-  }
-
   mpPendingCalls=[];
-  mpBroadcastState();
+  const resume=()=>{
+    if(aiSeats.has(p)){
+      aiDiscard(p);
+    }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+      isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
+      startTurnTimer();
+    }else{
+      isDiscardable=false;
+    }
+    mpBroadcastState();
+  };
+  resumeAfterAction(p,'Pon',resume);
 }
 function executeChi(p,combo){
   cancelAiTurn();
@@ -1601,11 +1690,9 @@ function executeChi(p,combo){
   const a=[];
   for(const n of combo){
     if(n===tile.num)continue;
-
     const idx=playerHands[p].findIndex(
       t=>t.type===tile.type&&t.num===n
     );
-
     if(idx<0)return;
     a.push(playerHands[p].splice(idx,1)[0]);
   }
@@ -1620,19 +1707,19 @@ function executeChi(p,combo){
   selectedTileIndex=-1;
   renderTable();
 
-  // Only AI seats may auto-discard.
-  // A human guest must choose the discard after Chi.
-  if(aiSeats.has(p)){
-    aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
-    isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
-    startTurnTimer();
-  }else{
-    isDiscardable=false;
-  }
-
   mpPendingCalls=[];
-  mpBroadcastState();
+  const resume=()=>{
+    if(aiSeats.has(p)){
+      aiDiscard(p);
+    }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+      isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
+      startTurnTimer();
+    }else{
+      isDiscardable=false;
+    }
+    mpBroadcastState();
+  };
+  resumeAfterAction(p,'Chi',resume);
 }
 function executeKan(p){
   cancelAiTurn();
@@ -1662,19 +1749,19 @@ function executeKan(p){
   selectedTileIndex=-1;
   renderTable();
 
-  // Only AI seats may auto-discard.
-  // A human guest must choose the discard after Kan draw.
-  if(aiSeats.has(p)){
-    aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
-    isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
-    startTurnTimer();
-  }else{
-    isDiscardable=false;
-  }
-
   mpPendingCalls=[];
-  mpBroadcastState();
+  const resume=()=>{
+    if(aiSeats.has(p)){
+      aiDiscard(p);
+    }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+      isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
+      startTurnTimer();
+    }else{
+      isDiscardable=false;
+    }
+    mpBroadcastState();
+  };
+  resumeAfterAction(p,'Kan',resume);
 }
 function executeSelfKan(p,opt){
   cancelAiTurn();
@@ -1706,18 +1793,18 @@ function executeSelfKan(p,opt){
   selectedTileIndex=-1;
   renderTable();
 
-  // Only AI seats may auto-discard.
-  // A human guest must choose the discard after self-Kan draw.
-  if(aiSeats.has(p)){
-    aiDiscard(p);
-  }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
-    isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
-    startTurnTimer();
-  }else{
-    isDiscardable=false;
-  }
-
-  mpBroadcastState();
+  const resume=()=>{
+    if(aiSeats.has(p)){
+      aiDiscard(p);
+    }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
+      isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
+      startTurnTimer();
+    }else{
+      isDiscardable=false;
+    }
+    mpBroadcastState();
+  };
+  resumeAfterAction(p,'Kan',resume);
   return true;
 }
 function chooseAiCall(actions){
@@ -1899,7 +1986,7 @@ function settleExhaustiveDraw(){
   const tn=tenpai.map(playerName).join(', ');const nn=noten.map(playerName).join(', ');
   return {tenpai,noten,changed:true,desc:`Tenpai: ${tn}. Noten: ${nn}. Pool ${Math.round(totalPool).toLocaleString('id-ID')} poin dibagi rata; masing-masing Noten -${poolPerNoten.toLocaleString('id-ID')}, masing-masing Tenpai +${Math.round(gain).toLocaleString('id-ID')}.`};
 }
-function resolveWin(seat,result,isTsumo){playSfx(isTsumo?'tsumo':'ron');roundEnding=true;clearInterval(turnTimer);const payer=isTsumo?null:lastDiscarderIdx;let amount=Number.isFinite(Number(result?.points))?Number(result.points):0;if(isTsumo){for(let p=0;p<4;p++)if(p!==seat)playerScores[p]-=amount/3;playerScores[seat]+=amount}else{playerScores[seat]+=amount; if(payer>=0)playerScores[payer]-=amount}renderTable();flashBoard('win');endRound(`${isTsumo?'TSUMO':'RON'} • ${playerName(seat)}`,`${result.yakuStr} • ${result.points} poin`)}
+function resolveWin(seat,result,isTsumo){playSfx(isTsumo?'tsumo':'ron');roundEnding=true;clearInterval(turnTimer);clearInterval(actionTimer);const payer=isTsumo?null:lastDiscarderIdx;let amount=Number.isFinite(Number(result?.points))?Number(result.points):0;if(isTsumo){for(let p=0;p<4;p++)if(p!==seat)playerScores[p]-=amount/3;playerScores[seat]+=amount}else{playerScores[seat]+=amount; if(payer>=0)playerScores[payer]-=amount}renderTable();flashBoard('win');const title=`${isTsumo?'TSUMO':'RON'} • ${playerName(seat)}`;const desc=`${result.yakuStr} • ${result.points} poin`;beginActionFeedback(seat,isTsumo?'Tsumo':'Ron',3000,()=>endRound(title,desc))}
 function hideAvailableActions(){
   const o=byId('action-overlay');
   if(o){o.innerHTML='';o.style.display='none';o.hidden=true;}
@@ -2129,6 +2216,7 @@ function renderResultModal(title,desc){
   requestAnimationFrame(()=>{if(box)box.querySelectorAll('[data-target-score]').forEach((el,i)=>animateScoreValue(el,Number(el.dataset.targetScore),700+i*80));});
 }
 function endRound(title,desc){smartAssistantHide();
+  actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();
   activeCallId=null;
   roundEnding=true;roundActive=false;clearGameTimers();clearTimeout(aiMoveTimer);
   renderResultModal(title,desc);
@@ -2139,6 +2227,7 @@ function computeStandings(){
   return [0,1,2,3].map(seat=>({seat,name:playerName(seat),score:Math.round(playerScores[seat]||0)})).sort((a,b)=>b.score-a.score);
 }
 function showMatchOverScreen(){
+  actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();
   roundActive=false;roundEnding=false;
   clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);
   stopGameMusic();
@@ -2208,7 +2297,7 @@ function nextRoundOrFinish(){
   currentDealerIdx=(currentDealerIdx+1)%4;setupRound();mpBroadcastState();
 }
 function flashBoard(kind){const e=byId('center-board-box');if(!e)return;e.classList.remove('win-flash','draw-flash');void e.offsetWidth;e.classList.add(kind==='draw'?'draw-flash':'win-flash')}
-function quitGame(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;mpClearActiveGameState();stopGameMusic();nav('screen-main');if(mp.connected)mpSend('leave')}
+function quitGame(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();roundActive=false;mpClearActiveGameState();stopGameMusic();nav('screen-main');if(mp.connected)mpSend('leave')}
 function openSettingsFromGame(){previousScreenId=activeScreenId==='screen-game'?'screen-game':(previousScreenId||'screen-main');nav('screen-settings');applyAudioSettings()}
 function returnToGameFromSettings(){nav(previousScreenId||'screen-main')}
 function exitGameFromSettings(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;mpClearActiveGameState();stopGameMusic();previousScreenId='screen-main';nav('screen-main')}
@@ -2404,6 +2493,7 @@ function startMpGameWatchdog(){
   clearInterval(mpGameWatchdogTimer);
   mpGameWatchdogTimer=setInterval(()=>{
     if(!isMultiplayerMode||!roundActive||roundEnding)return;
+    if(activeActionFeedback)return;
 
     if(mp.host){
       if(mpPendingCalls.length&&!actionTimer&&!aiMoveTimer){
@@ -2431,7 +2521,7 @@ function stopMpGameWatchdog(){
   clearInterval(mpGameWatchdogTimer);
   mpGameWatchdogTimer=null;
 }
-function mpStateSnapshot(extra={}){const hasRemote=Object.prototype.hasOwnProperty.call(extra,'remoteActions');if(hasRemote)activeRemoteActions=extra.remoteActions;return{currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,playerHands,playerRivers,playerMelds,playerScores,lastDiscardedTile,lastDiscarderIdx,drawnTile,secondsLeft,timeBank,actionSecondsLeft,isActionPhase,isDiscardable,pendingCalls:mpPendingCalls,roundActive,roundEnding,roomPlayers:mp.room?.players||[],aiSeats:[...aiSeats],playerAvatars:[...playerAvatars],actionContextId:activeCallId,remoteActions:activeRemoteActions,...extra}}
+function mpStateSnapshot(extra={}){const hasRemote=Object.prototype.hasOwnProperty.call(extra,'remoteActions');if(hasRemote)activeRemoteActions=extra.remoteActions;const hasFeedback=Object.prototype.hasOwnProperty.call(extra,'actionFeedback');if(hasFeedback)activeActionFeedback=extra.actionFeedback||null;return{currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,playerHands,playerRivers,playerMelds,playerScores,lastDiscardedTile,lastDiscarderIdx,drawnTile,secondsLeft,timeBank,actionSecondsLeft,isActionPhase,isDiscardable,pendingCalls:mpPendingCalls,roundActive,roundEnding,roomPlayers:mp.room?.players||[],aiSeats:[...aiSeats],playerAvatars:[...playerAvatars],actionContextId:activeCallId,remoteActions:activeRemoteActions,actionFeedback:activeActionFeedback,...extra}}
 function mpBroadcastState(extra={}){const state=mpStateSnapshot(extra);if(isMultiplayerMode&&mp.host)mpSaveActiveGameState(state);if(isMultiplayerMode&&mp.host&&mp.connected)mpSend('state',{state})}
 function mpApplyRemoteState(state){
   if(mp.host)return;
@@ -2503,6 +2593,18 @@ function mpApplyRemoteState(state){
 
   renderTable();
 
+  const feedbackActive=!!(state.actionFeedback?.id&&Math.max(0,(Number(state.actionFeedback.duration)||0)-((Date.now()-(Number(state.actionFeedback.startedAt)||Date.now()))))>0);
+  if(feedbackActive){
+    isDiscardable=false;
+    isActionPhase=false;
+    hideAvailableActions();
+    restoreRemoteActionFeedback(state.actionFeedback);
+  }else if(!state.actionFeedback&&lastActionFeedbackId){
+    lastActionFeedbackId='';
+    clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;
+    clearPlayerActionFeedback();
+  }
+
   if(mpPendingGuestAction){
     const localActionStillOpen=
       state.remoteActions?.callId===activeCallId&&
@@ -2516,7 +2618,7 @@ function mpApplyRemoteState(state){
     if(!localActionStillOpen&&!localTurnStillActive)clearGuestActionRetry();
   }
 
-  if(
+  if(!feedbackActive&&
     state.remoteActions?.callId===activeCallId&&
     state.remoteActions?.seat===(mp.seat??0)&&
     Array.isArray(state.remoteActions.actions)&&
@@ -2526,7 +2628,7 @@ function mpApplyRemoteState(state){
     showAvailableActions(state.remoteActions.actions,state.remoteActions.callId);
     setText('hand-status-main','Aksi tersedia');
     setText('hand-status-sub','Pilih aksi sebelum waktu habis.');
-  }else if(currentTurn===(mp.seat??0)&&roundActive){
+  }else if(!feedbackActive&&currentTurn===(mp.seat??0)&&roundActive){
     // Reconnect can happen during a normal turn without a fresh startGame
     // message. Recreate the same Tsumo/Kan controls the player would have had.
     const turnActions=[];
