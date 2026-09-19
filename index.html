@@ -895,6 +895,79 @@ body::after{
   }
 }
 
+
+/* v12 UI-only precision polish:
+   - Center AI / 4P mode markers exactly inside their artwork.
+   - Compact Multiplayer Lobby by ~10% so the waiting room fits a viewport more comfortably.
+*/
+#screen-play .menu-actions .btn:nth-child(1)::before,
+#screen-play .menu-actions .btn:nth-child(2)::before{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  margin:0;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+#screen-play .menu-actions .btn:nth-child(1)::before,
+#screen-play .menu-actions .btn:nth-child(2)::before{
+  line-height:1;
+}
+
+#modal-lobby .lobby-box{
+  width:min(92vw,684px);
+  max-height:calc(100dvh - 18px);
+  padding:12px 14px;
+  overflow:hidden;
+}
+#modal-lobby .modal-title{font-size:19px;}
+#modal-lobby .modal-copy{font-size:10px;margin-top:4px;}
+#modal-lobby .modal-head{gap:10px;}
+#modal-lobby .connection-badge{padding:4px 7px;font-size:8px;}
+#modal-lobby .mp-setup,
+#modal-lobby .mp-room-panel,
+#modal-lobby .lobby-actions{gap:6px;}
+#modal-lobby .p2p-card,
+#modal-lobby .room-share-card{
+  padding:10px;
+  gap:6px;
+}
+#modal-lobby .room-share-big strong{font-size:28px;letter-spacing:4px;}
+#modal-lobby .field-input{padding:9px 10px;}
+#modal-lobby .btn{min-height:36px;padding:8px 12px;font-size:10px;}
+#modal-lobby .btn-compact{min-height:32px;padding:6px 9px;font-size:9px;}
+#modal-lobby .signal-qr{width:162px;height:162px;padding:4px;}
+#modal-lobby .ready-player-list{gap:6px;margin-top:9px;}
+#modal-lobby .ready-item{padding:8px 9px;font-size:11px;}
+#modal-lobby .p2p-mini,
+#modal-lobby .mp-hint{font-size:9px;line-height:1.32;}
+#modal-lobby .lobby-back-main{margin-top:7px;}
+#modal-lobby .share-link-btn{font-size:9px;}
+
+@media (max-width:760px){
+  #modal-lobby .lobby-box{
+    width:min(92vw,560px);
+    padding:11px 10px;
+  }
+  #modal-lobby .p2p-card,
+  #modal-lobby .room-share-card{padding:9px;}
+  #modal-lobby .signal-qr{width:148px;height:148px;}
+  #modal-lobby .room-share-big strong{font-size:25px;}
+  #modal-lobby .ready-item{padding:7px 8px;font-size:10px;}
+  #modal-lobby .btn{min-height:34px;padding:7px 10px;font-size:9px;}
+}
+@media (max-width:430px){
+  #modal-lobby .lobby-box{width:min(94vw,520px);padding:10px 9px;}
+  #modal-lobby .modal-title{font-size:18px;}
+  #modal-lobby .modal-copy{font-size:9px;}
+  #modal-lobby .signal-qr{width:132px;height:132px;}
+  #modal-lobby .ready-item{padding:6px 7px;font-size:9px;}
+}
+
 </style>
 </head>
 <body>
