@@ -2398,12 +2398,14 @@ function drawTile(){if(!fullDeck.length)return null;return fullDeck.pop()}
 function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKey='';advisorKnownCache=null;
   actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();
   activeCallId=nextMpCallId('TURN');
+  mpPendingCalls=[];
+  activeRemoteActions=null;
   fullDeck=makeDeck();playerHands=[[],[],[],[]];playerRivers=[[],[],[],[]];playerMelds=[[],[],[],[]];lastDiscardedTile=null;lastDiscarderIdx=-1;selectedTileIndex=-1;roundEnding=false;roundActive=true;secondsLeft=TURN_BASE_SECONDS;timeBank=[TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX];actionSecondsLeft=0;pendingCallChoice=null;clearInterval(turnTimer);clearInterval(actionTimer);
   for(let n=0;n<13;n++)for(let p=0;p<4;p++)playerHands[p].push(fullDeck.pop());
   for(let p=0;p<4;p++)sortHand(p);
   currentTurn=currentDealerIdx;drawnTile=null;renderTable();processTurn();
 }
-function start4PGame(diff='Medium',multi=false){activeRemoteActions=null;activeActionFeedback=null;actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;lastActionFeedbackId='';clearPlayerActionFeedback();activeCallId=null;mpCallSeq=0;mpActionSeq=0;mpProcessedActionIds=new Set();cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
+function start4PGame(diff='Medium',multi=false){activeRemoteActions=null;mpPendingCalls=[];activeActionFeedback=null;actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;lastActionFeedbackId='';clearPlayerActionFeedback();activeCallId=null;mpCallSeq=0;mpActionSeq=0;mpProcessedActionIds=new Set();cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
   aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
   if(!multi){
     mp.seat=0;mp.room=null;mp.host=true;mp.connected=false;mp.playerAvatar=selectedAvatar;
@@ -3397,6 +3399,8 @@ function renderResultModal(title,desc,resultMeta=null){
 function endRound(title,desc,resultMeta={}){smartAssistantHide();
   actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();
   activeCallId=null;
+  mpPendingCalls=[];
+  activeRemoteActions=null;
   roundEnding=true;roundActive=false;clearGameTimers();clearTimeout(aiMoveTimer);
   renderResultModal(title,desc,resultMeta);
   mpBroadcastState({phase:'result',result:{title,desc,...resultMeta},playerScores});
@@ -3654,7 +3658,7 @@ function mpHandle(msg){
     return
   }
   if(msg.type==='startGame'){
-    mp.started=true;if(mp.room)mp.room.started=true;mpSaveSession({started:true});setDisplay('modal-lobby','none');setDisplay('modal-match-over','none');nav('screen-game');playGameMusic();if(mp.host&&!roundActive)start4PGame('Medium',true);if(mp.host)startMpGameWatchdog();return
+    mp.started=true;if(mp.room)mp.room.started=true;mpSaveSession({started:true});setDisplay('modal-lobby','none');setDisplay('modal-match-over','none');setDisplay('modal-result','none');nav('screen-game');playGameMusic();if(mp.host&&!roundActive)start4PGame('Medium',true);if(mp.host)startMpGameWatchdog();return
   }
   if(msg.type==='state'&&msg.state){mpApplyRemoteState(msg.state);return}
   if(msg.type==='playerAction'&&mp.host){mpHandlePlayerAction(msg.seat,msg.action||{});return}
@@ -3754,6 +3758,7 @@ function mpApplyRemoteState(state){
 
   nav('screen-game');
   if(state.roundActive||state.roundEnding)setDisplay('modal-lobby','none');
+  if(state.roundActive){setDisplay('modal-result','none');setDisplay('modal-match-over','none');}
 
   // Rebuild the guest's local control state from the synchronized table.
   const remoteCallId=state.remoteActions?.callId||null;
