@@ -5,8 +5,8 @@
     <meta name="app-version" content="25.0-mahyong-dj-actionfix">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
-    <meta name="description" content="Mahjong DJ - HongKong Mahjong dengan AI dan Cloudflare multiplayer.">
-    <title>Mahjong DJ - HongKong</title>
+    <meta name="description" content="Majong DJ - HongKong Mahjong dengan AI dan Cloudflare multiplayer.">
+    <title>Majong DJ - HongKong</title>
         <link rel="apple-touch-icon" sizes="180x180" href="IMG_6682.PNG">
     <link rel="icon" type="image/PNG" sizes="32x32" href="IMG_6682.PNG">
     <style>
@@ -150,7 +150,7 @@ min-width:14px;min-height:33px;padding:2px;display:flex;align-items:center;justi
 .smart-assistant{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);display:grid;gap:2px;min-width:170px;max-width:min(58vw,330px);padding:6px 9px;border-radius:9px;border:1px solid rgba(224,180,93,.22);background:linear-gradient(180deg,rgba(25,20,15,.96),rgba(10,9,8,.98));box-shadow:0 10px 26px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,235,192,.05);backdrop-filter:blur(10px);pointer-events:none;animation:smartAssistantIn .18s ease-out}.smart-assistant[hidden]{display:none}.smart-assistant-title{font-size:8px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:#e0b45d}.smart-assistant-detail{font-size:7px;font-weight:750;line-height:1.25;color:#c8bfb1;white-space:normal;text-align:center}.smart-assistant.is-green{border-color:rgba(85,199,154,.32)}.smart-assistant.is-green .smart-assistant-title{color:#69d3ab}.smart-assistant.is-red{border-color:rgba(217,101,90,.36)}.smart-assistant.is-red .smart-assistant-title{color:#e26d61}@keyframes smartAssistantIn{from{opacity:0;transform:translate(-50%,4px) scale(.98)}to{opacity:1;transform:translate(-50%,0) scale(1)}}.hand-bottom-container{flex-wrap:wrap}.hand-status-bar{flex:0 0 100%;text-align:center;padding:0 10px;margin-bottom:3px}.hand-status-main{font-size:7.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#e0b45d}.hand-status-sub{font-size:6.5px;font-weight:650;line-height:1.25;color:#9f9587;margin-top:1px}
 
 /* ============================================================
-   MAHJONG DJ HONGKONG — CINEMATIC UI THEME
+   MAJONG DJ HONGKONG — CINEMATIC UI THEME
    Presentation-only layer. Game engine / IDs / handlers unchanged.
    ============================================================ */
 :root{
@@ -218,7 +218,7 @@ body{
   line-height:.96;
 }
 #screen-main h1::before{
-  content:"MAHJONG DJ";
+  content:"MAJONG DJ";
   display:block;
   font-size:clamp(42px,8.2vw,82px);
   font-weight:950;
@@ -1245,9 +1245,170 @@ body::after{
   }
 }
 
+
+/* v18: small global cache refresh control. Never clears game data/history. */
+#btn-cache-refresh{
+  position:fixed;
+  top:12px;
+  right:12px;
+  z-index:99999;
+  width:34px;
+  height:34px;
+  padding:0;
+  border:1px solid rgba(220,180,86,.55);
+  border-radius:50%;
+  background:rgba(5,22,19,.82);
+  color:#f3d27b;
+  font-size:18px;
+  line-height:32px;
+  text-align:center;
+  cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,.35);
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+}
+#btn-cache-refresh:hover{filter:brightness(1.12);transform:rotate(20deg)}
+#btn-cache-refresh:active{transform:scale(.94)}
+@media (max-width:600px){#btn-cache-refresh{top:8px;right:8px;width:30px;height:30px;line-height:28px;font-size:16px}}
+</style>
+<style>
+
+/* v17 UI-only polish: keep Main Menu controls visible and refine Settings toggles. */
+#screen-main .screen-card{
+  padding:clamp(20px,3.2vw,34px);
+}
+#screen-main .brand-lockup{
+  margin-bottom:22px;
+}
+#screen-main h1{
+  margin:10px 0 8px;
+}
+#screen-main h1::before{
+  font-size:clamp(36px,6.8vw,68px);
+}
+#screen-main h1::after{
+  margin-top:7px;
+  font-size:clamp(11px,1.5vw,17px);
+}
+#screen-main .menu-actions{
+  gap:8px;
+}
+#screen-main .btn{
+  min-height:50px;
+  padding:8px 12px;
+  font-size:clamp(13px,1.55vw,16px);
+}
+#screen-main .btn::before{
+  width:23px;
+  margin-right:6px;
+  font-size:15px;
+}
+
+/* Settings pair: compact, aligned controls without label/button collisions. */
+#screen-settings .settings-pair{
+  gap:8px;
+}
+#screen-settings .settings-pair .settings-row{
+  min-height:64px;
+  padding:7px 10px;
+}
+#screen-settings .settings-pair .settings-label{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+#screen-settings .settings-pair .settings-label > div{
+  flex:1 1 auto;
+  min-width:0;
+}
+#screen-settings .settings-pair .settings-label strong{
+  font-size:11px;
+  line-height:1.1;
+  white-space:nowrap;
+}
+#screen-settings .settings-pair .settings-label span{
+  max-width:none;
+  margin-top:3px;
+  font-size:8px;
+  line-height:1.2;
+}
+#screen-settings .settings-pair .toggle-btn{
+  flex:0 0 52px;
+  min-width:52px;
+  min-height:31px;
+  padding:5px 7px;
+  font-size:9px;
+}
+
+@media (max-width:760px){
+  #screen-main .screen-card{
+    padding:18px 14px 14px;
+  }
+  #screen-main .brand-lockup{
+    margin-bottom:16px;
+  }
+  #screen-main h1::before{
+    font-size:clamp(34px,7.2vw,60px);
+  }
+  #screen-main .btn{
+    min-height:46px;
+  }
+  #screen-settings .settings-pair{
+    gap:6px;
+  }
+  #screen-settings .settings-pair .settings-row{
+    min-height:60px;
+    padding:6px 8px;
+  }
+  #screen-settings .settings-pair .settings-label span{
+    font-size:7px;
+  }
+}
+
+@media (max-width:430px){
+  #screen-main .screen-card{
+    padding:15px 10px 11px;
+  }
+  #screen-main .brand-lockup{
+    margin-bottom:12px;
+  }
+  #screen-main h1::before{
+    font-size:clamp(31px,9vw,48px);
+  }
+  #screen-main h1::after{
+    font-size:10px;
+    letter-spacing:.34em;
+  }
+  #screen-main .btn{
+    min-height:42px;
+    padding:7px 10px;
+  }
+  #screen-settings .settings-pair .settings-row{
+    min-height:56px;
+    padding:6px;
+  }
+  #screen-settings .settings-pair .settings-label{
+    gap:6px;
+  }
+  #screen-settings .settings-pair .settings-label strong{
+    font-size:10px;
+  }
+  #screen-settings .settings-pair .settings-label span{
+    font-size:6.5px;
+  }
+  #screen-settings .settings-pair .toggle-btn{
+    flex-basis:48px;
+    min-width:48px;
+    min-height:29px;
+    font-size:8px;
+  }
+}
+
 </style>
 </head>
 <body>
+    <button id="btn-cache-refresh" type="button" onclick="forceFreshReload()" aria-label="Refresh dan ambil versi terbaru" title="Refresh versi terbaru">↻</button>
 
     <audio id="bg-music" loop preload="auto" aria-hidden="true"></audio>
 
@@ -1255,7 +1416,7 @@ body::after{
         <section class="screen-card glass">
             <div class="brand-lockup">
                 <div class="brand-kicker"><span class="brand-dot"></span> Hong Kong Mahjong</div>
-                <h1 id="main-title">MAHJONG DJ - HongKong</h1>
+                <h1 id="main-title">MAJONG DJ - HongKong</h1>
                 <p class="brand-subtitle">Simple, fast Hong Kong Mahjong table.</p>
             </div>
             <div class="menu-actions">
@@ -1481,7 +1642,7 @@ body::after{
                     <div class="score-guide-launcher">
                         <button id="btn-score-guide" class="score-guide-launcher-btn" type="button" onclick="toggleScoreGuide()" aria-label="Buka Score Guide" aria-expanded="false"><span class="score-guide-launcher-icon" aria-hidden="true">▤</span><span>Score Guide</span></button>
                     </div>
-                    <div class="game-title-compact" aria-label="Mahjong DJ - HongKong">MAHJONG DJ - HongKONG</div>
+                    <div class="game-title-compact" aria-label="Majong DJ - HongKong">MAJONG DJ - HongKONG</div>
                 </div>
                 <div class="score-guide-drawer" id="score-guide-drawer" aria-hidden="true">
                     <div class="score-guide-drawer-head">
@@ -1611,15 +1772,15 @@ function byId(id){return document.getElementById(id)}
    AUDIO MANAGER
    Local GitHub audio: ./audio/*.mp3
    Playlist: bgm1-game.mp3 ... bgm5-game.mp3
-   Random track with short history:
-   the same track cannot repeat within the previous 2 tracks,
-   so it may return again after 2 other tracks have played.
+   Random track; the same track cannot repeat within the
+   previous 2 tracks, so it may return again after 3 tracks.
    ============================================================ */
 const GAME_BGM_TRACKS=[1,2,3,4,5].map(n=>`audio/bgm${n}-game.mp3`);
 let musicTrackIndex=-1;
 let musicRecentTracks=[];
 let musicPlaylistBound=false;
 let musicSessionActive=false;
+let musicTrackPrepared=false;
 const SFX_SOURCES={
   draw:'audio/sfx-draw.mp3',
   discard:'audio/sfx-discard.mp3',
@@ -1733,6 +1894,7 @@ function pickNextMusicTrack(){
   musicTrackIndex=pick.index;
   musicRecentTracks.push(pick.index);
   if(musicRecentTracks.length>2)musicRecentTracks=musicRecentTracks.slice(-2);
+  musicTrackPrepared=false;
   return pick.src;
 }
 function loadNextMusicTrack(autoplay=true){
@@ -1743,6 +1905,7 @@ function loadNextMusicTrack(autoplay=true){
   audio.loop=false;
   audio.src=src;
   audio.currentTime=0;
+  musicTrackPrepared=false;
   updateMusicIntensity();
   applyAudioSettings();
   if(audioMuted||musicVolume===0||!autoplay)return true;
@@ -1763,10 +1926,12 @@ function unlockGameAudio(){
   const audio=byId('bg-music');
   if(!audio||audioUnlocked)return;
   bindMusicPlaylist();
-  const src=musicTrackIndex>=0?GAME_BGM_TRACKS[musicTrackIndex]:pickNextMusicTrack();
+  if(musicTrackIndex<0)pickNextMusicTrack();
+  const src=GAME_BGM_TRACKS[musicTrackIndex];
   if(!src)return;
   audio.src=src;
   audio.loop=false;
+  audio.currentTime=0;
   audio.volume=0;
   const p=audio.play();
   if(p&&typeof p.then==='function'){
@@ -1774,6 +1939,7 @@ function unlockGameAudio(){
       audio.pause();
       audio.currentTime=0;
       audioUnlocked=true;
+      musicTrackPrepared=true;
       applyAudioSettings();
     }).catch(()=>applyAudioSettings());
   }
@@ -1782,16 +1948,13 @@ function playGameMusic(){
   const audio=byId('bg-music');
   if(!audio||audioMuted||musicVolume===0)return;
   bindMusicPlaylist();
-
-  // On a fresh game session, keep the track selected during audio unlock
-  // instead of consuming another random track immediately.
   if(!musicSessionActive){
-    if(musicTrackIndex<0||!audio.src||audio.ended)loadNextMusicTrack(false);
+    if(!musicTrackPrepared||musicTrackIndex<0)loadNextMusicTrack(false);
     musicSessionActive=true;
+    musicTrackPrepared=false;
   }else if(!audio.src||audio.ended){
     loadNextMusicTrack(false);
   }
-
   audio.loop=false;
   updateMusicIntensity();
   applyAudioSettings();
@@ -1809,7 +1972,7 @@ function stopGameMusic(){
   const audio=byId('bg-music');
   if(audio){audio.pause();audio.currentTime=0;}
   musicSessionActive=false;
-  musicTrackIndex=-1;
+  musicTrackPrepared=false;
   stopAllSfx();
 }
 function initAudioSettingsUI(){
@@ -1818,6 +1981,16 @@ function initAudioSettingsUI(){
   if(sv)sv.addEventListener('input',e=>setSfxVolume(e.target.value));
   applyAudioSettings();
 }
+window.addEventListener('error',e=>{
+  lastRuntimeError=e?.error?.message||e?.message||'Unknown runtime error';
+  console.error('[Mahjong DJ] runtime error',e?.error||e);
+  scheduleGameRecovery('window-error');
+});
+window.addEventListener('unhandledrejection',e=>{
+  lastRuntimeError=e?.reason?.message||String(e?.reason||'Unhandled promise rejection');
+  console.error('[Mahjong DJ] unhandled rejection',e?.reason||e);
+  scheduleGameRecovery('promise-rejection');
+});
 document.addEventListener('pointerdown',()=>{bindMusicPlaylist();unlockGameAudio()},{once:true,passive:true});
 document.addEventListener('DOMContentLoaded',()=>{bindMusicPlaylist();initAudioSettingsUI()});
 
@@ -4127,6 +4300,25 @@ function mpReconnect(){
   mpConnect(saved.room,mp.host?'host':'guest',true);
 }
 window.mpConnect=mpConnect;window.mpSend=mpSend;window.openPlayerLobby=openPlayerLobby;window.mpCreateRoom=mpCreateRoom;window.mpJoinRoom=mpJoinRoom;window.mpShowJoinForm=mpShowJoinForm;window.togglePlayerReady=togglePlayerReady;window.mpStartGame=mpStartGame;window.closeLobby=closeLobby;window.mpCopyRoomLink=mpCopyRoomLink;window.mpCopyRoomInfo=mpCopyRoomInfo;
+
+function forceFreshReload(){
+  const btn=document.getElementById('btn-cache-refresh');
+  if(btn){btn.disabled=true;btn.textContent='↻';btn.style.opacity='.55'}
+  // Hanya bersihkan Cache Storage milik browser/service worker.
+  // localStorage dan IndexedDB TIDAK disentuh agar settings, session, dan History tetap aman.
+  const clearCaches=(async()=>{
+    try{
+      if(window.caches){
+        const keys=await caches.keys();
+        await Promise.all(keys.map(k=>caches.delete(k)));
+      }
+    }catch(e){}
+  })();
+  const sep=location.pathname.includes('?')?'&':'?';
+  const freshUrl=location.pathname+sep+'v='+Date.now()+location.hash;
+  clearCaches.finally(()=>{ location.replace(freshUrl); });
+}
+
 </script>
 </body>
 </html>
