@@ -1198,6 +1198,32 @@ body::after{
   }
 }
 
+/* Final targeted multiplayer lobby fit: keep Room Code + Salin on one row and keep all lobby actions visible. */
+#modal-lobby .room-share-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  min-height:38px;
+  padding:6px 9px;
+}
+#modal-lobby .room-share-card > div{
+  min-width:0;
+}
+#modal-lobby .room-share-card > .btn{
+  flex:0 0 auto;
+}
+#modal-lobby .lobby-actions{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+}
+#modal-lobby .lobby-actions .btn{
+  width:100%;
+  min-height:34px;
+  padding:7px 8px;
+  font-size:10px;
+}
+
 @media (max-width:430px){
   #screen-play .menu-actions .btn:nth-child(3){
     width:118px;
@@ -2119,6 +2145,15 @@ function bindMusicPlaylist(){
     if(!musicSessionActive||audioMuted||musicVolume===0)return;
     loadNextMusicTrack(true);
   });
+  audio.addEventListener('pause',()=>{
+    if(!musicSessionActive||!roundActive||audioMuted||musicVolume===0||audio.ended)return;
+    const resume=()=>{
+      if(!musicSessionActive||!roundActive||audioMuted||musicVolume===0||!audio.paused)return;
+      const p=audio.play();
+      if(p&&typeof p.catch==='function')p.catch(()=>{});
+    };
+    setTimeout(resume,120);
+  });
 }
 function unlockGameAudio(){
   const audio=byId('bg-music');
@@ -2157,6 +2192,9 @@ function playGameMusic(){
   updateMusicIntensity();
   applyAudioSettings();
   if(audio.volume===0)audio.volume=musicVolume;
+  // A mobile browser can pause media during a long-lived SPA transition.
+  // Resume the current track when the game session is still active; do not
+  // interfere with mute/volume-zero or an intentionally stopped session.
   const p=audio.play();
   if(p&&typeof p.catch==='function')p.catch(()=>{});
 }
@@ -4032,7 +4070,13 @@ function nextRoundOrFinish(){
     finishMatchToMenu();
     return;
   }
-  currentDealerIdx=(currentDealerIdx+1)%4;setupRound();mpBroadcastState();
+  currentDealerIdx=(currentDealerIdx+1)%4;
+  setupRound();
+  // Keep the same BGM session alive across round transitions. If the previous
+  // track ended while the result screen was open, playGameMusic() will select
+  // the next track and resume playback without resetting the playlist history.
+  playGameMusic();
+  mpBroadcastState();
 }
 function flashBoard(kind){const e=byId('center-board-box');if(!e)return;e.classList.remove('win-flash','draw-flash');void e.offsetWidth;e.classList.add(kind==='draw'?'draw-flash':'win-flash')}
 function quitGame(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();roundActive=false;mpClearActiveGameState();stopGameMusic();nav('screen-main');if(mp.connected)mpSend('leave')}
