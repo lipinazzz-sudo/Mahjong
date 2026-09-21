@@ -8,15 +8,21 @@ import { DurableObject } from "cloudflare:workers";
 // this Worker just relays JSON messages between the host and up to 3 guests,
 // plus tracks lobby/ready state.
 //
-// Key design points:
+// Key design points (see README-FIXES.md in the project root for the full
+// story of what changed and why):
 //   - Every player gets a random `token` the first time they join a room.
-//     The token (not the WebSocket) is that player's identity.
-//   - A dropped WebSocket does NOT free the seat immediately. The player is
-//     marked disconnected so `rejoin` can restore the same seat.
-//   - `rejoin` is the path used to restore a previous seat.
-//   - `rematch` (host-only) reopens the SAME room code for another match.
-//   - `chat` is a lightweight room-wide text relay and is NOT stored as game
-//     state.
+//     The token (not the WebSocket) is that player's identity. A dropped
+//     WebSocket does NOT free the seat immediately — it's just marked
+//     disconnected, so the same token can `rejoin` it later, including
+//     while a match is in progress.
+//   - `rejoin` is the ONLY message type allowed to succeed while
+//     `started === true`. `createRoom`/`joinRoom` are for brand-new seats
+//     and are intentionally blocked once a match has started.
+//   - `rematch` (host-only) reopens the SAME room code for another match
+//     without anyone needing a new invite link: it clears `started` and
+//     every player's `ready` flag, and the lobby is re-broadcast.
+//   - `chat` is a lightweight room-wide text relay. It is intentionally NOT
+//     stored inside the authoritative Mahjong game state.
 // ---------------------------------------------------------------------------
 
 const MAX_PLAYERS = 4;
@@ -232,16 +238,23 @@ export class MahjongRoom
     this.connections =
       new Map();
 
-    this.lastState = null;
-    this.started = false;
+    this.lastState =
+      null;
+
+    this.started =
+      false;
 
     this.lastActivity =
       Date.now();
 
-    this.loaded = false;
-    this.loading = null;
+    this.loaded =
+      false;
 
-    this.stateRevision = 0;
+    this.loading =
+      null;
+
+    this.stateRevision =
+      0;
 
     this.persistTimer =
       null;
@@ -302,22 +315,28 @@ export class MahjongRoom
                             id:
                               p.id ||
                               "",
+
                             token:
                               cleanToken(
                                 p.token
                               ),
+
                             name:
                               cleanName(
                                 p.name
                               ),
+
                             avatar:
                               cleanAvatar(
                                 p.avatar
                               ),
+
                             ready:
                               !!p.ready,
+
                             connected:
                               false,
+
                             disconnectedAt:
                               Number(
                                 p.disconnectedAt
@@ -366,8 +385,11 @@ export class MahjongRoom
             err
           );
         } finally {
-          this.loaded = true;
-          this.loading = null;
+          this.loaded =
+            true;
+
+          this.loading =
+            null;
         }
       })();
 
@@ -474,7 +496,8 @@ export class MahjongRoom
         id: clientId,
         role,
         name,
-        avatar: "panda",
+        avatar:
+          "panda",
         token: null,
       }
     );
@@ -498,6 +521,7 @@ export class MahjongRoom
                 "Pesan tidak valid.",
             }
           );
+
           return;
         }
 
@@ -561,8 +585,11 @@ export class MahjongRoom
     this.send(
       server,
       {
-        type: "hello",
+        type:
+          "hello",
+
         clientId,
+
         room,
       }
     );
@@ -746,6 +773,7 @@ export class MahjongRoom
               "Room ini sudah memiliki host yang aktif.",
           }
         );
+
         return;
       }
     }
@@ -872,7 +900,8 @@ export class MahjongRoom
     if (
       requested !==
         null &&
-      requested >= 1 &&
+      requested >=
+        1 &&
       requested <
         MAX_PLAYERS &&
       !this.players[
@@ -1058,7 +1087,6 @@ export class MahjongRoom
       );
     }
 
-    // Remove any stale WebSocket currently attached to this seat.
     for (
       const [
         oldWs,
@@ -1336,7 +1364,7 @@ export class MahjongRoom
   }
 
   // -------------------------------------------------------------------------
-  // START GAME
+  // START
   // -------------------------------------------------------------------------
 
   async startGame(
@@ -1488,7 +1516,6 @@ export class MahjongRoom
       return;
     }
 
-    // The Durable Object owns the authoritative state revision.
     this.stateRevision +=
       1;
 
@@ -1505,8 +1532,6 @@ export class MahjongRoom
 
     this.touch();
 
-    // Broadcast immediately.
-    // Persistence happens separately.
     this.broadcast(
       {
         type:
@@ -1555,10 +1580,10 @@ export class MahjongRoom
   }
 
   // -------------------------------------------------------------------------
-  // CHAT
+  // IN-GAME CHAT
   //
-  // Chat is deliberately NOT part of saved game state.
-  // It is simply relayed to every currently connected player in the room.
+  // Text chat is relayed to every connected player in this room.
+  // It is NOT persisted as part of the Mahjong state.
   // -------------------------------------------------------------------------
 
   async forwardChat(
@@ -1579,7 +1604,6 @@ export class MahjongRoom
       return;
     }
 
-    // Chat is available only once the actual game has started.
     if (
       !this.started
     ) {
@@ -1600,7 +1624,7 @@ export class MahjongRoom
       return;
     }
 
-    // Limit each message to 240 characters.
+    // Keep every message at a predictable size.
     text =
       text.slice(
         0,
@@ -1661,12 +1685,10 @@ export class MahjongRoom
       return;
     }
 
-    // Host processes its own actions locally.
     if (
       meta.seat ===
         this.hostSeat &&
-      meta.role ===
-        "host"
+      meta.role === "host"
     ) {
       return;
     }
@@ -1703,7 +1725,7 @@ export class MahjongRoom
   }
 
   // -------------------------------------------------------------------------
-  // LOBBY BROADCAST
+  // LOBBY
   // -------------------------------------------------------------------------
 
   broadcastLobby() {
@@ -1725,7 +1747,9 @@ export class MahjongRoom
     except = null
   ) {
     const data =
-      JSON.stringify(msg);
+      JSON.stringify(
+        msg
+      );
 
     for (
       const [
@@ -1784,9 +1808,6 @@ export class MahjongRoom
   // DISCONNECT / RECONNECT
   // -------------------------------------------------------------------------
 
-  // A closed socket does NOT free the seat immediately.
-  // The player stays reserved for reconnect.
-  // Explicit 'leave' frees the seat immediately.
   async detach(
     ws,
     explicit
@@ -1864,11 +1885,9 @@ export class MahjongRoom
   }
 
   // -------------------------------------------------------------------------
-  // ALARM
+  // ALARM / CLEANUP
   // -------------------------------------------------------------------------
 
-  // Frees seats that have been disconnected past their grace period, and
-  // fully resets a room that's been completely idle for a long time.
   async alarm() {
     await this.ensureLoaded();
 
