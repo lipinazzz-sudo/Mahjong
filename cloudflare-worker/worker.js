@@ -23,7 +23,7 @@ const MAX_PLAYERS = 4;
 const HOST_SEAT = 0;
 
 const ROOM_IDLE_TTL_MS = 6 * 60 * 60 * 1000;
-const SEAT_GRACE_MS = 5 * 60 * 1000;
+const SEAT_GRACE_MS = 15 * 60 * 1000;
 
 const STORAGE_KEY = "roomStateV2";
 
@@ -912,8 +912,9 @@ export class MahjongRoom extends DurableObject {
           ws,
           {
             type: "error",
+            code: "REJOIN_SESSION_NOT_FOUND",
             message:
-              "Sesi lama tidak ditemukan dan permainan sedang berjalan. Minta host mengundang ulang.",
+              "Sesi lama tidak ditemukan. Kursi mungkin sudah kedaluwarsa atau room sudah tidak dapat dipulihkan.",
           }
         );
 
@@ -1669,6 +1670,19 @@ export class MahjongRoom extends DurableObject {
         changed =
           true;
       }
+    }
+
+    // If a started room has lost every player and no live connection remains,
+    // release the stale game state so a future visit can start fresh.
+    if (
+      this.started &&
+      this.connections.size === 0 &&
+      this.players.every((p) => !p)
+    ) {
+      this.started = false;
+      this.lastState = null;
+      this.stateRevision = 0;
+      changed = true;
     }
 
     // Fully reset a stale room.
