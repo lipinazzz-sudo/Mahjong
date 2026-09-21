@@ -1629,7 +1629,7 @@ body::after{
 .player-voice-indicator.on .player-voice-icon{filter:saturate(1.15)}
 .player-voice-indicator.speaking{animation:voiceSpeakingPulse 1s ease-in-out infinite}
 @keyframes voiceSpeakingPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 1px rgba(92,230,159,.08),0 0 10px rgba(79,227,154,.18),0 3px 8px rgba(0,0,0,.30)}50%{transform:scale(1.10);box-shadow:0 0 0 3px rgba(92,230,159,.14),0 0 16px rgba(79,227,154,.34),0 3px 8px rgba(0,0,0,.30)}}
-.voice-chat-audio{display:none}
+.voice-chat-audio{position:fixed;left:-10000px;top:-10000px;width:1px;height:1px;opacity:0;pointer-events:none}
 .voice-notice{position:absolute;top:48px;right:12px;z-index:120;display:none;max-width:min(72vw,290px);padding:7px 10px;border-radius:9px;border:1px solid rgba(226,182,89,.28);background:rgba(10,9,8,.94);color:#e9ddc8;font-size:8px;line-height:1.3;text-align:left;box-shadow:0 10px 25px rgba(0,0,0,.32);pointer-events:none}
 .voice-notice.show{display:block;animation:voiceNoticeIn .16s ease-out}
 @keyframes voiceNoticeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
@@ -1683,6 +1683,17 @@ body::after{
                 </div>
                 <div class="range-wrap">
                     <input id="sfx-volume" type="range" min="0" max="5" value="2" step="1" aria-label="SFX Volume">
+                    <div class="range-caption"><span>0%</span><span>10%</span><span>30%</span><span>50%</span><span>80%</span><span>100%</span></div>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <div class="settings-label">
+                    <div><strong>Voice Volume</strong><span>Volume suara pemain lain.</span></div>
+                    <strong id="voice-volume-value">30%</strong>
+                </div>
+                <div class="range-wrap">
+                    <input id="voice-volume" type="range" min="0" max="5" value="2" step="1" aria-label="Voice Volume">
                     <div class="range-caption"><span>0%</span><span>10%</span><span>30%</span><span>50%</span><span>80%</span><span>100%</span></div>
                 </div>
             </div>
@@ -2012,7 +2023,7 @@ function byId(id){return document.getElementById(id)}
    Random track; the same track cannot repeat within the
    previous 2 tracks, so it may return again after 3 tracks.
    ============================================================ */
-const GAME_BGM_TRACKS=[1,2,3,4,5].map(n=>`audio/bgm${n}-game.mp3`);
+const GAME_BGM_TRACKS=['audio/bgm-game.mp3','audio/bgm2-game.mp3','audio/bgm3-game.mp3','audio/bgm4-game.mp3','audio/bgm5-game.mp3'];
 let musicTrackIndex=-1;
 let musicRecentTracks=[];
 let musicPlaylistBound=false;
@@ -2029,9 +2040,11 @@ const SFX_SOURCES={
   button:'audio/sfx-button.mp3'
 };
 const AUDIO_LEVELS=[0,0.10,0.30,0.50,0.80,1.00];
+const MUSIC_OUTPUT_GAIN=0.55;
 let audioMuted=false;
 let musicVolume=0.30;
 let sfxVolume=0.30;
+let voiceVolume=0.30;
 let audioUnlocked=false;
 const activeSfx=new Set();
 
@@ -2049,23 +2062,28 @@ function audioLevel(index){
 try{
   musicVolume=audioLevel(nearestAudioLevel(Number(localStorage.getItem('hk_music_volume')??0.30)));
   sfxVolume=audioLevel(nearestAudioLevel(Number(localStorage.getItem('hk_sfx_volume')??0.30)));
+  voiceVolume=audioLevel(nearestAudioLevel(Number(localStorage.getItem('hk_voice_volume')??0.30)));
   audioMuted=localStorage.getItem('hk_audio_muted')==='1';
 }catch{}
 
 function applyAudioSettings(){
   const bgm=byId('bg-music');
   if(bgm){
-    bgm.volume=audioMuted||musicVolume===0?0:musicVolume;
+    bgm.volume=audioMuted||musicVolume===0?0:Math.min(1,musicVolume*MUSIC_OUTPUT_GAIN);
     if(audioMuted||musicVolume===0)bgm.pause();
   }
   activeSfx.forEach(a=>a.volume=audioMuted?0:sfxVolume);
+  document.querySelectorAll('audio.voice-chat-audio').forEach(a=>a.volume=audioMuted?0:voiceVolume);
 
   const mv=byId('music-volume'),mvv=byId('music-volume-value');
   const sv=byId('sfx-volume'),svv=byId('sfx-volume-value');
+  const vv=byId('voice-volume'),vvv=byId('voice-volume-value');
   if(mv)mv.value=String(nearestAudioLevel(musicVolume));
   if(mvv)mvv.textContent=Math.round(musicVolume*100)+'%';
   if(sv)sv.value=String(nearestAudioLevel(sfxVolume));
   if(svv)svv.textContent=Math.round(sfxVolume*100)+'%';
+  if(vv)vv.value=String(nearestAudioLevel(voiceVolume));
+  if(vvv)vvv.textContent=Math.round(voiceVolume*100)+'%';
 
   const ab=byId('btn-toggle-audio');
   if(ab)ab.textContent=audioMuted?'OFF':'ON';
@@ -2089,6 +2107,11 @@ function setMusicVolume(index){
 function setSfxVolume(index){
   sfxVolume=audioLevel(index);
   try{localStorage.setItem('hk_sfx_volume',String(sfxVolume))}catch{}
+  applyAudioSettings();
+}
+function setVoiceVolume(index){
+  voiceVolume=audioLevel(index);
+  try{localStorage.setItem('hk_voice_volume',String(voiceVolume))}catch{}
   applyAudioSettings();
 }
 function stopAllSfx(){
@@ -2161,6 +2184,14 @@ function bindMusicPlaylist(){
     if(!musicSessionActive||audioMuted||musicVolume===0)return;
     loadNextMusicTrack(true);
   });
+  audio.addEventListener('error',()=>{
+    // Bila satu file audio gagal dimuat, lewati track itu agar BGM tidak mati
+    // permanen di tengah match. Playlist tetap memakai aturan random yang sama.
+    if(!musicSessionActive||audioMuted||musicVolume===0)return;
+    setTimeout(()=>{
+      if(musicSessionActive&&!audioMuted&&musicVolume>0)loadNextMusicTrack(true);
+    },60);
+  });
   audio.addEventListener('pause',()=>{
     if(!musicSessionActive||!roundActive||audioMuted||musicVolume===0||audio.ended)return;
     const resume=()=>{
@@ -2207,7 +2238,7 @@ function playGameMusic(){
   audio.loop=false;
   updateMusicIntensity();
   applyAudioSettings();
-  if(audio.volume===0)audio.volume=musicVolume;
+  if(audio.volume===0)audio.volume=Math.min(1,musicVolume*MUSIC_OUTPUT_GAIN);
   // A mobile browser can pause media during a long-lived SPA transition.
   // Resume the current track when the game session is still active; do not
   // interfere with mute/volume-zero or an intentionally stopped session.
@@ -2228,9 +2259,10 @@ function stopGameMusic(){
   stopAllSfx();
 }
 function initAudioSettingsUI(){
-  const mv=byId('music-volume'),sv=byId('sfx-volume');
+  const mv=byId('music-volume'),sv=byId('sfx-volume'),vv=byId('voice-volume');
   if(mv)mv.addEventListener('input',e=>setMusicVolume(e.target.value));
   if(sv)sv.addEventListener('input',e=>setSfxVolume(e.target.value));
+  if(vv)vv.addEventListener('input',e=>setVoiceVolume(e.target.value));
   applyAudioSettings();
 }
 window.addEventListener('error',e=>{
@@ -2244,7 +2276,7 @@ window.addEventListener('unhandledrejection',e=>{
   scheduleGameRecovery('promise-rejection');
 });
 document.addEventListener('pointerdown',()=>{bindMusicPlaylist();unlockGameAudio()},{once:true,passive:true});
-document.addEventListener('DOMContentLoaded',()=>{bindMusicPlaylist();initAudioSettingsUI();setTimeout(mpAutoRecoverSavedSession,0)});
+document.addEventListener('DOMContentLoaded',()=>{bindMusicPlaylist();initAudioSettingsUI()});
 window.addEventListener('pageshow',e=>{if(e.persisted)setTimeout(mpEnsureReconnectOnResume,0)});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(mpEnsureReconnectOnResume,0)},{passive:true});
 window.addEventListener('pagehide',()=>{if(isMultiplayerMode&&mp.room?.code)mpTouchSession(true)},{capture:true});
@@ -4356,9 +4388,60 @@ function mpEnsureReconnectOnResume(){
     }
     return;
   }
-  mpAutoRecoverSavedSession();
+  // A fresh page load must always stay on the Main Menu. Saved sessions are
+  // offered as a manual reconnect from the Multiplayer screen instead of
+  // silently opening the game table.
+  if(activeScreenId!=='screen-main')mpAutoRecoverSavedSession();
 }
-function openPlayerLobby(){isMultiplayerMode=true;mp.playerAvatar=selectedAvatar;clearTimeout(mpReconnectTimer);mpReconnectAttempts=0;mpReconnectDeadline=0;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');mpSetConnection(false);const code=new URL(location.href).searchParams.get(MP_ROOM_PARAM);const saved=mpLoadSession();if(code&&saved?.room===code&&saved?.token&&saved?.started){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('lobby-help','Menyambungkan kembali ke Room '+code+'…');mpBeginReconnect(saved);return}if(code){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.host=false;mp.ready=true;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};setText('lobby-help','Menghubungkan ke Room '+code+'…');mpConnect(code,'guest')}}
+function openPlayerLobby(){
+  isMultiplayerMode=true;
+  mp.playerAvatar=selectedAvatar;
+  clearTimeout(mpReconnectTimer);
+  mpReconnectAttempts=0;
+  mpReconnectDeadline=0;
+  setDisplay('modal-lobby','flex');
+  setDisplay('mp-setup','grid');
+  setDisplay('mp-room-panel','none');
+  setDisplay('mp-host-invite','none');
+  setDisplay('mp-guest-invite','none');
+  setDisplay('mp-reconnect-card','none');
+  mpSetConnection(false);
+
+  const code=new URL(location.href).searchParams.get(MP_ROOM_PARAM);
+  const saved=mpLoadSession();
+
+  if(code&&saved?.room===code&&saved?.token&&saved?.started){
+    setDisplay('mp-setup','none');
+    setDisplay('mp-room-panel','grid');
+    setText('lobby-help','Menyambungkan kembali ke Room '+code+'…');
+    mpBeginReconnect(saved);
+    return;
+  }
+
+  // Do not silently reconnect on page load. When the player explicitly opens
+  // Multiplayer, offer the saved session as a single manual action instead.
+  if(saved?.room&&saved?.token&&saved?.started&&!code){
+    setDisplay('mp-guest-invite','block');
+    setDisplay('mp-reconnect-card','grid');
+    setText('mp-reconnect-title','Sesi room ditemukan');
+    setText('mp-reconnect-text',`Room ${saved.room} masih tersimpan. Sambungkan kembali jika ingin melanjutkan permainan.`);
+    setText('lobby-help','Sesi multiplayer sebelumnya ditemukan. Tidak ada koneksi yang dibuat sebelum kamu menekan tombol sambung kembali.');
+    return;
+  }
+
+  if(code){
+    setDisplay('mp-setup','none');
+    setDisplay('mp-room-panel','grid');
+    mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';
+    mp.host=false;
+    mp.ready=true;
+    mpEnsureToken();
+    mp.room={code,players:[null,null,null,null],started:false};
+    setText('lobby-help','Menghubungkan ke Room '+code+'…');
+    mpConnect(code,'guest');
+  }
+}
+
 function closeLobby(){voiceStopAll();clearGuestActionRetry();clearTimeout(mpReconnectTimer);clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);clearTimeout(mpRejoinHandshakeTimer);mpRejoinHandshakeTimer=null;mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinFallbackState=null;stopMpGameWatchdog();stopMpPing();try{mpSend('leave')}catch(e){}try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}mp.ws=null;mp.connected=false;mpClearSession();mpClearActiveGameState();mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,token:null,playerName:mp.playerName||'Player',playerAvatar:selectedAvatar};isMultiplayerMode=false;setDisplay('modal-lobby','none');mpSetConnection(false)}
 function mpCreateRoom(){mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinJoined=false;mpRejoinFallbackState=null;clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.playerAvatar=selectedAvatar;const code=String(Math.floor(10000+Math.random()*90000));mp.host=true;mp.seat=0;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();isMultiplayerMode=true;mp.room={code,players:[null,null,null,null],started:false};setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('mp-room-code-display',code);setText('mp-host-room-code',code);setText('lobby-help','Membuat room di Cloudflare…');mpRenderRoomQr(code);mpSaveSession();mpConnect(code,'host')}
 function mpJoinRoom(){mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinJoined=false;mpRejoinFallbackState=null;clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code)){alert('Masukkan kode room 5 digit.');return}mp.host=false;mp.seat=null;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};isMultiplayerMode=true;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Menghubungkan ke Room '+code+'…');mpSaveSession();mpConnect(code,'guest')}
@@ -4632,7 +4715,8 @@ function mpApplyRemoteState(state){
     voiceSyncRoom(mp.room);
   }
 
-  nav('screen-game');
+  const keepSettingsScreen=activeScreenId==='screen-settings'&&previousScreenId==='screen-game';
+  if(!keepSettingsScreen)nav('screen-game');
   if(state.roundActive||state.roundEnding)setDisplay('modal-lobby','none');
   if(state.roundActive){setDisplay('modal-result','none');setDisplay('modal-match-over','none');}
 
@@ -4976,7 +5060,7 @@ function voiceCreateRemoteAudio(seat){
   audio.playsInline=true;
   audio.controls=false;
   audio.preload='none';
-  audio.volume=1;
+  audio.volume=audioMuted?0:voiceVolume;
   document.body.appendChild(audio);
   return audio;
 }
@@ -4995,7 +5079,10 @@ function voiceAttachRemoteStream(seat,stream){
   audio.srcObject=stream;
   const p=audio.play();
   if(p&&typeof p.catch==='function'){
-    p.catch(()=>{voiceAudioNeedsUnlock=true});
+    p.catch(()=>{
+      voiceAudioNeedsUnlock=true;
+      voiceSetNotice('Klik sekali di layar untuk mengaktifkan suara pemain lain.',4200);
+    });
   }
 }
 function voiceGetOrCreatePeer(remoteSeat,remoteSessionId=''){
@@ -5099,10 +5186,8 @@ async function voiceHandleHello(msg){
   if(old&&old.remoteSessionId&&old.remoteSessionId!==remoteSessionId){
     voiceClosePeer(seat,false);
   }
-  if(voiceShouldConnect(seat)){
-    const entry=await voiceEnsurePeer(seat,remoteSessionId);
-    if(entry&&entry.initiator)voiceCreateOffer(entry);
-  }
+  const entry=await voiceEnsurePeer(seat,remoteSessionId);
+  if(entry&&entry.initiator)voiceCreateOffer(entry);
 }
 async function voiceHandleRemoteState(msg){
   const seat=Number(msg.from);
@@ -5269,6 +5354,7 @@ async function voiceDisableMic(){
 }
 async function toggleVoice(){
   if(!voiceRoomActive())return;
+  voiceUnlockAudio();
   if(voiceMicEnabled)await voiceDisableMic();
   else await voiceEnableMic();
 }
