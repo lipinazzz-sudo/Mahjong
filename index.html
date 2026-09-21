@@ -2041,6 +2041,7 @@ const SFX_SOURCES={
 };
 const AUDIO_LEVELS=[0,0.10,0.30,0.50,0.80,1.00];
 const MUSIC_OUTPUT_GAIN=0.55;
+const VOICE_DUCK_GAIN=0.50;
 let audioMuted=false;
 let musicVolume=0.30;
 let sfxVolume=0.30;
@@ -2069,10 +2070,10 @@ try{
 function applyAudioSettings(){
   const bgm=byId('bg-music');
   if(bgm){
-    bgm.volume=audioMuted||musicVolume===0?0:Math.min(1,musicVolume*MUSIC_OUTPUT_GAIN);
+    bgm.volume=audioMuted||musicVolume===0?0:Math.min(1,musicVolume*MUSIC_OUTPUT_GAIN*(voiceMicEnabled?VOICE_DUCK_GAIN:1));
     if(audioMuted||musicVolume===0)bgm.pause();
   }
-  activeSfx.forEach(a=>a.volume=audioMuted?0:sfxVolume);
+  activeSfx.forEach(a=>a.volume=audioMuted?0:sfxVolume*(voiceMicEnabled?VOICE_DUCK_GAIN:1));
   document.querySelectorAll('audio.voice-chat-audio').forEach(a=>a.volume=audioMuted?0:voiceVolume);
 
   const mv=byId('music-volume'),mvv=byId('music-volume-value');
@@ -2139,8 +2140,8 @@ function playSfx(type){
   if(!src)return;
   const a=new Audio(src);
   a.preload='auto';
-  a.volume=sfxVolume;
-  if(type==='draw'||type==='discard')a.volume=sfxVolume*0.60;
+  a.volume=sfxVolume*(voiceMicEnabled?VOICE_DUCK_GAIN:1);
+  if(type==='draw'||type==='discard')a.volume*=0.60;
   activeSfx.add(a);
   a.addEventListener('ended',()=>activeSfx.delete(a),{once:true});
   const p=a.play();
@@ -2238,7 +2239,7 @@ function playGameMusic(){
   audio.loop=false;
   updateMusicIntensity();
   applyAudioSettings();
-  if(audio.volume===0)audio.volume=Math.min(1,musicVolume*MUSIC_OUTPUT_GAIN);
+  audio.volume=Math.min(1,musicVolume*MUSIC_OUTPUT_GAIN*(voiceMicEnabled?VOICE_DUCK_GAIN:1));
   // A mobile browser can pause media during a long-lived SPA transition.
   // Resume the current track when the game session is still active; do not
   // interfere with mute/volume-zero or an intentionally stopped session.
@@ -5059,8 +5060,9 @@ function voiceCreateRemoteAudio(seat){
   audio.autoplay=true;
   audio.playsInline=true;
   audio.controls=false;
-  audio.preload='none';
+  audio.preload='auto';
   audio.volume=audioMuted?0:voiceVolume;
+  audio.setAttribute('aria-hidden','true');
   document.body.appendChild(audio);
   return audio;
 }
@@ -5129,6 +5131,14 @@ function voiceGetOrCreatePeer(remoteSeat,remoteSessionId=''){
     const stream=event.streams?.[0]||new MediaStream([event.track]);
     voiceAttachRemoteStream(remoteSeat,stream);
   };
+  pc.oniceconnectionstatechange=()=>{
+    if(entry.closed)return;
+    const state=pc.iceConnectionState;
+    if(state==='failed'){
+      voiceSetNotice('Koneksi voice gagal. Coba matikan lalu nyalakan MIC lagi.',4200);
+      voiceScheduleRetry(entry);
+    }
+  };
   pc.onconnectionstatechange=()=>{
     if(entry.closed)return;
     const state=pc.connectionState;
@@ -5182,6 +5192,10 @@ async function voiceHandleHello(msg){
   if(!voiceIsSupported()||seat===mp.seat||!voiceRemoteIsActive(seat))return;
   const remoteSessionId=String(msg.sessionId||'');
   if(!remoteSessionId)return;
+  // Hello is discovery only. Do not negotiate an audio connection before a
+  // microphone is actually enabled; otherwise a peer can be negotiated with
+  // an empty sender and later replaceTrack() may not renegotiate the media.
+  if(!voiceMicEnabled&&!voiceStateBySeat[seat])return;
   const old=voicePeers.get(voicePeerKey(seat));
   if(old&&old.remoteSessionId&&old.remoteSessionId!==remoteSessionId){
     voiceClosePeer(seat,false);
@@ -5196,7 +5210,10 @@ async function voiceHandleRemoteState(msg){
   if(mp.room?.players?.[seat])mp.room.players[seat].voiceEnabled=!!msg.enabled;
   voiceUpdateUi(mp.room);
   if(msg.enabled){
-    await voiceEnsurePeer(seat,String(msg.sessionId||''));
+    const entry=await voiceEnsurePeer(seat,String(msg.sessionId||''));
+    // Keep one deterministic offerer per pair (lower seat). This avoids offer
+    // collisions when two players enable their microphones at nearly the same time.
+    if(entry?.initiator)await voiceCreateOffer(entry);
     voiceUnlockAudio();
   }
 }
@@ -5294,6 +5311,32 @@ function voiceSchedulePeerSweep(){
     if(!voiceRemoteIsActive(seat))voiceClosePeer(seat,false);
   }
 }
+async function voiceRenegotiateForLocalTrack(entry){
+  if(!entry||entry.closed||!voiceMicEnabled||!voiceLocalTrack)return;
+  try{
+    await entry.transceiver?.sender?.replaceTrack(voiceLocalTrack);
+    // If this peer was negotiated before the local mic was enabled, explicitly
+    // renegotiate so the remote side receives the newly-added outgoing track.
+    // The lower seat remains the normal initiator; when the higher seat enables
+    // its mic later, it is allowed one explicit offer to add its own track.
+    if(entry.initiator&&entry.pc.signalingState==='stable'&&!entry.makingOffer){
+      entry.makingOffer=true;
+      const offer=await entry.pc.createOffer();
+      await entry.pc.setLocalDescription(offer);
+      voiceSend('voiceOffer',{
+        to:entry.remoteSeat,
+        sdp:entry.pc.localDescription,
+        sessionId:voiceSessionId,
+        remoteSessionId:entry.remoteSessionId||null
+      });
+      entry.makingOffer=false;
+    }
+  }catch(err){
+    entry.makingOffer=false;
+    console.warn('Voice local-track renegotiation failed:',err);
+  }
+}
+
 async function voiceEnableMic(){
   if(!voiceRoomActive())return;
   if(!voiceIsSupported()){
@@ -5315,6 +5358,7 @@ async function voiceEnableMic(){
     voiceLocalTrack=stream.getAudioTracks()[0]||null;
     if(!voiceLocalTrack)throw new Error('No microphone track');
     voiceMicEnabled=true;
+    applyAudioSettings();
     voiceUpdateUi(mp.room);
     voiceHelloSent=false;
     voiceAnnounce();
@@ -5322,7 +5366,7 @@ async function voiceEnableMic(){
     for(let seat=0;seat<4;seat++){
       if(seat===mp.seat||!voiceRemoteIsActive(seat))continue;
       const entry=await voiceEnsurePeer(seat);
-      if(entry?.transceiver?.sender)await entry.transceiver.sender.replaceTrack(voiceLocalTrack).catch(()=>{});
+      if(entry)await voiceRenegotiateForLocalTrack(entry);
     }
     voiceUnlockAudio();
   }catch(err){
@@ -5350,6 +5394,7 @@ async function voiceDisableMic(){
     try{await entry.transceiver?.sender?.replaceTrack(null)}catch{}
   }
   voiceSend('voiceState',{enabled:false});
+  applyAudioSettings();
   voiceUpdateUi(mp.room);
 }
 async function toggleVoice(){
