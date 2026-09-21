@@ -173,7 +173,8 @@ export class MahjongRoom extends DurableObject {
     //   avatar,
     //   ready,
     //   connected,
-    //   disconnectedAt
+    //   disconnectedAt,
+    //   voiceEnabled
     // }
     this.players = [
       null,
@@ -257,7 +258,8 @@ export class MahjongRoom extends DurableObject {
                     p &&
                     typeof p === "object"
                       ? {
-                          id: p.id || "",
+                          id:
+                            p.id || "",
                           token:
                             cleanToken(
                               p.token
@@ -272,12 +274,15 @@ export class MahjongRoom extends DurableObject {
                             ),
                           ready:
                             !!p.ready,
-                          connected: false,
+                          connected:
+                            false,
                           disconnectedAt:
                             Number(
                               p.disconnectedAt
                             ) ||
                             null,
+                          voiceEnabled:
+                            false,
                         }
                       : null
                 )
@@ -327,9 +332,9 @@ export class MahjongRoom extends DurableObject {
     return this.loading;
   }
 
-  // -------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // PERSIST
-  // -------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   async persist() {
     await this.ensureLoaded();
@@ -337,13 +342,24 @@ export class MahjongRoom extends DurableObject {
     await this.ctx.storage.put(
       STORAGE_KEY,
       {
-        roomCode: this.roomCode,
-        hostSeat: this.hostSeat,
-        players: this.players,
-        lastState: this.lastState,
+        roomCode:
+          this.roomCode,
+
+        hostSeat:
+          this.hostSeat,
+
+        players:
+          this.players,
+
+        lastState:
+          this.lastState,
+
         stateRevision:
           this.stateRevision,
-        started: this.started,
+
+        started:
+          this.started,
+
         lastActivity:
           this.lastActivity,
       }
@@ -435,7 +451,8 @@ export class MahjongRoom extends DurableObject {
           this.send(
             server,
             {
-              type: "error",
+              type:
+                "error",
               message:
                 "Pesan tidak valid.",
             }
@@ -453,7 +470,8 @@ export class MahjongRoom extends DurableObject {
           this.send(
             server,
             {
-              type: "error",
+              type:
+                "error",
               message:
                 err?.message ||
                 "Room error.",
@@ -494,7 +512,8 @@ export class MahjongRoom extends DurableObject {
     this.send(
       server,
       {
-        type: "hello",
+        type:
+          "hello",
         clientId,
         room,
       }
@@ -506,7 +525,8 @@ export class MahjongRoom extends DurableObject {
       null,
       {
         status: 101,
-        webSocket: client,
+        webSocket:
+          client,
       }
     );
   }
@@ -519,7 +539,9 @@ export class MahjongRoom extends DurableObject {
     await this.ensureLoaded();
 
     const meta =
-      this.connections.get(ws);
+      this.connections.get(
+        ws
+      );
 
     if (
       !meta ||
@@ -582,6 +604,28 @@ export class MahjongRoom extends DurableObject {
           msg.action || {}
         );
 
+      case "voiceHello":
+        return this.forwardVoiceHello(
+          ws,
+          msg
+        );
+
+      case "voiceState":
+        return this.forwardVoiceState(
+          ws,
+          !!msg.enabled,
+          msg
+        );
+
+      case "voiceOffer":
+      case "voiceAnswer":
+      case "voiceIce":
+      case "voiceBye":
+        return this.forwardVoiceSignal(
+          ws,
+          msg
+        );
+
       case "leave":
         return this.detach(
           ws,
@@ -592,8 +636,10 @@ export class MahjongRoom extends DurableObject {
         return this.send(
           ws,
           {
-            type: "pong",
-            now: Date.now(),
+            type:
+              "pong",
+            now:
+              Date.now(),
           }
         );
 
@@ -601,7 +647,8 @@ export class MahjongRoom extends DurableObject {
         return this.send(
           ws,
           {
-            type: "error",
+            type:
+              "error",
             message:
               `Perintah '${msg.type}' tidak dikenali.`,
           }
@@ -663,7 +710,8 @@ export class MahjongRoom extends DurableObject {
         this.send(
           ws,
           {
-            type: "error",
+            type:
+              "error",
             message:
               "Room ini sudah memiliki host yang aktif.",
           }
@@ -686,7 +734,9 @@ export class MahjongRoom extends DurableObject {
       );
 
     const token =
-      cleanToken(msg.token) ||
+      cleanToken(
+        msg.token
+      ) ||
       crypto.randomUUID();
 
     if (
@@ -702,14 +752,26 @@ export class MahjongRoom extends DurableObject {
     this.players[
       this.hostSeat
     ] = {
-      id: meta.id,
+      id:
+        meta.id,
+
       name,
+
       avatar,
-      ready: true,
+
+      ready:
+        true,
+
       token,
-      connected: true,
+
+      connected:
+        true,
+
       disconnectedAt:
         null,
+
+      voiceEnabled:
+        false,
     };
 
     meta.seat =
@@ -764,7 +826,8 @@ export class MahjongRoom extends DurableObject {
       this.send(
         ws,
         {
-          type: "error",
+          type:
+            "error",
           message:
             "Game sudah dimulai. Minta host menekan 'Main Lagi' agar room bisa dimasuki lagi.",
         }
@@ -780,7 +843,8 @@ export class MahjongRoom extends DurableObject {
         ? Number(msg.seat)
         : null;
 
-    let seat = null;
+    let seat =
+      null;
 
     if (
       requested !== null &&
@@ -791,10 +855,13 @@ export class MahjongRoom extends DurableObject {
         requested
       ]
     ) {
-      seat = requested;
+      seat =
+        requested;
     }
 
-    if (seat === null) {
+    if (
+      seat === null
+    ) {
       for (
         let i = 1;
         i < MAX_PLAYERS;
@@ -803,17 +870,21 @@ export class MahjongRoom extends DurableObject {
         if (
           !this.players[i]
         ) {
-          seat = i;
+          seat =
+            i;
           break;
         }
       }
     }
 
-    if (seat === null) {
+    if (
+      seat === null
+    ) {
       this.send(
         ws,
         {
-          type: "error",
+          type:
+            "error",
           message:
             "Room penuh (4 pemain).",
         }
@@ -835,26 +906,48 @@ export class MahjongRoom extends DurableObject {
       );
 
     const token =
-      cleanToken(msg.token) ||
+      cleanToken(
+        msg.token
+      ) ||
       crypto.randomUUID();
 
-    this.players[seat] =
-      {
-        id: meta.id,
-        name,
-        avatar,
-        ready: true,
-        token,
-        connected: true,
-        disconnectedAt:
-          null,
-      };
+    this.players[seat] = {
+      id:
+        meta.id,
 
-    meta.seat = seat;
-    meta.role = "guest";
-    meta.name = name;
-    meta.avatar = avatar;
-    meta.token = token;
+      name,
+
+      avatar,
+
+      ready:
+        true,
+
+      token,
+
+      connected:
+        true,
+
+      disconnectedAt:
+        null,
+
+      voiceEnabled:
+        false,
+    };
+
+    meta.seat =
+      seat;
+
+    meta.role =
+      "guest";
+
+    meta.name =
+      name;
+
+    meta.avatar =
+      avatar;
+
+    meta.token =
+      token;
 
     this.touch();
 
@@ -911,8 +1004,10 @@ export class MahjongRoom extends DurableObject {
         this.send(
           ws,
           {
-            type: "error",
-            code: "REJOIN_SESSION_NOT_FOUND",
+            type:
+              "error",
+            code:
+              "REJOIN_SESSION_NOT_FOUND",
             message:
               "Sesi lama tidak ditemukan. Kursi mungkin sudah kedaluwarsa atau room sudah tidak dapat dipulihkan.",
           }
@@ -990,6 +1085,11 @@ export class MahjongRoom extends DurableObject {
     existing.id =
       meta.id;
 
+    // Rejoin never restores microphone state automatically.
+    // The browser must explicitly enable it again for privacy.
+    existing.voiceEnabled =
+      false;
+
     const role =
       seat ===
       this.hostSeat
@@ -1028,8 +1128,10 @@ export class MahjongRoom extends DurableObject {
       this.send(
         ws,
         {
-          type: "state",
-          state: this.lastState,
+          type:
+            "state",
+          state:
+            this.lastState,
         }
       );
     }
@@ -1039,7 +1141,8 @@ export class MahjongRoom extends DurableObject {
       this.send(
         ws,
         {
-          type: "startGame",
+          type:
+            "startGame",
         }
       );
     }
@@ -1084,7 +1187,8 @@ export class MahjongRoom extends DurableObject {
     await this.persist();
 
     this.broadcast({
-      type: "startGame",
+      type:
+        "startGame",
     });
 
     return true;
@@ -1107,12 +1211,20 @@ export class MahjongRoom extends DurableObject {
     this.send(
       ws,
       {
-        type: "joined",
-        room: this.roomView(),
-        seat: meta
-          ? meta.seat
-          : null,
-        host: !!host,
+        type:
+          "joined",
+
+        room:
+          this.roomView(),
+
+        seat:
+          meta
+            ? meta.seat
+            : null,
+
+        host:
+          !!host,
+
         token,
       }
     );
@@ -1137,17 +1249,24 @@ export class MahjongRoom extends DurableObject {
               ? {
                   id:
                     p.id,
+
                   name:
                     p.name,
+
                   avatar:
                     cleanAvatar(
                       p.avatar
                     ),
+
                   ready:
                     !!p.ready,
+
                   connected:
                     p.connected !==
                     false,
+
+                  voiceEnabled:
+                    !!p.voiceEnabled,
                 }
               : null
         ),
@@ -1230,7 +1349,8 @@ export class MahjongRoom extends DurableObject {
       return this.send(
         ws,
         {
-          type: "error",
+          type:
+            "error",
           message:
             "Butuh minimal 1 pemain lain untuk mulai.",
         }
@@ -1245,7 +1365,8 @@ export class MahjongRoom extends DurableObject {
       return this.send(
         ws,
         {
-          type: "error",
+          type:
+            "error",
           message:
             "Semua pemain harus READY.",
         }
@@ -1260,7 +1381,8 @@ export class MahjongRoom extends DurableObject {
     await this.persist();
 
     this.broadcast({
-      type: "startGame",
+      type:
+        "startGame",
     });
   }
 
@@ -1366,7 +1488,8 @@ export class MahjongRoom extends DurableObject {
     // Do not wait for storage.
     this.broadcast(
       {
-        type: "state",
+        type:
+          "state",
         state:
           publishedState,
       },
@@ -1382,7 +1505,9 @@ export class MahjongRoom extends DurableObject {
   // -------------------------------------------------------------------------
 
   queueStatePersist() {
-    if (this.persistPending) {
+    if (
+      this.persistPending
+    ) {
       return;
     }
 
@@ -1394,21 +1519,25 @@ export class MahjongRoom extends DurableObject {
     );
 
     this.persistTimer =
-      setTimeout(() => {
-        this.persistPending =
-          false;
+      setTimeout(
+        () => {
+          this.persistPending =
+            false;
 
-        this.persistTimer =
-          null;
+          this.persistTimer =
+            null;
 
-        this.persist()
-          .catch((err) =>
-            console.error(
-              "State persist failed",
-              err
-            )
-          );
-      }, 1000);
+          this.persist()
+            .catch(
+              (err) =>
+                console.error(
+                  "State persist failed",
+                  err
+                )
+            );
+        },
+        1000
+      );
   }
 
   // -------------------------------------------------------------------------
@@ -1450,7 +1579,8 @@ export class MahjongRoom extends DurableObject {
       this.send(
         ws,
         {
-          type: "error",
+          type:
+            "error",
           message:
             "Host tidak terhubung.",
         }
@@ -1474,12 +1604,349 @@ export class MahjongRoom extends DurableObject {
   }
 
   // -------------------------------------------------------------------------
+  // VOICE SIGNALING
+  // WebRTC media stays P2P; Worker only relays signaling.
+  // -------------------------------------------------------------------------
+
+  isValidSeat(seat) {
+    return (
+      Number.isInteger(
+        seat
+      ) &&
+      seat >= 0 &&
+      seat < MAX_PLAYERS
+    );
+  }
+
+  sendToSeat(
+    seat,
+    msg
+  ) {
+    if (
+      !this.isValidSeat(
+        seat
+      )
+    ) {
+      return false;
+    }
+
+    for (
+      const [
+        ws,
+        meta,
+      ] of this.connections
+    ) {
+      if (
+        meta.seat ===
+        seat
+      ) {
+        this.send(
+          ws,
+          msg
+        );
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  async forwardVoiceHello(
+    ws,
+    msg
+  ) {
+    await this.ensureLoaded();
+
+    const meta =
+      this.connections.get(
+        ws
+      );
+
+    if (
+      !meta ||
+      meta.seat === null
+    ) {
+      return;
+    }
+
+    const sessionId =
+      String(
+        msg.sessionId ||
+          ""
+      ).trim();
+
+    if (
+      !sessionId ||
+      sessionId.length >
+        96
+    ) {
+      return;
+    }
+
+    this.broadcast(
+      {
+        type:
+          "voiceHello",
+
+        from:
+          meta.seat,
+
+        sessionId,
+      },
+      ws
+    );
+  }
+
+  async forwardVoiceState(
+    ws,
+    enabled,
+    msg = {}
+  ) {
+    await this.ensureLoaded();
+
+    const meta =
+      this.connections.get(
+        ws
+      );
+
+    if (
+      !meta ||
+      meta.seat === null
+    ) {
+      return;
+    }
+
+    const player =
+      this.players[
+        meta.seat
+      ];
+
+    if (!player) {
+      return;
+    }
+
+    player.voiceEnabled =
+      !!enabled;
+
+    player.connected =
+      true;
+
+    player.disconnectedAt =
+      null;
+
+    this.touch();
+
+    await this.persist();
+
+    this.broadcast(
+      {
+        type:
+          "voiceState",
+
+        from:
+          meta.seat,
+
+        enabled:
+          !!enabled,
+
+        sessionId:
+          String(
+            msg?.sessionId ||
+              ""
+          ).slice(
+            0,
+            96
+          ),
+      },
+      ws
+    );
+
+    this.broadcastLobby();
+  }
+
+  async forwardVoiceSignal(
+    ws,
+    msg
+  ) {
+    await this.ensureLoaded();
+
+    const meta =
+      this.connections.get(
+        ws
+      );
+
+    if (
+      !meta ||
+      meta.seat === null
+    ) {
+      return;
+    }
+
+    const to =
+      Number(msg.to);
+
+    if (
+      !this.isValidSeat(
+        to
+      ) ||
+      to === meta.seat
+    ) {
+      return;
+    }
+
+    const target =
+      this.players[to];
+
+    if (
+      !target ||
+      target.connected ===
+        false
+    ) {
+      return;
+    }
+
+    const type =
+      String(
+        msg.type || ""
+      );
+
+    if (
+      ![
+        "voiceOffer",
+        "voiceAnswer",
+        "voiceIce",
+        "voiceBye",
+      ].includes(type)
+    ) {
+      return;
+    }
+
+    const out = {
+      type,
+      from:
+        meta.seat,
+      to,
+    };
+
+    if (
+      type ===
+        "voiceOffer" ||
+      type ===
+        "voiceAnswer"
+    ) {
+      if (
+        !msg.sdp ||
+        typeof msg.sdp !==
+          "object"
+      ) {
+        return;
+      }
+
+      const sdpType =
+        String(
+          msg.sdp.type ||
+            ""
+        );
+
+      const sdp =
+        String(
+          msg.sdp.sdp ||
+            ""
+        );
+
+      if (
+        !sdp ||
+        sdp.length >
+          200000
+      ) {
+        return;
+      }
+
+      if (
+        sdpType !==
+          "offer" &&
+        sdpType !==
+          "answer"
+      ) {
+        return;
+      }
+
+      out.sdp = {
+        type:
+          sdpType,
+        sdp,
+      };
+    }
+
+    if (
+      type ===
+      "voiceIce"
+    ) {
+      if (
+        !msg.candidate ||
+        typeof msg.candidate !==
+          "object"
+      ) {
+        return;
+      }
+
+      out.candidate =
+        msg.candidate;
+    }
+
+    if (
+      type ===
+      "voiceBye"
+    ) {
+      out.reason =
+        String(
+          msg.reason || ""
+        ).slice(
+          0,
+          80
+        );
+    }
+
+    if (
+      msg.sessionId
+    ) {
+      out.sessionId =
+        String(
+          msg.sessionId
+        ).slice(
+          0,
+          96
+        );
+    }
+
+    if (
+      msg.remoteSessionId
+    ) {
+      out.remoteSessionId =
+        String(
+          msg.remoteSessionId
+        ).slice(
+          0,
+          96
+        );
+    }
+
+    this.sendToSeat(
+      to,
+      out
+    );
+  }
+
+  // -------------------------------------------------------------------------
   // LOBBY
   // -------------------------------------------------------------------------
 
   broadcastLobby() {
     this.broadcast({
-      type: "lobby",
+      type:
+        "lobby",
+
       room:
         this.roomView(),
     });
@@ -1497,7 +1964,9 @@ export class MahjongRoom extends DurableObject {
 
     try {
       data =
-        JSON.stringify(msg);
+        JSON.stringify(
+          msg
+        );
     } catch (err) {
       console.error(
         "Broadcast JSON error:",
@@ -1537,10 +2006,15 @@ export class MahjongRoom extends DurableObject {
   // SAFE SEND
   // -------------------------------------------------------------------------
 
-  send(ws, msg) {
+  send(
+    ws,
+    msg
+  ) {
     try {
       ws.send(
-        JSON.stringify(msg)
+        JSON.stringify(
+          msg
+        )
       );
     } catch {
       Promise.resolve(
@@ -1589,8 +2063,9 @@ export class MahjongRoom extends DurableObject {
       if (explicit) {
         // Explicit leave:
         // immediately free the seat.
-        this.players[seat] =
-          null;
+        this.players[
+          seat
+        ] = null;
       } else {
         // Network disconnect:
         // reserve the seat.
@@ -1603,6 +2078,11 @@ export class MahjongRoom extends DurableObject {
           seat
         ].disconnectedAt =
           Date.now();
+
+        this.players[
+          seat
+        ].voiceEnabled =
+          false;
 
         await this.scheduleCleanup();
       }
@@ -1676,13 +2156,23 @@ export class MahjongRoom extends DurableObject {
     // release the stale game state so a future visit can start fresh.
     if (
       this.started &&
-      this.connections.size === 0 &&
-      this.players.every((p) => !p)
+      this.connections.size ===
+        0 &&
+      this.players.every(
+        (p) => !p
+      )
     ) {
-      this.started = false;
-      this.lastState = null;
-      this.stateRevision = 0;
-      changed = true;
+      this.started =
+        false;
+
+      this.lastState =
+        null;
+
+      this.stateRevision =
+        0;
+
+      changed =
+        true;
     }
 
     // Fully reset a stale room.
