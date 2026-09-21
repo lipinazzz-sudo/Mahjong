@@ -4717,8 +4717,26 @@ function mpHandle(msg){
     if(wasRejoining)mpRejoinJoined=true;
     clearTimeout(mpRejoinHandshakeTimer);
     mpRejoinHandshakeTimer=null;
-    mp.room=msg.room;gameChatReset(msg.room?.code||'');gameChatRefreshVisibility();mpLastRoomView=msg.room;mp.seat=msg.seat;mp.host=!!msg.host;mp.started=!!msg.room.started;mp.ready=!!(msg.room.players?.[msg.seat]?.ready);mp.playerAvatar=msg.room.players?.[msg.seat]?.avatar||mp.playerAvatar||selectedAvatar;selectedAvatar=mp.playerAvatar;syncHumanAvatars(msg.room);if(msg.seat!=null)playerAvatars[msg.seat]=mp.playerAvatar;mpReconnectAttempts=0;mpReconnectDeadline=0;
+
+    // Apply server identity/state before checking chat visibility.
+    // gameChatIsInGame() requires mp.room and mp.seat.
+    mp.room=msg.room;
+    mpLastRoomView=msg.room;
+    mp.seat=msg.seat;
+    mp.host=!!msg.host;
+    mp.started=!!msg.room.started;
+    mp.ready=!!(msg.room.players?.[msg.seat]?.ready);
+    mp.playerAvatar=msg.room.players?.[msg.seat]?.avatar||mp.playerAvatar||selectedAvatar;
+    selectedAvatar=mp.playerAvatar;
+    syncHumanAvatars(msg.room);
+    if(msg.seat!=null)playerAvatars[msg.seat]=mp.playerAvatar;
+    mpReconnectAttempts=0;
+    mpReconnectDeadline=0;
     if(msg.token)mp.token=msg.token;
+
+    gameChatReset(msg.room?.code||'');
+    gameChatRefreshVisibility();
+
     setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('mp-room-code-display',msg.room.code);
     if(mp.host){setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('lobby-help','Room dibuat. Bagikan link/QR kepada pemain lain.');mpRenderRoomQr(msg.room.code)}
     else{setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Berhasil masuk room. Kamu otomatis READY.')}
@@ -4732,7 +4750,12 @@ function mpHandle(msg){
     // Keep and persist the complete server room snapshot. This is also used to
     // restore the lobby UI after a temporary Wi-Fi/WebSocket interruption.
     const wasStarted=mp.started;
-    mp.room=msg.room||mp.room;gameChatReset(mp.room?.code||'');gameChatRefreshVisibility();mpLastRoomView=mp.room;mp.started=!!(msg.room?.started);mpRenderLobby(mp.room);renderPlayerConnectionStatus(mp.room);mpTouchSession(true);
+    mp.room=msg.room||mp.room;
+    mpLastRoomView=mp.room;
+    mp.started=!!(msg.room?.started);
+    gameChatReset(mp.room?.code||'');
+    gameChatRefreshVisibility();
+    mpRenderLobby(mp.room);renderPlayerConnectionStatus(msg.room);mpTouchSession(true);
     if(mp.host&&roundActive&&!mpRejoinMode&&!mpRejoinStateApplied)mpBroadcastState();
     if(mpRejoinMode&&!mp.started){
       clearTimeout(mpRejoinFallbackTimer);
