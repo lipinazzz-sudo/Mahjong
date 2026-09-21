@@ -281,7 +281,7 @@ body{
   color:#f2dfb4;
   box-shadow:0 10px 24px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,238,194,.08);
 }
-#screen-main .btn-secondary::before{content:"⚙";color:#efc66b;}.history-menu-btn::before{content:"◷";color:#efc66b;}
+#screen-main .btn-secondary::before{content:"⚙";color:#efc66b;}
 #screen-main .btn:hover{transform:translateY(-2px);filter:brightness(1.05);box-shadow:0 16px 34px rgba(0,0,0,.42),0 0 24px rgba(218,172,74,.10)}
 /* Game mode cards */
 #screen-play .screen-card{padding-top:42px;padding-bottom:36px;}
@@ -1618,74 +1618,32 @@ body::after{
 </style>
 
 
-
-<style id="player-connection-position-fix">
-/* Keep ONLINE / TERPUTUS above the action badge instead of beside the avatar. */
-.player-seat .avatar-wrap .player-connection-indicator{
-  top:calc(50% - 22px);
-  bottom:auto;
-  z-index:91;
-}
-.pos-bottom .player-connection-indicator,
-.pos-left .player-connection-indicator{
-  left:calc(100% + 6px);
-  right:auto;
-  transform:none;
-}
-.pos-top .player-connection-indicator,
-.pos-right .player-connection-indicator{
-  right:calc(100% + 6px);
-  left:auto;
-  transform:none;
-}
-@media (max-width:430px){
-  .player-seat .avatar-wrap .player-connection-indicator{
-    top:calc(50% - 21px);
-  }
-  .pos-bottom .player-connection-indicator,
-  .pos-left .player-connection-indicator{
-    left:calc(100% + 5px);
-    right:auto;
-  }
-  .pos-top .player-connection-indicator,
-  .pos-right .player-connection-indicator{
-    right:calc(100% + 5px);
-    left:auto;
-  }
-}
-</style>
-<style id="multiplayer-chat-style">
-/* ================= MULTIPLAYER CHAT ================= */
+<style id="mahjong-chat-style">
 #game-chat{
   position:absolute;
   left:0;
   top:0;
   width:24px;
   height:24px;
-  z-index:350;
+  z-index:240;
   pointer-events:none;
 }
-
-#game-chat[hidden]{
-  display:none!important;
-}
-
+#game-chat[hidden]{display:none!important}
 #game-chat-toggle{
   position:absolute;
-  left:0;
-  top:0;
+  inset:0 auto auto 0;
   width:24px;
   height:24px;
   padding:0;
   margin:0;
-  border:1px solid rgba(240,211,151,.72);
+  border:1px solid rgba(239,207,136,.72);
   border-radius:50%;
   display:flex;
   align-items:center;
   justify-content:center;
-  background:rgba(21,17,14,.88);
-  color:#f0d08a;
-  box-shadow:0 4px 12px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,255,255,.07);
+  background:rgba(17,15,13,.92);
+  color:#f1ce7f;
+  box-shadow:0 4px 11px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.07);
   cursor:grab;
   pointer-events:auto;
   touch-action:none;
@@ -1693,19 +1651,16 @@ body::after{
   -webkit-user-select:none;
   -webkit-tap-highlight-color:transparent;
 }
-
 #game-chat-toggle:active{cursor:grabbing}
-
-#game-chat-toggle .chat-icon{
+#game-chat-toggle .mahjong-chat-icon{
   font-size:12px;
   line-height:1;
-  transform:translateY(-.5px);
+  transform:translateY(-.4px);
 }
-
 #game-chat-unread{
   position:absolute;
-  right:-6px;
   top:-6px;
+  right:-6px;
   min-width:14px;
   height:14px;
   padding:0 3px;
@@ -1713,16 +1668,15 @@ body::after{
   display:flex;
   align-items:center;
   justify-content:center;
-  background:#dc3030;
-  border:1px solid rgba(255,235,235,.82);
+  background:#df3030;
+  border:1px solid rgba(255,240,240,.85);
   color:#fff;
-  font-size:8px;
+  font-size:7px;
   line-height:1;
   font-weight:950;
   box-shadow:0 2px 8px rgba(0,0,0,.38);
   pointer-events:none;
 }
-
 #game-chat-panel{
   position:absolute;
   left:0;
@@ -1730,55 +1684,40 @@ body::after{
   width:220px;
   max-width:min(220px,calc(100vw - 18px));
   height:248px;
-  min-height:180px;
   display:none;
   flex-direction:column;
   overflow:hidden;
-  border:1px solid rgba(235,202,131,.30);
+  border:1px solid rgba(231,201,132,.28);
   border-radius:12px;
-  background:rgba(24,20,17,.90);
-  box-shadow:0 14px 30px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.045);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
+  background:rgba(24,20,17,.91);
+  box-shadow:0 15px 32px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter:blur(9px);
+  -webkit-backdrop-filter:blur(9px);
   pointer-events:auto;
 }
-
 #game-chat.open #game-chat-panel{display:flex}
-
-#game-chat.panel-right #game-chat-panel{
-  left:auto;
-  right:0;
-}
-
-#game-chat.panel-below #game-chat-panel{
-  top:calc(100% + 7px);
-  bottom:auto;
-}
-
+#game-chat.panel-right #game-chat-panel{left:auto;right:0}
+#game-chat.panel-below #game-chat-panel{top:calc(100% + 7px);bottom:auto}
 #game-chat-head{
   flex:0 0 auto;
+  min-height:27px;
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:8px;
-  min-height:28px;
   padding:6px 8px;
   border-bottom:1px solid rgba(255,255,255,.07);
   color:#efd18a;
   font-size:8px;
   font-weight:950;
   letter-spacing:.10em;
-  text-transform:uppercase;
 }
-
 #game-chat-status{
-  color:#877e73;
+  color:#847b70;
   font-size:7px;
   font-weight:700;
   letter-spacing:0;
-  text-transform:none;
 }
-
 #game-chat-messages{
   flex:1 1 auto;
   min-height:0;
@@ -1790,16 +1729,14 @@ body::after{
   gap:5px;
   scrollbar-width:thin;
 }
-
-.game-chat-empty{
+.mahjong-chat-empty{
   margin:auto;
-  color:#726a60;
+  color:#71695f;
   font-size:8px;
   line-height:1.4;
   text-align:center;
 }
-
-.game-chat-msg{
+.mahjong-chat-msg{
   max-width:88%;
   padding:5px 7px;
   border-radius:8px;
@@ -1807,24 +1744,21 @@ body::after{
   background:rgba(255,255,255,.055);
   align-self:flex-start;
 }
-
-.game-chat-msg.own{
+.mahjong-chat-msg.own{
   align-self:flex-end;
-  border-color:rgba(231,192,111,.15);
+  border-color:rgba(231,192,111,.14);
   background:rgba(210,156,64,.11);
 }
-
-.game-chat-name{
+.mahjong-chat-name{
   display:block;
   margin-bottom:2px;
-  color:#e4bd74;
+  color:#e2bb73;
   font-size:7px;
   font-weight:900;
 }
-
-.game-chat-text{
+.mahjong-chat-text{
   display:block;
-  color:#f0ebe3;
+  color:#f0ebe2;
   font-size:9px;
   line-height:1.28;
   overflow-wrap:anywhere;
@@ -1832,16 +1766,14 @@ body::after{
   user-select:text;
   -webkit-user-select:text;
 }
-
-.game-chat-time{
+.mahjong-chat-time{
   display:block;
   margin-top:2px;
-  color:#71695f;
+  color:#70685f;
   font-size:6px;
   line-height:1;
   text-align:right;
 }
-
 #game-chat-form{
   flex:0 0 auto;
   display:flex;
@@ -1849,7 +1781,6 @@ body::after{
   padding:6px;
   border-top:1px solid rgba(255,255,255,.07);
 }
-
 #game-chat-input{
   flex:1 1 auto;
   min-width:0;
@@ -1864,13 +1795,8 @@ body::after{
   user-select:text;
   -webkit-user-select:text;
 }
-
-#game-chat-input::placeholder{color:#736a60}
-
-#game-chat-input:focus{
-  border-color:rgba(235,202,131,.44);
-}
-
+#game-chat-input::placeholder{color:#71695f}
+#game-chat-input:focus{border-color:rgba(232,201,132,.44)}
 #game-chat-send{
   flex:0 0 auto;
   width:34px;
@@ -1884,17 +1810,8 @@ body::after{
   font-weight:950;
   cursor:pointer;
 }
-
-#game-chat-send:disabled{
-  opacity:.42;
-  cursor:not-allowed;
-}
-
 @media (max-width:600px){
-  #game-chat-panel{
-    width:208px;
-    height:228px;
-  }
+  #game-chat-panel{width:208px;height:228px}
 }
 </style>
 
@@ -1912,7 +1829,7 @@ body::after{
             </div>
             <div class="menu-actions">
                 <button class="btn btn-primary" onclick="nav('screen-play')">Play Game</button>
-                <button class="btn btn-secondary history-menu-btn" onclick="openHistory()">History</button>
+                <button class="btn btn-secondary" onclick="openHistory()">History</button>
                 <button class="btn btn-secondary" onclick="nav('screen-settings')">Settings</button>
             </div>
         </section>
@@ -2229,23 +2146,24 @@ body::after{
 
             <div id="action-overlay" aria-live="polite"></div>
 
-            <div id="game-chat" hidden aria-live="polite">
-                <button id="game-chat-toggle" type="button" aria-label="Buka chat multiplayer" aria-expanded="false" title="Chat multiplayer">
-                    <span class="chat-icon" aria-hidden="true">💬</span>
-                    <span id="game-chat-unread" hidden>0</span>
-                </button>
-                <section id="game-chat-panel" aria-label="Chat multiplayer">
-                    <div id="game-chat-head">
-                        <span>CHAT</span>
-                        <span id="game-chat-status">Multiplayer</span>
-                    </div>
-                    <div id="game-chat-messages" aria-live="polite" aria-label="Pesan chat"></div>
-                    <form id="game-chat-form" autocomplete="off">
-                        <input id="game-chat-input" type="text" maxlength="240" placeholder="Tulis pesan…" aria-label="Tulis pesan chat" enterkeyhint="send">
-                        <button id="game-chat-send" type="submit" aria-label="Kirim chat">➤</button>
-                    </form>
-                </section>
-            </div>
+<div id="game-chat" hidden aria-live="polite">
+  <button id="game-chat-toggle" type="button" aria-label="Buka chat multiplayer" aria-expanded="false" title="Chat multiplayer">
+    <span class="mahjong-chat-icon" aria-hidden="true">●</span>
+    <span id="game-chat-unread" hidden>0</span>
+  </button>
+  <section id="game-chat-panel" aria-label="Chat multiplayer">
+    <div id="game-chat-head">
+      <span>CHAT</span>
+      <span id="game-chat-status">Multiplayer</span>
+    </div>
+    <div id="game-chat-messages" aria-live="polite" aria-label="Pesan chat"></div>
+    <form id="game-chat-form" autocomplete="off">
+      <input id="game-chat-input" type="text" maxlength="240" placeholder="Tulis pesan…" aria-label="Tulis pesan chat" enterkeyhint="send">
+      <button id="game-chat-send" type="submit" aria-label="Kirim chat">➤</button>
+    </form>
+  </section>
+</div>
+
             <div class="melds-container" id="player-melds-container"></div>
             <div class="hand-bottom-container">
                 <div id="smart-assistant" class="smart-assistant" aria-live="polite" hidden>
@@ -2519,7 +2437,7 @@ window.addEventListener('unhandledrejection',e=>{
   scheduleGameRecovery('promise-rejection');
 });
 document.addEventListener('pointerdown',()=>{bindMusicPlaylist();unlockGameAudio()},{once:true,passive:true});
-document.addEventListener('DOMContentLoaded',()=>{bindMusicPlaylist();initAudioSettingsUI();gameChatRefreshVisibility();});
+document.addEventListener('DOMContentLoaded',()=>{bindMusicPlaylist();initAudioSettingsUI()});
 window.addEventListener('pageshow',e=>{if(e.persisted)setTimeout(mpEnsureReconnectOnResume,0)});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(mpEnsureReconnectOnResume,0)},{passive:true});
 window.addEventListener('pagehide',()=>{if(isMultiplayerMode&&mp.room?.code)mpTouchSession(true)},{capture:true});
@@ -2546,9 +2464,6 @@ function nav(id){
   if(id==='screen-settings'){
     previousScreenId=from;
     applyAudioSettings();
-  }
-  if(typeof gameChatRefreshVisibility==='function'){
-    gameChatRefreshVisibility();
   }
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')toggleScoreGuide(false)},{passive:true});
@@ -3053,7 +2968,7 @@ function renderHand(){const wrap=byId('player-hand-tiles');if(!wrap)return;const
 function renderEnemyHands(){const s=mp.seat??0,m=mappedSeats(s);[[`enemy-hand-top`,m[2]],[`enemy-hand-right`,m[1]],[`enemy-hand-left`,m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const count=Math.max(0,playerHands[p]?.length||0);for(let i=0;i<count;i++){const b=document.createElement('span');b.className='mini-back';e.appendChild(b)}const label=document.createElement('span');label.className='hand-count-label';label.textContent=`×${count}`;e.appendChild(label);})}
 function renderRivers(){const s=mp.seat??0,m=mappedSeats(s);const selectedId=(selectedTileIndex>=0&&playerHands[s]?.[selectedTileIndex])?playerHands[s][selectedTileIndex].id:null;[['river-bottom',m[0]],['river-right',m[1]],['river-top',m[2]],['river-left',m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const tiles=(playerRivers[p]||[]).slice(0,id==='river-top'||id==='river-bottom'?32:30);tiles.forEach(t=>{const d=document.createElement('div');d.className='discard-tile';if(selectedId!==null&&t.id===selectedId)d.classList.add('same-tile-highlight');d.dataset.tileId=t.id;d.innerHTML=tileMarkup(t);e.appendChild(d)})})}
 function renderMelds(){const s=mp.seat??0,m=mappedSeats(s);const own=byId('player-melds-container');if(own){own.innerHTML='';(playerMelds[m[0]]||[]).forEach(g=>{const box=document.createElement('div');box.className='meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});own.appendChild(box)})}const enemyMap=[['enemy-meld-top-label','enemy-meld-top-tiles',m[2]],['enemy-meld-right-label','enemy-meld-right-tiles',m[1]],['enemy-meld-left-label','enemy-meld-left-tiles',m[3]]];enemyMap.forEach(([labelId,tilesId,p])=>{const label=byId(labelId),wrap=byId(tilesId);const groups=playerMelds[p]||[];const labels=groups.map(g=>g.length===4?'Kan':(g.length===3&&g.every(t=>t.id===g[0].id)?'Pon':'Chow'));if(label)setText(labelId,labels.length?labels.join(' • '):'');if(!wrap)return;wrap.innerHTML='';groups.forEach(g=>{const box=document.createElement('div');box.className='enemy-meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});wrap.appendChild(box)})})}
-function renderTable(){advisorKnownCacheKey='';advisorKnownCache=null;renderNames();renderAvatars();updateTurnHighlight();renderPlayerConnectionStatus(mp.room);renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);if(!isMultiplayerMode){renderLocalTurnTimer(isActionPhase?actionSecondsLeft:secondsLeft,isActionPhase?actionSeat:currentTurn);}else if(isActionPhase){renderLocalTurnTimer(actionSecondsLeft,actionSeat);}else{renderLocalTurnTimer(secondsLeft,currentTurn);}setText('tiles-remaining',`SISA ${fullDeck.length}`);updateMusicIntensity();showCurrentWaitAdvisor();if(currentTurn===(mp.seat??0)){setText('hand-status-main','Giliran Anda');setText('hand-status-sub','Pilih tile untuk membuang.');}else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');}}
+function renderTable(){advisorKnownCacheKey='';advisorKnownCache=null;renderNames();renderAvatars();updateTurnHighlight();renderPlayerConnectionStatus(mp.room);renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);if(!isMultiplayerMode){renderLocalTurnTimer(isActionPhase?actionSecondsLeft:secondsLeft,isActionPhase?actionSeat:currentTurn);}else if(isActionPhase){renderLocalTurnTimer(actionSecondsLeft,actionSeat);}else{renderLocalTurnTimer(secondsLeft,currentTurn);}setText('tiles-remaining',`SISA ${fullDeck.length}`);updateMusicIntensity();showCurrentWaitAdvisor();if(currentTurn===(mp.seat??0)){setText('hand-status-main','Giliran Anda');setText('hand-status-sub','Pilih tile untuk membuang.');}else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');};gameChatRefreshVisibility()}
 
 function isSequenceGroup(group){
   if(!Array.isArray(group)||group.length!==3)return false;
@@ -4413,7 +4328,7 @@ function nextRoundOrFinish(){
   mpBroadcastState();
 }
 function flashBoard(kind){const e=byId('center-board-box');if(!e)return;e.classList.remove('win-flash','draw-flash');void e.offsetWidth;e.classList.add(kind==='draw'?'draw-flash':'win-flash')}
-function quitGame(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();roundActive=false;mpClearActiveGameState();stopGameMusic();nav('screen-main');if(mp.connected)mpSend('leave')}
+function quitGame(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();roundActive=false;mpClearActiveGameState();stopGameMusic();nav('screen-main');if(mp.connected)mpSend('leave');gameChatClose()}
 function openSettingsFromGame(){previousScreenId=activeScreenId==='screen-game'?'screen-game':(previousScreenId||'screen-main');nav('screen-settings');applyAudioSettings()}
 function returnToGameFromSettings(){nav(previousScreenId||'screen-main')}
 function exitGameFromSettings(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;mpClearActiveGameState();stopGameMusic();previousScreenId='screen-main';nav('screen-main')}
@@ -4422,7 +4337,7 @@ function toggleAutoSortSetting(){autoSortSetting=!autoSortSetting;try{localStora
 
 
 // --------------------- Multiplayer Chat -------------------------
-const MP_CHAT_POSITION_KEY='mahjongHKChatPositionV1';
+const MP_CHAT_POSITION_KEY='mahjongDJChatPositionV1';
 const MP_CHAT_MAX_MESSAGES=100;
 let gameChatMessages=[];
 let gameChatUnread=0;
@@ -4441,138 +4356,82 @@ function gameChatRoot(){return byId('game-chat')}
 function gameChatToggle(){return byId('game-chat-toggle')}
 function gameChatPanel(){return byId('game-chat-panel')}
 function gameChatInput(){return byId('game-chat-input')}
-
-function gameChatHumanCount(){
-  return (mp.room?.players||[]).filter(Boolean).length;
-}
-
+function gameChatHumanCount(){return (mp.room?.players||[]).filter(Boolean).length}
 function gameChatIsAvailable(){
   return !!(
-    activeScreenId==='screen-game' &&
-    isMultiplayerMode &&
-    gameChatHumanCount()>=2 &&
-    mp.room?.code &&
-    mp.seat!==null &&
-    mp.seat!==undefined &&
+    activeScreenId==='screen-game'&&
+    isMultiplayerMode&&
+    gameChatHumanCount()>=2&&
+    mp.room?.code&&
+    mp.seat!==null&&
+    mp.seat!==undefined&&
+    mp.connected&&
     mp.started
-  );
+  )
 }
-
 function gameChatLoadPosition(){
-  const root=gameChatRoot();
-  const board=byId('game-board');
+  const root=gameChatRoot(),board=byId('game-board');
   if(!root||!board)return;
-
   let saved=null;
   try{saved=JSON.parse(localStorage.getItem(MP_CHAT_POSITION_KEY)||'null')}catch(e){}
-
-  if(
-    saved &&
-    Number.isFinite(Number(saved.left)) &&
-    Number.isFinite(Number(saved.top))
-  ){
+  if(saved&&Number.isFinite(Number(saved.left))&&Number.isFinite(Number(saved.top))){
     root.style.left=`${Number(saved.left)}px`;
     root.style.top=`${Number(saved.top)}px`;
   }else{
     const rect=board.getBoundingClientRect();
-    root.style.left=`${Math.max(6,rect.width-40)}px`;
-    root.style.top=`${Math.max(6,rect.height-115)}px`;
+    root.style.left=`${Math.max(6,rect.width-38)}px`;
+    root.style.top=`${Math.max(6,rect.height-118)}px`;
   }
-
   gameChatClampPosition();
 }
-
 function gameChatClampPosition(){
-  const root=gameChatRoot();
-  const board=byId('game-board');
+  const root=gameChatRoot(),board=byId('game-board');
   if(!root||!board)return;
-
   const rect=board.getBoundingClientRect();
-  const w=root.offsetWidth||24;
-  const h=root.offsetHeight||24;
-  const left=Number.parseFloat(root.style.left);
-  const top=Number.parseFloat(root.style.top);
-
+  const w=root.offsetWidth||24,h=root.offsetHeight||24;
+  let left=Number.parseFloat(root.style.left),top=Number.parseFloat(root.style.top);
   if(!Number.isFinite(left)||!Number.isFinite(top))return;
-
-  root.style.left=`${Math.max(4,Math.min(left,Math.max(4,rect.width-w-4)))}px`;
-  root.style.top=`${Math.max(4,Math.min(top,Math.max(4,rect.height-h-4)))}px`;
+  left=Math.max(4,Math.min(left,Math.max(4,rect.width-w-4)));
+  top=Math.max(4,Math.min(top,Math.max(4,rect.height-h-4)));
+  root.style.left=`${left}px`;
+  root.style.top=`${top}px`;
 }
-
 function gameChatSavePosition(){
   const root=gameChatRoot();
   if(!root)return;
-
-  const left=Number.parseFloat(root.style.left);
-  const top=Number.parseFloat(root.style.top);
+  const left=Number.parseFloat(root.style.left),top=Number.parseFloat(root.style.top);
   if(!Number.isFinite(left)||!Number.isFinite(top))return;
-
-  try{
-    localStorage.setItem(
-      MP_CHAT_POSITION_KEY,
-      JSON.stringify({left,top})
-    );
-  }catch(e){}
+  try{localStorage.setItem(MP_CHAT_POSITION_KEY,JSON.stringify({left,top}))}catch(e){}
 }
-
 function gameChatUpdatePanelPlacement(){
-  const root=gameChatRoot();
-  const panel=gameChatPanel();
-  const board=byId('game-board');
+  const root=gameChatRoot(),panel=gameChatPanel(),board=byId('game-board');
   if(!root||!panel||!board||!gameChatOpen)return;
-
   root.classList.remove('panel-right','panel-below');
-
-  const boardRect=board.getBoundingClientRect();
-  const rootRect=root.getBoundingClientRect();
-  const panelW=panel.offsetWidth||220;
-  const panelH=panel.offsetHeight||248;
-
-  if(rootRect.left+panelW>boardRect.right-6){
-    root.classList.add('panel-right');
-  }
-
-  if(rootRect.top-panelH-7<boardRect.top+6){
-    root.classList.add('panel-below');
-  }
+  const boardRect=board.getBoundingClientRect(),rootRect=root.getBoundingClientRect();
+  if(rootRect.left+(panel.offsetWidth||220)>boardRect.right-6)root.classList.add('panel-right');
+  if(rootRect.top-(panel.offsetHeight||248)-7<boardRect.top+6)root.classList.add('panel-below');
 }
-
 function gameChatUnreadRender(){
   const badge=byId('game-chat-unread');
   if(!badge)return;
-
   badge.hidden=gameChatUnread<=0;
-  if(gameChatUnread>0){
-    badge.textContent=gameChatUnread>99?'99+':String(gameChatUnread);
-  }
+  if(gameChatUnread>0)badge.textContent=gameChatUnread>99?'99+':String(gameChatUnread);
 }
-
 function gameChatRender(){
   const box=byId('game-chat-messages');
   if(!box)return;
-
   if(!gameChatMessages.length){
-    box.innerHTML='<div class="game-chat-empty">Belum ada pesan.<br>Mulai ngobrol dengan pemain lain.</div>';
+    box.innerHTML='<div class="mahjong-chat-empty">Belum ada pesan.<br>Mulai ngobrol dengan pemain lain.</div>';
     return;
   }
-
   box.innerHTML=gameChatMessages.map(msg=>{
     const own=Number(msg.from)===Number(mp.seat);
     let time='';
-    try{
-      time=new Date(Number(msg.ts)||Date.now()).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
-    }catch(e){}
-
-    return `<div class="game-chat-msg${own?' own':''}>`+
-      `<span class="game-chat-name">${esc(msg.name||'Player')}${own?' • Kamu':''}</span>`+
-      `<span class="game-chat-text">${esc(msg.text||'')}</span>`+
-      `<span class="game-chat-time">${esc(time)}</span>`+
-      `</div>`;
+    try{time=new Date(Number(msg.ts)||Date.now()).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}catch(e){}
+    return `<div class="mahjong-chat-msg${own?' own':''}><span class="mahjong-chat-name">${esc(msg.name||'Player')}${own?' • Kamu':''}</span><span class="mahjong-chat-text">${esc(msg.text||'')}</span><span class="mahjong-chat-time">${esc(time)}</span></div>`;
   }).join('');
-
   box.scrollTop=box.scrollHeight;
 }
-
 function gameChatReset(){
   gameChatMessages=[];
   gameChatUnread=0;
@@ -4580,35 +4439,21 @@ function gameChatReset(){
   gameChatRender();
   gameChatUnreadRender();
 }
-
 function gameChatClose(){
-  const root=gameChatRoot();
-  const toggle=gameChatToggle();
+  const root=gameChatRoot(),toggle=gameChatToggle();
   if(!root)return;
-
   gameChatOpen=false;
   root.classList.remove('open','panel-right','panel-below');
-
-  if(toggle){
-    toggle.setAttribute('aria-expanded','false');
-  }
+  if(toggle)toggle.setAttribute('aria-expanded','false');
 }
-
 function gameChatOpenPanel(){
-  const root=gameChatRoot();
-  const toggle=gameChatToggle();
+  const root=gameChatRoot(),toggle=gameChatToggle();
   if(!root||!gameChatIsAvailable())return;
-
   gameChatOpen=true;
   gameChatUnread=0;
   root.classList.add('open');
-
-  if(toggle){
-    toggle.setAttribute('aria-expanded','true');
-  }
-
+  if(toggle)toggle.setAttribute('aria-expanded','true');
   gameChatUnreadRender();
-
   requestAnimationFrame(()=>{
     gameChatClampPosition();
     gameChatUpdatePanelPlacement();
@@ -4616,90 +4461,56 @@ function gameChatOpenPanel(){
     gameChatInput()?.focus();
   });
 }
-
 function gameChatTogglePanel(){
   if(!gameChatIsAvailable())return;
   if(gameChatOpen)gameChatClose();
   else gameChatOpenPanel();
 }
-
 function gameChatRefreshVisibility(){
   const root=gameChatRoot();
   if(!root)return;
-
   const visible=gameChatIsAvailable();
   root.hidden=!visible;
-
-  if(!visible){
-    gameChatClose();
-    return;
-  }
-
+  if(!visible){gameChatClose();return}
   gameChatLoadPosition();
   gameChatUnreadRender();
 }
-
 function gameChatPush(msg){
   if(!msg||typeof msg!=='object')return;
-
   const id=String(msg.id||'').trim();
   if(id&&gameChatSeenIds.has(id))return;
   if(id)gameChatSeenIds.add(id);
-
   const text=String(msg.text||'').replace(/\s+/g,' ').trim().slice(0,240);
   if(!text)return;
-
   gameChatMessages.push({
-    id:id||`chat-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,
+    id:id||`chat-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
     from:Number.isFinite(Number(msg.from))?Number(msg.from):-1,
     name:String(msg.name||'Player').trim().slice(0,20)||'Player',
     text,
     ts:Number(msg.ts)||Date.now()
   });
-
   while(gameChatMessages.length>MP_CHAT_MAX_MESSAGES){
     const removed=gameChatMessages.shift();
     if(removed?.id)gameChatSeenIds.delete(removed.id);
   }
-
-  if(
-    !gameChatOpen &&
-    Number(msg.from)!==Number(mp.seat)
-  ){
-    gameChatUnread++;
-  }
-
+  if(!gameChatOpen&&Number(msg.from)!==Number(mp.seat))gameChatUnread++;
   gameChatRender();
   gameChatUnreadRender();
 }
-
 function gameChatSend(){
   const input=gameChatInput();
   if(!input||!gameChatIsAvailable())return false;
-
   const text=String(input.value||'').replace(/\s+/g,' ').trim().slice(0,240);
   if(!text)return false;
-
-  if(!mp.connected||mp.ws?.readyState!==WebSocket.OPEN){
-    return false;
-  }
-
+  if(!mp.connected||mp.ws?.readyState!==WebSocket.OPEN)return false;
   const sent=mpSend('chat',{text});
-  if(sent){
-    input.value='';
-    input.focus();
-  }
-
+  if(sent){input.value='';input.focus()}
   return sent;
 }
-
 function gameChatDragStart(e){
-  const root=gameChatRoot();
-  const toggle=gameChatToggle();
+  const root=gameChatRoot(),toggle=gameChatToggle();
   if(!root||!toggle||!gameChatIsAvailable())return;
-
   if(e.pointerType==='mouse'&&e.button!==0)return;
-
   gameChatDragging=true;
   gameChatDragMoved=false;
   gameChatSuppressToggle=false;
@@ -4708,106 +4519,66 @@ function gameChatDragStart(e){
   gameChatStartY=e.clientY;
   gameChatStartLeft=Number.parseFloat(root.style.left)||0;
   gameChatStartTop=Number.parseFloat(root.style.top)||0;
-
   try{toggle.setPointerCapture(e.pointerId)}catch(err){}
   e.preventDefault();
 }
-
 function gameChatDragMove(e){
   if(!gameChatDragging||e.pointerId!==gameChatPointerId)return;
-
-  const root=gameChatRoot();
-  const board=byId('game-board');
+  const root=gameChatRoot(),board=byId('game-board');
   if(!root||!board)return;
-
-  const dx=e.clientX-gameChatStartX;
-  const dy=e.clientY-gameChatStartY;
-
+  const dx=e.clientX-gameChatStartX,dy=e.clientY-gameChatStartY;
   if(Math.hypot(dx,dy)>4)gameChatDragMoved=true;
   if(!gameChatDragMoved)return;
-
-  const rect=board.getBoundingClientRect();
-  const w=root.offsetWidth||24;
-  const h=root.offsetHeight||24;
-
+  const rect=board.getBoundingClientRect(),w=root.offsetWidth||24,h=root.offsetHeight||24;
   const left=Math.max(4,Math.min(gameChatStartLeft+dx,Math.max(4,rect.width-w-4)));
   const top=Math.max(4,Math.min(gameChatStartTop+dy,Math.max(4,rect.height-h-4)));
-
   root.style.left=`${left}px`;
   root.style.top=`${top}px`;
   gameChatSuppressToggle=true;
-
   if(gameChatOpen)gameChatUpdatePanelPlacement();
   e.preventDefault();
 }
-
 function gameChatDragEnd(e){
   if(!gameChatDragging||e.pointerId!==gameChatPointerId)return;
-
   const toggle=gameChatToggle();
   try{toggle?.releasePointerCapture(e.pointerId)}catch(err){}
-
   const moved=gameChatDragMoved;
   gameChatDragging=false;
   gameChatPointerId=null;
-
-  if(moved){
-    gameChatSavePosition();
-  }else if(!gameChatSuppressToggle){
-    gameChatTogglePanel();
-  }
-
+  if(moved)gameChatSavePosition();
+  else if(!gameChatSuppressToggle)gameChatTogglePanel();
   gameChatSuppressToggle=false;
   e.preventDefault();
 }
-
 function gameChatInit(){
-  const root=gameChatRoot();
-  const toggle=gameChatToggle();
-  const form=byId('game-chat-form');
-  const input=gameChatInput();
-
-  if(!root||!toggle||!form||!input)return;
-  if(root.dataset.ready==='1')return;
+  const root=gameChatRoot(),toggle=gameChatToggle(),form=byId('game-chat-form'),input=gameChatInput();
+  if(!root||!toggle||!form||!input||root.dataset.ready==='1')return;
   root.dataset.ready='1';
-
   gameChatLoadPosition();
   gameChatRender();
   gameChatUnreadRender();
-
   toggle.addEventListener('pointerdown',gameChatDragStart,{passive:false});
   toggle.addEventListener('pointermove',gameChatDragMove,{passive:false});
   toggle.addEventListener('pointerup',gameChatDragEnd,{passive:false});
   toggle.addEventListener('pointercancel',gameChatDragEnd,{passive:false});
-
-  form.addEventListener('submit',e=>{
-    e.preventDefault();
-    gameChatSend();
-  });
-
+  form.addEventListener('submit',e=>{e.preventDefault();gameChatSend()});
   input.addEventListener('keydown',e=>{
-    if(e.key==='Enter'&&!e.shiftKey){
-      e.preventDefault();
-      gameChatSend();
-    }
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();gameChatSend()}
   });
-
   document.addEventListener('pointerdown',e=>{
     if(!gameChatOpen)return;
     if(root.contains(e.target))return;
     gameChatClose();
   },{passive:true});
-
   window.addEventListener('resize',()=>{
     if(!gameChatIsAvailable())return;
     gameChatClampPosition();
     if(gameChatOpen)gameChatUpdatePanelPlacement();
   },{passive:true});
 }
-
 setTimeout(gameChatInit,0);
-
 // --------------------- Multiplayer -------------------------
+
 function escapeHtml(v){return esc(v)}
 function mpSetConnection(online){setText('mp-connection-badge',online?'ONLINE':'OFFLINE');const b=byId('mp-connection-badge');if(b)b.className=`connection-badge ${online?'online':'offline'}`;renderPlayerConnectionStatus(mp.room)}
 function renderPlayerConnectionStatus(room=mp.room){const indicators=[['.pos-bottom .player-connection-indicator',0],['.pos-left .player-connection-indicator',3],['.pos-top .player-connection-indicator',2],['.pos-right .player-connection-indicator',1]];if(!isMultiplayerMode){indicators.forEach(([sel])=>{const el=document.querySelector(sel);if(el)el.className='player-connection-indicator hidden'});return}const localSeat=mp.seat??0;const mapped=mappedSeats(localSeat);indicators.forEach(([sel,displayIndex])=>{const el=document.querySelector(sel);if(!el)return;const seat=mapped[displayIndex];el.className='player-connection-indicator';const p=room?.players?.[seat];if(aiSeats.has(seat)){el.classList.add('ai');el.querySelector('.player-connection-text').textContent='AI';el.title='AI';return}let online=false;let disconnected=false;if(seat===localSeat){online=!!mp.connected;disconnected=!online}else if(p){online=p.connected!==false;disconnected=p.connected===false}else{disconnected=true}const stateClass=online?'online':'disconnected';el.classList.add(stateClass);el.querySelector('.player-connection-text').textContent=online?'ONLINE':'TERPUTUS';el.title=online?'Player online':'Player terputus';});}
@@ -5007,37 +4778,27 @@ function mpBeginReconnect(saved){
   return true;
 }
 function mpAutoRecoverSavedSession(){
-  // Intentionally disabled on startup. Reconnection is initiated only when
-  // the player opens the Multiplayer menu and chooses to reconnect.
-  return false;
+  if(isMultiplayerMode)return;
+  const saved=mpLoadSession();
+  if(!saved?.room||!saved.started||!saved.token)return false;
+  return mpBeginReconnect(saved);
 }
 function mpEnsureReconnectOnResume(){
-  // Refresh/returning to the tab may reconnect ONLY when the player is
-  // already inside a live multiplayer session. A normal page open must
-  // remain on the main menu and must never revive an old game automatically.
   if(!isMultiplayerMode)return;
-
-  if(
-    mp.room?.code&&
-    !mp.connected&&
-    (!mp.ws||mp.ws.readyState===WebSocket.CLOSED)
-  ){
+  if(mp.room?.code&&!mp.connected&&(!mp.ws||mp.ws.readyState===WebSocket.CLOSED)){
     mpReconnectDeadline=Date.now()+MP_RECONNECT_WINDOW_MS;
-    mpConnect(
-      mp.room.code,
-      mp.host?'host':'guest',
-      true
-    );
+    mpConnect(mp.room.code,mp.host?'host':'guest',true);
   }
 }
 function openPlayerLobby(){isMultiplayerMode=true;mp.playerAvatar=selectedAvatar;clearTimeout(mpReconnectTimer);mpReconnectAttempts=0;mpReconnectDeadline=0;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');mpSetConnection(false);const code=new URL(location.href).searchParams.get(MP_ROOM_PARAM);const saved=mpLoadSession();if(code&&saved?.room===code&&saved?.token&&saved?.started){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('lobby-help','Menyambungkan kembali ke Room '+code+'…');mpBeginReconnect(saved);return}if(code){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.host=false;mp.ready=true;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};setText('lobby-help','Menghubungkan ke Room '+code+'…');mpConnect(code,'guest')}}
-function closeLobby(){clearGuestActionRetry();clearTimeout(mpReconnectTimer);clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);clearTimeout(mpRejoinHandshakeTimer);mpRejoinHandshakeTimer=null;mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinFallbackState=null;stopMpGameWatchdog();stopMpPing();try{mpSend('leave')}catch(e){}try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}mp.ws=null;mp.connected=false;mpClearSession();mpClearActiveGameState();mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,token:null,playerName:mp.playerName||'Player',playerAvatar:selectedAvatar};isMultiplayerMode=false;setDisplay('modal-lobby','none');mpSetConnection(false)}
+function closeLobby(){gameChatReset();clearGuestActionRetry();clearTimeout(mpReconnectTimer);clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);clearTimeout(mpRejoinHandshakeTimer);mpRejoinHandshakeTimer=null;mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinFallbackState=null;stopMpGameWatchdog();stopMpPing();try{mpSend('leave')}catch(e){}try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}mp.ws=null;mp.connected=false;mpClearSession();mpClearActiveGameState();mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,token:null,playerName:mp.playerName||'Player',playerAvatar:selectedAvatar};isMultiplayerMode=false;setDisplay('modal-lobby','none');mpSetConnection(false);gameChatClose();gameChatRefreshVisibility()}
 function mpCreateRoom(){mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinJoined=false;mpRejoinFallbackState=null;clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.playerAvatar=selectedAvatar;const code=String(Math.floor(10000+Math.random()*90000));mp.host=true;mp.seat=0;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();isMultiplayerMode=true;mp.room={code,players:[null,null,null,null],started:false};setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('mp-room-code-display',code);setText('mp-host-room-code',code);setText('lobby-help','Membuat room di Cloudflare…');mpRenderRoomQr(code);mpSaveSession();mpConnect(code,'host')}
 function mpJoinRoom(){mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinJoined=false;mpRejoinFallbackState=null;clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code)){alert('Masukkan kode room 5 digit.');return}mp.host=false;mp.seat=null;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};isMultiplayerMode=true;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Menghubungkan ke Room '+code+'…');mpSaveSession();mpConnect(code,'guest')}
 function mpShowJoinForm(){setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','block')}
 function togglePlayerReady(){if(!mp.room)return;mp.ready=!mp.ready;mpSend('ready',{ready:mp.ready});mpSaveSession();if(mp.host&&mp.room.players?.[0])mp.room.players[0].ready=mp.ready;mpRenderLobby(mp.room)}
 function mpStartGame(){
   if(!mp.host)return;
+  gameChatReset();
   const humans=(mp.room?.players||[]).filter(Boolean).length;
   if(humans<1)return;
   mpRejoinMode=false;
@@ -5089,7 +4850,7 @@ function mpHandle(msg){
     setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('mp-room-code-display',msg.room.code);
     if(mp.host){setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('lobby-help','Room dibuat. Bagikan link/QR kepada pemain lain.');mpRenderRoomQr(msg.room.code)}
     else{setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Berhasil masuk room. Kamu otomatis READY.')}
-    mpRenderLobby(msg.room);renderPlayerConnectionStatus(msg.room);mpTouchSession(true);gameChatRefreshVisibility();
+    mpRenderLobby(msg.room);renderPlayerConnectionStatus(msg.room);mpTouchSession(true);
     // A reconnecting host immediately gives the returning player the latest
     // authoritative table state rather than leaving them in the lobby.
     if(mp.host&&roundActive&&!mpRejoinMode&&!mpRejoinStateApplied)mpBroadcastState();
@@ -5130,8 +4891,9 @@ function mpHandle(msg){
     return
   }
   if(msg.type==='startGame'){
+    gameChatReset();
     mpHistoryRounds=[];mpHistorySavedKeys=new Set();mpHistoryMatchStartedAt=Date.now();
-    mp.started=true;if(mp.room)mp.room.started=true;mpTouchSession(true);gameChatRefreshVisibility();setDisplay('modal-lobby','none');setDisplay('modal-match-over','none');setDisplay('modal-result','none');nav('screen-game');playGameMusic();
+    mp.started=true;if(mp.room)mp.room.started=true;mpTouchSession(true);setDisplay('modal-lobby','none');setDisplay('modal-match-over','none');setDisplay('modal-result','none');nav('screen-game');playGameMusic();
     if(mpRejoinMode||mpRejoinStateApplied){
       if(mp.host&&mpRejoinMode&&!mpRejoinStateApplied&&mpRejoinJoined&&mpRejoinFallbackState){
         clearTimeout(mpRejoinFallbackTimer);
