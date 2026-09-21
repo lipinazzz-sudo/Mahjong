@@ -1624,13 +1624,13 @@ body::after{
    Multiplayer text chat only.
    ============================================================ */
 #game-chat-layer{position:absolute;inset:0;z-index:88;pointer-events:none;overflow:hidden}
-#game-chat-fab{position:absolute;left:auto;top:auto;right:16px;bottom:108px;width:46px;height:46px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:50%;border:1px solid rgba(240,198,109,.58);background:radial-gradient(circle at 35% 30%,rgba(255,231,176,.16),rgba(39,28,20,.96) 62%);color:#fff5dc;box-shadow:0 10px 26px rgba(0,0,0,.38),0 0 0 2px rgba(214,165,74,.08);font-size:21px;line-height:1;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;cursor:grab;z-index:90}
+#game-chat-fab{position:absolute;left:auto;top:auto;right:16px;bottom:108px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:50%;border:1px solid rgba(240,198,109,.58);background:radial-gradient(circle at 35% 30%,rgba(255,231,176,.16),rgba(39,28,20,.96) 62%);color:#fff5dc;box-shadow:0 10px 26px rgba(0,0,0,.38),0 0 0 2px rgba(214,165,74,.08);font-size:14px;line-height:1;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;cursor:grab;z-index:90}
 #game-chat-fab:hover{filter:brightness(1.06)}
 #game-chat-fab.dragging{cursor:grabbing;transform:scale(.98)}
 #game-chat-fab .game-chat-fab-icon{display:block;transform:translateY(-1px);pointer-events:none}
-#game-chat-unread{position:absolute;right:-3px;top:-3px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;display:none;align-items:center;justify-content:center;background:#e74646;color:#fff;border:2px solid #0b0a09;font-size:8px;font-weight:950;line-height:1;box-shadow:0 2px 7px rgba(0,0,0,.42);pointer-events:none}
+#game-chat-unread{position:absolute;right:-3px;top:-3px;min-width:12px;height:12px;padding:0 3px;border-radius:999px;display:none;align-items:center;justify-content:center;background:#e74646;color:#fff;border:1.5px solid #0b0a09;font-size:6.5px;font-weight:950;line-height:1;box-shadow:0 2px 7px rgba(0,0,0,.42);pointer-events:none}
 #game-chat-fab.has-unread #game-chat-unread{display:flex}
-#game-chat-panel{position:absolute;width:min(88vw,310px);height:min(56dvh,410px);display:none;flex-direction:column;box-sizing:border-box;padding:10px;border-radius:15px;border:1px solid rgba(240,198,109,.26);background:linear-gradient(180deg,rgba(30,22,17,.98),rgba(11,10,9,.98));box-shadow:0 22px 55px rgba(0,0,0,.50),inset 0 1px 0 rgba(255,236,198,.04);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);pointer-events:auto;z-index:91}
+#game-chat-panel{position:absolute;width:min(88vw,310px);height:min(56dvh,410px);display:none;flex-direction:column;box-sizing:border-box;padding:10px;border-radius:15px;border:1px solid rgba(240,198,109,.26);background:linear-gradient(180deg,rgba(30,22,17,.995),rgba(11,10,9,.995));box-shadow:0 22px 55px rgba(0,0,0,.50),inset 0 1px 0 rgba(255,236,198,.04);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);pointer-events:auto;z-index:91}
 #game-chat-panel.open{display:flex}
 .game-chat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:1px 1px 8px;border-bottom:1px solid rgba(255,255,255,.08)}
 .game-chat-head-copy{min-width:0}
@@ -1652,7 +1652,7 @@ body::after{
 #game-chat-send{height:36px;min-width:52px;padding:0 10px;border:0;border-radius:9px;background:linear-gradient(180deg,#d8ae61,#aa7a2f);color:#1b140d;font-size:9px;font-weight:950;box-shadow:0 7px 14px rgba(0,0,0,.18)}
 #game-chat-send:disabled{opacity:.48}
 @media (max-width:430px){
-  #game-chat-fab{width:44px;height:44px;right:12px;bottom:96px;font-size:20px}
+  #game-chat-fab{width:29px;height:29px;right:12px;bottom:96px;font-size:13px}
   #game-chat-panel{width:min(90vw,310px);height:min(58dvh,390px);padding:9px;border-radius:14px}
   .game-chat-title{font-size:13px}
   .game-chat-text{font-size:9px}
@@ -2286,7 +2286,7 @@ window.addEventListener('unhandledrejection',e=>{
   scheduleGameRecovery('promise-rejection');
 });
 document.addEventListener('pointerdown',()=>{bindMusicPlaylist();unlockGameAudio()},{once:true,passive:true});
-document.addEventListener('DOMContentLoaded',()=>{bindMusicPlaylist();initAudioSettingsUI();gameChatInit();gameChatRefreshVisibility();setTimeout(mpAutoRecoverSavedSession,0)});
+document.addEventListener('DOMContentLoaded',()=>{bindMusicPlaylist();initAudioSettingsUI();gameChatInit();gameChatRefreshVisibility();});
 window.addEventListener('pageshow',e=>{if(e.persisted)setTimeout(mpEnsureReconnectOnResume,0)});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(mpEnsureReconnectOnResume,0)},{passive:true});
 window.addEventListener('pagehide',()=>{if(isMultiplayerMode&&mp.room?.code)mpTouchSession(true)},{capture:true});
@@ -4305,8 +4305,8 @@ function gameChatClampPosition(left,top){
   if(!fab||!layer)return{x:left,y:top};
   const w=layer.clientWidth||window.innerWidth||0;
   const h=layer.clientHeight||window.innerHeight||0;
-  const fw=fab.offsetWidth||46;
-  const fh=fab.offsetHeight||46;
+  const fw=fab.offsetWidth||30;
+  const fh=fab.offsetHeight||30;
   const margin=8;
   return {
     x:Math.max(margin,Math.min(Number(left)||0,Math.max(margin,w-fw-margin))),
@@ -4396,7 +4396,7 @@ function gameChatPositionPanel(){
   let x=fabX;
   if(x+pw>boardW-8)x=boardW-pw-8;
   if(x<8)x=8;
-  let y=fabY+(fab.offsetHeight||46)+10;
+  let y=fabY+(fab.offsetHeight||30)+10;
   if(y+ph>boardH-8)y=fabY-ph-10;
   if(y<8)y=8;
   panel.style.left=`${Math.max(8,x)}px`;
