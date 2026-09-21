@@ -2557,7 +2557,7 @@ let avatarPickerMode='';
 let playerAvatars=['panda','shiba','kucing','penguin'];
 
 let mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,playerName:'Player',token:null,playerAvatar:selectedAvatar};
-let mpClientId=null,mpReconnectTimer=null,mpAutoStartTimer=null,mpPendingCalls=[];let mpReconnectAttempts=0,mpReconnectDeadline=0,mpLastRoomView=null;let mpGameWatchdogTimer=null;let lastHostServerSeq=0;let mpRejoinMode=false,mpRejoinStateApplied=false,mpRejoinJoined=false,mpRejoinFallbackState=null,mpRejoinFallbackTimer=null,mpRejoinModeTimer=null,mpRejoinHandshakeTimer=null,mpSessionTouchAt=0;const MP_RECONNECT_WINDOW_MS=15*60*1000;const MP_SESSION_TOUCH_MS=5000;const MP_WORKER_URL='https://mahjong-room.mahjongjong.workers.dev',MP_ROOM_PARAM='room',MP_SESSION_KEY='mahjongHKRoomV1',MP_GAME_STATE_KEY='mahjongHKActiveGameV1';
+let mpClientId=null,mpReconnectTimer=null,mpAutoStartTimer=null,mpPendingCalls=[];let mpReconnectAttempts=0,mpReconnectDeadline=0,mpLastRoomView=null;let mpGameWatchdogTimer=null;let lastHostServerSeq=0;let mpRejoinMode=false,mpRejoinStateApplied=false,mpRejoinJoined=false,mpRejoinFallbackState=null,mpRejoinFallbackTimer=null,mpRejoinModeTimer=null,mpRejoinHandshakeTimer=null,mpSessionTouchAt=0;const MP_RECONNECT_WINDOW_MS=15*60*1000;const MP_SESSION_TOUCH_MS=5000;const MP_WORKER_URL='https://mahjong-room.mahjongio.workers.dev',MP_ROOM_PARAM='room',MP_SESSION_KEY='mahjongHKRoomV1',MP_GAME_STATE_KEY='mahjongHKActiveGameV1';
 let aiSeats=new Set();
 const HUMAN_NAMES=['Player','Player 2','Player 3','Player 4'];
 
