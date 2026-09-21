@@ -1617,25 +1617,6 @@ body::after{
 }
 </style>
 
-
-<style id="voice-chat-ui">
-/* v26 Voice Chat: visual layer only; game layout remains unchanged. */
-#btn-voice-toggle[hidden]{display:none!important}
-#btn-voice-toggle.voice-off{color:#cfc5b8;border-color:rgba(255,255,255,.12)}
-#btn-voice-toggle.voice-on{color:#fff2c8;border-color:rgba(230,184,87,.52);background:linear-gradient(180deg,rgba(91,64,27,.88),rgba(39,27,16,.96));box-shadow:0 0 0 2px rgba(230,184,87,.10),0 0 16px rgba(216,171,73,.18),inset 0 1px 0 rgba(255,239,196,.10)}
-#btn-voice-toggle.voice-error{color:#ffd1ca;border-color:rgba(217,101,90,.50);background:rgba(92,31,26,.68)}
-.player-voice-indicator{position:absolute;right:-4px;bottom:-4px;z-index:92;display:none;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(9,8,7,.94);border:1px solid rgba(255,255,255,.16);box-shadow:0 3px 8px rgba(0,0,0,.30);font-size:9px;line-height:1;pointer-events:none}
-.player-voice-indicator.on{display:flex;border-color:rgba(92,230,159,.45);box-shadow:0 0 0 1px rgba(92,230,159,.08),0 0 10px rgba(79,227,154,.18),0 3px 8px rgba(0,0,0,.30)}
-.player-voice-indicator.on .player-voice-icon{filter:saturate(1.15)}
-.player-voice-indicator.speaking{animation:voiceSpeakingPulse 1s ease-in-out infinite}
-@keyframes voiceSpeakingPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 1px rgba(92,230,159,.08),0 0 10px rgba(79,227,154,.18),0 3px 8px rgba(0,0,0,.30)}50%{transform:scale(1.10);box-shadow:0 0 0 3px rgba(92,230,159,.14),0 0 16px rgba(79,227,154,.34),0 3px 8px rgba(0,0,0,.30)}}
-.voice-chat-audio{position:fixed;left:-10000px;top:-10000px;width:1px;height:1px;opacity:0;pointer-events:none}
-.voice-notice{position:absolute;top:48px;right:12px;z-index:120;display:none;max-width:min(72vw,290px);padding:7px 10px;border-radius:9px;border:1px solid rgba(226,182,89,.28);background:rgba(10,9,8,.94);color:#e9ddc8;font-size:8px;line-height:1.3;text-align:left;box-shadow:0 10px 25px rgba(0,0,0,.32);pointer-events:none}
-.voice-notice.show{display:block;animation:voiceNoticeIn .16s ease-out}
-@keyframes voiceNoticeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:430px){.player-voice-indicator{width:14px;height:14px;font-size:8px;right:-3px;bottom:-3px}.voice-notice{top:45px;right:8px;font-size:7px}}
-</style>
-
 </head>
 <body>
     <audio id="bg-music" loop preload="auto" aria-hidden="true"></audio>
@@ -1683,17 +1664,6 @@ body::after{
                 </div>
                 <div class="range-wrap">
                     <input id="sfx-volume" type="range" min="0" max="5" value="2" step="1" aria-label="SFX Volume">
-                    <div class="range-caption"><span>0%</span><span>10%</span><span>30%</span><span>50%</span><span>80%</span><span>100%</span></div>
-                </div>
-            </div>
-
-            <div class="settings-row">
-                <div class="settings-label">
-                    <div><strong>Voice Volume</strong><span>Volume suara pemain lain.</span></div>
-                    <strong id="voice-volume-value">30%</strong>
-                </div>
-                <div class="range-wrap">
-                    <input id="voice-volume" type="range" min="0" max="5" value="2" step="1" aria-label="Voice Volume">
                     <div class="range-caption"><span>0%</span><span>10%</span><span>30%</span><span>50%</span><span>80%</span><span>100%</span></div>
                 </div>
             </div>
@@ -1914,7 +1884,6 @@ body::after{
                     <div class="furiten-status" id="furiten-status"></div>
                 </div>
                 <div class="top-right-btns">
-                    <button id="btn-voice-toggle" class="icon-btn voice-off" onclick="toggleVoice()" title="Mic OFF — klik untuk menyalakan" aria-label="Mic OFF — klik untuk menyalakan" aria-pressed="false" hidden>🎙️</button>
                     <button class="icon-btn" onclick="openSettingsFromGame()" title="Settings" aria-label="Settings">⚙️</button>
                 </div>
             </div>
@@ -1926,7 +1895,6 @@ body::after{
                     <div class="avatar-img" aria-hidden="true"></div>
                     <div class="action-badge" aria-hidden="true"></div>
                     <div class="player-connection-indicator" aria-hidden="true"><span class="player-connection-dot"></span><span class="player-connection-text">ONLINE</span></div>
-                    <div class="player-voice-indicator" aria-hidden="true"><span class="player-voice-icon">🎙</span></div>
                 </div>
                 <div class="avatar-name" id="name-bottom">You <span class="seat-direction">• South</span></div>
                 <div class="time-bank-tag" id="player-time-bank">+20s</div>
@@ -1936,7 +1904,6 @@ body::after{
                     <div class="avatar-img" aria-hidden="true"></div>
                     <div class="action-badge" aria-hidden="true"></div>
                     <div class="player-connection-indicator" aria-hidden="true"><span class="player-connection-dot"></span><span class="player-connection-text">ONLINE</span></div>
-                    <div class="player-voice-indicator" aria-hidden="true"><span class="player-voice-icon">🎙</span></div>
                 </div>
                 <div class="avatar-name" id="name-left">P3 <span class="seat-direction">• West</span></div>
                 <div class="enemy-hand-count" id="enemy-hand-left" aria-label="Kartu tersembunyi West"></div>
@@ -1947,7 +1914,6 @@ body::after{
                     <div class="avatar-img" aria-hidden="true"></div>
                     <div class="action-badge" aria-hidden="true"></div>
                     <div class="player-connection-indicator" aria-hidden="true"><span class="player-connection-dot"></span><span class="player-connection-text">ONLINE</span></div>
-                    <div class="player-voice-indicator" aria-hidden="true"><span class="player-voice-icon">🎙</span></div>
                 </div>
                 <div class="avatar-name" id="name-top">P2 <span class="seat-direction">• North</span></div>
                 <div class="enemy-hand-count" id="enemy-hand-top" aria-label="Kartu tersembunyi North"></div>
@@ -1958,7 +1924,6 @@ body::after{
                     <div class="avatar-img" aria-hidden="true"></div>
                     <div class="action-badge" aria-hidden="true"></div>
                     <div class="player-connection-indicator" aria-hidden="true"><span class="player-connection-dot"></span><span class="player-connection-text">ONLINE</span></div>
-                    <div class="player-voice-indicator" aria-hidden="true"><span class="player-voice-icon">🎙</span></div>
                 </div>
                 <div class="avatar-name" id="name-right">P1 <span class="seat-direction">• East</span></div>
                 <div class="enemy-hand-count" id="enemy-hand-right" aria-label="Kartu tersembunyi East"></div>
@@ -2023,7 +1988,7 @@ function byId(id){return document.getElementById(id)}
    Random track; the same track cannot repeat within the
    previous 2 tracks, so it may return again after 3 tracks.
    ============================================================ */
-const GAME_BGM_TRACKS=['audio/bgm-game.mp3','audio/bgm2-game.mp3','audio/bgm3-game.mp3','audio/bgm4-game.mp3','audio/bgm5-game.mp3'];
+const GAME_BGM_TRACKS=[1,2,3,4,5].map(n=>`audio/bgm${n}-game.mp3`);
 let musicTrackIndex=-1;
 let musicRecentTracks=[];
 let musicPlaylistBound=false;
@@ -2040,12 +2005,9 @@ const SFX_SOURCES={
   button:'audio/sfx-button.mp3'
 };
 const AUDIO_LEVELS=[0,0.10,0.30,0.50,0.80,1.00];
-const MUSIC_OUTPUT_GAIN=0.55;
-const VOICE_DUCK_GAIN=0.50;
 let audioMuted=false;
 let musicVolume=0.30;
 let sfxVolume=0.30;
-let voiceVolume=0.30;
 let audioUnlocked=false;
 const activeSfx=new Set();
 
@@ -2063,28 +2025,23 @@ function audioLevel(index){
 try{
   musicVolume=audioLevel(nearestAudioLevel(Number(localStorage.getItem('hk_music_volume')??0.30)));
   sfxVolume=audioLevel(nearestAudioLevel(Number(localStorage.getItem('hk_sfx_volume')??0.30)));
-  voiceVolume=audioLevel(nearestAudioLevel(Number(localStorage.getItem('hk_voice_volume')??0.30)));
   audioMuted=localStorage.getItem('hk_audio_muted')==='1';
 }catch{}
 
 function applyAudioSettings(){
   const bgm=byId('bg-music');
   if(bgm){
-    bgm.volume=audioMuted||musicVolume===0?0:Math.min(1,musicVolume*MUSIC_OUTPUT_GAIN*(voiceMicEnabled?VOICE_DUCK_GAIN:1));
+    bgm.volume=audioMuted||musicVolume===0?0:musicVolume;
     if(audioMuted||musicVolume===0)bgm.pause();
   }
-  activeSfx.forEach(a=>a.volume=audioMuted?0:sfxVolume*(voiceMicEnabled?VOICE_DUCK_GAIN:1));
-  document.querySelectorAll('audio.voice-chat-audio').forEach(a=>a.volume=audioMuted?0:voiceVolume);
+  activeSfx.forEach(a=>a.volume=audioMuted?0:sfxVolume);
 
   const mv=byId('music-volume'),mvv=byId('music-volume-value');
   const sv=byId('sfx-volume'),svv=byId('sfx-volume-value');
-  const vv=byId('voice-volume'),vvv=byId('voice-volume-value');
   if(mv)mv.value=String(nearestAudioLevel(musicVolume));
   if(mvv)mvv.textContent=Math.round(musicVolume*100)+'%';
   if(sv)sv.value=String(nearestAudioLevel(sfxVolume));
   if(svv)svv.textContent=Math.round(sfxVolume*100)+'%';
-  if(vv)vv.value=String(nearestAudioLevel(voiceVolume));
-  if(vvv)vvv.textContent=Math.round(voiceVolume*100)+'%';
 
   const ab=byId('btn-toggle-audio');
   if(ab)ab.textContent=audioMuted?'OFF':'ON';
@@ -2108,11 +2065,6 @@ function setMusicVolume(index){
 function setSfxVolume(index){
   sfxVolume=audioLevel(index);
   try{localStorage.setItem('hk_sfx_volume',String(sfxVolume))}catch{}
-  applyAudioSettings();
-}
-function setVoiceVolume(index){
-  voiceVolume=audioLevel(index);
-  try{localStorage.setItem('hk_voice_volume',String(voiceVolume))}catch{}
   applyAudioSettings();
 }
 function stopAllSfx(){
@@ -2140,8 +2092,8 @@ function playSfx(type){
   if(!src)return;
   const a=new Audio(src);
   a.preload='auto';
-  a.volume=sfxVolume*(voiceMicEnabled?VOICE_DUCK_GAIN:1);
-  if(type==='draw'||type==='discard')a.volume*=0.60;
+  a.volume=sfxVolume;
+  if(type==='draw'||type==='discard')a.volume=sfxVolume*0.60;
   activeSfx.add(a);
   a.addEventListener('ended',()=>activeSfx.delete(a),{once:true});
   const p=a.play();
@@ -2184,14 +2136,6 @@ function bindMusicPlaylist(){
     // Jadi pergantian lagu tetap berjalan saat layar hasil ronde tampil.
     if(!musicSessionActive||audioMuted||musicVolume===0)return;
     loadNextMusicTrack(true);
-  });
-  audio.addEventListener('error',()=>{
-    // Bila satu file audio gagal dimuat, lewati track itu agar BGM tidak mati
-    // permanen di tengah match. Playlist tetap memakai aturan random yang sama.
-    if(!musicSessionActive||audioMuted||musicVolume===0)return;
-    setTimeout(()=>{
-      if(musicSessionActive&&!audioMuted&&musicVolume>0)loadNextMusicTrack(true);
-    },60);
   });
   audio.addEventListener('pause',()=>{
     if(!musicSessionActive||!roundActive||audioMuted||musicVolume===0||audio.ended)return;
@@ -2239,7 +2183,7 @@ function playGameMusic(){
   audio.loop=false;
   updateMusicIntensity();
   applyAudioSettings();
-  audio.volume=Math.min(1,musicVolume*MUSIC_OUTPUT_GAIN*(voiceMicEnabled?VOICE_DUCK_GAIN:1));
+  if(audio.volume===0)audio.volume=musicVolume;
   // A mobile browser can pause media during a long-lived SPA transition.
   // Resume the current track when the game session is still active; do not
   // interfere with mute/volume-zero or an intentionally stopped session.
@@ -2260,10 +2204,9 @@ function stopGameMusic(){
   stopAllSfx();
 }
 function initAudioSettingsUI(){
-  const mv=byId('music-volume'),sv=byId('sfx-volume'),vv=byId('voice-volume');
+  const mv=byId('music-volume'),sv=byId('sfx-volume');
   if(mv)mv.addEventListener('input',e=>setMusicVolume(e.target.value));
   if(sv)sv.addEventListener('input',e=>setSfxVolume(e.target.value));
-  if(vv)vv.addEventListener('input',e=>setVoiceVolume(e.target.value));
   applyAudioSettings();
 }
 window.addEventListener('error',e=>{
@@ -2277,7 +2220,7 @@ window.addEventListener('unhandledrejection',e=>{
   scheduleGameRecovery('promise-rejection');
 });
 document.addEventListener('pointerdown',()=>{bindMusicPlaylist();unlockGameAudio()},{once:true,passive:true});
-document.addEventListener('DOMContentLoaded',()=>{bindMusicPlaylist();initAudioSettingsUI()});
+document.addEventListener('DOMContentLoaded',()=>{bindMusicPlaylist();initAudioSettingsUI();setTimeout(mpAutoRecoverSavedSession,0)});
 window.addEventListener('pageshow',e=>{if(e.persisted)setTimeout(mpEnsureReconnectOnResume,0)});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(mpEnsureReconnectOnResume,0)},{passive:true});
 window.addEventListener('pagehide',()=>{if(isMultiplayerMode&&mp.room?.code)mpTouchSession(true)},{capture:true});
@@ -2808,7 +2751,7 @@ function renderHand(){const wrap=byId('player-hand-tiles');if(!wrap)return;const
 function renderEnemyHands(){const s=mp.seat??0,m=mappedSeats(s);[[`enemy-hand-top`,m[2]],[`enemy-hand-right`,m[1]],[`enemy-hand-left`,m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const count=Math.max(0,playerHands[p]?.length||0);for(let i=0;i<count;i++){const b=document.createElement('span');b.className='mini-back';e.appendChild(b)}const label=document.createElement('span');label.className='hand-count-label';label.textContent=`×${count}`;e.appendChild(label);})}
 function renderRivers(){const s=mp.seat??0,m=mappedSeats(s);const selectedId=(selectedTileIndex>=0&&playerHands[s]?.[selectedTileIndex])?playerHands[s][selectedTileIndex].id:null;[['river-bottom',m[0]],['river-right',m[1]],['river-top',m[2]],['river-left',m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const tiles=(playerRivers[p]||[]).slice(0,id==='river-top'||id==='river-bottom'?32:30);tiles.forEach(t=>{const d=document.createElement('div');d.className='discard-tile';if(selectedId!==null&&t.id===selectedId)d.classList.add('same-tile-highlight');d.dataset.tileId=t.id;d.innerHTML=tileMarkup(t);e.appendChild(d)})})}
 function renderMelds(){const s=mp.seat??0,m=mappedSeats(s);const own=byId('player-melds-container');if(own){own.innerHTML='';(playerMelds[m[0]]||[]).forEach(g=>{const box=document.createElement('div');box.className='meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});own.appendChild(box)})}const enemyMap=[['enemy-meld-top-label','enemy-meld-top-tiles',m[2]],['enemy-meld-right-label','enemy-meld-right-tiles',m[1]],['enemy-meld-left-label','enemy-meld-left-tiles',m[3]]];enemyMap.forEach(([labelId,tilesId,p])=>{const label=byId(labelId),wrap=byId(tilesId);const groups=playerMelds[p]||[];const labels=groups.map(g=>g.length===4?'Kan':(g.length===3&&g.every(t=>t.id===g[0].id)?'Pon':'Chow'));if(label)setText(labelId,labels.length?labels.join(' • '):'');if(!wrap)return;wrap.innerHTML='';groups.forEach(g=>{const box=document.createElement('div');box.className='enemy-meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});wrap.appendChild(box)})})}
-function renderTable(){advisorKnownCacheKey='';advisorKnownCache=null;renderNames();renderAvatars();updateTurnHighlight();renderPlayerConnectionStatus(mp.room);voiceUpdateUi(mp.room);renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);if(!isMultiplayerMode){renderLocalTurnTimer(isActionPhase?actionSecondsLeft:secondsLeft,isActionPhase?actionSeat:currentTurn);}else if(isActionPhase){renderLocalTurnTimer(actionSecondsLeft,actionSeat);}else{renderLocalTurnTimer(secondsLeft,currentTurn);}setText('tiles-remaining',`SISA ${fullDeck.length}`);updateMusicIntensity();showCurrentWaitAdvisor();if(currentTurn===(mp.seat??0)){setText('hand-status-main','Giliran Anda');setText('hand-status-sub','Pilih tile untuk membuang.');}else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');}}
+function renderTable(){advisorKnownCacheKey='';advisorKnownCache=null;renderNames();renderAvatars();updateTurnHighlight();renderPlayerConnectionStatus(mp.room);renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);if(!isMultiplayerMode){renderLocalTurnTimer(isActionPhase?actionSecondsLeft:secondsLeft,isActionPhase?actionSeat:currentTurn);}else if(isActionPhase){renderLocalTurnTimer(actionSecondsLeft,actionSeat);}else{renderLocalTurnTimer(secondsLeft,currentTurn);}setText('tiles-remaining',`SISA ${fullDeck.length}`);updateMusicIntensity();showCurrentWaitAdvisor();if(currentTurn===(mp.seat??0)){setText('hand-status-main','Giliran Anda');setText('hand-status-sub','Pilih tile untuk membuang.');}else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');}}
 
 function isSequenceGroup(group){
   if(!Array.isArray(group)||group.length!==3)return false;
@@ -4008,7 +3951,6 @@ function addResultGroupTile(box,tile){
   box.appendChild(el);
 }
 function leaveFinishedRoom(){
-  voiceStopAll();
   clearGuestActionRetry();
   clearTimeout(mpRejoinHandshakeTimer);
   mpRejoinHandshakeTimer=null;
@@ -4169,16 +4111,16 @@ function nextRoundOrFinish(){
   mpBroadcastState();
 }
 function flashBoard(kind){const e=byId('center-board-box');if(!e)return;e.classList.remove('win-flash','draw-flash');void e.offsetWidth;e.classList.add(kind==='draw'?'draw-flash':'win-flash')}
-function quitGame(){voiceStopAll();cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();roundActive=false;mpClearActiveGameState();stopGameMusic();nav('screen-main');if(mp.connected)mpSend('leave')}
+function quitGame(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();roundActive=false;mpClearActiveGameState();stopGameMusic();nav('screen-main');if(mp.connected)mpSend('leave')}
 function openSettingsFromGame(){previousScreenId=activeScreenId==='screen-game'?'screen-game':(previousScreenId||'screen-main');nav('screen-settings');applyAudioSettings()}
 function returnToGameFromSettings(){nav(previousScreenId||'screen-main')}
-function exitGameFromSettings(){voiceStopAll();cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;mpClearActiveGameState();stopGameMusic();previousScreenId='screen-main';nav('screen-main')}
+function exitGameFromSettings(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;mpClearActiveGameState();stopGameMusic();previousScreenId='screen-main';nav('screen-main')}
 function exitSettings(){returnToGameFromSettings()}
 function toggleAutoSortSetting(){autoSortSetting=!autoSortSetting;try{localStorage.setItem('hk_auto_sort',autoSortSetting?'1':'0')}catch{};setText('btn-toggle-autosort',autoSortSetting?'ON':'OFF');if(roundActive)renderTable()}
 
 // --------------------- Multiplayer -------------------------
 function escapeHtml(v){return esc(v)}
-function mpSetConnection(online){setText('mp-connection-badge',online?'ONLINE':'OFFLINE');const b=byId('mp-connection-badge');if(b)b.className=`connection-badge ${online?'online':'offline'}`;renderPlayerConnectionStatus(mp.room);voiceRefreshButton()}
+function mpSetConnection(online){setText('mp-connection-badge',online?'ONLINE':'OFFLINE');const b=byId('mp-connection-badge');if(b)b.className=`connection-badge ${online?'online':'offline'}`;renderPlayerConnectionStatus(mp.room)}
 function renderPlayerConnectionStatus(room=mp.room){const indicators=[['.pos-bottom .player-connection-indicator',0],['.pos-left .player-connection-indicator',3],['.pos-top .player-connection-indicator',2],['.pos-right .player-connection-indicator',1]];if(!isMultiplayerMode){indicators.forEach(([sel])=>{const el=document.querySelector(sel);if(el)el.className='player-connection-indicator hidden'});return}const localSeat=mp.seat??0;const mapped=mappedSeats(localSeat);indicators.forEach(([sel,displayIndex])=>{const el=document.querySelector(sel);if(!el)return;const seat=mapped[displayIndex];el.className='player-connection-indicator';const p=room?.players?.[seat];if(aiSeats.has(seat)){el.classList.add('ai');el.querySelector('.player-connection-text').textContent='AI';el.title='AI';return}let online=false;let disconnected=false;if(seat===localSeat){online=!!mp.connected;disconnected=!online}else if(p){online=p.connected!==false;disconnected=p.connected===false}else{disconnected=true}const stateClass=online?'online':'disconnected';el.classList.add(stateClass);el.querySelector('.player-connection-text').textContent=online?'ONLINE':'TERPUTUS';el.title=online?'Player online':'Player terputus';});}
 
 function mpServerUrl(code=''){const base=String(MP_WORKER_URL||'').replace(/\/$/,'');if(!base)return null;const wsBase=base.replace(/^https:/,'wss:').replace(/^http:/,'ws:');return `${wsBase}/ws?room=${encodeURIComponent(code)}`}
@@ -4389,61 +4331,10 @@ function mpEnsureReconnectOnResume(){
     }
     return;
   }
-  // A fresh page load must always stay on the Main Menu. Saved sessions are
-  // offered as a manual reconnect from the Multiplayer screen instead of
-  // silently opening the game table.
-  if(activeScreenId!=='screen-main')mpAutoRecoverSavedSession();
+  mpAutoRecoverSavedSession();
 }
-function openPlayerLobby(){
-  isMultiplayerMode=true;
-  mp.playerAvatar=selectedAvatar;
-  clearTimeout(mpReconnectTimer);
-  mpReconnectAttempts=0;
-  mpReconnectDeadline=0;
-  setDisplay('modal-lobby','flex');
-  setDisplay('mp-setup','grid');
-  setDisplay('mp-room-panel','none');
-  setDisplay('mp-host-invite','none');
-  setDisplay('mp-guest-invite','none');
-  setDisplay('mp-reconnect-card','none');
-  mpSetConnection(false);
-
-  const code=new URL(location.href).searchParams.get(MP_ROOM_PARAM);
-  const saved=mpLoadSession();
-
-  if(code&&saved?.room===code&&saved?.token&&saved?.started){
-    setDisplay('mp-setup','none');
-    setDisplay('mp-room-panel','grid');
-    setText('lobby-help','Menyambungkan kembali ke Room '+code+'…');
-    mpBeginReconnect(saved);
-    return;
-  }
-
-  // Do not silently reconnect on page load. When the player explicitly opens
-  // Multiplayer, offer the saved session as a single manual action instead.
-  if(saved?.room&&saved?.token&&saved?.started&&!code){
-    setDisplay('mp-guest-invite','block');
-    setDisplay('mp-reconnect-card','grid');
-    setText('mp-reconnect-title','Sesi room ditemukan');
-    setText('mp-reconnect-text',`Room ${saved.room} masih tersimpan. Sambungkan kembali jika ingin melanjutkan permainan.`);
-    setText('lobby-help','Sesi multiplayer sebelumnya ditemukan. Tidak ada koneksi yang dibuat sebelum kamu menekan tombol sambung kembali.');
-    return;
-  }
-
-  if(code){
-    setDisplay('mp-setup','none');
-    setDisplay('mp-room-panel','grid');
-    mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';
-    mp.host=false;
-    mp.ready=true;
-    mpEnsureToken();
-    mp.room={code,players:[null,null,null,null],started:false};
-    setText('lobby-help','Menghubungkan ke Room '+code+'…');
-    mpConnect(code,'guest');
-  }
-}
-
-function closeLobby(){voiceStopAll();clearGuestActionRetry();clearTimeout(mpReconnectTimer);clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);clearTimeout(mpRejoinHandshakeTimer);mpRejoinHandshakeTimer=null;mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinFallbackState=null;stopMpGameWatchdog();stopMpPing();try{mpSend('leave')}catch(e){}try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}mp.ws=null;mp.connected=false;mpClearSession();mpClearActiveGameState();mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,token:null,playerName:mp.playerName||'Player',playerAvatar:selectedAvatar};isMultiplayerMode=false;setDisplay('modal-lobby','none');mpSetConnection(false)}
+function openPlayerLobby(){isMultiplayerMode=true;mp.playerAvatar=selectedAvatar;clearTimeout(mpReconnectTimer);mpReconnectAttempts=0;mpReconnectDeadline=0;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');mpSetConnection(false);const code=new URL(location.href).searchParams.get(MP_ROOM_PARAM);const saved=mpLoadSession();if(code&&saved?.room===code&&saved?.token&&saved?.started){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('lobby-help','Menyambungkan kembali ke Room '+code+'…');mpBeginReconnect(saved);return}if(code){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.host=false;mp.ready=true;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};setText('lobby-help','Menghubungkan ke Room '+code+'…');mpConnect(code,'guest')}}
+function closeLobby(){clearGuestActionRetry();clearTimeout(mpReconnectTimer);clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);clearTimeout(mpRejoinHandshakeTimer);mpRejoinHandshakeTimer=null;mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinFallbackState=null;stopMpGameWatchdog();stopMpPing();try{mpSend('leave')}catch(e){}try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}mp.ws=null;mp.connected=false;mpClearSession();mpClearActiveGameState();mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,token:null,playerName:mp.playerName||'Player',playerAvatar:selectedAvatar};isMultiplayerMode=false;setDisplay('modal-lobby','none');mpSetConnection(false)}
 function mpCreateRoom(){mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinJoined=false;mpRejoinFallbackState=null;clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.playerAvatar=selectedAvatar;const code=String(Math.floor(10000+Math.random()*90000));mp.host=true;mp.seat=0;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();isMultiplayerMode=true;mp.room={code,players:[null,null,null,null],started:false};setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('mp-room-code-display',code);setText('mp-host-room-code',code);setText('lobby-help','Membuat room di Cloudflare…');mpRenderRoomQr(code);mpSaveSession();mpConnect(code,'host')}
 function mpJoinRoom(){mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinJoined=false;mpRejoinFallbackState=null;clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code)){alert('Masukkan kode room 5 digit.');return}mp.host=false;mp.seat=null;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};isMultiplayerMode=true;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Menghubungkan ke Room '+code+'…');mpSaveSession();mpConnect(code,'guest')}
 function mpShowJoinForm(){setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','block')}
@@ -4471,12 +4362,6 @@ function mpStartGame(){
 }
 function mpHandle(msg){
   if(msg.type==='hello'){mpClientId=msg.clientId;return}
-  if(msg.type==='voiceHello'){voiceHandleHello(msg);return}
-  if(msg.type==='voiceState'){voiceHandleRemoteState(msg);return}
-  if(msg.type==='voiceOffer'){voiceHandleOffer(msg);return}
-  if(msg.type==='voiceAnswer'){voiceHandleAnswer(msg);return}
-  if(msg.type==='voiceIce'){voiceHandleIce(msg);return}
-  if(msg.type==='voiceBye'){voiceHandleBye(msg);return}
   if(msg.type==='error'){
     setText('lobby-help',msg.message||'Room error');
     mpSetConnection(false);
@@ -4507,7 +4392,7 @@ function mpHandle(msg){
     setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('mp-room-code-display',msg.room.code);
     if(mp.host){setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('lobby-help','Room dibuat. Bagikan link/QR kepada pemain lain.');mpRenderRoomQr(msg.room.code)}
     else{setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Berhasil masuk room. Kamu otomatis READY.')}
-    mpRenderLobby(msg.room);renderPlayerConnectionStatus(msg.room);voiceSyncRoom(msg.room);voiceAnnounce();if(voiceMicEnabled)voiceSend('voiceState',{enabled:true});mpTouchSession(true);
+    mpRenderLobby(msg.room);renderPlayerConnectionStatus(msg.room);mpTouchSession(true);
     // A reconnecting host immediately gives the returning player the latest
     // authoritative table state rather than leaving them in the lobby.
     if(mp.host&&roundActive&&!mpRejoinMode&&!mpRejoinStateApplied)mpBroadcastState();
@@ -4517,7 +4402,7 @@ function mpHandle(msg){
     // Keep and persist the complete server room snapshot. This is also used to
     // restore the lobby UI after a temporary Wi-Fi/WebSocket interruption.
     const wasStarted=mp.started;
-    mp.room=msg.room||mp.room;mpLastRoomView=mp.room;mp.started=!!(msg.room?.started);mpRenderLobby(mp.room);renderPlayerConnectionStatus(mp.room);voiceSyncRoom(mp.room);mpTouchSession(true);
+    mp.room=msg.room||mp.room;mpLastRoomView=mp.room;mp.started=!!(msg.room?.started);mpRenderLobby(mp.room);renderPlayerConnectionStatus(mp.room);mpTouchSession(true);
     if(mp.host&&roundActive&&!mpRejoinMode&&!mpRejoinStateApplied)mpBroadcastState();
     if(mpRejoinMode&&!mp.started){
       clearTimeout(mpRejoinFallbackTimer);
@@ -4549,7 +4434,7 @@ function mpHandle(msg){
   }
   if(msg.type==='startGame'){
     mpHistoryRounds=[];mpHistorySavedKeys=new Set();mpHistoryMatchStartedAt=Date.now();
-    mp.started=true;if(mp.room)mp.room.started=true;voiceSyncRoom(mp.room);mpTouchSession(true);setDisplay('modal-lobby','none');setDisplay('modal-match-over','none');setDisplay('modal-result','none');nav('screen-game');playGameMusic();
+    mp.started=true;if(mp.room)mp.room.started=true;mpTouchSession(true);setDisplay('modal-lobby','none');setDisplay('modal-match-over','none');setDisplay('modal-result','none');nav('screen-game');playGameMusic();
     if(mpRejoinMode||mpRejoinStateApplied){
       if(mp.host&&mpRejoinMode&&!mpRejoinStateApplied&&mpRejoinJoined&&mpRejoinFallbackState){
         clearTimeout(mpRejoinFallbackTimer);
@@ -4713,11 +4598,9 @@ function mpApplyRemoteState(state){
     mp.room={...(mp.room||{}),players:state.roomPlayers};
     syncHumanAvatars(mp.room);
     renderPlayerConnectionStatus(mp.room);
-    voiceSyncRoom(mp.room);
   }
 
-  const keepSettingsScreen=activeScreenId==='screen-settings'&&previousScreenId==='screen-game';
-  if(!keepSettingsScreen)nav('screen-game');
+  nav('screen-game');
   if(state.roundActive||state.roundEnding)setDisplay('modal-lobby','none');
   if(state.roundActive){setDisplay('modal-result','none');setDisplay('modal-match-over','none');}
 
@@ -4932,490 +4815,6 @@ function mpReconnect(){
   mpBeginReconnect(saved);
 }
 window.mpConnect=mpConnect;window.mpSend=mpSend;window.openPlayerLobby=openPlayerLobby;window.mpCreateRoom=mpCreateRoom;window.mpJoinRoom=mpJoinRoom;window.mpShowJoinForm=mpShowJoinForm;window.togglePlayerReady=togglePlayerReady;window.mpStartGame=mpStartGame;window.closeLobby=closeLobby;window.mpCopyRoomLink=mpCopyRoomLink;window.mpCopyRoomInfo=mpCopyRoomInfo;
-
-/* ============================================================
-   VOICE CHAT — v1
-   WebRTC mesh (max 4 players) with Cloudflare WebSocket signaling.
-   The Worker relays only signaling; microphone media stays P2P.
-   ============================================================ */
-const VOICE_ICE_SERVERS=[
-  {urls:'stun:stun.cloudflare.com:3478'}
-];
-const VOICE_RTC_CONFIG={iceServers:VOICE_ICE_SERVERS};
-let voiceMicEnabled=false;
-let voiceLocalStream=null;
-let voiceLocalTrack=null;
-let voiceUnlocked=false;
-let voiceLastNoticeTimer=null;
-let voiceHelloSent=false;
-let voiceAudioNeedsUnlock=false;
-let voicePeers=new Map();
-let voiceStateBySeat=[false,false,false,false];
-let voiceSessionId='';
-try{voiceSessionId=crypto.randomUUID()}catch(e){voiceSessionId='v-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)}
-
-function voiceIsSupported(){
-  return !!(
-    isMultiplayerMode&&
-    window.RTCPeerConnection&&
-    navigator.mediaDevices&&
-    navigator.mediaDevices.getUserMedia&&
-    mp.seat!=null&&
-    mp.connected
-  );
-}
-function voiceRoomActive(){return !!(isMultiplayerMode&&mp.room?.code&&(roundActive||mp.started||mp.room.started));}
-function voiceSetNotice(message,duration=2800){
-  let el=byId('voice-chat-notice');
-  if(!el){
-    el=document.createElement('div');
-    el.id='voice-chat-notice';
-    el.className='voice-notice';
-    const board=byId('game-board');
-    if(board)board.appendChild(el);else document.body.appendChild(el);
-  }
-  el.textContent=String(message||'');
-  el.classList.add('show');
-  clearTimeout(voiceLastNoticeTimer);
-  voiceLastNoticeTimer=setTimeout(()=>el.classList.remove('show'),duration);
-}
-function voiceRefreshButton(){
-  const btn=byId('btn-voice-toggle');
-  if(!btn)return;
-  const show=!!(isMultiplayerMode&&mp.seat!=null&&(roundActive||mp.started||mp.room?.started));
-  btn.hidden=!show;
-  if(!show){
-    btn.className='icon-btn voice-off';
-    btn.textContent='🎙️';
-    btn.title='Mic';
-    btn.setAttribute('aria-label','Mic');
-    btn.setAttribute('aria-pressed','false');
-    return;
-  }
-  btn.className=`icon-btn ${voiceMicEnabled?'voice-on':'voice-off'}`;
-  btn.textContent=voiceMicEnabled?'🎙️':'🎙️';
-  const title=voiceMicEnabled?'Mic ON — klik untuk mute':'Mic OFF — klik untuk menyalakan';
-  btn.title=title;
-  btn.setAttribute('aria-label',title);
-  btn.setAttribute('aria-pressed',voiceMicEnabled?'true':'false');
-}
-function voiceUpdateIndicators(room=mp.room){
-  const indicators=[
-    ['.pos-bottom .player-voice-indicator',0],
-    ['.pos-left .player-voice-indicator',3],
-    ['.pos-top .player-voice-indicator',2],
-    ['.pos-right .player-voice-indicator',1]
-  ];
-  const localSeat=mp.seat??0;
-  const mapped=mappedSeats(localSeat);
-  if(!isMultiplayerMode){
-    indicators.forEach(([sel])=>{const el=document.querySelector(sel);if(el){el.className='player-voice-indicator';el.querySelector('.player-voice-icon').textContent='🎙';}});
-    return;
-  }
-  voiceStateBySeat=Array.from({length:4},(_,i)=>!!(room?.players?.[i]?.voiceEnabled));
-  if(localSeat>=0&&localSeat<4)voiceStateBySeat[localSeat]=voiceMicEnabled;
-  indicators.forEach(([sel,displayIndex])=>{
-    const el=document.querySelector(sel);if(!el)return;
-    const seat=mapped[displayIndex];
-    const on=!!voiceStateBySeat[seat];
-    el.className=`player-voice-indicator${on?' on':''}`;
-    el.querySelector('.player-voice-icon').textContent=on?'🎙':'🎙';
-  });
-}
-function voiceUpdateUi(room=mp.room){voiceRefreshButton();voiceUpdateIndicators(room)}
-function voicePeerKey(remoteSeat){return String(remoteSeat)}
-function voiceRemoteIsActive(remoteSeat){return !!(mp.room?.players?.[remoteSeat]&&mp.room.players[remoteSeat].connected!==false)}
-function voiceShouldConnect(remoteSeat){return !!(voiceMicEnabled||voiceStateBySeat[remoteSeat]||voicePeers.has(remoteSeat))}
-function voiceAnnounce(){
-  if(!isMultiplayerMode||mp.seat==null||!mp.connected)return;
-  if(!voiceHelloSent){
-    voiceHelloSent=true;
-    voiceSend('voiceHello',{sessionId:voiceSessionId});
-  }else if(voiceMicEnabled){
-    voiceSend('voiceHello',{sessionId:voiceSessionId});
-  }
-}
-function voiceSyncRoom(room=mp.room){
-  if(!isMultiplayerMode||mp.seat==null){voiceUpdateUi(room);return}
-  voiceStateBySeat=Array.from({length:4},(_,i)=>!!(room?.players?.[i]?.voiceEnabled));
-  voiceStateBySeat[mp.seat]=voiceMicEnabled;
-  for(let seat=0;seat<4;seat++){
-    if(seat===mp.seat)continue;
-    const p=room?.players?.[seat];
-    if(!p||p.connected===false){
-      if(voicePeers.has(seat))voiceClosePeer(seat,false);
-    }else if(voiceShouldConnect(seat)){
-      voiceEnsurePeer(seat).catch(()=>{});
-    }
-  }
-  voiceUpdateUi(room);
-}
-function voiceSend(type,data={}){return mpSend(type,data)}
-function voiceCreateRemoteAudio(seat){
-  const existing=document.querySelector(`audio.voice-chat-audio[data-voice-seat="${seat}"]`);
-  if(existing)return existing;
-  const audio=document.createElement('audio');
-  audio.className='voice-chat-audio';
-  audio.dataset.voiceSeat=String(seat);
-  audio.autoplay=true;
-  audio.playsInline=true;
-  audio.controls=false;
-  audio.preload='auto';
-  audio.volume=audioMuted?0:voiceVolume;
-  audio.setAttribute('aria-hidden','true');
-  document.body.appendChild(audio);
-  return audio;
-}
-function voiceUnlockAudio(){
-  voiceUnlocked=true;
-  document.querySelectorAll('audio.voice-chat-audio').forEach(audio=>{
-    if(!audio.srcObject)return;
-    const p=audio.play();
-    if(p&&typeof p.catch==='function')p.catch(()=>{voiceAudioNeedsUnlock=true});
-  });
-}
-window.addEventListener('pointerdown',voiceUnlockAudio,{passive:true});
-window.addEventListener('keydown',voiceUnlockAudio,{passive:true});
-function voiceAttachRemoteStream(seat,stream){
-  const audio=voiceCreateRemoteAudio(seat);
-  audio.srcObject=stream;
-  const p=audio.play();
-  if(p&&typeof p.catch==='function'){
-    p.catch(()=>{
-      voiceAudioNeedsUnlock=true;
-      voiceSetNotice('Klik sekali di layar untuk mengaktifkan suara pemain lain.',4200);
-    });
-  }
-}
-function voiceGetOrCreatePeer(remoteSeat,remoteSessionId=''){
-  if(!voiceIsSupported()||remoteSeat===mp.seat||!voiceRemoteIsActive(remoteSeat))return null;
-  const key=voicePeerKey(remoteSeat);
-  let entry=voicePeers.get(key);
-  if(entry&&entry.pc&&entry.pc.connectionState!=='closed'){
-    if(remoteSessionId&&entry.remoteSessionId&&entry.remoteSessionId!==remoteSessionId){
-      voiceClosePeer(remoteSeat,false);
-      entry=null;
-    }else if(remoteSessionId&&!entry.remoteSessionId){
-      entry.remoteSessionId=remoteSessionId;
-    }
-  }
-  if(entry&&entry.pc&&entry.pc.connectionState!=='closed')return entry;
-
-  const initiator=(mp.seat??0)<remoteSeat;
-  const pc=new RTCPeerConnection(VOICE_RTC_CONFIG);
-  const transceiver=pc.addTransceiver('audio',{direction:'sendrecv'});
-  entry={
-    remoteSeat,
-    pc,
-    initiator,
-    transceiver,
-    pendingIce:[],
-    remoteSessionId:remoteSessionId||null,
-    retryTimer:null,
-    makingOffer:false,
-    closed:false
-  };
-  voicePeers.set(key,entry);
-
-  pc.onicecandidate=(event)=>{
-    if(event.candidate){
-      voiceSend('voiceIce',{
-        to:remoteSeat,
-        candidate:event.candidate,
-        sessionId:voiceSessionId,
-        remoteSessionId:entry.remoteSessionId||null
-      });
-    }
-  };
-  pc.ontrack=(event)=>{
-    const stream=event.streams?.[0]||new MediaStream([event.track]);
-    voiceAttachRemoteStream(remoteSeat,stream);
-  };
-  pc.oniceconnectionstatechange=()=>{
-    if(entry.closed)return;
-    const state=pc.iceConnectionState;
-    if(state==='failed'){
-      voiceSetNotice('Koneksi voice gagal. Coba matikan lalu nyalakan MIC lagi.',4200);
-      voiceScheduleRetry(entry);
-    }
-  };
-  pc.onconnectionstatechange=()=>{
-    if(entry.closed)return;
-    const state=pc.connectionState;
-    if(state==='connected'){
-      if(entry.retryTimer){clearTimeout(entry.retryTimer);entry.retryTimer=null;}
-      return;
-    }
-    if(state==='failed'||state==='closed')voiceScheduleRetry(entry);
-    else if(state==='disconnected'){
-      clearTimeout(entry.retryTimer);
-      entry.retryTimer=setTimeout(()=>{
-        if(entry.closed)return;
-        if(pc.connectionState==='disconnected'||pc.connectionState==='failed')voiceScheduleRetry(entry);
-      },4500);
-    }
-  };
-  transceiver.sender.replaceTrack(voiceLocalTrack||null).catch(()=>{});
-
-  if(initiator){
-    setTimeout(()=>voiceCreateOffer(entry),0);
-  }
-  return entry;
-}
-function voiceEnsurePeer(remoteSeat,remoteSessionId=''){
-  const entry=voiceGetOrCreatePeer(remoteSeat,remoteSessionId);
-  if(entry&&voiceMicEnabled&&voiceLocalTrack){
-    entry.transceiver?.sender?.replaceTrack(voiceLocalTrack).catch(()=>{});
-  }
-  return Promise.resolve(entry);
-}
-async function voiceCreateOffer(entry){
-  if(!entry||entry.closed||!entry.initiator||!entry.pc||entry.pc.signalingState!=='stable'||entry.makingOffer)return;
-  entry.makingOffer=true;
-  try{
-    const offer=await entry.pc.createOffer();
-    await entry.pc.setLocalDescription(offer);
-    voiceSend('voiceOffer',{
-      to:entry.remoteSeat,
-      sdp:entry.pc.localDescription,
-      sessionId:voiceSessionId,
-      remoteSessionId:entry.remoteSessionId||null
-    });
-  }catch(err){
-    console.warn('Voice offer failed:',err);
-  }finally{
-    entry.makingOffer=false;
-  }
-}
-async function voiceHandleHello(msg){
-  const seat=Number(msg.from);
-  if(!voiceIsSupported()||seat===mp.seat||!voiceRemoteIsActive(seat))return;
-  const remoteSessionId=String(msg.sessionId||'');
-  if(!remoteSessionId)return;
-  // Hello is discovery only. Do not negotiate an audio connection before a
-  // microphone is actually enabled; otherwise a peer can be negotiated with
-  // an empty sender and later replaceTrack() may not renegotiate the media.
-  if(!voiceMicEnabled&&!voiceStateBySeat[seat])return;
-  const old=voicePeers.get(voicePeerKey(seat));
-  if(old&&old.remoteSessionId&&old.remoteSessionId!==remoteSessionId){
-    voiceClosePeer(seat,false);
-  }
-  const entry=await voiceEnsurePeer(seat,remoteSessionId);
-  if(entry&&entry.initiator)voiceCreateOffer(entry);
-}
-async function voiceHandleRemoteState(msg){
-  const seat=Number(msg.from);
-  if(!voiceIsSupported()||seat===mp.seat)return;
-  voiceStateBySeat[seat]=!!msg.enabled;
-  if(mp.room?.players?.[seat])mp.room.players[seat].voiceEnabled=!!msg.enabled;
-  voiceUpdateUi(mp.room);
-  if(msg.enabled){
-    const entry=await voiceEnsurePeer(seat,String(msg.sessionId||''));
-    // Keep one deterministic offerer per pair (lower seat). This avoids offer
-    // collisions when two players enable their microphones at nearly the same time.
-    if(entry?.initiator)await voiceCreateOffer(entry);
-    voiceUnlockAudio();
-  }
-}
-async function voiceHandleOffer(msg){
-  const seat=Number(msg.from);
-  if(!voiceIsSupported()||seat===mp.seat||!msg.sdp||!voiceRemoteIsActive(seat))return;
-  const remoteSessionId=String(msg.sessionId||'');
-  const entry=voiceGetOrCreatePeer(seat,remoteSessionId);
-  if(!entry||entry.closed)return;
-  if(entry.remoteSessionId&&remoteSessionId&&entry.remoteSessionId!==remoteSessionId){
-    voiceClosePeer(seat,false);
-    return voiceHandleOffer(msg);
-  }
-  entry.remoteSessionId=remoteSessionId||entry.remoteSessionId;
-  try{
-    if(entry.pc.signalingState!=='stable'&&entry.pc.signalingState!=='have-local-offer'){
-      voiceClosePeer(seat,false);
-      return voiceHandleOffer(msg);
-    }
-    await entry.pc.setRemoteDescription(msg.sdp);
-    while(entry.pendingIce.length){
-      const c=entry.pendingIce.shift();
-      try{await entry.pc.addIceCandidate(c)}catch{}
-    }
-    const answer=await entry.pc.createAnswer();
-    await entry.pc.setLocalDescription(answer);
-    voiceSend('voiceAnswer',{
-      to:seat,
-      sdp:entry.pc.localDescription,
-      sessionId:voiceSessionId,
-      remoteSessionId:entry.remoteSessionId||null
-    });
-  }catch(err){
-    console.warn('Voice offer handling failed:',err);
-    voiceScheduleRetry(entry);
-  }
-}
-async function voiceHandleAnswer(msg){
-  const seat=Number(msg.from);
-  const entry=voicePeers.get(voicePeerKey(seat));
-  if(!entry||!msg.sdp)return;
-  const remoteSessionId=String(msg.sessionId||'');
-  if(entry.remoteSessionId&&remoteSessionId&&entry.remoteSessionId!==remoteSessionId)return;
-  try{await entry.pc.setRemoteDescription(msg.sdp)}catch(err){console.warn('Voice answer handling failed:',err);voiceScheduleRetry(entry)}
-}
-async function voiceHandleIce(msg){
-  const seat=Number(msg.from);
-  if(!voiceIsSupported()||seat===mp.seat||!msg.candidate)return;
-  const remoteSessionId=String(msg.sessionId||'');
-  const entry=voiceGetOrCreatePeer(seat,remoteSessionId);
-  if(!entry)return;
-  if(entry.remoteSessionId&&remoteSessionId&&entry.remoteSessionId!==remoteSessionId)return;
-  if(!entry.pc.remoteDescription){
-    entry.pendingIce.push(msg.candidate);
-    return;
-  }
-  try{await entry.pc.addIceCandidate(msg.candidate)}catch(err){console.warn('Voice ICE failed:',err)}
-}
-function voiceHandleBye(msg){
-  const seat=Number(msg.from);
-  if(Number.isInteger(seat))voiceClosePeer(seat,false);
-}
-function voiceScheduleRetry(entry){
-  if(!entry||entry.closed||entry.retryTimer)return;
-  clearTimeout(entry.retryTimer);
-  entry.retryTimer=setTimeout(()=>{
-    entry.retryTimer=null;
-    if(entry.closed||!voiceRemoteIsActive(entry.remoteSeat)||!voiceShouldConnect(entry.remoteSeat))return;
-    const seat=entry.remoteSeat;
-    const initiator=entry.initiator;
-    voiceClosePeer(seat,false);
-    const next=voiceGetOrCreatePeer(seat);
-    if(next&&initiator)voiceCreateOffer(next);
-  },1200);
-}
-function voiceClosePeer(remoteSeat,notify=true){
-  const key=voicePeerKey(remoteSeat);
-  const entry=voicePeers.get(key);
-  if(!entry)return;
-  entry.closed=true;
-  clearTimeout(entry.retryTimer);
-  entry.retryTimer=null;
-  if(notify){
-    voiceSend('voiceBye',{to:remoteSeat,reason:'peer-close',sessionId:voiceSessionId});
-  }
-  try{entry.pc.ontrack=null;entry.pc.onicecandidate=null;entry.pc.onconnectionstatechange=null}catch{}
-  try{entry.pc.close()}catch{}
-  voicePeers.delete(key);
-  const audio=document.querySelector(`audio.voice-chat-audio[data-voice-seat="${remoteSeat}"]`);
-  if(audio){try{audio.pause()}catch{};audio.srcObject=null;audio.remove()}
-}
-function voiceSchedulePeerSweep(){
-  for(const [key,entry] of voicePeers){
-    const seat=Number(key);
-    if(!voiceRemoteIsActive(seat))voiceClosePeer(seat,false);
-  }
-}
-async function voiceRenegotiateForLocalTrack(entry){
-  if(!entry||entry.closed||!voiceMicEnabled||!voiceLocalTrack)return;
-  try{
-    await entry.transceiver?.sender?.replaceTrack(voiceLocalTrack);
-    // If this peer was negotiated before the local mic was enabled, explicitly
-    // renegotiate so the remote side receives the newly-added outgoing track.
-    // The lower seat remains the normal initiator; when the higher seat enables
-    // its mic later, it is allowed one explicit offer to add its own track.
-    if(entry.initiator&&entry.pc.signalingState==='stable'&&!entry.makingOffer){
-      entry.makingOffer=true;
-      const offer=await entry.pc.createOffer();
-      await entry.pc.setLocalDescription(offer);
-      voiceSend('voiceOffer',{
-        to:entry.remoteSeat,
-        sdp:entry.pc.localDescription,
-        sessionId:voiceSessionId,
-        remoteSessionId:entry.remoteSessionId||null
-      });
-      entry.makingOffer=false;
-    }
-  }catch(err){
-    entry.makingOffer=false;
-    console.warn('Voice local-track renegotiation failed:',err);
-  }
-}
-
-async function voiceEnableMic(){
-  if(!voiceRoomActive())return;
-  if(!voiceIsSupported()){
-    voiceSetNotice('Browser ini belum mendukung voice chat.');
-    return;
-  }
-  if(voiceMicEnabled)return;
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({
-      audio:{
-        echoCancellation:true,
-        noiseSuppression:true,
-        autoGainControl:true,
-        channelCount:1
-      },
-      video:false
-    });
-    voiceLocalStream=stream;
-    voiceLocalTrack=stream.getAudioTracks()[0]||null;
-    if(!voiceLocalTrack)throw new Error('No microphone track');
-    voiceMicEnabled=true;
-    applyAudioSettings();
-    voiceUpdateUi(mp.room);
-    voiceHelloSent=false;
-    voiceAnnounce();
-    voiceSend('voiceState',{enabled:true});
-    for(let seat=0;seat<4;seat++){
-      if(seat===mp.seat||!voiceRemoteIsActive(seat))continue;
-      const entry=await voiceEnsurePeer(seat);
-      if(entry)await voiceRenegotiateForLocalTrack(entry);
-    }
-    voiceUnlockAudio();
-  }catch(err){
-    voiceMicEnabled=false;
-    voiceLocalTrack=null;
-    if(voiceLocalStream){voiceLocalStream.getTracks().forEach(t=>t.stop());voiceLocalStream=null;}
-    voiceUpdateUi(mp.room);
-    const name=err?.name||'';
-    let text='Mikrofon tidak dapat diaktifkan.';
-    if(name==='NotAllowedError'||name==='SecurityError')text='Akses mikrofon ditolak. Izinkan mikrofon di browser lalu coba lagi.';
-    else if(name==='NotFoundError')text='Mikrofon tidak ditemukan di perangkat ini.';
-    else if(name==='NotReadableError')text='Mikrofon sedang digunakan aplikasi lain.';
-    voiceSetNotice(text,4200);
-    console.warn('Voice microphone error:',err);
-  }
-}
-async function voiceDisableMic(){
-  if(!voiceMicEnabled&&!voiceLocalStream)return;
-  voiceMicEnabled=false;
-  const oldTrack=voiceLocalTrack;
-  voiceLocalTrack=null;
-  if(oldTrack)oldTrack.stop();
-  if(voiceLocalStream){voiceLocalStream.getTracks().forEach(t=>{try{t.stop()}catch{}});voiceLocalStream=null;}
-  for(const entry of voicePeers.values()){
-    try{await entry.transceiver?.sender?.replaceTrack(null)}catch{}
-  }
-  voiceSend('voiceState',{enabled:false});
-  applyAudioSettings();
-  voiceUpdateUi(mp.room);
-}
-async function toggleVoice(){
-  if(!voiceRoomActive())return;
-  voiceUnlockAudio();
-  if(voiceMicEnabled)await voiceDisableMic();
-  else await voiceEnableMic();
-}
-function voiceStopAll(){
-  voiceMicEnabled=false;
-  voiceLocalTrack=null;
-  if(voiceLocalStream){voiceLocalStream.getTracks().forEach(t=>{try{t.stop()}catch{}});voiceLocalStream=null;}
-  for(const [key] of voicePeers){voiceClosePeer(Number(key),false)}
-  document.querySelectorAll('audio.voice-chat-audio').forEach(audio=>{try{audio.pause()}catch{};audio.srcObject=null;audio.remove()});
-  voiceStateBySeat=[false,false,false,false];
-  voiceHelloSent=false;
-  clearTimeout(voiceLastNoticeTimer);
-  const notice=byId('voice-chat-notice');if(notice)notice.classList.remove('show');
-  voiceRefreshButton();
-}
-function voiceRefreshFromRoom(){voiceSyncRoom(mp.room)}
 
 function forceFreshReload(){
   const btn=document.getElementById('btn-cache-refresh');
