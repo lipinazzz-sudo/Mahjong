@@ -21,6 +21,7 @@ import { DurableObject } from "cloudflare:workers";
 
 const MAX_PLAYERS = 4;
 const HOST_SEAT = 0;
+const MAX_CHAT_TEXT = 240;
 
 const ROOM_IDLE_TTL_MS = 6 * 60 * 60 * 1000;
 const SEAT_GRACE_MS = 5 * 60 * 1000;
@@ -78,6 +79,13 @@ function cleanToken(token) {
   return /^[A-Za-z0-9-]{8,64}$/.test(t)
     ? t
     : "";
+}
+
+function cleanChatText(text) {
+  return String(text || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, MAX_CHAT_TEXT);
 }
 
 // ---------------------------------------------------------------------------
@@ -582,6 +590,13 @@ export class MahjongRoom extends DurableObject {
           msg.action || {}
         );
 
+      case "chat":
+        return this.broadcastChat(
+          ws,
+          meta,
+          msg.text
+        );
+
       case "leave":
         return this.detach(
           ws,
@@ -912,6 +927,7 @@ export class MahjongRoom extends DurableObject {
           ws,
           {
             type: "error",
+            code: "REJOIN_SESSION_NOT_FOUND",
             message:
               "Sesi lama tidak ditemukan dan permainan sedang berjalan. Minta host mengundang ulang.",
           }
@@ -1458,18 +1474,68 @@ export class MahjongRoom extends DurableObject {
       return;
     }
 
-    this.send(
-      hostWs,
-      {
-        type:
-          "playerAction",
+    const delivered =
+      this.send(
+        hostWs,
+        {
+          type:
+            "playerAction",
 
-        seat:
-          meta.seat,
+          seat:
+            meta.seat,
 
-        action,
+          action,
+        }
+      );
+
+    if (delivered) {
+      const actionId =
+        String(action.actionId || "").trim();
+
+      if (actionId) {
+        this.send(
+          ws,
+          {
+            type: "actionAck",
+            actionId,
+          }
+        );
       }
-    );
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // CHAT
+  // -------------------------------------------------------------------------
+
+  broadcastChat(ws, meta, text) {
+    if (!meta || meta.seat === null) {
+      return;
+    }
+
+    const player = this.players[meta.seat];
+
+    if (
+      !player ||
+      player.id !== meta.id
+    ) {
+      return;
+    }
+
+    const cleanText = cleanChatText(text);
+
+    if (!cleanText) {
+      return;
+    }
+
+    this.broadcast({
+      type: "chat",
+      id: crypto.randomUUID(),
+      from: meta.seat,
+      name: cleanName(meta.name),
+      text: cleanText,
+      ts: Date.now(),
+    });
   }
 
   // -------------------------------------------------------------------------
@@ -1541,6 +1607,7 @@ export class MahjongRoom extends DurableObject {
       ws.send(
         JSON.stringify(msg)
       );
+      return true;
     } catch {
       Promise.resolve(
         this.detach(
@@ -1550,6 +1617,7 @@ export class MahjongRoom extends DurableObject {
       ).catch((err) =>
         console.error(err)
       );
+      return false;
     }
   }
 
