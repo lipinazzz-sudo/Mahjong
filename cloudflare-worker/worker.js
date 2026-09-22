@@ -10,71 +10,56 @@ import { DurableObject } from "cloudflare:workers";
 //
 // Key design points:
 //   - Every player gets a random token the first time they join a room.
-//     The token (not the WebSocket) is that player's identity. A dropped
-//     WebSocket does NOT free the seat immediately — it's just marked
-//     disconnected, so the same token can rejoin it later, including
-//     while a match is in progress.
-//   - `rejoin` is the ONLY message type allowed to succeed while
-//     `started === true`. `createRoom`/`joinRoom` are for brand-new seats
-//     and are intentionally blocked once a match has started.
-//   - `rematch` (host-only) reopens the SAME room code for another match
-//     without anyone needing a new invite link: it clears `started` and
-//     every player's `ready` flag, and the lobby is re-broadcast.
-//   - `chat` is an ephemeral room-wide relay. It is NOT stored inside the
-//     authoritative Mahjong game state.
+//     The token (not the WebSocket) is that player's identity.
+//   - A dropped WebSocket does NOT free the seat immediately.
+//     The seat is marked disconnected so the same player can rejoin.
+//   - `rejoin` is the only path allowed while the room is already started.
+//   - `rematch` is host-only and reopens the same room code.
+//   - Durable Object owns the authoritative state revision.
+//   - Game state is broadcast immediately; storage persistence is coalesced.
 // ---------------------------------------------------------------------------
 
 const MAX_PLAYERS = 4;
 const HOST_SEAT = 0;
 
-const ROOM_IDLE_TTL_MS =
-  6 * 60 * 60 * 1000;
+const ROOM_IDLE_TTL_MS = 6 * 60 * 60 * 1000;
+const SEAT_GRACE_MS = 5 * 60 * 1000;
 
-const SEAT_GRACE_MS =
-  5 * 60 * 1000;
+const STORAGE_KEY = "roomStateV2";
 
-const STORAGE_KEY =
-  "roomStateV2";
+// ---------------------------------------------------------------------------
+// BASIC HELPERS
+// ---------------------------------------------------------------------------
 
-function json(
-  data,
-  status = 200
-) {
-  return new Response(
-    JSON.stringify(data),
-    {
-      status,
-      headers: {
-        "content-type":
-          "application/json; charset=utf-8",
-      },
-    }
-  );
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+    },
+  });
 }
 
 function cleanName(name) {
   return (
     String(name || "Player")
       .trim()
-      .slice(0, 20) ||
-    "Player"
+      .slice(0, 20) || "Player"
   );
 }
 
-const AVATAR_IDS =
-  new Set([
-    "panda",
-    "shiba",
-    "kucing",
-    "penguin",
-    "rubah",
-  ]);
+const AVATAR_IDS = new Set([
+  "panda",
+  "shiba",
+  "kucing",
+  "penguin",
+  "rubah",
+]);
 
 function cleanAvatar(avatar) {
-  const a =
-    String(avatar || "")
-      .trim()
-      .toLowerCase();
+  const a = String(avatar || "")
+    .trim()
+    .toLowerCase();
 
   return AVATAR_IDS.has(a)
     ? a
@@ -88,67 +73,47 @@ function validCode(code) {
 }
 
 function cleanToken(token) {
-  const t =
-    String(token || "")
-      .trim();
+  const t = String(token || "").trim();
 
-  return /^[A-Za-z0-9-]{8,64}$/.test(
-    t
-  )
+  return /^[A-Za-z0-9-]{8,64}$/.test(t)
     ? t
     : "";
 }
 
-export default {
-  async fetch(
-    request,
-    env
-  ) {
-    const url =
-      new URL(request.url);
+// ---------------------------------------------------------------------------
+// WORKER ENTRY
+// ---------------------------------------------------------------------------
 
-    if (
-      url.pathname ===
-      "/health"
-    ) {
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+
+    // Health endpoint
+    if (url.pathname === "/health") {
       return json({
         ok: true,
-        service:
-          "mahjong-room",
-        now:
-          Date.now(),
+        service: "mahjong-room",
+        now: Date.now(),
       });
     }
 
-    if (
-      url.pathname ===
-      "/ws"
-    ) {
+    // WebSocket endpoint
+    if (url.pathname === "/ws") {
       if (
-        (
-          request.headers.get(
-            "Upgrade"
-          ) || ""
-        ).toLowerCase() !==
-        "websocket"
+        (request.headers.get("Upgrade") || "")
+          .toLowerCase() !== "websocket"
       ) {
         return new Response(
           "Expected WebSocket upgrade",
-          {
-            status: 426,
-          }
+          { status: 426 }
         );
       }
 
       const code = (
-        url.searchParams.get(
-          "room"
-        ) || ""
+        url.searchParams.get("room") || ""
       ).trim();
 
-      if (
-        !validCode(code)
-      ) {
+      if (!validCode(code)) {
         return json(
           {
             error:
@@ -159,28 +124,19 @@ export default {
       }
 
       const id =
-        env.MAHJONG_ROOMS.idFromName(
-          code
-        );
+        env.MAHJONG_ROOMS.idFromName(code);
 
       const stub =
-        env.MAHJONG_ROOMS.get(
-          id
-        );
+        env.MAHJONG_ROOMS.get(id);
 
-      return stub.fetch(
-        request
-      );
+      return stub.fetch(request);
     }
 
-    if (
-      url.pathname ===
-      "/"
-    ) {
+    // Root endpoint
+    if (url.pathname === "/") {
       return json({
         ok: true,
-        service:
-          "Mahjong DJ room server",
+        service: "Mahjong DJ room server",
         endpoints: [
           "/health",
           "/ws?room=12345&role=host|guest&name=...",
@@ -190,31 +146,35 @@ export default {
 
     return new Response(
       "Not found",
-      {
-        status: 404,
-      }
+      { status: 404 }
     );
   },
 };
 
-export class MahjongRoom
-  extends DurableObject {
+// ---------------------------------------------------------------------------
+// DURABLE OBJECT
+// ---------------------------------------------------------------------------
 
-  constructor(
-    ctx,
-    env
-  ) {
+export class MahjongRoom extends DurableObject {
+  constructor(ctx, env) {
     super(ctx, env);
 
     this.ctx = ctx;
     this.env = env;
 
-    this.roomCode =
-      null;
+    this.roomCode = null;
+    this.hostSeat = HOST_SEAT;
 
-    this.hostSeat =
-      HOST_SEAT;
-
+    // players[seat] =
+    // {
+    //   id,
+    //   token,
+    //   name,
+    //   avatar,
+    //   ready,
+    //   connected,
+    //   disconnectedAt
+    // }
     this.players = [
       null,
       null,
@@ -222,166 +182,154 @@ export class MahjongRoom
       null,
     ];
 
-    this.connections =
-      new Map();
+    // WebSocket ->
+    // {
+    //   seat,
+    //   id,
+    //   role,
+    //   name,
+    //   avatar,
+    //   token
+    // }
+    this.connections = new Map();
 
-    this.lastState =
-      null;
+    // Latest authoritative state from host
+    this.lastState = null;
 
-    this.started =
-      false;
+    this.started = false;
 
     this.lastActivity =
       Date.now();
 
-    this.loaded =
-      false;
+    this.loaded = false;
+    this.loading = null;
 
-    this.loading =
-      null;
+    // Durable Object server-side state revision.
+    // This MUST NOT depend on a browser-generated counter.
+    this.stateRevision = 0;
 
-    this.stateRevision =
-      0;
-
-    this.persistTimer =
-      null;
-
-    this.persistPending =
-      false;
+    // Coalesced persistence.
+    this.persistTimer = null;
+    this.persistPending = false;
   }
 
+  // -------------------------------------------------------------------------
+  // LOAD FROM DURABLE STORAGE
+  // -------------------------------------------------------------------------
+
   async ensureLoaded() {
-    if (
-      this.loaded
-    ) {
+    if (this.loaded) {
       return;
     }
 
-    if (
-      this.loading
-    ) {
+    if (this.loading) {
       return this.loading;
     }
 
-    this.loading =
-      (async () => {
-        try {
-          const saved =
-            await this.ctx.storage.get(
-              STORAGE_KEY
-            );
-
-          if (
-            saved &&
-            typeof saved ===
-              "object"
-          ) {
-            this.roomCode =
-              saved.roomCode ||
-              this.roomCode;
-
-            this.hostSeat =
-              Number.isInteger(
-                saved.hostSeat
-              )
-                ? saved.hostSeat
-                : HOST_SEAT;
-
-            this.players =
-              Array.isArray(
-                saved.players
-              ) &&
-              saved.players.length ===
-                MAX_PLAYERS
-                ? saved.players.map(
-                    p =>
-                      p &&
-                      typeof p ===
-                        "object"
-                        ? {
-                            id:
-                              p.id ||
-                              "",
-
-                            token:
-                              cleanToken(
-                                p.token
-                              ),
-
-                            name:
-                              cleanName(
-                                p.name
-                              ),
-
-                            avatar:
-                              cleanAvatar(
-                                p.avatar
-                              ),
-
-                            ready:
-                              !!p.ready,
-
-                            connected:
-                              false,
-
-                            disconnectedAt:
-                              Number(
-                                p.disconnectedAt
-                              ) ||
-                              null,
-                          }
-                        : null
-                  )
-                : [
-                    null,
-                    null,
-                    null,
-                    null,
-                  ];
-
-            this.lastState =
-              saved.lastState &&
-              typeof saved.lastState ===
-                "object"
-                ? saved.lastState
-                : null;
-
-            this.stateRevision =
-              Number(
-                saved.stateRevision
-              ) ||
-              Number(
-                this.lastState?._serverSeq
-              ) ||
-              0;
-
-            this.started =
-              !!saved.started;
-
-            this.lastActivity =
-              Number(
-                saved.lastActivity
-              ) ||
-              Date.now();
-          }
-        } catch (
-          err
-        ) {
-          console.error(
-            "Failed to load room state",
-            err
+    this.loading = (async () => {
+      try {
+        const saved =
+          await this.ctx.storage.get(
+            STORAGE_KEY
           );
-        } finally {
-          this.loaded =
-            true;
 
-          this.loading =
-            null;
+        if (
+          saved &&
+          typeof saved === "object"
+        ) {
+          this.roomCode =
+            saved.roomCode ||
+            this.roomCode;
+
+          this.hostSeat =
+            Number.isInteger(
+              saved.hostSeat
+            )
+              ? saved.hostSeat
+              : HOST_SEAT;
+
+          this.players =
+            Array.isArray(saved.players) &&
+            saved.players.length ===
+              MAX_PLAYERS
+              ? saved.players.map(
+                  (p) =>
+                    p &&
+                    typeof p === "object"
+                      ? {
+                          id: p.id || "",
+                          token:
+                            cleanToken(
+                              p.token
+                            ),
+                          name:
+                            cleanName(
+                              p.name
+                            ),
+                          avatar:
+                            cleanAvatar(
+                              p.avatar
+                            ),
+                          ready:
+                            !!p.ready,
+                          connected: false,
+                          disconnectedAt:
+                            Number(
+                              p.disconnectedAt
+                            ) ||
+                            null,
+                        }
+                      : null
+                )
+              : [
+                  null,
+                  null,
+                  null,
+                  null,
+                ];
+
+          this.lastState =
+            saved.lastState &&
+            typeof saved.lastState ===
+              "object"
+              ? saved.lastState
+              : null;
+
+          this.stateRevision =
+            Number(
+              saved.stateRevision
+            ) ||
+            Number(
+              this.lastState?._serverSeq
+            ) ||
+            0;
+
+          this.started =
+            !!saved.started;
+
+          this.lastActivity =
+            Number(
+              saved.lastActivity
+            ) ||
+            Date.now();
         }
-      })();
+      } catch (err) {
+        console.error(
+          "Failed to load room state",
+          err
+        );
+      } finally {
+        this.loaded = true;
+        this.loading = null;
+      }
+    })();
 
     return this.loading;
   }
+
+  // -------------------------------------------------------------------------
+  // PERSIST
+  // -------------------------------------------------------------------------
 
   async persist() {
     await this.ensureLoaded();
@@ -389,24 +337,13 @@ export class MahjongRoom
     await this.ctx.storage.put(
       STORAGE_KEY,
       {
-        roomCode:
-          this.roomCode,
-
-        hostSeat:
-          this.hostSeat,
-
-        players:
-          this.players,
-
-        lastState:
-          this.lastState,
-
+        roomCode: this.roomCode,
+        hostSeat: this.hostSeat,
+        players: this.players,
+        lastState: this.lastState,
         stateRevision:
           this.stateRevision,
-
-        started:
-          this.started,
-
+        started: this.started,
         lastActivity:
           this.lastActivity,
       }
@@ -418,42 +355,36 @@ export class MahjongRoom
       Date.now();
   }
 
-  async fetch(
-    request
-  ) {
+  // -------------------------------------------------------------------------
+  // WEBSOCKET CONNECTION
+  // -------------------------------------------------------------------------
+
+  async fetch(request) {
     await this.ensureLoaded();
 
     const url =
       new URL(request.url);
 
     const room = (
-      url.searchParams.get(
-        "room"
-      ) || ""
+      url.searchParams.get("room") ||
+      ""
     ).trim();
 
     const role =
-      url.searchParams.get(
-        "role"
-      ) === "host"
+      url.searchParams.get("role") ===
+      "host"
         ? "host"
         : "guest";
 
     const name =
       cleanName(
-        url.searchParams.get(
-          "name"
-        )
+        url.searchParams.get("name")
       );
 
-    if (
-      !validCode(room)
-    ) {
+    if (!validCode(room)) {
       return new Response(
         "Invalid room code",
-        {
-          status: 400,
-        }
+        { status: 400 }
       );
     }
 
@@ -474,35 +405,25 @@ export class MahjongRoom
       crypto.randomUUID();
 
     this.roomCode =
-      this.roomCode ||
-      room;
+      this.roomCode || room;
 
     this.touch();
 
     this.connections.set(
       server,
       {
-        seat:
-          null,
-
-        id:
-          clientId,
-
+        seat: null,
+        id: clientId,
         role,
-
         name,
-
-        avatar:
-          "panda",
-
-        token:
-          null,
+        avatar: "panda",
+        token: null,
       }
     );
 
     server.addEventListener(
       "message",
-      event => {
+      (event) => {
         let msg;
 
         try {
@@ -514,9 +435,7 @@ export class MahjongRoom
           this.send(
             server,
             {
-              type:
-                "error",
-
+              type: "error",
               message:
                 "Pesan tidak valid.",
             }
@@ -530,21 +449,17 @@ export class MahjongRoom
             server,
             msg
           )
-        ).catch(
-          err => {
-            this.send(
-              server,
-              {
-                type:
-                  "error",
-
-                message:
-                  err?.message ||
-                  "Room error.",
-              }
-            );
-          }
-        );
+        ).catch((err) => {
+          this.send(
+            server,
+            {
+              type: "error",
+              message:
+                err?.message ||
+                "Room error.",
+            }
+          );
+        });
       }
     );
 
@@ -556,11 +471,8 @@ export class MahjongRoom
             server,
             false
           )
-        ).catch(
-          err =>
-            console.error(
-              err
-            )
+        ).catch((err) =>
+          console.error(err)
         );
       }
     );
@@ -573,11 +485,8 @@ export class MahjongRoom
             server,
             false
           )
-        ).catch(
-          err =>
-            console.error(
-              err
-            )
+        ).catch((err) =>
+          console.error(err)
         );
       }
     );
@@ -585,11 +494,8 @@ export class MahjongRoom
     this.send(
       server,
       {
-        type:
-          "hello",
-
+        type: "hello",
         clientId,
-
         room,
       }
     );
@@ -600,23 +506,20 @@ export class MahjongRoom
       null,
       {
         status: 101,
-
-        webSocket:
-          client,
+        webSocket: client,
       }
     );
   }
 
-  async handle(
-    ws,
-    msg
-  ) {
+  // -------------------------------------------------------------------------
+  // MESSAGE ROUTER
+  // -------------------------------------------------------------------------
+
+  async handle(ws, msg) {
     await this.ensureLoaded();
 
     const meta =
-      this.connections.get(
-        ws
-      );
+      this.connections.get(ws);
 
     if (
       !meta ||
@@ -629,10 +532,7 @@ export class MahjongRoom
 
     this.touch();
 
-    switch (
-      msg.type
-    ) {
-
+    switch (msg.type) {
       case "createRoom":
         return this.createRoom(
           ws,
@@ -682,12 +582,6 @@ export class MahjongRoom
           msg.action || {}
         );
 
-      case "chat":
-        return this.forwardChat(
-          ws,
-          msg
-        );
-
       case "leave":
         return this.detach(
           ws,
@@ -698,11 +592,8 @@ export class MahjongRoom
         return this.send(
           ws,
           {
-            type:
-              "pong",
-
-            now:
-              Date.now(),
+            type: "pong",
+            now: Date.now(),
           }
         );
 
@@ -710,15 +601,17 @@ export class MahjongRoom
         return this.send(
           ws,
           {
-            type:
-              "error",
-
+            type: "error",
             message:
               `Perintah '${msg.type}' tidak dikenali.`,
           }
         );
     }
   }
+
+  // -------------------------------------------------------------------------
+  // FIND HOST
+  // -------------------------------------------------------------------------
 
   findHostSocket() {
     for (
@@ -739,6 +632,10 @@ export class MahjongRoom
 
     return null;
   }
+
+  // -------------------------------------------------------------------------
+  // CREATE ROOM
+  // -------------------------------------------------------------------------
 
   async createRoom(
     ws,
@@ -766,9 +663,7 @@ export class MahjongRoom
         this.send(
           ws,
           {
-            type:
-              "error",
-
+            type: "error",
             message:
               "Room ini sudah memiliki host yang aktif.",
           }
@@ -791,9 +686,7 @@ export class MahjongRoom
       );
 
     const token =
-      cleanToken(
-        msg.token
-      ) ||
+      cleanToken(msg.token) ||
       crypto.randomUUID();
 
     if (
@@ -809,21 +702,12 @@ export class MahjongRoom
     this.players[
       this.hostSeat
     ] = {
-      id:
-        meta.id,
-
+      id: meta.id,
       name,
-
       avatar,
-
-      ready:
-        true,
-
+      ready: true,
       token,
-
-      connected:
-        true,
-
+      connected: true,
       disconnectedAt:
         null,
     };
@@ -849,6 +733,9 @@ export class MahjongRoom
     this.lastState =
       null;
 
+    this.stateRevision =
+      0;
+
     this.touch();
 
     await this.persist();
@@ -862,6 +749,10 @@ export class MahjongRoom
     this.broadcastLobby();
   }
 
+  // -------------------------------------------------------------------------
+  // JOIN ROOM
+  // -------------------------------------------------------------------------
+
   async joinRoom(
     ws,
     meta,
@@ -869,15 +760,11 @@ export class MahjongRoom
   ) {
     await this.ensureLoaded();
 
-    if (
-      this.started
-    ) {
+    if (this.started) {
       this.send(
         ws,
         {
-          type:
-            "error",
-
+          type: "error",
           message:
             "Game sudah dimulai. Minta host menekan 'Main Lagi' agar room bisa dimasuki lagi.",
         }
@@ -893,51 +780,40 @@ export class MahjongRoom
         ? Number(msg.seat)
         : null;
 
-    let seat =
-      null;
+    let seat = null;
 
     if (
       requested !== null &&
       requested >= 1 &&
-      requested < MAX_PLAYERS &&
+      requested <
+        MAX_PLAYERS &&
       !this.players[
         requested
       ]
     ) {
-      seat =
-        requested;
+      seat = requested;
     }
 
-    if (
-      seat === null
-    ) {
+    if (seat === null) {
       for (
         let i = 1;
         i < MAX_PLAYERS;
         i++
       ) {
         if (
-          !this.players[
-            i
-          ]
+          !this.players[i]
         ) {
-          seat =
-            i;
-
+          seat = i;
           break;
         }
       }
     }
 
-    if (
-      seat === null
-    ) {
+    if (seat === null) {
       this.send(
         ws,
         {
-          type:
-            "error",
-
+          type: "error",
           message:
             "Room penuh (4 pemain).",
         }
@@ -959,47 +835,26 @@ export class MahjongRoom
       );
 
     const token =
-      cleanToken(
-        msg.token
-      ) ||
+      cleanToken(msg.token) ||
       crypto.randomUUID();
 
-    this.players[
-      seat
-    ] = {
-      id:
-        meta.id,
+    this.players[seat] =
+      {
+        id: meta.id,
+        name,
+        avatar,
+        ready: true,
+        token,
+        connected: true,
+        disconnectedAt:
+          null,
+      };
 
-      name,
-
-      avatar,
-
-      ready:
-        true,
-
-      token,
-
-      connected:
-        true,
-
-      disconnectedAt:
-        null,
-    };
-
-    meta.seat =
-      seat;
-
-    meta.role =
-      "guest";
-
-    meta.name =
-      name;
-
-    meta.avatar =
-      avatar;
-
-    meta.token =
-      token;
+    meta.seat = seat;
+    meta.role = "guest";
+    meta.name = name;
+    meta.avatar = avatar;
+    meta.token = token;
 
     this.touch();
 
@@ -1015,6 +870,10 @@ export class MahjongRoom
 
     this.maybeAutoStart();
   }
+
+  // -------------------------------------------------------------------------
+  // REJOIN EXISTING SEAT
+  // -------------------------------------------------------------------------
 
   async rejoin(
     ws,
@@ -1037,9 +896,7 @@ export class MahjongRoom
 
     const existing =
       seat !== null
-        ? this.players[
-            seat
-          ]
+        ? this.players[seat]
         : null;
 
     const matches =
@@ -1048,18 +905,13 @@ export class MahjongRoom
       existing.token ===
         token;
 
-    if (
-      !matches
-    ) {
-      if (
-        this.started
-      ) {
+    // No matching reservation
+    if (!matches) {
+      if (this.started) {
         this.send(
           ws,
           {
-            type:
-              "error",
-
+            type: "error",
             message:
               "Sesi lama tidak ditemukan dan permainan sedang berjalan. Minta host mengundang ulang.",
           }
@@ -1086,6 +938,7 @@ export class MahjongRoom
       );
     }
 
+    // Close stale connection for same seat
     for (
       const [
         oldWs,
@@ -1104,6 +957,7 @@ export class MahjongRoom
         try {
           oldWs.close();
         } catch {
+          // Already closed
         }
       }
     }
@@ -1168,40 +1022,36 @@ export class MahjongRoom
 
     this.broadcastLobby();
 
-    if (
-      this.lastState
-    ) {
+    // Immediately restore latest state.
+    if (this.lastState) {
       this.send(
         ws,
         {
-          type:
-            "state",
-
-          state:
-            this.lastState,
+          type: "state",
+          state: this.lastState,
         }
       );
     }
 
-    if (
-      this.started
-    ) {
+    // Tell reconnecting client the room is active.
+    if (this.started) {
       this.send(
         ws,
         {
-          type:
-            "startGame",
+          type: "startGame",
         }
       );
     }
   }
 
+  // -------------------------------------------------------------------------
+  // AUTO START
+  // -------------------------------------------------------------------------
+
   async maybeAutoStart() {
     await this.ensureLoaded();
 
-    if (
-      this.started
-    ) {
+    if (this.started) {
       return false;
     }
 
@@ -1219,8 +1069,7 @@ export class MahjongRoom
 
     if (
       !players.every(
-        p =>
-          p.ready
+        (p) => p.ready
       )
     ) {
       return false;
@@ -1234,12 +1083,15 @@ export class MahjongRoom
     await this.persist();
 
     this.broadcast({
-      type:
-        "startGame",
+      type: "startGame",
     });
 
     return true;
   }
+
+  // -------------------------------------------------------------------------
+  // JOINED RESPONSE
+  // -------------------------------------------------------------------------
 
   sendJoined(
     ws,
@@ -1254,24 +1106,20 @@ export class MahjongRoom
     this.send(
       ws,
       {
-        type:
-          "joined",
-
-        room:
-          this.roomView(),
-
-        seat:
-          meta
-            ? meta.seat
-            : null,
-
-        host:
-          !!host,
-
+        type: "joined",
+        room: this.roomView(),
+        seat: meta
+          ? meta.seat
+          : null,
+        host: !!host,
         token,
       }
     );
   }
+
+  // -------------------------------------------------------------------------
+  // ROOM VIEW
+  // -------------------------------------------------------------------------
 
   roomView() {
     return {
@@ -1283,23 +1131,19 @@ export class MahjongRoom
 
       players:
         this.players.map(
-          p =>
+          (p) =>
             p
               ? {
                   id:
                     p.id,
-
                   name:
                     p.name,
-
                   avatar:
                     cleanAvatar(
                       p.avatar
                     ),
-
                   ready:
                     !!p.ready,
-
                   connected:
                     p.connected !==
                     false,
@@ -1308,6 +1152,10 @@ export class MahjongRoom
         ),
     };
   }
+
+  // -------------------------------------------------------------------------
+  // READY
+  // -------------------------------------------------------------------------
 
   async setReady(
     ws,
@@ -1322,8 +1170,7 @@ export class MahjongRoom
 
     if (
       !meta ||
-      meta.seat ===
-        null
+      meta.seat === null
     ) {
       return;
     }
@@ -1349,9 +1196,11 @@ export class MahjongRoom
     await this.maybeAutoStart();
   }
 
-  async startGame(
-    ws
-  ) {
+  // -------------------------------------------------------------------------
+  // START GAME
+  // -------------------------------------------------------------------------
+
+  async startGame(ws) {
     await this.ensureLoaded();
 
     const meta =
@@ -1375,15 +1224,12 @@ export class MahjongRoom
       );
 
     if (
-      humans.length <
-      1
+      humans.length < 1
     ) {
       return this.send(
         ws,
         {
-          type:
-            "error",
-
+          type: "error",
           message:
             "Butuh minimal 1 pemain lain untuk mulai.",
         }
@@ -1392,16 +1238,13 @@ export class MahjongRoom
 
     if (
       !humans.every(
-        p =>
-          p.ready
+        (p) => p.ready
       )
     ) {
       return this.send(
         ws,
         {
-          type:
-            "error",
-
+          type: "error",
           message:
             "Semua pemain harus READY.",
         }
@@ -1416,14 +1259,15 @@ export class MahjongRoom
     await this.persist();
 
     this.broadcast({
-      type:
-        "startGame",
+      type: "startGame",
     });
   }
 
-  async rematch(
-    ws
-  ) {
+  // -------------------------------------------------------------------------
+  // REMATCH
+  // -------------------------------------------------------------------------
+
+  async rematch(ws) {
     await this.ensureLoaded();
 
     const meta =
@@ -1447,9 +1291,11 @@ export class MahjongRoom
     this.lastState =
       null;
 
+    this.stateRevision =
+      0;
+
     for (
-      const p of
-        this.players
+      const p of this.players
     ) {
       if (p) {
         p.ready =
@@ -1463,6 +1309,10 @@ export class MahjongRoom
 
     this.broadcastLobby();
   }
+
+  // -------------------------------------------------------------------------
+  // HOST -> GUEST STATE
+  // -------------------------------------------------------------------------
 
   async forwardState(
     ws,
@@ -1493,8 +1343,9 @@ export class MahjongRoom
       return;
     }
 
-    this.stateRevision +=
-      1;
+    // The Durable Object, not the browser,
+    // owns the authoritative state sequence.
+    this.stateRevision += 1;
 
     const publishedState =
       {
@@ -1509,24 +1360,28 @@ export class MahjongRoom
 
     this.touch();
 
+    // IMPORTANT:
+    // Broadcast immediately.
+    // Do not wait for storage.
     this.broadcast(
       {
-        type:
-          "state",
-
+        type: "state",
         state:
           publishedState,
       },
       ws
     );
 
+    // Persist separately.
     this.queueStatePersist();
   }
 
+  // -------------------------------------------------------------------------
+  // COALESCED STATE PERSISTENCE
+  // -------------------------------------------------------------------------
+
   queueStatePersist() {
-    if (
-      this.persistPending
-    ) {
+    if (this.persistPending) {
       return;
     }
 
@@ -1538,126 +1393,21 @@ export class MahjongRoom
     );
 
     this.persistTimer =
-      setTimeout(
-        () => {
-          this.persistPending =
-            false;
+      setTimeout(() => {
+        this.persistPending =
+          false;
 
-          this.persistTimer =
-            null;
+        this.persistTimer =
+          null;
 
-          this.persist()
-            .catch(
-              err =>
-                console.error(
-                  "State persist failed",
-                  err
-                )
-            );
-        },
-        1000
-      );
-  }
-
-  // -------------------------------------------------------------------------
-  // CHAT
-  // -------------------------------------------------------------------------
-
-  async forwardChat(
-    ws,
-    msg
-  ) {
-    await this.ensureLoaded();
-
-    const meta =
-      this.connections.get(
-        ws
-      );
-
-    if (
-      !meta ||
-      meta.seat ===
-        null
-    ) {
-      return;
-    }
-
-    // Chat is only useful when at least two human players
-    // are currently connected to this room.
-    const connectedHumans =
-      this.players.filter(
-        p =>
-          p &&
-          p.connected !==
-            false
-      ).length;
-
-    if (
-      connectedHumans <
-      2
-    ) {
-      return;
-    }
-
-    let text =
-      String(
-        msg?.text ||
-        ""
-      )
-        .replace(
-          /[\u0000-\u001F\u007F]+/g,
-          " "
-        )
-        .replace(
-          /\s+/g,
-          " "
-        )
-        .trim();
-
-    if (
-      !text
-    ) {
-      return;
-    }
-
-    text =
-      text.slice(
-        0,
-        240
-      );
-
-    const player =
-      this.players[
-        meta.seat
-      ];
-
-    if (
-      !player
-    ) {
-      return;
-    }
-
-    this.broadcast({
-      type:
-        "chat",
-
-      from:
-        meta.seat,
-
-      name:
-        cleanName(
-          player.name ||
-          meta.name
-        ),
-
-      text,
-
-      ts:
-        Date.now(),
-
-      id:
-        crypto.randomUUID(),
-    });
+        this.persist()
+          .catch((err) =>
+            console.error(
+              "State persist failed",
+              err
+            )
+          );
+      }, 1000);
   }
 
   // -------------------------------------------------------------------------
@@ -1677,12 +1427,12 @@ export class MahjongRoom
 
     if (
       !meta ||
-      meta.seat ===
-        null
+      meta.seat === null
     ) {
       return;
     }
 
+    // Host processes its own actions locally.
     if (
       meta.seat ===
         this.hostSeat &&
@@ -1695,15 +1445,11 @@ export class MahjongRoom
     const hostWs =
       this.findHostSocket();
 
-    if (
-      !hostWs
-    ) {
+    if (!hostWs) {
       this.send(
         ws,
         {
-          type:
-            "error",
-
+          type: "error",
           message:
             "Host tidak terhubung.",
         }
@@ -1732,9 +1478,7 @@ export class MahjongRoom
 
   broadcastLobby() {
     this.broadcast({
-      type:
-        "lobby",
-
+      type: "lobby",
       room:
         this.roomView(),
     });
@@ -1752,12 +1496,8 @@ export class MahjongRoom
 
     try {
       data =
-        JSON.stringify(
-          msg
-        );
-    } catch (
-      err
-    ) {
+        JSON.stringify(msg);
+    } catch (err) {
       console.error(
         "Broadcast JSON error:",
         err
@@ -1772,45 +1512,34 @@ export class MahjongRoom
       ] of this.connections
     ) {
       if (
-        ws ===
-        except
+        ws === except
       ) {
         continue;
       }
 
       try {
-        ws.send(
-          data
-        );
+        ws.send(data);
       } catch {
         Promise.resolve(
           this.detach(
             ws,
             false
           )
-        ).catch(
-          err =>
-            console.error(
-              err
-            )
+        ).catch((err) =>
+          console.error(err)
         );
       }
     }
   }
 
   // -------------------------------------------------------------------------
-  // SEND
+  // SAFE SEND
   // -------------------------------------------------------------------------
 
-  send(
-    ws,
-    msg
-  ) {
+  send(ws, msg) {
     try {
       ws.send(
-        JSON.stringify(
-          msg
-        )
+        JSON.stringify(msg)
       );
     } catch {
       Promise.resolve(
@@ -1818,17 +1547,14 @@ export class MahjongRoom
           ws,
           false
         )
-      ).catch(
-        err =>
-          console.error(
-            err
-          )
+      ).catch((err) =>
+        console.error(err)
       );
     }
   }
 
   // -------------------------------------------------------------------------
-  // DISCONNECT
+  // DISCONNECT / LEAVE
   // -------------------------------------------------------------------------
 
   async detach(
@@ -1842,9 +1568,7 @@ export class MahjongRoom
         ws
       );
 
-    if (
-      !meta
-    ) {
+    if (!meta) {
       return;
     }
 
@@ -1856,23 +1580,19 @@ export class MahjongRoom
       meta.seat;
 
     if (
-      seat !==
-        null &&
-      this.players[
-        seat
-      ] &&
-      this.players[
-        seat
-      ].id ===
+      seat !== null &&
+      this.players[seat] &&
+      this.players[seat].id ===
         meta.id
     ) {
-      if (
-        explicit
-      ) {
-        this.players[
-          seat
-        ] = null;
+      if (explicit) {
+        // Explicit leave:
+        // immediately free the seat.
+        this.players[seat] =
+          null;
       } else {
+        // Network disconnect:
+        // reserve the seat.
         this.players[
           seat
         ].connected =
@@ -1894,21 +1614,27 @@ export class MahjongRoom
     this.broadcastLobby();
   }
 
+  // -------------------------------------------------------------------------
+  // CLEANUP ALARM
+  // -------------------------------------------------------------------------
+
   async scheduleCleanup() {
     try {
       await this.ctx.storage.setAlarm(
         Date.now() +
           SEAT_GRACE_MS
       );
-    } catch (
-      err
-    ) {
+    } catch (err) {
       console.error(
         "Unable to schedule room alarm",
         err
       );
     }
   }
+
+  // -------------------------------------------------------------------------
+  // ALARM
+  // -------------------------------------------------------------------------
 
   async alarm() {
     await this.ensureLoaded();
@@ -1919,15 +1645,14 @@ export class MahjongRoom
     let changed =
       false;
 
+    // Free expired disconnected seats.
     for (
       let i = 0;
       i < MAX_PLAYERS;
       i++
     ) {
       const p =
-        this.players[
-          i
-        ];
+        this.players[i];
 
       if (
         p &&
@@ -1935,18 +1660,18 @@ export class MahjongRoom
           false &&
         p.disconnectedAt &&
         now -
-          p.disconnectedAt >
+            p.disconnectedAt >
           SEAT_GRACE_MS
       ) {
-        this.players[
-          i
-        ] = null;
+        this.players[i] =
+          null;
 
         changed =
           true;
       }
     }
 
+    // Fully reset a stale room.
     if (
       now -
         this.lastActivity >
@@ -1965,13 +1690,14 @@ export class MahjongRoom
       this.lastState =
         null;
 
+      this.stateRevision =
+        0;
+
       changed =
         true;
     }
 
-    if (
-      changed
-    ) {
+    if (changed) {
       this.touch();
 
       await this.persist();
@@ -1984,6 +1710,7 @@ export class MahjongRoom
       }
     }
 
+    // Keep the cleanup alarm alive.
     await this.scheduleCleanup();
   }
 }
