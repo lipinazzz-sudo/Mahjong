@@ -4219,12 +4219,12 @@ function gameChatIsAvailable(){
   }
 
   // CHAT MULTIPLAYER TETAP AKTIF MESKI HANYA 1 PEMAIN MANUSIA DI ROOM.
-  // Kursi AI yang kosong akan tetap mengisi meja saat game dimulai.
+  // Jangan bergantung pada jumlah pemain, mpServerStarted, atau room.code.
+  // Setelah layar game terbuka dan WebSocket tersambung, chat sudah boleh dipakai.
   return !!(
-    mp.room?.code &&
     mp.seat!=null &&
-    mpServerStarted &&
-    mp.connected
+    mp.connected &&
+    mp.ws?.readyState===WebSocket.OPEN
   );
 }
 
