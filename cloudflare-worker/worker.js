@@ -345,24 +345,13 @@ export class MahjongRoom extends DurableObject {
     await this.ctx.storage.put(
       STORAGE_KEY,
       {
-        roomCode:
-          this.roomCode,
-
-        hostSeat:
-          this.hostSeat,
-
-        players:
-          this.players,
-
-        lastState:
-          this.lastState,
-
+        roomCode: this.roomCode,
+        hostSeat: this.hostSeat,
+        players: this.players,
+        lastState: this.lastState,
         stateRevision:
           this.stateRevision,
-
-        started:
-          this.started,
-
+        started: this.started,
         lastActivity:
           this.lastActivity,
       }
@@ -437,11 +426,6 @@ export class MahjongRoom extends DurableObject {
         name,
         avatar: "panda",
         token: null,
-
-        // Messages from one socket are processed in order.
-        // This protects join/rejoin/action sequencing.
-        queue:
-          Promise.resolve(),
       }
     );
 
@@ -459,8 +443,7 @@ export class MahjongRoom extends DurableObject {
           this.send(
             server,
             {
-              type:
-                "error",
+              type: "error",
               message:
                 "Pesan tidak valid.",
             }
@@ -469,41 +452,22 @@ export class MahjongRoom extends DurableObject {
           return;
         }
 
-        const meta =
-          this.connections.get(
-            server
-          );
-
-        if (!meta) {
-          return;
-        }
-
-        meta.queue =
-          (
-            meta.queue ||
-            Promise.resolve()
+        Promise.resolve(
+          this.handle(
+            server,
+            msg
           )
-            .then(
-              () =>
-                this.handle(
-                  server,
-                  msg
-                )
-            )
-            .catch(
-              (err) => {
-                this.send(
-                  server,
-                  {
-                    type:
-                      "error",
-                    message:
-                      err?.message ||
-                      "Room error.",
-                  }
-                );
-              }
-            );
+        ).catch((err) => {
+          this.send(
+            server,
+            {
+              type: "error",
+              message:
+                err?.message ||
+                "Room error.",
+            }
+          );
+        });
       }
     );
 
@@ -515,9 +479,8 @@ export class MahjongRoom extends DurableObject {
             server,
             false
           )
-        ).catch(
-          (err) =>
-            console.error(err)
+        ).catch((err) =>
+          console.error(err)
         );
       }
     );
@@ -530,9 +493,8 @@ export class MahjongRoom extends DurableObject {
             server,
             false
           )
-        ).catch(
-          (err) =>
-            console.error(err)
+        ).catch((err) =>
+          console.error(err)
         );
       }
     );
@@ -540,11 +502,8 @@ export class MahjongRoom extends DurableObject {
     this.send(
       server,
       {
-        type:
-          "hello",
-
+        type: "hello",
         clientId,
-
         room,
       }
     );
@@ -555,8 +514,7 @@ export class MahjongRoom extends DurableObject {
       null,
       {
         status: 101,
-        webSocket:
-          client,
+        webSocket: client,
       }
     );
   }
@@ -569,9 +527,7 @@ export class MahjongRoom extends DurableObject {
     await this.ensureLoaded();
 
     const meta =
-      this.connections.get(
-        ws
-      );
+      this.connections.get(ws);
 
     if (
       !meta ||
@@ -634,9 +590,6 @@ export class MahjongRoom extends DurableObject {
           msg.action || {}
         );
 
-      // ---------------------------------------------------------------------
-      // CHAT
-      // ---------------------------------------------------------------------
       case "chat":
         return this.broadcastChat(
           ws,
@@ -654,10 +607,8 @@ export class MahjongRoom extends DurableObject {
         return this.send(
           ws,
           {
-            type:
-              "pong",
-            now:
-              Date.now(),
+            type: "pong",
+            now: Date.now(),
           }
         );
 
@@ -665,8 +616,7 @@ export class MahjongRoom extends DurableObject {
         return this.send(
           ws,
           {
-            type:
-              "error",
+            type: "error",
             message:
               `Perintah '${msg.type}' tidak dikenali.`,
           }
@@ -728,8 +678,7 @@ export class MahjongRoom extends DurableObject {
         this.send(
           ws,
           {
-            type:
-              "error",
+            type: "error",
             message:
               "Room ini sudah memiliki host yang aktif.",
           }
@@ -752,9 +701,7 @@ export class MahjongRoom extends DurableObject {
       );
 
     const token =
-      cleanToken(
-        msg.token
-      ) ||
+      cleanToken(msg.token) ||
       crypto.randomUUID();
 
     if (
@@ -770,21 +717,12 @@ export class MahjongRoom extends DurableObject {
     this.players[
       this.hostSeat
     ] = {
-      id:
-        meta.id,
-
+      id: meta.id,
       name,
-
       avatar,
-
-      ready:
-        true,
-
+      ready: true,
       token,
-
-      connected:
-        true,
-
+      connected: true,
       disconnectedAt:
         null,
     };
@@ -841,8 +779,7 @@ export class MahjongRoom extends DurableObject {
       this.send(
         ws,
         {
-          type:
-            "error",
+          type: "error",
           message:
             "Game sudah dimulai. Minta host menekan 'Main Lagi' agar room bisa dimasuki lagi.",
         }
@@ -858,8 +795,7 @@ export class MahjongRoom extends DurableObject {
         ? Number(msg.seat)
         : null;
 
-    let seat =
-      null;
+    let seat = null;
 
     if (
       requested !== null &&
@@ -870,8 +806,7 @@ export class MahjongRoom extends DurableObject {
         requested
       ]
     ) {
-      seat =
-        requested;
+      seat = requested;
     }
 
     if (seat === null) {
@@ -883,9 +818,7 @@ export class MahjongRoom extends DurableObject {
         if (
           !this.players[i]
         ) {
-          seat =
-            i;
-
+          seat = i;
           break;
         }
       }
@@ -895,8 +828,7 @@ export class MahjongRoom extends DurableObject {
       this.send(
         ws,
         {
-          type:
-            "error",
+          type: "error",
           message:
             "Room penuh (4 pemain).",
         }
@@ -918,46 +850,26 @@ export class MahjongRoom extends DurableObject {
       );
 
     const token =
-      cleanToken(
-        msg.token
-      ) ||
+      cleanToken(msg.token) ||
       crypto.randomUUID();
 
     this.players[seat] =
       {
-        id:
-          meta.id,
-
+        id: meta.id,
         name,
-
         avatar,
-
-        ready:
-          true,
-
+        ready: true,
         token,
-
-        connected:
-          true,
-
+        connected: true,
         disconnectedAt:
           null,
       };
 
-    meta.seat =
-      seat;
-
-    meta.role =
-      "guest";
-
-    meta.name =
-      name;
-
-    meta.avatar =
-      avatar;
-
-    meta.token =
-      token;
+    meta.seat = seat;
+    meta.role = "guest";
+    meta.name = name;
+    meta.avatar = avatar;
+    meta.token = token;
 
     this.touch();
 
@@ -1014,12 +926,8 @@ export class MahjongRoom extends DurableObject {
         this.send(
           ws,
           {
-            type:
-              "error",
-
-            code:
-              "REJOIN_SESSION_NOT_FOUND",
-
+            type: "error",
+            code: "REJOIN_SESSION_NOT_FOUND",
             message:
               "Sesi lama tidak ditemukan dan permainan sedang berjalan. Minta host mengundang ulang.",
           }
@@ -1124,8 +1032,7 @@ export class MahjongRoom extends DurableObject {
 
     this.sendJoined(
       ws,
-      role ===
-        "host",
+      role === "host",
       token
     );
 
@@ -1136,8 +1043,7 @@ export class MahjongRoom extends DurableObject {
       this.send(
         ws,
         {
-          type:
-            "state",
+          type: "state",
           state:
             this.lastState,
         }
@@ -1149,8 +1055,7 @@ export class MahjongRoom extends DurableObject {
       this.send(
         ws,
         {
-          type:
-            "startGame",
+          type: "startGame",
         }
       );
     }
@@ -1195,8 +1100,7 @@ export class MahjongRoom extends DurableObject {
     await this.persist();
 
     this.broadcast({
-      type:
-        "startGame",
+      type: "startGame",
     });
 
     return true;
@@ -1219,20 +1123,15 @@ export class MahjongRoom extends DurableObject {
     this.send(
       ws,
       {
-        type:
-          "joined",
-
+        type: "joined",
         room:
           this.roomView(),
-
         seat:
           meta
             ? meta.seat
             : null,
-
         host:
           !!host,
-
         token,
       }
     );
@@ -1257,18 +1156,14 @@ export class MahjongRoom extends DurableObject {
               ? {
                   id:
                     p.id,
-
                   name:
                     p.name,
-
                   avatar:
                     cleanAvatar(
                       p.avatar
                     ),
-
                   ready:
                     !!p.ready,
-
                   connected:
                     p.connected !==
                     false,
@@ -1354,9 +1249,7 @@ export class MahjongRoom extends DurableObject {
       return this.send(
         ws,
         {
-          type:
-            "error",
-
+          type: "error",
           message:
             "Butuh minimal 1 pemain lain untuk mulai.",
         }
@@ -1371,9 +1264,7 @@ export class MahjongRoom extends DurableObject {
       return this.send(
         ws,
         {
-          type:
-            "error",
-
+          type: "error",
           message:
             "Semua pemain harus READY.",
         }
@@ -1388,8 +1279,7 @@ export class MahjongRoom extends DurableObject {
     await this.persist();
 
     this.broadcast({
-      type:
-        "startGame",
+      type: "startGame",
     });
   }
 
@@ -1423,16 +1313,6 @@ export class MahjongRoom extends DurableObject {
 
     this.stateRevision =
       0;
-
-    clearTimeout(
-      this.persistTimer
-    );
-
-    this.persistTimer =
-      null;
-
-    this.persistPending =
-      false;
 
     for (
       const p of this.players
@@ -1483,8 +1363,9 @@ export class MahjongRoom extends DurableObject {
       return;
     }
 
-    this.stateRevision +=
-      1;
+    // The Durable Object, not the browser,
+    // owns the authoritative state sequence.
+    this.stateRevision += 1;
 
     const publishedState =
       {
@@ -1499,17 +1380,19 @@ export class MahjongRoom extends DurableObject {
 
     this.touch();
 
+    // IMPORTANT:
+    // Broadcast immediately.
+    // Do not wait for storage.
     this.broadcast(
       {
-        type:
-          "state",
-
+        type: "state",
         state:
           publishedState,
       },
       ws
     );
 
+    // Persist separately.
     this.queueStatePersist();
   }
 
@@ -1530,25 +1413,21 @@ export class MahjongRoom extends DurableObject {
     );
 
     this.persistTimer =
-      setTimeout(
-        () => {
-          this.persistPending =
-            false;
+      setTimeout(() => {
+        this.persistPending =
+          false;
 
-          this.persistTimer =
-            null;
+        this.persistTimer =
+          null;
 
-          this.persist()
-            .catch(
-              (err) =>
-                console.error(
-                  "State persist failed",
-                  err
-                )
-            );
-        },
-        1000
-      );
+        this.persist()
+          .catch((err) =>
+            console.error(
+              "State persist failed",
+              err
+            )
+          );
+      }, 1000);
   }
 
   // -------------------------------------------------------------------------
@@ -1590,9 +1469,7 @@ export class MahjongRoom extends DurableObject {
       this.send(
         ws,
         {
-          type:
-            "error",
-
+          type: "error",
           message:
             "Host tidak terhubung.",
         }
@@ -1617,18 +1494,13 @@ export class MahjongRoom extends DurableObject {
 
     if (delivered) {
       const actionId =
-        String(
-          action.actionId ||
-          ""
-        ).trim();
+        String(action.actionId || "").trim();
 
       if (actionId) {
         this.send(
           ws,
           {
-            type:
-              "actionAck",
-
+            type: "actionAck",
             actionId,
           }
         );
@@ -1640,151 +1512,128 @@ export class MahjongRoom extends DurableObject {
   // CHAT
   // -------------------------------------------------------------------------
 
-  broadcastChat(
-    ws,
-    meta,
-    msg
-  ) {
-    if (
-      !meta ||
-      meta.seat === null ||
-      !msg ||
-      typeof msg !==
-        "object"
-    ) {
+  broadcastChat(ws, meta, msg) {
+    if (!meta || meta.seat === null) {
       return;
     }
 
-    const player =
-      this.players[
-        meta.seat
-      ];
+    const player = this.players[meta.seat];
 
     if (
       !player ||
-      player.id !==
-        meta.id
+      player.id !== meta.id
     ) {
       return;
     }
 
+    const isAi = !!(
+      msg &&
+      typeof msg === "object" &&
+      msg.ai === true
+    );
+
+    // -----------------------------------------------------------------------
+    // AI CHAT
+    // -----------------------------------------------------------------------
+    //
+    // Balasan AI hanya boleh dikirim oleh HOST.
+    // Host akan mengirim aiSeat + nama + avatar + text.
+    // Worker kemudian broadcast ke semua client.
+    // -----------------------------------------------------------------------
+
+    if (isAi) {
+      if (
+        meta.seat !== this.hostSeat ||
+        meta.role !== "host"
+      ) {
+        return;
+      }
+
+      const aiSeat =
+        Number(msg.aiSeat);
+
+      if (
+        !Number.isInteger(aiSeat) ||
+        aiSeat < 0 ||
+        aiSeat >= MAX_PLAYERS ||
+        aiSeat === this.hostSeat
+      ) {
+        return;
+      }
+
+      const cleanAiText =
+        cleanChatText(
+          msg.text
+        );
+
+      if (!cleanAiText) {
+        return;
+      }
+
+      this.broadcast({
+        type: "chat",
+        id:
+          crypto.randomUUID(),
+        from:
+          aiSeat,
+        name:
+          cleanName(
+            msg.name ||
+            `AI ${aiSeat}`
+          ),
+        avatar:
+          cleanAvatar(
+            msg.avatar
+          ),
+        text:
+          cleanAiText,
+        ts:
+          Date.now(),
+        ai:
+          true,
+      });
+
+      return;
+    }
+
+    // -----------------------------------------------------------------------
+    // HUMAN CHAT
+    // -----------------------------------------------------------------------
+    //
+    // FIX:
+    // Sebelumnya seluruh object `msg` dikirim ke cleanChatText(),
+    // sehingga JavaScript mengubahnya menjadi "[object Object]".
+    //
+    // Sekarang yang dibaca adalah msg.text.
+    // -----------------------------------------------------------------------
+
     const cleanText =
       cleanChatText(
-        msg.text
+        msg?.text
       );
 
     if (!cleanText) {
       return;
     }
 
-    let from =
-      meta.seat;
-
-    let name =
-      cleanName(
-        meta.name
-      );
-
-    let avatar =
-      cleanAvatar(
-        player.avatar
-      );
-
-    let ai =
-      false;
-
-    // AI chat can only be generated by the HOST.
-    // The Worker then broadcasts it to everyone.
-    if (
-      msg.ai === true
-    ) {
-      if (
-        meta.seat !==
-          this.hostSeat ||
-        meta.role !==
-          "host"
-      ) {
-        return;
-      }
-
-      const aiSeat =
-        Number(
-          msg.aiSeat
-        );
-
-      if (
-        !Number.isInteger(
-          aiSeat
-        ) ||
-        aiSeat <=
-          this.hostSeat ||
-        aiSeat >=
-          MAX_PLAYERS
-      ) {
-        return;
-      }
-
-      // Prefer the AI seats reported by the current host game state.
-      const knownAiSeats =
-        Array.isArray(
-          this.lastState?.aiSeats
-        )
-          ? this.lastState.aiSeats.map(
-              Number
-            )
-          : null;
-
-      if (
-        knownAiSeats &&
-        !knownAiSeats.includes(
-          aiSeat
-        )
-      ) {
-        return;
-      }
-
-      from =
-        aiSeat;
-
-      name =
-        cleanName(
-          msg.name ||
-          `AI ${aiSeat + 1}`
-        );
-
-      avatar =
-        cleanAvatar(
-          msg.avatar ||
-          this.lastState?.playerAvatars?.[
-            aiSeat
-          ] ||
-          "panda"
-        );
-
-      ai =
-        true;
-    }
-
     this.broadcast({
-      type:
-        "chat",
-
+      type: "chat",
       id:
         crypto.randomUUID(),
-
-      from,
-
-      name,
-
-      avatar,
-
+      from:
+        meta.seat,
+      name:
+        cleanName(
+          meta.name
+        ),
+      avatar:
+        cleanAvatar(
+          meta.avatar
+        ),
       text:
         cleanText,
-
       ts:
         Date.now(),
-
-      ai,
     });
   }
 
@@ -1794,9 +1643,7 @@ export class MahjongRoom extends DurableObject {
 
   broadcastLobby() {
     this.broadcast({
-      type:
-        "lobby",
-
+      type: "lobby",
       room:
         this.roomView(),
     });
@@ -1814,9 +1661,7 @@ export class MahjongRoom extends DurableObject {
 
     try {
       data =
-        JSON.stringify(
-          msg
-        );
+        JSON.stringify(msg);
     } catch (err) {
       console.error(
         "Broadcast JSON error:",
@@ -1838,20 +1683,15 @@ export class MahjongRoom extends DurableObject {
       }
 
       try {
-        ws.send(
-          data
-        );
+        ws.send(data);
       } catch {
         Promise.resolve(
           this.detach(
             ws,
             false
           )
-        ).catch(
-          (err) =>
-            console.error(
-              err
-            )
+        ).catch((err) =>
+          console.error(err)
         );
       }
     }
@@ -1861,17 +1701,11 @@ export class MahjongRoom extends DurableObject {
   // SAFE SEND
   // -------------------------------------------------------------------------
 
-  send(
-    ws,
-    msg
-  ) {
+  send(ws, msg) {
     try {
       ws.send(
-        JSON.stringify(
-          msg
-        )
+        JSON.stringify(msg)
       );
-
       return true;
     } catch {
       Promise.resolve(
@@ -1879,11 +1713,8 @@ export class MahjongRoom extends DurableObject {
           ws,
           false
         )
-      ).catch(
-        (err) =>
-          console.error(
-            err
-          )
+      ).catch((err) =>
+        console.error(err)
       );
 
       return false;
