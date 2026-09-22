@@ -4190,8 +4190,14 @@ let gameChatStartY=0;
 let gameChatStartLeft=0;
 let gameChatStartTop=0;
 let gameChatSuppressToggle=false;
-let gameChatAiReplyTimer=null;
+let gameChatAiReplyTimers=[];
 const gameChatSeenIds=new Set();
+// ============================================================
+// CHAT AI REPLIES — UBAH BALASAN AI DI SINI
+// Cari kata: CHAT AI REPLIES
+// Kamu cukup mengubah / menambah kalimat di dalam array berikut.
+// Setiap AI akan memilih 1 template secara RANDOM.
+// ============================================================
 const GAME_CHAT_AI_TEMPLATES=[
   'Selamat Bermain Mahjong ! Semoga Beruntung.',
   'Bagaimana Perasaan Kamu Saat Bermain Bersama Saya ?',
@@ -4205,10 +4211,6 @@ function gameChatToggle(){return byId('game-chat-toggle')}
 function gameChatPanel(){return byId('game-chat-panel')}
 function gameChatInput(){return byId('game-chat-input')}
 
-function gameChatHumanCount(){
-  return (mp.room?.players||[]).filter(Boolean).length;
-}
-
 function gameChatIsAvailable(){
   if(activeScreenId!=='screen-game')return false;
 
@@ -4216,8 +4218,9 @@ function gameChatIsAvailable(){
     return !!roundActive;
   }
 
+  // CHAT MULTIPLAYER TETAP AKTIF MESKI HANYA 1 PEMAIN MANUSIA DI ROOM.
+  // Kursi AI yang kosong akan tetap mengisi meja saat game dimulai.
   return !!(
-    gameChatHumanCount()>=2 &&
     mp.room?.code &&
     mp.seat!=null &&
     mpServerStarted &&
@@ -4326,7 +4329,7 @@ function gameChatRender(){
     }catch(e){}
 
     const senderSeat=Number.isFinite(Number(msg.from))?Number(msg.from):-1;
-    const senderAvatar=String(playerAvatars?.[senderSeat]||'panda').toLowerCase();
+    const senderAvatar=String(msg.avatar||playerAvatars?.[senderSeat]||'panda').toLowerCase();
     const avatarClass=['panda','shiba','kucing','penguin','rubah'].includes(senderAvatar)?` avatar-${senderAvatar}`:' avatar-panda';
 
     return `<div class="game-chat-msg${own?' own':''}">`+
@@ -4340,6 +4343,8 @@ function gameChatRender(){
 }
 
 function gameChatReset(){
+  gameChatAiReplyTimers.forEach(clearTimeout);
+  gameChatAiReplyTimers=[];
   gameChatMessages=[];
   gameChatUnread=0;
   gameChatSeenIds.clear();
@@ -4425,6 +4430,7 @@ function gameChatPush(msg){
     id:id||`chat-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,
     from:Number.isFinite(Number(msg.from))?Number(msg.from):-1,
     name:String(msg.name||'Player').trim().slice(0,20)||'Player',
+    avatar:String(msg.avatar||playerAvatars?.[Number(msg.from)]||'panda').toLowerCase(),
     text,
     ts:Number(msg.ts)||Date.now()
   });
@@ -4442,6 +4448,58 @@ function gameChatPush(msg){
   gameChatUnreadRender();
 }
 
+function gameChatRandomAiReply(){
+  const templates=GAME_CHAT_AI_TEMPLATES.filter(v=>String(v||'').trim());
+  if(!templates.length)return '';
+  return String(templates[Math.floor(Math.random()*templates.length)]).trim().slice(0,240);
+}
+
+function gameChatScheduleAiReplies(){
+  const seats=[...aiSeats].filter(seat=>Number.isInteger(Number(seat))&&Number(seat)>=0&&Number(seat)<4);
+  if(!seats.length)return;
+
+  // Multiplayer: HANYA HOST yang mengirim balasan AI ke Worker supaya
+  // setiap pemain menerima balasan yang sama dan tidak terjadi duplikasi.
+  if(isMultiplayerMode&&!mp.host)return;
+  if(isMultiplayerMode&&(!mp.connected||mp.ws?.readyState!==WebSocket.OPEN))return;
+
+  seats.forEach((aiSeat,index)=>{
+    const delay=700+(index*950)+Math.floor(Math.random()*350);
+    const timer=setTimeout(()=>{
+      gameChatAiReplyTimers=gameChatAiReplyTimers.filter(t=>t!==timer);
+      if(!gameChatIsAvailable())return;
+
+      const reply=gameChatRandomAiReply();
+      if(!reply)return;
+
+      if(isMultiplayerMode){
+        // Worker akan broadcast pesan AI ini ke host + seluruh guest.
+        mpSend('chat',{
+          text:reply,
+          ai:true,
+          aiSeat:Number(aiSeat),
+          name:playerName(aiSeat),
+          avatar:playerAvatars[aiSeat]||'panda'
+        });
+        return;
+      }
+
+      // Solo: tidak ada WebSocket, jadi tampilkan AI langsung di browser.
+      gameChatPush({
+        id:`solo-ai-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+        from:Number(aiSeat),
+        name:playerName(aiSeat),
+        avatar:playerAvatars[aiSeat]||'panda',
+        text:reply,
+        ts:Date.now(),
+        ai:true
+      });
+    },delay);
+
+    gameChatAiReplyTimers.push(timer);
+  });
+}
+
 function gameChatSend(){
   const input=gameChatInput();
   if(!input||!gameChatIsAvailable())return false;
@@ -4454,30 +4512,14 @@ function gameChatSend(){
       id:`solo-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
       from:0,
       name:playerName(0)||'Player',
+      avatar:playerAvatars[0]||selectedAvatar||'panda',
       text,
       ts:Date.now()
     });
 
     input.value='';
     input.focus();
-
-    clearTimeout(gameChatAiReplyTimer);
-    gameChatAiReplyTimer=setTimeout(()=>{
-      gameChatAiReplyTimer=null;
-      if(!gameChatIsAvailable())return;
-
-      const aiSeat=[...aiSeats][0]??1;
-      const reply=GAME_CHAT_AI_TEMPLATES[Math.floor(Math.random()*GAME_CHAT_AI_TEMPLATES.length)];
-
-      gameChatPush({
-        id:`solo-ai-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
-        from:aiSeat,
-        name:playerName(aiSeat),
-        text:reply,
-        ts:Date.now()
-      });
-    },700+Math.floor(Math.random()*700));
-
+    gameChatScheduleAiReplies();
     return true;
   }
 
@@ -4487,6 +4529,7 @@ function gameChatSend(){
   if(sent){
     input.value='';
     input.focus();
+    gameChatScheduleAiReplies();
   }
 
   return sent;
@@ -5148,6 +5191,7 @@ function mpApplyRemoteState(state){
   }
 
   nav('screen-game');
+  gameChatRefreshVisibility();
   if(state.roundActive||state.roundEnding)setDisplay('modal-lobby','none');
   if(state.roundActive){setDisplay('modal-result','none');setDisplay('modal-match-over','none');}
 
