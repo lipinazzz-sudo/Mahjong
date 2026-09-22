@@ -1627,7 +1627,7 @@ body::after{
 #game-chat-toggle:active{cursor:grabbing}
 #game-chat-toggle .chat-icon{font-size:11px;line-height:1;transform:translateY(-.4px)}
 #game-chat-unread{position:absolute;right:-6px;top:-6px;min-width:14px;height:14px;padding:0 3px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:#dc3030;border:1px solid rgba(255,235,235,.82);color:#fff;font-size:8px;line-height:1;font-weight:950;box-shadow:0 2px 8px rgba(0,0,0,.38);pointer-events:none}
-#game-chat-panel{position:absolute;left:0;bottom:calc(100% + 7px);width:220px;max-width:min(220px,calc(100vw - 18px));height:248px;min-height:180px;display:none;flex-direction:column;overflow:hidden;border:1px solid rgba(235,202,131,.30);border-radius:12px;background:rgba(24,20,17,.84);box-shadow:0 14px 30px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.045);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:auto}
+#game-chat-panel{position:absolute;left:0;bottom:calc(100% + 7px);width:220px;max-width:min(220px,calc(100vw - 18px));height:248px;min-height:180px;display:none;flex-direction:column;overflow:hidden;border:1px solid rgba(235,202,131,.30);border-radius:12px;background:rgba(24,20,17,.90);box-shadow:0 14px 30px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.045);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:auto}
 #game-chat.open #game-chat-panel{display:flex}
 #game-chat.panel-right #game-chat-panel{left:auto;right:0}
 #game-chat.panel-below #game-chat-panel{top:calc(100% + 7px);bottom:auto}
@@ -1637,7 +1637,12 @@ body::after{
 .game-chat-empty{margin:auto;color:#726a60;font-size:8px;line-height:1.4;text-align:center}
 .game-chat-msg{max-width:88%;padding:5px 7px;border-radius:8px;border:1px solid rgba(255,255,255,.055);background:rgba(255,255,255,.055);align-self:flex-start}
 .game-chat-msg.own{align-self:flex-end;border-color:rgba(231,192,111,.15);background:rgba(210,156,64,.11)}
-.game-chat-name{display:block;margin-bottom:2px;color:#e4bd74;font-size:7px;font-weight:900}
+.game-chat-name{display:inline-flex;align-items:center;width:max-content;max-width:100%;margin-bottom:2px;padding:1px 4px;border:1px solid rgba(255,255,255,.16);border-radius:5px;color:#f1ede6;font-size:6.5px;line-height:1.15;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:rgba(0,0,0,.14)}
+.game-chat-name.avatar-panda{border-color:#050505;background:rgba(0,0,0,.12)}
+.game-chat-name.avatar-shiba{border-color:#d7a64a;background:rgba(215,166,74,.08)}
+.game-chat-name.avatar-kucing{border-color:#a0a0a0;background:rgba(160,160,160,.08)}
+.game-chat-name.avatar-penguin{border-color:#89cfff;background:rgba(137,207,255,.08)}
+.game-chat-name.avatar-rubah{border-color:#d67068;background:rgba(214,112,104,.08)}
 .game-chat-text{display:block;color:#f0ebe3;font-size:9px;line-height:1.28;overflow-wrap:anywhere;white-space:pre-wrap;user-select:text;-webkit-user-select:text}
 .game-chat-time{display:block;margin-top:2px;color:#71695f;font-size:6px;line-height:1;text-align:right}
 #game-chat-form{flex:0 0 auto;display:flex;gap:5px;padding:6px;border-top:1px solid rgba(255,255,255,.07)}
@@ -2296,7 +2301,9 @@ function nav(id){
     previousScreenId=from;
     applyAudioSettings();
   }
-  gameChatRefreshVisibility();
+  if(typeof gameChatRefreshVisibility==='function'){
+    requestAnimationFrame(gameChatRefreshVisibility);
+  }
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')toggleScoreGuide(false)},{passive:true});
 document.addEventListener('click',e=>{
@@ -3011,16 +3018,17 @@ function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKe
   for(let n=0;n<13;n++)for(let p=0;p<4;p++)playerHands[p].push(fullDeck.pop());
   for(let p=0;p<4;p++)sortHand(p);
   currentTurn=currentDealerIdx;drawnTile=null;renderTable();processTurn();
+  if(typeof gameChatRefreshVisibility==='function')gameChatRefreshVisibility();
 }
 function start4PGame(diff='Medium',multi=false){mpHistoryRounds=[];mpHistorySavedKeys=new Set();mpHistoryCompletedMatch=null;mpHistoryMatchStartedAt=Date.now();activeRemoteActions=null;mpPendingCalls=[];activeActionFeedback=null;actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;lastActionFeedbackId='';clearPlayerActionFeedback();activeCallId=null;mpCallSeq=0;mpActionSeq=0;mpProcessedActionIds=new Set();cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
   aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
   if(!multi){
     mp.seat=0;mp.room=null;mp.host=true;mp.connected=false;mp.playerAvatar=selectedAvatar;
     aiSeats=new Set([1,2,3]);playerAvatars[0]=selectedAvatar;playerAvatars[1]='shiba';playerAvatars[2]='kucing';playerAvatars[3]='penguin';randomizeAiAvatars();
-    playerScores=[15000,15000,15000,15000];nav('screen-game');playGameMusic();setTimeout(()=>{startMpGameWatchdog();setupRound()},20);return
+    playerScores=[15000,15000,15000,15000];nav('screen-game');playGameMusic();setTimeout(()=>{startMpGameWatchdog();setupRound();gameChatRefreshVisibility()},20);return
   }
   if(mp.host){
-    fillAiSeats();playerScores=[15000,15000,15000,15000];nav('screen-game');playGameMusic();setTimeout(()=>{startMpGameWatchdog();setupRound()},20);mpSaveSession({started:true});mpBroadcastState()
+    fillAiSeats();playerScores=[15000,15000,15000,15000];nav('screen-game');playGameMusic();setTimeout(()=>{startMpGameWatchdog();setupRound();gameChatRefreshVisibility()},20);mpSaveSession({started:true});mpBroadcastState()
   }
 }
 function fillAiSeats(){
@@ -4129,7 +4137,13 @@ function matchOverToMenu(){
   setDisplay('modal-match-over','none');
   roundActive=false;roundEnding=false;
   stopGameMusic();
-  if(isMultiplayerMode)leaveFinishedRoom();
+  if(isMultiplayerMode){
+    try{mpSend('leave')}catch(e){}
+    try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}
+    mpClearSession();mpClearActiveGameState();
+    mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,token:null,playerName:mp.playerName||'Player',playerAvatar:selectedAvatar};
+    isMultiplayerMode=false;
+  }
   nav('screen-main');
 }
 function nextRoundOrFinish(){
@@ -4154,10 +4168,10 @@ function nextRoundOrFinish(){
   mpBroadcastState();
 }
 function flashBoard(kind){const e=byId('center-board-box');if(!e)return;e.classList.remove('win-flash','draw-flash');void e.offsetWidth;e.classList.add(kind==='draw'?'draw-flash':'win-flash')}
-function quitGame(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();roundActive=false;mpClearActiveGameState();stopGameMusic();if(isMultiplayerMode)leaveFinishedRoom();nav('screen-main')}
+function quitGame(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();roundActive=false;mpClearActiveGameState();stopGameMusic();nav('screen-main');if(mp.connected)mpSend('leave')}
 function openSettingsFromGame(){previousScreenId=activeScreenId==='screen-game'?'screen-game':(previousScreenId||'screen-main');nav('screen-settings');applyAudioSettings()}
 function returnToGameFromSettings(){nav(previousScreenId||'screen-main')}
-function exitGameFromSettings(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;mpClearActiveGameState();stopGameMusic();if(isMultiplayerMode)leaveFinishedRoom();previousScreenId='screen-main';nav('screen-main')}
+function exitGameFromSettings(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;mpClearActiveGameState();stopGameMusic();previousScreenId='screen-main';nav('screen-main')}
 function exitSettings(){returnToGameFromSettings()}
 function toggleAutoSortSetting(){autoSortSetting=!autoSortSetting;try{localStorage.setItem('hk_auto_sort',autoSortSetting?'1':'0')}catch{};setText('btn-toggle-autosort',autoSortSetting?'ON':'OFF');if(roundActive)renderTable()}
 
@@ -4176,7 +4190,15 @@ let gameChatStartY=0;
 let gameChatStartLeft=0;
 let gameChatStartTop=0;
 let gameChatSuppressToggle=false;
+let gameChatAiReplyTimer=null;
 const gameChatSeenIds=new Set();
+const GAME_CHAT_AI_TEMPLATES=[
+  'Selamat Bermain Mahjong ! Semoga Beruntung.',
+  'Bagaimana Perasaan Kamu Saat Bermain Bersama Saya ?',
+  'Apakah Saya Hebat ?',
+  'Cuman Segini Kemampuan Kamu?',
+  'Saya Rasa Kamu Bukan Tandingan Kami !!'
+];
 
 function gameChatRoot(){return byId('game-chat')}
 function gameChatToggle(){return byId('game-chat-toggle')}
@@ -4188,9 +4210,13 @@ function gameChatHumanCount(){
 }
 
 function gameChatIsAvailable(){
+  if(activeScreenId!=='screen-game')return false;
+
+  if(!isMultiplayerMode){
+    return !!roundActive;
+  }
+
   return !!(
-    activeScreenId==='screen-game' &&
-    isMultiplayerMode &&
     gameChatHumanCount()>=2 &&
     mp.room?.code &&
     mp.seat!=null &&
@@ -4299,8 +4325,12 @@ function gameChatRender(){
       time=new Date(Number(msg.ts)||Date.now()).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
     }catch(e){}
 
-    return `<div class="game-chat-msg${own?' own':''}>`+
-      `<span class="game-chat-name">${esc(msg.name||'Player')}${own?' • Kamu':''}</span>`+
+    const senderSeat=Number.isFinite(Number(msg.from))?Number(msg.from):-1;
+    const senderAvatar=String(playerAvatars?.[senderSeat]||'panda').toLowerCase();
+    const avatarClass=['panda','shiba','kucing','penguin','rubah'].includes(senderAvatar)?` avatar-${senderAvatar}`:' avatar-panda';
+
+    return `<div class="game-chat-msg${own?' own':''}">`+
+      `<span class="game-chat-name${avatarClass}">${esc(msg.name||'Player')}${own?' • Kamu':''}</span>`+
       `<span class="game-chat-text">${esc(msg.text||'')}</span>`+
       `<span class="game-chat-time">${esc(time)}</span>`+
       `</div>`;
@@ -4367,6 +4397,11 @@ function gameChatRefreshVisibility(){
   const visible=gameChatIsAvailable();
   root.hidden=!visible;
 
+  const status=byId('game-chat-status');
+  if(status){
+    status.textContent=isMultiplayerMode?'Multiplayer':'Solo • AI';
+  }
+
   if(!visible){
     gameChatClose();
     return;
@@ -4413,6 +4448,38 @@ function gameChatSend(){
 
   const text=String(input.value||'').replace(/\s+/g,' ').trim().slice(0,240);
   if(!text)return false;
+
+  if(!isMultiplayerMode){
+    gameChatPush({
+      id:`solo-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+      from:0,
+      name:playerName(0)||'Player',
+      text,
+      ts:Date.now()
+    });
+
+    input.value='';
+    input.focus();
+
+    clearTimeout(gameChatAiReplyTimer);
+    gameChatAiReplyTimer=setTimeout(()=>{
+      gameChatAiReplyTimer=null;
+      if(!gameChatIsAvailable())return;
+
+      const aiSeat=[...aiSeats][0]??1;
+      const reply=GAME_CHAT_AI_TEMPLATES[Math.floor(Math.random()*GAME_CHAT_AI_TEMPLATES.length)];
+
+      gameChatPush({
+        id:`solo-ai-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+        from:aiSeat,
+        name:playerName(aiSeat),
+        text:reply,
+        ts:Date.now()
+      });
+    },700+Math.floor(Math.random()*700));
+
+    return true;
+  }
 
   if(!mp.connected||mp.ws?.readyState!==WebSocket.OPEN)return false;
 
@@ -4610,7 +4677,7 @@ function mpConnect(code='',role='',isReconnect=false){const c=String(code||mp.ro
   mpRejoinJoined=false;
   clearTimeout(mpRejoinFallbackTimer);
   clearTimeout(mpRejoinModeTimer);
-}try{const desiredRole=role||(mp.host?'host':'guest');const ws=new WebSocket(`${workerUrl}&name=${encodeURIComponent(mp.playerName||'Player')}&role=${desiredRole}${mp.seat!=null?`&seat=${mp.seat}`:''}`);mp.ws=ws;ws.onopen=()=>{mp.connected=true;mpReconnectAttempts=0;mpReconnectDeadline=0;mpSetConnection(true);startMpPing();lastHostServerSeq=0;clearTimeout(mpRejoinHandshakeTimer);ws.send(JSON.stringify({type:isReconnect?'rejoin':(desiredRole==='host'?'createRoom':'joinRoom'),code:c,name:mp.playerName||'Player',seat:mp.seat,token:mp.token,avatar:mp.playerAvatar||selectedAvatar}));if(isReconnect){mpRejoinHandshakeTimer=setTimeout(()=>{if(mpRejoinMode&&!mpRejoinStateApplied&&mp.ws===ws){try{ws.close()}catch(e){}}},7000)}};ws.onmessage=e=>{try{mpHandle(JSON.parse(e.data))}catch(err){console.error('MP message error',err)}};ws.onerror=()=>{mp.connected=false;mpSetConnection(false)};ws.onclose=()=>{mp.connected=false;stopMpPing();clearTimeout(mpRejoinHandshakeTimer);mpRejoinHandshakeTimer=null;if(isReconnect)mpRejoinJoined=false;mpSetConnection(false);mp.ws=null;
+}try{const desiredRole=role||(mp.host?'host':'guest');const ws=new WebSocket(`${workerUrl}&name=${encodeURIComponent(mp.playerName||'Player')}&role=${desiredRole}${mp.seat!=null?`&seat=${mp.seat}`:''}`);mp.ws=ws;ws.onopen=()=>{setTimeout(retryPendingGuestAction,0);mp.connected=true;mpReconnectAttempts=0;mpReconnectDeadline=0;mpSetConnection(true);startMpPing();lastHostServerSeq=0;clearTimeout(mpRejoinHandshakeTimer);ws.send(JSON.stringify({type:isReconnect?'rejoin':(desiredRole==='host'?'createRoom':'joinRoom'),code:c,name:mp.playerName||'Player',seat:mp.seat,token:mp.token,avatar:mp.playerAvatar||selectedAvatar}));if(isReconnect){mpRejoinHandshakeTimer=setTimeout(()=>{if(mpRejoinMode&&!mpRejoinStateApplied&&mp.ws===ws){try{ws.close()}catch(e){}}},7000)}};ws.onmessage=e=>{try{mpHandle(JSON.parse(e.data))}catch(err){console.error('MP message error',err)}};ws.onerror=()=>{mp.connected=false;mpSetConnection(false)};ws.onclose=()=>{mp.connected=false;stopMpPing();clearTimeout(mpRejoinHandshakeTimer);mpRejoinHandshakeTimer=null;if(isReconnect)mpRejoinJoined=false;mpSetConnection(false);mp.ws=null;
     // Reconnect during a game too. The host keeps a local snapshot and sends
     // it again after the Worker accepts the restored room connection.
     if(mp.room?.code && isMultiplayerMode){
@@ -4643,10 +4710,12 @@ function retryPendingGuestAction(){
   if(mp.ws?.readyState===WebSocket.OPEN){
     if(mpSend('action',{action:pending})){
       hideAvailableActions();
+      clearGuestActionRetry();
+      return;
     }
   }
 
-  mpGuestActionRetryTimer=setTimeout(retryPendingGuestAction,450);
+  mpGuestActionRetryTimer=setTimeout(retryPendingGuestAction,350);
 }
 function queueGuestAction(action){
   if(!action||typeof action!=='object')return false;
@@ -4799,18 +4868,10 @@ function mpHandle(msg){
       mpRejoinFallbackState=null;
       try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}
       mp.ws=null;
-      mp.connected=false;
-      mp.started=false;
-      mpServerStarted=false;
-      clearGuestActionRetry();
-      mpClearSession();
-      mpClearActiveGameState();
       setDisplay('modal-lobby','flex');
-      setDisplay('mp-setup','grid');
-      setDisplay('mp-room-panel','none');
-      setDisplay('mp-host-invite','none');
-      setDisplay('mp-guest-invite','none');
-      setText('lobby-help',msg.message||'Sesi lama sudah tidak tersedia. Silakan buat atau gabung room baru.');
+      setDisplay('mp-setup','none');
+      setDisplay('mp-room-panel','grid');
+      setText('lobby-help',msg.message||'Sesi lama sudah tidak tersedia.');
     }
     return
   }
@@ -4865,7 +4926,6 @@ function mpHandle(msg){
     renderPlayerConnectionStatus(msg.room);
     mpTouchSession(true);
     gameChatRefreshVisibility();
-    if(!mp.host)retryPendingGuestAction();
 
     if(mp.host&&roundActive&&!mpRejoinMode&&!mpRejoinStateApplied){
       mpBroadcastState();
@@ -4939,12 +4999,6 @@ function mpHandle(msg){
       return;
     }
     if(mp.host&&!roundActive)start4PGame('Medium',true);if(mp.host)startMpGameWatchdog();return
-  }
-  if(msg.type==='actionAck'){
-    if(msg.actionId&&mpPendingGuestAction?.actionId===msg.actionId){
-      clearGuestActionRetry();
-    }
-    return;
   }
   if(msg.type==='state'&&msg.state){
     if(mp.host&&mpRejoinMode){
