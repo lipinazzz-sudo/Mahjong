@@ -426,6 +426,7 @@ export class MahjongRoom extends DurableObject {
         name,
         avatar: "panda",
         token: null,
+        queue: Promise.resolve(),
       }
     );
 
@@ -452,22 +453,29 @@ export class MahjongRoom extends DurableObject {
           return;
         }
 
-        Promise.resolve(
-          this.handle(
-            server,
-            msg
-          )
-        ).catch((err) => {
-          this.send(
-            server,
-            {
-              type: "error",
-              message:
-                err?.message ||
-                "Room error.",
-            }
-          );
-        });
+        const meta =
+          this.connections.get(server);
+
+        if (!meta) {
+          return;
+        }
+
+        // Process messages from one socket in order.
+        // This prevents reconnect/join races where an action arrives before
+        // the preceding rejoin/join message has finished assigning the seat.
+        meta.queue = (meta.queue || Promise.resolve())
+          .then(() => this.handle(server, msg))
+          .catch((err) => {
+            this.send(
+              server,
+              {
+                type: "error",
+                message:
+                  err?.message ||
+                  "Room error.",
+              }
+            );
+          });
       }
     );
 
@@ -1044,7 +1052,8 @@ export class MahjongRoom extends DurableObject {
         ws,
         {
           type: "state",
-          state: this.lastState,
+          state:
+            this.lastState,
         }
       );
     }
@@ -1123,11 +1132,14 @@ export class MahjongRoom extends DurableObject {
       ws,
       {
         type: "joined",
-        room: this.roomView(),
-        seat: meta
-          ? meta.seat
-          : null,
-        host: !!host,
+        room:
+          this.roomView(),
+        seat:
+          meta
+            ? meta.seat
+            : null,
+        host:
+          !!host,
         token,
       }
     );
@@ -1474,34 +1486,18 @@ export class MahjongRoom extends DurableObject {
       return;
     }
 
-    const delivered =
-      this.send(
-        hostWs,
-        {
-          type:
-            "playerAction",
+    this.send(
+      hostWs,
+      {
+        type:
+          "playerAction",
 
-          seat:
-            meta.seat,
+        seat:
+          meta.seat,
 
-          action,
-        }
-      );
-
-    if (delivered) {
-      const actionId =
-        String(action.actionId || "").trim();
-
-      if (actionId) {
-        this.send(
-          ws,
-          {
-            type: "actionAck",
-            actionId,
-          }
-        );
+        action,
       }
-    }
+    );
   }
 
   // -------------------------------------------------------------------------
@@ -1513,7 +1509,8 @@ export class MahjongRoom extends DurableObject {
       return;
     }
 
-    const player = this.players[meta.seat];
+    const player =
+      this.players[meta.seat];
 
     if (
       !player ||
@@ -1522,12 +1519,15 @@ export class MahjongRoom extends DurableObject {
       return;
     }
 
-    const cleanText = cleanChatText(text);
+    const cleanText =
+      cleanChatText(text);
 
     if (!cleanText) {
       return;
     }
 
+    // Send to everyone, including the sender.
+    // The client uses this same message to render the local chat bubble.
     this.broadcast({
       type: "chat",
       id: crypto.randomUUID(),
