@@ -119,20 +119,17 @@ min-width:14px;min-height:33px;padding:2px;display:flex;align-items:center;justi
  .tile-asset-error{opacity:0}
 
 
-.avatar-picker-box{width:min(92vw,620px);max-height:min(88dvh,650px);overflow:auto;border-color:rgba(225,189,111,.22);background:radial-gradient(circle at 50% 0%,rgba(197,146,54,.10),transparent 42%),linear-gradient(180deg,#241b14,#0f0c09);box-shadow:0 30px 95px rgba(0,0,0,.68),inset 0 1px 0 rgba(255,238,204,.05)}
+.avatar-picker-box{width:min(94vw,760px);max-height:min(88dvh,700px);overflow:auto;border-color:rgba(230,187,88,.48);background:linear-gradient(180deg,rgba(3,25,21,.22),rgba(2,12,10,.38)),url('assets/backgrounds/bg-avatar.jpg') center/cover no-repeat;box-shadow:0 34px 100px rgba(0,0,0,.70),inset 0 1px 0 rgba(255,242,205,.10)}
 .avatar-grid-picker{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:15px}
-.avatar-option-picker{appearance:none;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025);border-radius:13px;padding:7px;color:#f6f0e4;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
-.avatar-option-picker:hover{transform:translateY(-2px);border-color:rgba(240,198,109,.45)}
-.avatar-option-picker.selected{border-color:#f0c66d;box-shadow:0 0 0 2px rgba(214,165,74,.20),0 8px 22px rgba(214,165,74,.13)}
-.avatar-option-picker img{display:block;width:100%;aspect-ratio:1;border-radius:50%;object-fit:cover;border:2px solid rgba(214,165,74,.72)}
-.avatar-option-picker .avatar-option-name{display:block;margin-top:6px;font-size:9px;font-weight:850;text-align:center}
-.avatar-picker-preview{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:15px;padding:11px;border:1px solid rgba(255,225,176,.10);border-radius:12px;background:rgba(255,255,255,.025)}
-.avatar-picker-preview img{width:54px;height:54px;border-radius:50%;object-fit:cover;border:2px solid #f0c66d;box-shadow:0 0 14px rgba(214,165,74,.16)}
-.avatar-picker-preview div{display:grid;gap:3px;min-width:0}
-.avatar-picker-preview strong{font-size:13px;color:#ffe1a0}
-.avatar-picker-preview span{font-size:9px;color:#a99f91}
+.avatar-option-picker{appearance:none;border:1px solid rgba(227,183,91,.20);background:rgba(1,18,15,.62);border-radius:13px;padding:7px;color:#f6f0e4;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background .16s ease}
+.avatar-option-picker:hover{transform:translateY(-2px);border-color:rgba(240,198,109,.52);background:rgba(15,30,24,.76)}
+.avatar-option-picker.selected{border-color:#f0c66d;background:rgba(89,61,17,.44);box-shadow:0 0 0 2px rgba(236,193,101,.20),0 8px 22px rgba(214,165,74,.16)}
+.avatar-option-picker img{display:block;width:100%;aspect-ratio:1;border-radius:50%;object-fit:cover;border:2px solid rgba(214,165,74,.86);box-shadow:0 5px 14px rgba(0,0,0,.24)}
+.avatar-option-picker .avatar-option-name{display:block;margin-top:6px;font-size:9px;font-weight:850;text-align:center;color:#f8edd7}
+.avatar-picker-preview{display:none}
 .avatar-picker-actions{display:grid;grid-template-columns:1fr 1.6fr;gap:8px;margin-top:12px}
-@media (max-width:600px){.avatar-grid-picker{grid-template-columns:repeat(3,minmax(0,1fr))}.avatar-picker-box{width:min(94vw,440px)}}
+@media (max-width:600px){.avatar-grid-picker{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.avatar-picker-box{width:min(96vw,560px)}}
+@media (max-width:430px){.avatar-grid-picker{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:360px){.avatar-grid-picker{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .result-modal-box{width:min(92vw,560px);max-height:min(88dvh,620px);overflow:auto;border-color:rgba(225,189,111,.22);background:radial-gradient(circle at 50% 0%,rgba(197,146,54,.10),transparent 44%),linear-gradient(180deg,#241b14,#0f0c09);box-shadow:0 30px 95px rgba(0,0,0,.68),inset 0 1px 0 rgba(255,238,204,.05);animation:resultIn .22s cubic-bezier(.2,.8,.25,1)}
 .result-hero{text-align:center;padding:5px 4px 2px}.result-hero-icon{font-size:30px;line-height:1;margin-bottom:8px;filter:drop-shadow(0 5px 12px rgba(214,164,74,.22))}.result-hero .modal-kicker{margin-bottom:4px}.result-hero .modal-title{font-size:22px;line-height:1.15}.result-hero .modal-copy{margin:7px auto 0;max-width:430px}
@@ -403,15 +400,9 @@ body{
 #screen-settings .btn-danger{background:linear-gradient(180deg,#74272c,#4e161b);border-color:rgba(238,116,106,.34);}
 
 /* Avatar picker and lobby — preserve existing DOM and behavior */
-#modal-avatar-picker{background:rgba(0,10,9,.70);}
-#modal-avatar-picker .avatar-picker-box{
-  background:linear-gradient(180deg,rgba(4,28,24,.88),rgba(5,14,13,.96)),url('assets/backgrounds/bg-avatar.jpg') center/cover;
-  border-color:rgba(230,187,88,.48);
-  box-shadow:0 34px 100px rgba(0,0,0,.66),inset 0 1px 0 rgba(255,242,205,.10);
-}
-#modal-avatar-picker .avatar-option-picker{background:rgba(1,18,15,.50);border-color:rgba(227,183,91,.20);}
-#modal-avatar-picker .avatar-option-picker.selected{background:rgba(89,61,17,.36);border-color:#efc66d;box-shadow:0 0 0 2px rgba(236,193,101,.20),0 0 24px rgba(233,188,83,.12);}
-#modal-avatar-picker .avatar-picker-preview{background:rgba(0,20,16,.55);border-color:rgba(226,183,91,.22);}
+#modal-avatar-picker{background:rgba(0,10,9,.48);backdrop-filter:none;-webkit-backdrop-filter:none;}
+#modal-avatar-picker .avatar-picker-box{background:linear-gradient(180deg,rgba(3,25,21,.22),rgba(2,12,10,.38)),url('assets/backgrounds/bg-avatar.jpg') center/cover no-repeat;backdrop-filter:none;-webkit-backdrop-filter:none;}
+#modal-avatar-picker .avatar-picker-preview{display:none;}
 #modal-lobby .lobby-box{
   background:linear-gradient(180deg,rgba(4,29,24,.88),rgba(5,14,13,.96)),url('assets/backgrounds/bg-lobby.jpg') center/cover;
   border-color:rgba(230,187,88,.48);
@@ -1610,6 +1601,11 @@ body::after{
 .game-chat-name.avatar-kucing{border-color:#a0a0a0;background:rgba(160,160,160,.08);box-shadow:0 0 10px rgba(160,160,160,.06);}
 .game-chat-name.avatar-penguin{border-color:#89cfff;background:rgba(137,207,255,.08);box-shadow:0 0 10px rgba(137,207,255,.06);}
 .game-chat-name.avatar-rubah{border-color:#d67068;background:rgba(214,112,104,.08);box-shadow:0 0 10px rgba(196,112,105,.06);}
+.game-chat-name.avatar-rabbit{border-color:#e9a8b4;background:rgba(233,168,180,.08);box-shadow:0 0 10px rgba(233,168,180,.07);}
+.game-chat-name.avatar-dragon{border-color:#4fbd9c;background:rgba(79,189,156,.08);box-shadow:0 0 10px rgba(79,189,156,.07);}
+.game-chat-name.avatar-tiger{border-color:#e49a45;background:rgba(228,154,69,.08);box-shadow:0 0 10px rgba(228,154,69,.07);}
+.game-chat-name.avatar-owl{border-color:#8aa8cf;background:rgba(138,168,207,.08);box-shadow:0 0 10px rgba(138,168,207,.07);}
+.game-chat-name.avatar-squirrel{border-color:#c79a5d;background:rgba(199,154,93,.08);box-shadow:0 0 10px rgba(199,154,93,.07);}
 .game-chat-text{display:block;color:#f2eee7;font-size:9px;line-height:1.30;overflow-wrap:anywhere;white-space:pre-wrap;user-select:text;-webkit-user-select:text}
 .game-chat-time{display:block;margin-top:3px;color:#746b61;font-size:6px;line-height:1;text-align:right}
 #game-chat-form{flex:0 0 auto;display:flex;gap:5px;padding:8px;border-top:1px solid rgba(240,211,151,.11);background:linear-gradient(180deg,rgba(255,255,255,.015),rgba(0,0,0,.08));border-top-color:rgba(232,194,111,.10);}
@@ -1773,13 +1769,6 @@ body::after{
                 <button class="icon-btn" type="button" onclick="closeAvatarPicker()" aria-label="Tutup">×</button>
             </div>
             <div class="avatar-grid-picker" id="avatar-picker-grid"></div>
-            <div class="avatar-picker-preview">
-                <img id="avatar-picker-preview-image" src="avatars/avatar-panda.jpg" alt="Avatar terpilih">
-                <div>
-                    <strong id="avatar-picker-preview-name">Panda</strong>
-                    <span>Avatar yang akan digunakan di meja.</span>
-                </div>
-            </div>
             <div class="avatar-picker-actions">
                 <button class="btn btn-secondary" type="button" onclick="closeAvatarPicker()">Batal</button>
                 <button class="btn btn-primary" type="button" onclick="confirmAvatarSelection()">Pilih &amp; Lanjut</button>
@@ -2558,7 +2547,12 @@ const AVATAR_OPTIONS=[
   {id:'shiba',name:'Shiba',file:'avatars/avatar-shiba.jpg'},
   {id:'kucing',name:'Kucing',file:'avatars/avatar-kucing.jpg'},
   {id:'penguin',name:'Penguin',file:'avatars/avatar-penguin.jpg'},
-  {id:'rubah',name:'Rubah',file:'avatars/avatar-rubah.jpg'}
+  {id:'rubah',name:'Rubah',file:'avatars/avatar-rubah.jpg'},
+  {id:'rabbit',name:'Kelinci',file:'avatars/avatar-rabbit.jpg'},
+  {id:'dragon',name:'Naga',file:'avatars/avatar-dragon.jpg'},
+  {id:'tiger',name:'Macan',file:'avatars/avatar-tiger.jpg'},
+  {id:'owl',name:'Owl',file:'avatars/avatar-owl.jpg'},
+  {id:'squirrel',name:'Tupai',file:'avatars/avatar-squirrel.jpg'}
 ];
 const AVATAR_IDS=AVATAR_OPTIONS.map(a=>a.id);
 let selectedAvatar='panda';
@@ -2592,12 +2586,9 @@ function setSelectedAvatar(id){
   renderAvatarPicker();
 }
 function renderAvatarPicker(){
-  const grid=byId('avatar-picker-grid'),img=byId('avatar-picker-preview-image'),name=byId('avatar-picker-preview-name');
+  const grid=byId('avatar-picker-grid');
   if(!grid)return;
   grid.innerHTML=AVATAR_OPTIONS.map(a=>`<button class="avatar-option-picker${a.id===selectedAvatar?' selected':''}" type="button" onclick="setSelectedAvatar('${a.id}')"><img src="${a.file}" alt="${esc(a.name)}"><span class="avatar-option-name">${esc(a.name)}</span></button>`).join('');
-  const def=getAvatarDef(selectedAvatar);
-  if(img){img.src=def.file;img.alt=def.name}
-  if(name)name.textContent=def.name;
 }
 function openAvatarPicker(mode){
   avatarPickerMode=mode==='multi'?'multi':'single';
@@ -4351,7 +4342,7 @@ function gameChatRender(){
 
     const senderSeat=Number.isFinite(Number(msg.from))?Number(msg.from):-1;
     const senderAvatar=String(msg.avatar||playerAvatars?.[senderSeat]||'panda').toLowerCase();
-    const avatarClass=['panda','shiba','kucing','penguin','rubah'].includes(senderAvatar)?` avatar-${senderAvatar}`:' avatar-panda';
+    const avatarClass=['panda','shiba','kucing','penguin','rubah','rabbit','dragon','tiger','owl','squirrel'].includes(senderAvatar)?` avatar-${senderAvatar}`:' avatar-panda';
 
     return `<div class="game-chat-msg${own?' own':''}${avatarClass}">`+
       `<span class="game-chat-name${avatarClass}">${esc(msg.name||'Player')}${own?' • Kamu':''}</span>`+
