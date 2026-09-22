@@ -119,11 +119,11 @@ min-width:14px;min-height:33px;padding:2px;display:flex;align-items:center;justi
  .tile-asset-error{opacity:0}
 
 
-.avatar-picker-box{width:min(94vw,760px);max-height:min(88dvh,700px);overflow:auto;border-color:rgba(230,187,88,.48);background:linear-gradient(180deg,rgba(3,25,21,.22),rgba(2,12,10,.38)),url('assets/backgrounds/bg-avatar.jpg') center/cover no-repeat;box-shadow:0 34px 100px rgba(0,0,0,.70),inset 0 1px 0 rgba(255,242,205,.10)}
+.avatar-picker-box{width:min(94vw,760px);max-height:min(88dvh,700px);overflow:auto;border-color:rgba(230,187,88,.48);background:#071a16;box-shadow:0 34px 100px rgba(0,0,0,.70),inset 0 1px 0 rgba(255,242,205,.10)}
 .avatar-grid-picker{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:15px}
-.avatar-option-picker{appearance:none;border:1px solid rgba(227,183,91,.20);background:rgba(1,18,15,.62);border-radius:13px;padding:7px;color:#f6f0e4;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background .16s ease}
-.avatar-option-picker:hover{transform:translateY(-2px);border-color:rgba(240,198,109,.52);background:rgba(15,30,24,.76)}
-.avatar-option-picker.selected{border-color:#f0c66d;background:rgba(89,61,17,.44);box-shadow:0 0 0 2px rgba(236,193,101,.20),0 8px 22px rgba(214,165,74,.16)}
+.avatar-option-picker{appearance:none;border:1px solid rgba(227,183,91,.32);background:#0a211b;border-radius:13px;padding:7px;color:#f6f0e4;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background .16s ease}
+.avatar-option-picker:hover{transform:translateY(-2px);border-color:rgba(240,198,109,.68);background:#102920}
+.avatar-option-picker.selected{border-color:#f0c66d;background:#4a3510;box-shadow:0 0 0 2px rgba(236,193,101,.20),0 8px 22px rgba(214,165,74,.16)}
 .avatar-option-picker img{display:block;width:100%;aspect-ratio:1;border-radius:50%;object-fit:cover;border:2px solid rgba(214,165,74,.86);box-shadow:0 5px 14px rgba(0,0,0,.24)}
 .avatar-option-picker .avatar-option-name{display:block;margin-top:6px;font-size:9px;font-weight:850;text-align:center;color:#f8edd7}
 .avatar-picker-preview{display:none}
@@ -401,7 +401,7 @@ body{
 
 /* Avatar picker and lobby — preserve existing DOM and behavior */
 #modal-avatar-picker{background:rgba(0,10,9,.48);backdrop-filter:none;-webkit-backdrop-filter:none;}
-#modal-avatar-picker .avatar-picker-box{background:linear-gradient(180deg,rgba(3,25,21,.22),rgba(2,12,10,.38)),url('assets/backgrounds/bg-avatar.jpg') center/cover no-repeat;backdrop-filter:none;-webkit-backdrop-filter:none;}
+#modal-avatar-picker .avatar-picker-box{background:#071a16;backdrop-filter:none;-webkit-backdrop-filter:none;}
 #modal-avatar-picker .avatar-picker-preview{display:none;}
 #modal-lobby .lobby-box{
   background:linear-gradient(180deg,rgba(4,29,24,.88),rgba(5,14,13,.96)),url('assets/backgrounds/bg-lobby.jpg') center/cover;
@@ -990,47 +990,59 @@ body::after{
 }
 #modal-lobby .lobby-box{
   width:min(92vw,760px);
-  height:calc(100dvh - 12px);
-  max-height:calc(100dvh - 12px);
+  height:auto;
+  max-height:calc(100dvh - 18px);
   overflow:hidden;
-  padding:13px 15px 10px;
+  padding:10px 13px 8px;
 }
 #modal-lobby .modal-head{
-  margin-bottom:5px;
+  margin-bottom:2px;
+}
+#modal-lobby .lobby-head-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex:0 0 auto;
 }
 #modal-lobby .modal-kicker{
   font-size:8px;
 }
 #modal-lobby .modal-title{
-  font-size:18px;
-  margin-top:2px;
+  font-size:17px;
+  margin-top:1px;
 }
 #modal-lobby .modal-copy{
-  font-size:9px;
-  line-height:1.25;
-  margin-top:3px;
+  font-size:8px;
+  line-height:1.15;
+  margin-top:1px;
+  min-height:0;
 }
 #modal-lobby .mp-setup,
 #modal-lobby .mp-room-panel,
 #modal-lobby .lobby-actions{
-  gap:5px;
+  gap:4px;
 }
 #modal-lobby .field-label{
-  font-size:9px;
+  font-size:8px;
 }
 #modal-lobby .field-input{
-  padding:7px 9px;
-  min-height:34px;
-  font-size:11px;
+  padding:6px 9px;
+  min-height:31px;
+  font-size:10px;
   border-radius:8px;
 }
 #modal-lobby .mp-p2p-choice{
-  gap:6px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:5px;
+}
+#modal-lobby .mp-p2p-choice .btn{
+  width:100%;
 }
 #modal-lobby .p2p-card,
 #modal-lobby .room-share-card{
-  gap:5px;
-  padding:8px 9px;
+  gap:4px;
+  padding:7px 8px;
   border-radius:9px;
 }
 #modal-lobby .p2p-card-title{
@@ -1086,6 +1098,69 @@ body::after{
 }
 #modal-lobby .reconnect-card span{
   font-size:8px;
+}
+
+/* Unified multiplayer setup: one name field, two top actions, join + reconnect below. */
+#modal-lobby .mp-p2p-choice{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:5px;
+}
+#modal-lobby .mp-p2p-choice .btn{
+  width:100%;
+}
+#modal-lobby .mp-p2p-choice .btn-danger{
+  background:linear-gradient(180deg,#c9534e,#982c2c);
+  border-color:#e17a72;
+  color:#fff7f5;
+  box-shadow:0 7px 16px rgba(120,25,25,.24),inset 0 1px 0 rgba(255,255,255,.16);
+}
+#modal-lobby .lobby-setup-join-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:7px;
+  align-items:stretch;
+}
+#modal-lobby .lobby-setup-join-grid .p2p-card,
+#modal-lobby .lobby-setup-join-grid .reconnect-card{
+  min-width:0;
+  height:100%;
+}
+#modal-lobby .lobby-setup-join-grid .reconnect-card{
+  display:grid;
+  align-content:center;
+  gap:4px;
+  padding:7px 8px;
+  border-radius:8px;
+}
+#modal-lobby .lobby-setup-join-grid .reconnect-card strong{
+  font-size:10px;
+}
+#modal-lobby .lobby-setup-join-grid .reconnect-card span{
+  font-size:8px;
+}
+#modal-lobby .lobby-setup-join-grid .reconnect-card .btn{
+  width:100%;
+}
+#modal-lobby .lobby-setup-join-grid .p2p-card-title{
+  margin-bottom:1px;
+}
+@media (max-width:430px){
+  #modal-lobby .lobby-setup-join-grid{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:5px;
+  }
+  #modal-lobby .lobby-setup-join-grid .p2p-card,
+  #modal-lobby .lobby-setup-join-grid .reconnect-card{
+    padding:6px;
+  }
+  #modal-lobby .lobby-setup-join-grid .reconnect-card strong{
+    font-size:8.5px;
+  }
+  #modal-lobby .lobby-setup-join-grid .reconnect-card span,
+  #modal-lobby .lobby-setup-join-grid .mp-hint{
+    font-size:7px;
+  }
 }
 
 
@@ -1175,6 +1250,9 @@ body::after{
 #modal-lobby .lobby-actions{
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:6px;
+}
+#modal-lobby .lobby-actions.guest-actions{
+  grid-template-columns:repeat(2,minmax(0,1fr));
 }
 #modal-lobby .lobby-actions .btn{
   width:100%;
@@ -1692,21 +1770,27 @@ body::after{
 #modal-history-detail .history-summary-action{display:flex;justify-content:center;margin-top:1px;}
 #modal-history-detail .history-round-open-btn{width:100%;min-height:38px;padding:7px 12px;border-radius:9px;background:linear-gradient(180deg,#efc76f,#bc7a27);color:#1e1205;border:1px solid #f5d89b;font-size:9px;font-weight:950;box-shadow:0 8px 20px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,248,220,.28);}
 #modal-history-round{align-items:center;justify-content:center;padding:10px;overflow:hidden;background:linear-gradient(180deg,rgba(0,12,10,.78),rgba(0,5,4,.90));backdrop-filter:blur(6px);}
-#modal-history-round .history-box{width:min(94vw,900px);max-height:calc(100dvh - 20px);overflow:auto;padding:16px;border-color:rgba(229,189,105,.26);background:radial-gradient(circle at 50% 0%,rgba(218,170,75,.06),transparent 36%),linear-gradient(180deg,rgba(25,33,27,.97),rgba(7,14,11,.99));box-shadow:0 34px 100px rgba(0,0,0,.64),inset 0 1px 0 rgba(255,238,198,.06);}
+#modal-history-round .history-box{width:min(94vw,900px);max-height:calc(100dvh - 16px);overflow:hidden;padding:12px;border-color:rgba(229,189,105,.26);background:radial-gradient(circle at 50% 0%,rgba(218,170,75,.06),transparent 36%),linear-gradient(180deg,rgba(25,33,27,.97),rgba(7,14,11,.99));box-shadow:0 34px 100px rgba(0,0,0,.64),inset 0 1px 0 rgba(255,238,198,.06);}
 #modal-history-round .history-head{margin-bottom:10px;padding-bottom:9px;}
 #modal-history-round .history-title{font-size:clamp(19px,2.6vw,25px);}
 #modal-history-round .history-subtitle{font-size:10px;margin-top:3px;}
-#modal-history-round #history-round-body{display:grid;gap:9px;}
-#modal-history-round .history-round-tabs{justify-content:center;}
-#modal-history-round .history-round-tab{padding:7px 12px;font-size:9px;}
-#modal-history-round .history-round-result{padding:9px;gap:8px;}
+#modal-history-round #history-round-body{display:grid;gap:7px;min-height:0;}
+#modal-history-round .history-round-overview{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1.45fr);gap:7px;align-items:stretch;}
+#modal-history-round .history-round-selector{display:flex;align-items:center;gap:8px;min-width:0;padding:7px 8px;border-radius:9px;border:1px solid rgba(226,182,89,.16);background:rgba(1,19,16,.46);}
+#modal-history-round .history-round-selector .history-card-title{flex:0 0 auto;margin:0;font-size:7px;}
+#modal-history-round .history-round-tabs{justify-content:flex-start;gap:4px;min-width:0;}
+#modal-history-round .history-round-tab{padding:6px 9px;font-size:8px;}
+#modal-history-round .history-round-result{padding:7px 9px;gap:7px;min-width:0;}
+#modal-history-round .history-round-data-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(190px,.8fr);gap:7px;align-items:stretch;}
+#modal-history-round .history-round-hand-card,#modal-history-round .history-round-score-card{min-width:0;padding:7px;}
+#modal-history-round .history-round-hand-card .history-card-title,#modal-history-round .history-round-score-card .history-card-title{margin-bottom:4px;}
 #modal-history-round .history-trophy{font-size:21px;}
 #modal-history-round .history-round-result strong{font-size:11px;}
 #modal-history-round .history-round-result span{font-size:8px;}
 #modal-history-round .history-points{font-size:14px;}
-#modal-history-round .history-tiles{padding:6px;gap:2px;}
-#modal-history-round .history-winning-hand .history-tile{width:clamp(24px,3.1vw,38px);height:clamp(34px,4.5vw,52px);}
-#modal-history-round .history-yaku{font-size:8px;margin-top:3px;}
+#modal-history-round .history-tiles{padding:5px;gap:2px;align-items:flex-end;justify-content:flex-start;max-height:118px;overflow:hidden;}
+#modal-history-round .history-winning-hand .history-tile{width:clamp(22px,2.9vw,35px);height:clamp(31px,4.2vw,48px);}
+#modal-history-round .history-yaku{font-size:7px;margin-top:3px;line-height:1.25;}
 #modal-history-round .history-close-row{margin-top:2px;}
 #modal-history-round .history-close-row .btn{min-height:34px;font-size:8px;}
 @media(max-width:760px){
@@ -1717,7 +1801,10 @@ body::after{
   #modal-history-detail .history-summary-action{margin-top:0;}
   #modal-history-detail .history-round-open-btn{min-height:36px;font-size:8.5px;}
   #modal-history-round .history-card{padding:8px;}
-  #modal-history-round .history-round-tabs{justify-content:flex-start;}
+  #modal-history-round .history-round-overview{grid-template-columns:1fr;gap:5px;}
+  #modal-history-round .history-round-selector{align-items:flex-start;flex-direction:column;gap:4px;}
+  #modal-history-round .history-round-tabs{justify-content:flex-start;overflow:auto;}
+  #modal-history-round .history-round-data-grid{grid-template-columns:1fr;gap:5px;}
   #modal-history-round .history-round-tab{padding:6px 10px;font-size:8px;}
   #modal-history-round .history-round-result{grid-template-columns:auto 1fr;}
   #modal-history-round .history-points{grid-column:2;}
@@ -1728,6 +1815,29 @@ body::after{
 #modal-history-detail .history-card-title{color:#d6b56f;letter-spacing:.18em;}
 #modal-history-detail .history-score-line{background:rgba(2,17,14,.54);border:1px solid rgba(224,184,96,.055);}
 #modal-history-detail .history-score-line strong{color:#f3ce79;}
+
+@media (orientation:landscape) and (max-height:760px){
+  #modal-lobby .lobby-box{max-height:calc(100dvh - 12px);padding:8px 12px 7px;}
+  #modal-lobby .modal-head{margin-bottom:1px;}
+  #modal-lobby .modal-title{font-size:16px;}
+  #modal-lobby .field-input{min-height:29px;padding:5px 8px;}
+  #modal-lobby .btn{min-height:31px;padding:6px 10px;}
+  #modal-lobby .p2p-card{padding:6px 7px;}
+  #modal-history-round .history-box{max-height:calc(100dvh - 10px);padding:10px;}
+  #modal-history-round .history-head{margin-bottom:6px;padding-bottom:6px;}
+  #modal-history-round .history-title{font-size:19px;}
+  #modal-history-round .history-subtitle{font-size:8px;}
+  #modal-history-round #history-round-body{gap:5px;}
+  #modal-history-round .history-round-overview{gap:5px;}
+  #modal-history-round .history-round-selector,#modal-history-round .history-round-result{padding:5px 7px;}
+  #modal-history-round .history-round-data-grid{gap:5px;}
+  #modal-history-round .history-tiles{max-height:104px;padding:4px;}
+  #modal-history-round .history-winning-hand .history-tile{width:clamp(20px,2.5vw,31px);height:clamp(29px,3.8vw,43px);}
+  #modal-history-round .history-meld-mini .history-tile{width:15px;height:22px;}
+  #modal-history-round .history-score-line{padding:4px 6px;font-size:7.5px;}
+  #modal-history-round .history-close-row .btn{min-height:30px;}
+}
+
 #modal-history-detail .history-player-row{border-top-color:rgba(224,184,96,.08);}
 #modal-history-detail .history-avatar{box-shadow:0 4px 12px rgba(0,0,0,.20);}
 #modal-history-detail .history-round-tab{background:rgba(4,22,18,.72);border-color:rgba(224,184,96,.18);}
@@ -1855,16 +1965,18 @@ body::after{
                 <div>
                     <div class="modal-kicker">ONLINE FRIEND ROOM</div>
                     <div class="modal-title" id="lobby-title">Multiplayer</div>
-                    <p class="modal-copy" id="lobby-help">Buat room dan bagikan link. kursi kosong otomatis diisi AI.</p>
+                    <p class="modal-copy" id="lobby-help"></p>
                 </div>
-                <div id="mp-connection-badge" class="connection-badge offline">OFFLINE</div>
+                <div class="lobby-head-actions">
+                    <div id="mp-connection-badge" class="connection-badge offline">OFFLINE</div>
+                </div>
             </div>
             <div id="mp-setup" class="mp-setup">
                 <label class="field-label" for="mp-name">Nama pemain</label>
                 <input class="field-input" id="mp-name" maxlength="20" placeholder="Nama kamu" value="Player">
                 <div class="mp-p2p-choice">
                     <button class="btn btn-primary" onclick="mpCreateRoom()">Buat Room</button>
-                    <button class="btn btn-secondary" onclick="mpShowJoinForm()">Masukkan Kode</button>
+                    <button class="btn btn-danger" onclick="closeLobbyToMenu()">Keluar</button>
                 </div>
                 <div id="mp-host-invite" class="p2p-card" hidden>
                     <div class="p2p-card-title">Bagikan Room</div>
@@ -1874,13 +1986,15 @@ body::after{
                     <div class="p2p-row"><input class="field-input" id="mp-room-link" readonly><button type="button" class="btn btn-primary btn-compact share-link-btn" id="btn-share-room-link" onclick="mpCopyRoomLink()">Bagikan Link</button></div>
                     <div class="p2p-mini">Transport memakai Cloudflare.</div>
                 </div>
-                <div id="mp-guest-invite" class="p2p-card" hidden>
-                    <div class="p2p-card-title">Gabung Room</div>
-                    <label class="field-label" for="mp-room-code">Kode Room</label>
-                    <input class="field-input" id="mp-room-code" maxlength="5" inputmode="numeric" placeholder="12345">
-                    <button class="btn btn-primary btn-wide" onclick="mpJoinRoom()">Gabung Sekarang</button>
-                    <div class="mp-hint">Masukan Kode Room akan Masuk otomatis.</div>
-                    <div id="mp-reconnect-card" class="reconnect-card" hidden>
+                <div id="mp-guest-invite" class="lobby-setup-join-grid">
+                    <div class="p2p-card">
+                        <div class="p2p-card-title">Gabung Room</div>
+                        <label class="field-label" for="mp-room-code">Kode Room</label>
+                        <input class="field-input" id="mp-room-code" maxlength="5" inputmode="numeric" placeholder="12345">
+                        <button class="btn btn-primary btn-wide" onclick="mpJoinRoom()">Gabung Sekarang</button>
+                        <div class="mp-hint">Masukan Kode Room akan Masuk otomatis.</div>
+                    </div>
+                    <div id="mp-reconnect-card" class="reconnect-card">
                         <strong id="mp-reconnect-title">Menyambungkan kembali</strong>
                         <span id="mp-reconnect-text">Sesi room tersimpan.</span>
                         <button class="btn btn-secondary btn-compact" onclick="mpReconnect()">Sambungkan Kembali</button>
@@ -1897,7 +2011,7 @@ body::after{
                 <div class="lobby-actions">
                     <button class="btn btn-primary btn-wide" id="btn-lobby-ready" onclick="togglePlayerReady()">SIAP</button>
                     <button class="btn btn-primary btn-wide" id="btn-lobby-start" onclick="mpStartGame()" hidden>MULAI GAME</button>
-                    <button class="btn btn-secondary btn-wide" onclick="closeLobby()">Keluar</button>
+                    <button class="btn btn-danger btn-wide" onclick="closeLobby()">Keluar</button>
                 </div>
             </div>
         </section>
@@ -2532,7 +2646,7 @@ async function renderHistoryList(){const box=byId('history-list');if(!box)return
 async function openHistoryMatch(index){const list=window.__mahjongHistoryList||await historyGetAll();const m=list[index];if(!m)return;historyDetailMatch=m;historyDetailRoundIndex=0;setDisplay('modal-history','none');setDisplay('modal-history-round','none');setDisplay('modal-history-detail','flex');renderHistoryDetail()}
 function renderHistoryDetail(){const m=historyDetailMatch;if(!m)return;setText('history-detail-title','Detail Pertandingan');setText('history-detail-subtitle',`Room ${m.room} • ${historyDate(m.playedAt)} • ${m.rounds.length} ronde`);const body=byId('history-detail-body');if(!body)return;const players=(m.players||[]);const standings=(m.finalScores||[]).map((score,seat)=>({seat,name:players[seat]?.name||`Player ${seat+1}`,score})).sort((a,b)=>b.score-a.score);const phtml=players.map(p=>`<div class="history-player-row"><div class="history-avatar" style="background-image:url('${avatarUrl(p.avatar)}')"></div><span>${esc(p.name)}<small>${esc(p.wind)}</small></span><strong>${(m.finalScores?.[p.seat]||0).toLocaleString('id-ID')}</strong></div>`).join('');body.innerHTML=`<div class="history-detail-grid"><div class="history-card"><div class="history-card-title">Pertandingan</div><div class="history-info-list"><div class="history-info-row"><span>Room</span><strong>${esc(m.room)}</strong></div><div class="history-info-row"><span>Durasi</span><strong>${Math.round((m.durationMs||0)/60000)} menit</strong></div><div class="history-info-row"><span>Ronde</span><strong>${m.rounds.length}</strong></div></div><div class="history-card-title" style="margin-top:10px">Pemain</div><div class="history-players-grid">${phtml}</div></div><div class="history-card"><div class="history-card-title">Hasil Akhir</div><div class="history-score-table">${standings.map((x,i)=>`<div class="history-score-line"><span>${i===0?'🏆 ':`#${i+1} `}${esc(x.name)}</span><strong>${x.score.toLocaleString('id-ID')}</strong></div>`).join('')}</div></div></div><div class="history-summary-action"><button class="history-round-open-btn" type="button" onclick="openHistoryRoundDetail()">Lihat History Per Round ›</button></div>`}
 function openHistoryRoundDetail(){if(!historyDetailMatch)return;setDisplay('modal-history-detail','none');setDisplay('modal-history-round','flex');renderHistoryRoundDetail()}
-function renderHistoryRoundDetail(){const m=historyDetailMatch;if(!m)return;setText('history-round-title','Detail Per Round');setText('history-round-subtitle',`Room ${m.room} • ${historyDate(m.playedAt)} • ${m.rounds.length} ronde`);const body=byId('history-round-body');if(!body)return;const players=(m.players||[]);const rounds=(m.rounds||[]).map((r,i)=>`<button class="history-round-tab${i===historyDetailRoundIndex?' active':''}" onclick="selectHistoryRound(${i})">${esc(r.name||`Round ${i+1}`)}</button>`).join('');const r=m.rounds?.[historyDetailRoundIndex]||null;let winner=r?.winner;const winnerName=winner?.winnerName||(winner?.winnerSeat!==undefined?players[winner.winnerSeat]?.name:'Draw');const winTitle=r?.title||'DRAW';const points=String(r?.desc||'').split(' • ').slice(1).join(' • ');const tiles=winner?[...(winner.hand||[])]:[];if(winner?.winningTile&&!tiles.some(t=>t?.uniqueId===winner.winningTile.uniqueId))tiles.push(winner.winningTile);const tileHtml=tiles.map(historyTileHtml).join('');const meldHtml=(winner?.melds||[]).map((group,i)=>Array.isArray(group)&&group.length?`<div class="history-meld-mini" title="Meld ${i+1}">${group.map(historyTileHtml).join('')}</div>`:'').join('');const yaku=winner?.yakuStr||r?.desc||'Tidak ada detail kemenangan.';body.innerHTML=`<div class="history-card"><div class="history-card-title">Pilih Round</div><div class="history-round-nav"><div class="history-round-tabs">${rounds}</div></div></div><div class="history-round-content">${r?`<div class="history-round-result"><div class="history-trophy">${winTitle.startsWith('DRAW')?'🀄':'🏆'}</div><div><strong>${esc(winTitle)}</strong><span>${esc(winnerName||'Tidak ada pemenang')} • ${esc(r.desc||'')}</span></div><div class="history-points">${esc(points)}</div></div>${tileHtml||meldHtml?`<div><div class="history-card-title">Tangan Kemenangan</div><div class="history-winning-pack">${tileHtml?`<div class="history-tiles history-winning-hand">${tileHtml}</div>`:''}${meldHtml?`<div class="history-meld-inline"><span class="history-meld-inline-label">MELD</span>${meldHtml}</div>`:''}</div></div>`:''}<div class="history-yaku">${esc(yaku)}</div><div class="history-card"><div class="history-card-title">Skor Setelah Ronde</div><div class="history-score-table">${(r.scores||[]).map((score,seat)=>`<div class="history-score-line"><span>${esc(players[seat]?.name||playerName(seat))}</span><strong>${Number(score).toLocaleString('id-ID')}</strong></div>`).join('')}</div></div>`:'<div class="history-empty">Detail ronde tidak tersedia.</div>'}</div><div class="history-close-row"><button class="btn btn-secondary" type="button" onclick="closeHistoryRoundDetail()">Kembali ke Detail Pertandingan</button></div>`}
+function renderHistoryRoundDetail(){const m=historyDetailMatch;if(!m)return;setText('history-round-title','Detail Per Round');setText('history-round-subtitle',`Room ${m.room} • ${historyDate(m.playedAt)} • ${m.rounds.length} ronde`);const body=byId('history-round-body');if(!body)return;const players=(m.players||[]);const rounds=(m.rounds||[]).map((r,i)=>`<button class="history-round-tab${i===historyDetailRoundIndex?' active':''}" onclick="selectHistoryRound(${i})">${esc(r.name||`Round ${i+1}`)}</button>`).join('');const r=m.rounds?.[historyDetailRoundIndex]||null;let winner=r?.winner;const winnerName=winner?.winnerName||(winner?.winnerSeat!==undefined?players[winner.winnerSeat]?.name:'Draw');const winTitle=r?.title||'DRAW';const points=String(r?.desc||'').split(' • ').slice(1).join(' • ');const tiles=winner?[...(winner.hand||[])]:[];if(winner?.winningTile&&!tiles.some(t=>t?.uniqueId===winner.winningTile.uniqueId))tiles.push(winner.winningTile);const tileHtml=tiles.map(historyTileHtml).join('');const meldHtml=(winner?.melds||[]).map((group,i)=>Array.isArray(group)&&group.length?`<div class="history-meld-mini" title="Meld ${i+1}">${group.map(historyTileHtml).join('')}</div>`:'').join('');const yaku=winner?.yakuStr||r?.desc||'Tidak ada detail kemenangan.';body.innerHTML=`${r?`<div class="history-round-overview"><div class="history-round-selector"><div class="history-card-title">Pilih Round</div><div class="history-round-tabs">${rounds}</div></div><div class="history-round-result"><div class="history-trophy">${winTitle.startsWith('DRAW')?'🀄':'🏆'}</div><div><strong>${esc(winTitle)}</strong><span>${esc(winnerName||'Tidak ada pemenang')} • ${esc(r.desc||'')}</span></div><div class="history-points">${esc(points)}</div></div></div><div class="history-round-data-grid">${tileHtml||meldHtml?`<div class="history-card history-round-hand-card"><div class="history-card-title">Tangan Kemenangan</div><div class="history-winning-pack">${tileHtml?`<div class="history-tiles history-winning-hand">${tileHtml}</div>`:''}${meldHtml?`<div class="history-meld-inline"><span class="history-meld-inline-label">MELD</span>${meldHtml}</div>`:''}</div><div class="history-yaku">${esc(yaku)}</div></div>`:`<div class="history-card history-round-hand-card"><div class="history-card-title">Tangan Kemenangan</div><div class="history-empty">Detail tangan tidak tersedia.</div><div class="history-yaku">${esc(yaku)}</div></div>`}<div class="history-card history-round-score-card"><div class="history-card-title">Skor Setelah Ronde</div><div class="history-score-table">${(r.scores||[]).map((score,seat)=>`<div class="history-score-line"><span>${esc(players[seat]?.name||playerName(seat))}</span><strong>${Number(score).toLocaleString('id-ID')}</strong></div>`).join('')}</div></div></div>`:'<div class="history-empty">Detail ronde tidak tersedia.</div>'}<div class="history-close-row"><button class="btn btn-secondary" type="button" onclick="closeHistoryRoundDetail()">Kembali ke Detail Pertandingan</button></div>`}
 function selectHistoryRound(i){historyDetailRoundIndex=Math.max(0,Math.min(i,(historyDetailMatch?.rounds?.length||1)-1));renderHistoryRoundDetail()}
 try{autoSortSetting=localStorage.getItem('hk_auto_sort')!=='0'}catch{}
 function nextMpCallId(prefix='TURN'){
@@ -5020,11 +5134,11 @@ function mpEnsureReconnectOnResume(){
     );
   }
 }
-function openPlayerLobby(){isMultiplayerMode=true;mp.playerAvatar=selectedAvatar;clearTimeout(mpReconnectTimer);mpReconnectAttempts=0;mpReconnectDeadline=0;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');mpSetConnection(false);const code=new URL(location.href).searchParams.get(MP_ROOM_PARAM);const saved=mpLoadSession();if(code&&saved?.room===code&&saved?.token&&saved?.started){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('lobby-help','Menyambungkan kembali ke Room '+code+'…');mpBeginReconnect(saved);return}if(code){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.host=false;mp.ready=true;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};setText('lobby-help','Menghubungkan ke Room '+code+'…');mpConnect(code,'guest')}}
+function openPlayerLobby(){isMultiplayerMode=true;mp.playerAvatar=selectedAvatar;clearTimeout(mpReconnectTimer);mpReconnectAttempts=0;mpReconnectDeadline=0;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','grid');setDisplay('mp-reconnect-card','grid');mpSetConnection(false);const code=new URL(location.href).searchParams.get(MP_ROOM_PARAM);const saved=mpLoadSession();if(code&&saved?.room===code&&saved?.token&&saved?.started){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('lobby-help','Menyambungkan kembali ke Room '+code+'…');mpBeginReconnect(saved);return}if(code){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.host=false;mp.ready=true;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};setText('lobby-help','Menghubungkan ke Room '+code+'…');mpConnect(code,'guest')}}
 function closeLobby(){gameChatClose();mpServerStarted=false;clearGuestActionRetry();clearTimeout(mpReconnectTimer);clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);clearTimeout(mpRejoinHandshakeTimer);mpRejoinHandshakeTimer=null;mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinFallbackState=null;stopMpGameWatchdog();stopMpPing();try{mpSend('leave')}catch(e){}try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}mp.ws=null;mp.connected=false;mpClearSession();mpClearActiveGameState();mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,token:null,playerName:mp.playerName||'Player',playerAvatar:selectedAvatar};isMultiplayerMode=false;setDisplay('modal-lobby','none');mpSetConnection(false)}
+function closeLobbyToMenu(){closeLobby();nav('screen-play')}
 function mpCreateRoom(){mpServerStarted=false;mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinJoined=false;mpRejoinFallbackState=null;clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.playerAvatar=selectedAvatar;const code=String(Math.floor(10000+Math.random()*90000));mp.host=true;mp.seat=0;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();isMultiplayerMode=true;mp.room={code,players:[null,null,null,null],started:false};setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('mp-room-code-display',code);setText('mp-host-room-code',code);setText('lobby-help','Membuat room di Cloudflare…');mpRenderRoomQr(code);mpSaveSession();mpConnect(code,'host')}
 function mpJoinRoom(){mpServerStarted=false;mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinJoined=false;mpRejoinFallbackState=null;clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code)){alert('Masukkan kode room 5 digit.');return}mp.host=false;mp.seat=null;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};isMultiplayerMode=true;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Menghubungkan ke Room '+code+'…');mpSaveSession();mpConnect(code,'guest')}
-function mpShowJoinForm(){setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','block')}
 function togglePlayerReady(){if(!mp.room)return;mp.ready=!mp.ready;mpSend('ready',{ready:mp.ready});mpSaveSession();if(mp.host&&mp.room.players?.[0])mp.room.players[0].ready=mp.ready;mpRenderLobby(mp.room)}
 function mpStartGame(){
   if(!mp.host)return;
@@ -5249,6 +5363,8 @@ function mpRenderLobby(room){
   winds.forEach((w,i)=>{const p=room.players?.[i];const row=document.createElement('div');row.className='ready-item';const isHost=i===0&&p;const name=p?escapeHtml(p.name):'Kursi kosong';const disconnected=p&&p.connected===false;const state=p?(disconnected?'TERPUTUS':(p.ready?'READY':'WAITING')):'OPEN';const cls=p&&p.ready&&!disconnected?'status-ready':'status-waiting';row.innerHTML=`<span>${name} <small>• ${w}${isHost?' • HOST':''}</small></span><span class="${cls}">${state}</span>`;list.appendChild(row)});
   setText('btn-lobby-ready',mp.ready?'BATAL SIAP':'SIAP');
   const joined=(room.players||[]).filter(Boolean).length;const humans=(room.players||[]).filter(Boolean);const startBtn=byId('btn-lobby-start');
+  const lobbyActions=byId('modal-lobby')?.querySelector('.lobby-actions');
+  if(lobbyActions)lobbyActions.classList.toggle('guest-actions',!mp.host);
   if(startBtn){startBtn.hidden=!mp.host||room.started;startBtn.disabled=!(joined>=1&&humans.every(p=>p.ready));}
   if(mp.host&&joined>=1&&!room.started) setText('lobby-help',joined<4?`Room siap. ${joined}/4 pemain; kursi kosong dapat diisi AI saat game dimulai.`:'Semua kursi terisi.');
 }
@@ -5554,10 +5670,13 @@ function mpTapRemoteDiscard(t){
 function mpCopyRoomInfo(){mpCopyRoomLink()}
 function mpReconnect(){
   const saved=mpLoadSession();
-  if(!saved?.room)return;
-  mpBeginReconnect(saved);
+  if(!saved?.room){
+    setText('mp-reconnect-text','Tidak ada sesi room tersimpan.');
+    return false;
+  }
+  return mpBeginReconnect(saved);
 }
-window.mpConnect=mpConnect;window.mpSend=mpSend;window.openPlayerLobby=openPlayerLobby;window.mpCreateRoom=mpCreateRoom;window.mpJoinRoom=mpJoinRoom;window.mpShowJoinForm=mpShowJoinForm;window.togglePlayerReady=togglePlayerReady;window.mpStartGame=mpStartGame;window.closeLobby=closeLobby;window.mpCopyRoomLink=mpCopyRoomLink;window.mpCopyRoomInfo=mpCopyRoomInfo;
+window.mpConnect=mpConnect;window.mpSend=mpSend;window.openPlayerLobby=openPlayerLobby;window.mpCreateRoom=mpCreateRoom;window.mpJoinRoom=mpJoinRoom;window.togglePlayerReady=togglePlayerReady;window.mpStartGame=mpStartGame;window.closeLobby=closeLobby;window.mpCopyRoomLink=mpCopyRoomLink;window.mpCopyRoomInfo=mpCopyRoomInfo;
 
 function forceFreshReload(){
   const btn=document.getElementById('btn-cache-refresh');
