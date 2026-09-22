@@ -2005,7 +2005,7 @@ body::after{
             <div class="center-board" id="center-board-box">
                 <div class="round-info" id="round-title-display">East 1</div>
                 <div class="turn-timer" id="turn-timer-display">--</div>
-                <div class="tiles-left" id="tiles-remaining"><span class="tiles-left-icon" aria-hidden="true">🀄</span><span class="tiles-left-number">70</span></div>
+                <div class="tiles-left" id="tiles-remaining"><span class="tiles-left-number">70</span></div>
                 <div class="score-tag score-south" id="score-0" title="South score">15.000</div>
                 <div class="score-tag score-east" id="score-1" title="East score">15.000</div>
                 <div class="score-tag score-north" id="score-2" title="North score">15.000</div>
@@ -2839,7 +2839,7 @@ function renderHand(){const wrap=byId('player-hand-tiles');if(!wrap)return;const
 function renderEnemyHands(){const s=mp.seat??0,m=mappedSeats(s);[[`enemy-hand-top`,m[2]],[`enemy-hand-right`,m[1]],[`enemy-hand-left`,m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const count=Math.max(0,playerHands[p]?.length||0);for(let i=0;i<count;i++){const b=document.createElement('span');b.className='mini-back';e.appendChild(b)}const label=document.createElement('span');label.className='hand-count-label';label.textContent=`×${count}`;e.appendChild(label);})}
 function renderRivers(){const s=mp.seat??0,m=mappedSeats(s);const selectedId=(selectedTileIndex>=0&&playerHands[s]?.[selectedTileIndex])?playerHands[s][selectedTileIndex].id:null;[['river-bottom',m[0]],['river-right',m[1]],['river-top',m[2]],['river-left',m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const tiles=(playerRivers[p]||[]).slice(0,id==='river-top'||id==='river-bottom'?32:30);tiles.forEach(t=>{const d=document.createElement('div');d.className='discard-tile';if(selectedId!==null&&t.id===selectedId)d.classList.add('same-tile-highlight');d.dataset.tileId=t.id;d.innerHTML=tileMarkup(t);e.appendChild(d)})})}
 function renderMelds(){const s=mp.seat??0,m=mappedSeats(s);const own=byId('player-melds-container');if(own){own.innerHTML='';(playerMelds[m[0]]||[]).forEach(g=>{const box=document.createElement('div');box.className='meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});own.appendChild(box)})}const enemyMap=[['enemy-meld-top-label','enemy-meld-top-tiles',m[2]],['enemy-meld-right-label','enemy-meld-right-tiles',m[1]],['enemy-meld-left-label','enemy-meld-left-tiles',m[3]]];enemyMap.forEach(([labelId,tilesId,p])=>{const label=byId(labelId),wrap=byId(tilesId);const groups=playerMelds[p]||[];const labels=groups.map(g=>g.length===4?'Kan':(g.length===3&&g.every(t=>t.id===g[0].id)?'Pon':'Chow'));if(label)setText(labelId,labels.length?labels.join(' • '):'');if(!wrap)return;wrap.innerHTML='';groups.forEach(g=>{const box=document.createElement('div');box.className='enemy-meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});wrap.appendChild(box)})})}
-function renderTable(){advisorKnownCacheKey='';advisorKnownCache=null;renderNames();renderAvatars();updateTurnHighlight();renderPlayerConnectionStatus(mp.room);renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);if(!isMultiplayerMode){renderLocalTurnTimer(isActionPhase?actionSecondsLeft:secondsLeft,isActionPhase?actionSeat:currentTurn);}else if(isActionPhase){renderLocalTurnTimer(actionSecondsLeft,actionSeat);}else{renderLocalTurnTimer(secondsLeft,currentTurn);}const tilesLeftEl=byId('tiles-remaining');const tilesRemaining=Math.max(0,Number(fullDeck.length)||0);if(tilesLeftEl){tilesLeftEl.classList.toggle('low',tilesRemaining<30);tilesLeftEl.innerHTML=`<span class="tiles-left-icon" aria-hidden="true">🀄</span><span class="tiles-left-number">${tilesRemaining}</span>`;}updateMusicIntensity();showCurrentWaitAdvisor();if(currentTurn===(mp.seat??0)){setText('hand-status-main','Giliran Anda');setText('hand-status-sub','Pilih tile untuk membuang.');}else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');}}
+function renderTable(){advisorKnownCacheKey='';advisorKnownCache=null;renderNames();renderAvatars();updateTurnHighlight();renderPlayerConnectionStatus(mp.room);renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);if(!isMultiplayerMode){renderLocalTurnTimer(isActionPhase?actionSecondsLeft:secondsLeft,isActionPhase?actionSeat:currentTurn);}else if(isActionPhase){renderLocalTurnTimer(actionSecondsLeft,actionSeat);}else{renderLocalTurnTimer(secondsLeft,currentTurn);}const tilesLeftEl=byId('tiles-remaining');const tilesRemaining=Math.max(0,Number(fullDeck.length)||0);if(tilesLeftEl){tilesLeftEl.classList.toggle('low',tilesRemaining<30);tilesLeftEl.innerHTML=`<span class="tiles-left-number">${tilesRemaining}</span>`;}updateMusicIntensity();showCurrentWaitAdvisor();if(currentTurn===(mp.seat??0)){setText('hand-status-main','Giliran Anda');setText('hand-status-sub','Pilih tile untuk membuang.');}else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');}}
 
 function isSequenceGroup(group){
   if(!Array.isArray(group)||group.length!==3)return false;
@@ -4318,19 +4318,65 @@ function gameChatUpdatePanelPlacement(){
   if(!root||!panel||!board||!gameChatOpen)return;
 
   root.classList.remove('panel-right','panel-below');
+  panel.style.left='';
+  panel.style.top='';
+  panel.style.right='auto';
+  panel.style.bottom='auto';
 
   const boardRect=board.getBoundingClientRect();
   const rootRect=root.getBoundingClientRect();
   const panelW=panel.offsetWidth||220;
   const panelH=panel.offsetHeight||248;
+  const gap=8;
+  const margin=6;
 
-  if(rootRect.left+panelW>boardRect.right-6){
-    root.classList.add('panel-right');
-  }
+  // Keep the whole chat panel inside the actual visible viewport.
+  // The old class-only placement could still let the panel run off-screen.
+  const viewportW=window.visualViewport?.width||window.innerWidth;
+  const viewportH=window.visualViewport?.height||window.innerHeight;
+  const viewportLeft=window.visualViewport?.offsetLeft||0;
+  const viewportTop=window.visualViewport?.offsetTop||0;
 
-  if(rootRect.top-panelH-7<boardRect.top+6){
+  const minX=Math.max(viewportLeft+margin,boardRect.left+margin);
+  const maxX=Math.min(viewportLeft+viewportW-margin,boardRect.right-margin);
+  const minY=Math.max(viewportTop+margin,boardRect.top+margin);
+  const maxY=Math.min(viewportTop+viewportH-margin,boardRect.bottom-margin);
+
+  let targetX=rootRect.left;
+  let targetY=rootRect.top-panelH-gap;
+
+  // Prefer opening above the button.
+  if(targetY<minY){
+    targetY=rootRect.bottom+gap;
     root.classList.add('panel-below');
   }
+
+  // If there is not enough room below either, clamp vertically to the viewport.
+  if(targetY+panelH>maxY){
+    targetY=Math.max(minY,maxY-panelH);
+  }
+
+  // Keep the full panel horizontally visible.
+  if(targetX+panelW>maxX){
+    targetX=maxX-panelW;
+    root.classList.add('panel-right');
+  }
+  if(targetX<minX){
+    targetX=minX;
+    root.classList.remove('panel-right');
+  }
+
+  // When the screen is narrower than the panel, let CSS max-width handle it.
+  // Re-read the size once after clamping so the calculation remains accurate.
+  const finalW=panel.offsetWidth||panelW;
+  const finalH=panel.offsetHeight||panelH;
+  targetX=Math.max(minX,Math.min(targetX,maxX-finalW));
+  targetY=Math.max(minY,Math.min(targetY,maxY-finalH));
+
+  panel.style.left=`${targetX-rootRect.left}px`;
+  panel.style.top=`${targetY-rootRect.top}px`;
+  panel.style.right='auto';
+  panel.style.bottom='auto';
 }
 
 function gameChatUnreadRender(){
@@ -4659,6 +4705,14 @@ function gameChatInit(){
     e.preventDefault();
     gameChatSend();
   });
+
+  const refreshChatViewport=()=>{
+    gameChatClampPosition();
+    if(gameChatOpen)gameChatUpdatePanelPlacement();
+  };
+  window.addEventListener('resize',refreshChatViewport,{passive:true});
+  window.visualViewport?.addEventListener('resize',refreshChatViewport,{passive:true});
+  window.visualViewport?.addEventListener('scroll',refreshChatViewport,{passive:true});
 
   input.addEventListener('keydown',e=>{
     if(e.key==='Enter'&&!e.shiftKey){
