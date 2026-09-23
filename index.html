@@ -1850,23 +1850,178 @@ body::after{
 #game-board .player-seat.turn-active .avatar-img{box-shadow:0 0 0 3px rgba(243,210,123,.34),0 0 22px rgba(243,210,123,.36),0 8px 16px rgba(0,0,0,.34);}
 #game-board .player-seat.turn-active .avatar-name{box-shadow:0 0 14px rgba(243,210,123,.15);}
 </style>
+
+<style id="custom-profile-style-integration">
+/* ============================================================
+   CUSTOM PROFILE + STYLE — PRESENTATION ONLY
+   Player identity is local; style never enters Worker/game state.
+   ============================================================ */
+:root{
+  --user-table-a:#203d2d;--user-table-b:#07140e;--user-table-c:#0d2b20;
+  --user-center-top:#173f32;--user-center-bottom:#06130e;
+}
+#screen-main{align-items:stretch;justify-content:stretch;padding:0!important;overflow:hidden;background-position:center;background-size:cover;}
+#screen-main .main-menu-canvas{position:relative;width:100%;height:100%;max-width:none;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding:0!important;overflow:hidden;}
+#screen-main .main-menu-canvas::before{display:none!important}
+#screen-main #btn-cache-refresh{display:none!important}
+#screen-main .main-menu-center{position:absolute;left:50%;top:51%;transform:translate(-50%,-50%);width:min(76vw,820px);display:grid;justify-items:center;text-align:center;z-index:8;}
+#screen-main .menu-emblem{width:58px;height:58px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(180deg,#fff6dd,#f5ede0);color:#a61f1d;font-family:serif;font-size:34px;font-weight:900;border:2px solid #d5a64e;box-shadow:0 8px 25px rgba(0,0,0,.30),0 0 20px rgba(234,183,76,.18);text-shadow:none;margin-bottom:8px;}
+#screen-main .brand-lockup{margin-bottom:28px;}
+#screen-main .brand-kicker{font-size:12px;letter-spacing:.25em;color:#f2d58d;}
+#screen-main .brand-dot{background:#f0c85d;box-shadow:0 0 12px rgba(240,200,93,.45);}
+#screen-main h1{font-size:clamp(42px,6.6vw,78px)!important;line-height:.9;margin:7px 0 11px!important;letter-spacing:-.045em;color:#fff3d8!important;text-shadow:0 4px 28px rgba(0,0,0,.55),0 0 20px rgba(230,181,77,.13)!important;}
+#screen-main h1::before,#screen-main h1::after{display:none!important}
+#screen-main .brand-subtitle{font-size:clamp(11px,1.4vw,16px);letter-spacing:.19em;color:#d5c8af;}
+#screen-main .main-menu-actions{width:min(48vw,560px);gap:14px;justify-items:center;}
+#screen-main .main-play-btn{width:100%;min-height:66px;border-radius:16px;font-size:clamp(17px,2vw,24px);font-weight:950;background:linear-gradient(180deg,#ba342e,#74171b 72%,#5c1014);border-color:#f4d18e;color:#fff2df;box-shadow:0 16px 35px rgba(0,0,0,.38),0 0 24px rgba(188,45,39,.22),inset 0 1px 0 rgba(255,244,205,.18);}
+#screen-main .main-history-btn{width:235px;min-height:48px;border-radius:15px;font-size:17px;font-weight:900;background:linear-gradient(180deg,rgba(19,21,17,.92),rgba(6,10,8,.96));border-color:#d8ad59;color:#f0dfba;box-shadow:0 10px 24px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,242,208,.08);}
+#screen-main .history-menu-symbol{margin-right:8px;color:#edc670;}
+#screen-main .profile-card{position:absolute;left:2vw;top:2.2vh;width:min(17.6vw,256px);min-width:185px;display:grid;grid-template-columns:54px minmax(0,1fr) 30px;align-items:center;gap:8px;padding:7px 14px 7px 8px;border:1px solid rgba(238,198,109,.82);border-radius:18px;background:linear-gradient(180deg,rgba(4,24,19,.96),rgba(2,12,10,.98));box-shadow:0 14px 36px rgba(0,0,0,.50),0 0 0 1px rgba(255,236,198,.05) inset,0 0 18px rgba(226,177,74,.09);color:#f5ecd7;z-index:20;text-align:left;}
+#screen-main .profile-avatar-frame{width:54px;height:54px;padding:3px;border-radius:15px;border:2px solid #e3b657;box-shadow:0 0 0 3px rgba(226,182,85,.12),0 8px 20px rgba(0,0,0,.30);overflow:hidden;background:#07130f;}
+#screen-main .profile-avatar-frame img{width:100%;height:100%;display:block;object-fit:cover;border-radius:11px;}
+#screen-main .profile-card-copy{display:grid;gap:2px;min-width:0;}
+#screen-main .profile-card-copy strong{font-size:14px;line-height:1.0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff2d5;}
+#screen-main .profile-card-copy span{font-size:9px;font-weight:800;color:#d8c8a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#screen-main .profile-card-copy small{margin-top:2px;font-size:8px;color:#eac875;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#screen-main .profile-card-copy small b{font-size:13px;margin-left:4px;}
+#screen-main .profile-edit{width:30px;height:30px;margin-right:3px;justify-self:end;border-radius:9px;display:grid;place-items:center;border:1px solid rgba(242,206,124,.65);background:rgba(14,20,15,.86);color:#f0d18a;font-size:17px;}
+#screen-main .main-settings-btn{position:absolute;right:2.3vw;bottom:3vh;display:flex;align-items:center;gap:9px;padding:0 22px;height:56px;border-radius:17px;border:1px solid rgba(233,198,120,.86);background:linear-gradient(180deg,rgba(15,18,14,.97),rgba(4,8,7,.99));color:#f2dfb8;font-size:16px;font-weight:900;box-shadow:0 14px 28px rgba(0,0,0,.35),0 0 16px rgba(227,178,77,.08),inset 0 1px 0 rgba(255,244,207,.08);z-index:20;}
+#screen-main .main-settings-btn span:first-child{font-size:21px;color:#f0cb76;}
+
+#screen-play{background-image:url('assets/backgrounds/bg-play.jpg')!important;background-size:cover;background-position:center;}
+#screen-play .screen-card{width:min(94vw,900px);min-height:0;max-height:calc(100dvh - 16px);padding:26px 28px 18px;background:linear-gradient(180deg,rgba(3,25,21,.28),rgba(2,14,12,.58));border-color:rgba(229,189,103,.40);}
+#screen-play .screen-card::before{inset:8px;border-radius:18px;}
+#screen-play .brand-lockup{margin-bottom:15px;}
+#screen-play .screen-heading{font-size:clamp(27px,4.2vw,42px);margin:7px 0 4px;color:var(--ui-ivory);text-shadow:0 5px 24px rgba(0,0,0,.45);}
+#screen-play .brand-subtitle{font-size:11px;color:#c5baaa;}
+#screen-play .menu-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:stretch;}
+#screen-play .menu-actions .btn{position:relative;min-height:clamp(184px,30vh,238px);height:clamp(184px,30vh,238px);padding:calc(clamp(184px,30vh,238px) - 94px) 12px 12px;border-radius:17px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;background-position:center;background-size:cover;background-repeat:no-repeat;border:1px solid rgba(236,195,103,.56);overflow:hidden;text-align:center;backdrop-filter:none;-webkit-backdrop-filter:none;}
+#screen-play .menu-actions .btn::before{position:relative;z-index:2;width:42px;height:42px;font-size:18px;margin:0 auto 6px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(3,21,18,.78);border:1px solid rgba(237,194,99,.56);box-shadow:0 0 0 4px rgba(221,176,77,.08),0 0 18px rgba(227,183,92,.14);color:#f2ce79;}
+#screen-play .menu-actions .btn span,#screen-play .menu-actions .btn{position:relative;z-index:2;}
+#screen-play .menu-actions .btn:nth-child(1){background-image:linear-gradient(180deg,rgba(1,12,9,.04) 12%,rgba(1,8,7,.10) 44%,rgba(1,8,7,.78) 76%,rgba(0,6,5,.97) 100%),url('assets/backgrounds/bg-ai-card.jpg');}
+#screen-play .menu-actions .btn:nth-child(1)::before{content:"AI";font-size:11px;letter-spacing:.04em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:950;}
+#screen-play .menu-actions .btn:nth-child(2){background-image:linear-gradient(180deg,rgba(1,12,9,.04) 12%,rgba(1,8,7,.10) 44%,rgba(1,8,7,.78) 76%,rgba(0,6,5,.97) 100%),url('assets/backgrounds/bg-multiplayer-card.jpg');}
+#screen-play .menu-actions .btn:nth-child(2)::before{content:"4P";font-size:11px;letter-spacing:.02em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:950;}
+#screen-play .menu-actions .btn:nth-child(3){grid-column:1/-1;justify-self:center;width:150px;min-height:36px;height:36px;padding:7px 16px;border-radius:9px;font-size:10px;background:rgba(2,20,17,.78);border-color:rgba(222,175,77,.38);}
+#screen-play .menu-actions .btn:nth-child(3)::before{content:"←";width:auto;height:auto;border:0;box-shadow:none;background:none;margin:0 5px 0 0;font-size:13px;}
+#screen-play .btn-note{font-size:9px;margin-top:4px;color:#bdb2a2;}
+#screen-play .menu-actions .btn:hover{transform:translateY(-3px);filter:brightness(1.04);box-shadow:0 22px 44px rgba(0,0,0,.48),0 0 30px rgba(226,182,83,.14);}
+
+/* Profile/style modal */
+#modal-avatar-picker{padding:12px;background:rgba(0,6,5,.76);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+#modal-avatar-picker .profile-style-box{width:min(94vw,1040px);max-height:min(92dvh,820px);overflow:hidden;padding:18px 20px 16px;border-color:rgba(231,188,93,.52);background:linear-gradient(180deg,rgba(4,26,22,.98),rgba(3,11,10,.99));box-shadow:0 35px 110px rgba(0,0,0,.72),inset 0 1px 0 rgba(255,241,204,.09);}
+#modal-avatar-picker .profile-style-box>.modal-head{margin-bottom:12px;}
+#modal-avatar-picker .profile-style-box>.modal-head .modal-title{font-size:24px;}
+.profile-style-layout{display:grid;grid-template-columns:minmax(330px,.92fr) minmax(420px,1.08fr);gap:13px;min-height:0;}
+.profile-style-column{display:grid;gap:10px;min-width:0;align-content:start;}
+.style-section{border:1px solid rgba(226,181,86,.16);border-radius:15px;background:linear-gradient(180deg,rgba(5,26,21,.74),rgba(2,14,12,.88));padding:12px;min-width:0;}
+.style-section-title{font-size:9px;font-weight:950;letter-spacing:.18em;color:#e2b864;text-transform:uppercase;margin-bottom:9px;}
+.style-profile-head{display:grid;grid-template-columns:54px minmax(110px,.65fr) minmax(170px,1fr);align-items:center;gap:10px;margin:0;}
+.style-profile-head img{width:54px;height:54px;object-fit:cover;border-radius:15px;border:2px solid #e0b65c;box-shadow:0 0 0 3px rgba(226,182,84,.08);}
+.style-profile-head strong{display:block;color:#fff0d1;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.style-profile-head span{display:block;margin-top:3px;color:#bcae97;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.style-profile-head .field-input{margin:0;min-width:0;}
+#modal-avatar-picker .field-input{min-height:38px;padding:8px 10px;font-size:11px;}
+#modal-avatar-picker .avatar-grid-picker{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;margin-top:0;max-height:none;overflow:visible;padding-right:0;}
+#modal-avatar-picker .avatar-option-picker{padding:4px 3px;border-radius:10px;background:rgba(8,24,20,.88);border-color:rgba(221,181,92,.18);min-width:0;}
+#modal-avatar-picker .avatar-option-picker.selected{background:rgba(76,50,12,.95);border-color:#efc768;box-shadow:0 0 0 2px rgba(235,193,100,.14),0 8px 18px rgba(214,165,74,.13);}
+#modal-avatar-picker .avatar-option-picker img{display:block;width:clamp(32px,4.8vw,56px);height:clamp(32px,4.8vw,56px);margin:0 auto;object-fit:cover;border-radius:50%;border:2px solid rgba(220,177,83,.78);}
+#modal-avatar-picker .avatar-option-picker .avatar-option-name{font-size:7px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.style-choice-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.style-choice-select{width:100%;min-height:40px;padding:8px 34px 8px 11px;border:1px solid rgba(225,181,92,.24);border-radius:11px;background:linear-gradient(180deg,rgba(17,33,28,.96),rgba(5,16,13,.98));color:#f1e6d0;font-size:10px;font-weight:800;outline:none;appearance:auto;}
+.style-choice-select:focus{border-color:#edc568;box-shadow:0 0 0 2px rgba(236,193,95,.10);}
+.style-live-preview{padding-bottom:10px;}
+.style-preview-stage{height:235px;border-radius:12px;display:grid;place-items:center;overflow:hidden;border:1px solid rgba(223,181,92,.10);background:linear-gradient(145deg,var(--user-table-a),var(--user-table-b) 56%,var(--user-table-c));}
+.style-preview-board{position:relative;width:185px;height:185px;border-radius:20px;overflow:visible;background:linear-gradient(180deg,var(--user-center-top),var(--user-center-bottom));box-shadow:0 18px 38px rgba(0,0,0,.48);}
+.style-preview-glow,.style-preview-pattern,.style-preview-frame{position:absolute;pointer-events:none;user-select:none;inset:auto;}
+.style-preview-glow{inset:-18%;width:136%;height:136%;z-index:0;opacity:.88;}
+.style-preview-pattern{inset:5%;width:90%;height:90%;z-index:1;opacity:.64;}
+.style-preview-frame{inset:-11%;width:122%;height:122%;z-index:4;}
+.style-preview-score{position:absolute;z-index:5;color:#f8ead0;font-size:8px;font-weight:950;background:rgba(5,10,8,.82);border:1px solid rgba(232,191,98,.42);border-radius:999px;padding:3px 8px;white-space:nowrap;}
+.style-preview-score-top{left:50%;top:13px;transform:translateX(-50%) rotate(180deg);}
+.style-preview-score-bottom{left:50%;bottom:13px;transform:translateX(-50%);}
+.style-preview-score-left{left:8px;top:50%;transform:translateY(-50%) rotate(180deg);writing-mode:vertical-rl;}
+.style-preview-score-right{right:8px;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;}
+.style-preview-timer{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:5;font-size:38px;font-weight:950;color:#fff4da;text-shadow:0 3px 15px rgba(226,180,82,.15);}
+.style-preview-remain{position:absolute;left:50%;bottom:47px;transform:translateX(-50%);z-index:5;color:#e5bd68;font-size:8px;font-weight:850;white-space:nowrap;}
+.profile-style-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px;}
+.profile-style-actions .btn{min-width:130px;min-height:38px;font-size:10px;}
+
+/* Apply local style only to the existing game visuals. */
+#screen-game .table-plane::before{background:radial-gradient(ellipse at 50% 42%,rgba(78,112,69,.09),rgba(34,59,42,.025) 34%,transparent 68%),radial-gradient(circle at 15% 17%,rgba(133,86,48,.07),transparent 31%),radial-gradient(circle at 84% 80%,rgba(79,108,78,.06),transparent 35%),linear-gradient(116deg,rgba(219,174,82,.035),transparent 19%,transparent 76%,rgba(113,85,49,.038)),repeating-linear-gradient(0deg,rgba(255,255,255,.009) 0 1px,transparent 1px 5px),repeating-linear-gradient(90deg,rgba(0,0,0,.028) 0 1px,transparent 1px 6px),linear-gradient(145deg,var(--user-table-a),var(--user-table-b) 58%,var(--user-table-c));}
+#screen-game .center-board{background:linear-gradient(180deg,var(--user-center-top),var(--user-center-bottom));}
+
+@media (max-width:800px){
+  #screen-main .profile-card{left:2.5vw;top:2.2vh;width:41.6vw;min-width:175px;max-width:240px;grid-template-columns:46px minmax(0,1fr) 26px;padding:6px 11px 6px 7px;gap:7px;border-radius:15px;}
+  #screen-main .profile-avatar-frame{width:46px;height:46px;border-radius:13px;}
+  #screen-main .profile-card-copy strong{font-size:13px;}
+  #screen-main .profile-card-copy span{font-size:8px;}
+  #screen-main .profile-card-copy small{font-size:7px;}
+  #screen-main .main-settings-btn{right:2.5vw;bottom:2.8vh;height:48px;padding:0 15px;font-size:13px;border-radius:14px;}
+  #screen-main .main-menu-center{top:55%;width:88vw;}
+  #screen-main .menu-emblem{width:46px;height:46px;font-size:27px;margin-bottom:6px;}
+  #screen-main .brand-kicker{font-size:8px;letter-spacing:.22em;}
+  #screen-main h1{font-size:clamp(32px,9vw,56px)!important;}
+  #screen-main .brand-subtitle{font-size:8px;letter-spacing:.12em;}
+  #screen-main .brand-lockup{margin-bottom:18px;}
+  #screen-main .main-menu-actions{gap:11px;}
+  #screen-main .main-menu-actions{width:min(74vw,400px);}
+  #screen-main .main-play-btn{min-height:54px;font-size:17px;}
+  #screen-main .main-history-btn{width:180px;min-height:44px;font-size:14px;}
+  .profile-style-layout{grid-template-columns:1fr;max-height:calc(92dvh - 150px);overflow:auto;padding-right:2px;}
+  #modal-avatar-picker .profile-style-box{max-height:94dvh;padding:12px;}
+  #modal-avatar-picker .avatar-grid-picker{grid-template-columns:repeat(10,minmax(0,1fr));max-height:none;}
+}
+@media (max-width:480px){
+  #screen-main .profile-card{width:51.2vw;min-width:172px;max-width:210px;padding-right:10px;}
+  #screen-main .profile-edit{width:26px;height:26px;margin-right:2px;font-size:15px;}
+    .profile-style-actions{flex-direction:row;}
+  .profile-style-actions .btn{min-width:0;flex:1;}
+  #modal-avatar-picker .avatar-grid-picker{grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;}
+  #modal-avatar-picker .style-profile-head{grid-template-columns:40px minmax(66px,.7fr) minmax(96px,1fr);gap:7px;}
+  #modal-avatar-picker .style-profile-head img{width:40px;height:40px;border-radius:11px;}
+  #modal-avatar-picker .style-profile-head strong{font-size:13px;}
+  #modal-avatar-picker .style-profile-head span{font-size:7px;}
+  #modal-avatar-picker .style-profile-head .field-input{min-height:34px;font-size:9px;padding:7px 8px;}
+  #modal-avatar-picker .avatar-option-picker{padding:3px 2px;border-radius:8px;}
+  #modal-avatar-picker .avatar-option-picker img{width:28px;height:28px;}
+  #modal-avatar-picker .avatar-option-picker .avatar-option-name{font-size:5.5px;}
+}
+</style>
+
 </head>
 <body>
     <audio id="bg-music" loop preload="auto" aria-hidden="true"></audio>
 
     <main id="screen-main" class="screen active" aria-labelledby="main-title">
         <button id="btn-cache-refresh" type="button" onclick="forceFreshReload()" aria-label="Refresh dan ambil versi terbaru" title="Refresh versi terbaru">↻</button>
-        <section class="screen-card glass">
-            <div class="brand-lockup">
-                <div class="brand-kicker"><span class="brand-dot"></span> Hong Kong Mahjong</div>
-                <h1 id="main-title">MAHJONG DJ - HongKong</h1>
-                <p class="brand-subtitle">GOOD VIBES • GOOD FRIENDS • GOOD GAMES</p>
+        <section class="screen-card glass main-menu-canvas">
+            <button class="profile-card" id="main-profile-card" type="button" onclick="openCustomizeProfile()" aria-label="Customize Your Style">
+                <span class="profile-avatar-frame"><img id="main-profile-avatar" src="avatars/avatar-panda.jpg" alt="Avatar pemain"></span>
+                <span class="profile-card-copy">
+                    <strong id="main-profile-name">Player</strong>
+                    <span id="main-profile-avatar-name">Panda</span>
+                    <small>Customize Profile <b aria-hidden="true">›</b></small>
+                </span>
+                <span class="profile-edit" aria-hidden="true">✎</span>
+            </button>
+
+            <div class="main-menu-center">
+                <div class="menu-emblem" aria-hidden="true">發</div>
+                <div class="brand-lockup">
+                    <div class="brand-kicker"><span class="brand-dot"></span> Hong Kong Mahjong</div>
+                    <h1 id="main-title">MAHJONG DJ</h1>
+                    <p class="brand-subtitle">GOOD VIBES • GOOD FRIENDS • GOOD GAMES</p>
+                </div>
+                <div class="menu-actions main-menu-actions">
+                    <button class="btn btn-primary main-play-btn" onclick="nav('screen-play')">Play Game</button>
+                    <button class="btn btn-secondary main-history-btn history-menu-btn" onclick="openHistory()"><span class="history-menu-symbol" aria-hidden="true">↺</span>History</button>
+                </div>
             </div>
-            <div class="menu-actions">
-                <button class="btn btn-primary" onclick="nav('screen-play')">Play Game</button>
-                <button class="btn btn-secondary history-menu-btn" onclick="openHistory()"><span class="history-menu-symbol" aria-hidden="true">↺</span>History</button>
-                <button class="btn btn-secondary" onclick="nav('screen-settings')">Settings</button>
-            </div>
+
+            <button class="main-settings-btn" type="button" onclick="nav('screen-settings')">
+                <span aria-hidden="true">⚙</span><span>Settings</span>
+            </button>
         </section>
     </main>
 
@@ -1924,34 +2079,99 @@ body::after{
     </main>
 
     <main id="screen-play" class="screen" aria-labelledby="play-title">
-        <section class="screen-card glass">
+        <section class="screen-card glass mode-select-card">
             <div class="brand-lockup">
                 <div class="brand-kicker">Game Modes</div>
                 <h1 id="play-title" class="screen-heading">Select Mode</h1>
-                <p class="brand-subtitle">Pilih meja untuk memulai ronde.</p>
+                <p class="brand-subtitle">Profile dan style sudah tersimpan. Pilih mode untuk langsung bermain.</p>
             </div>
-            <div class="menu-actions">
-                <button class="btn btn-primary" onclick="openSingleAvatarPicker()">Vs AI <span class="btn-note">• Singleplayer</span></button>
-                <button class="btn btn-secondary" onclick="openMultiAvatarPicker()">Vs Player <span class="btn-note">• Multiplayer Lobby</span></button>
-                <button class="btn btn-secondary" onclick="nav('screen-main')">Back</button>
+            <div class="menu-actions mode-actions">
+                <button class="btn btn-primary mode-card" onclick="startSinglePlayerFromMenu()">
+                    <strong>VS AI</strong><span>Singleplayer</span>
+                </button>
+                <button class="btn btn-secondary mode-card" onclick="openPlayerLobby()">
+                    <strong>VS PLAYER</strong><span>Multiplayer Lobby</span>
+                </button>
+                <button class="btn btn-secondary mode-back" onclick="nav('screen-main')">Back</button>
             </div>
         </section>
     </main>
 
     <div id="modal-avatar-picker" class="modal" role="dialog" aria-modal="true" aria-labelledby="avatar-picker-title">
-        <section class="modal-box glass avatar-picker-box">
+        <section class="modal-box glass profile-style-box">
             <div class="modal-head">
                 <div>
                     <div class="modal-kicker">PLAYER PROFILE</div>
-                    <div class="modal-title" id="avatar-picker-title">Pilih Avatar</div>
-                    <p class="modal-copy">Pilih avatar sebelum permainan dimulai.</p>
+                    <div class="modal-title" id="avatar-picker-title">Customize Your Style</div>
+                    <p class="modal-copy">Nama, avatar, warna meja, dan background center board tersimpan di perangkat ini.</p>
                 </div>
-                <button class="icon-btn" type="button" onclick="closeAvatarPicker()" aria-label="Tutup">×</button>
+                <button class="icon-btn" type="button" onclick="closeCustomizeProfile()" aria-label="Tutup">×</button>
             </div>
-            <div class="avatar-grid-picker" id="avatar-picker-grid"></div>
-            <div class="avatar-picker-actions">
-                <button class="btn btn-secondary" type="button" onclick="closeAvatarPicker()">Batal</button>
-                <button class="btn btn-primary" type="button" onclick="confirmAvatarSelection()">Pilih &amp; Lanjut</button>
+
+            <div class="profile-style-layout">
+                <div class="profile-style-column">
+                    <div class="style-section">
+                        <div class="style-section-title">PROFILE</div>
+                        <div class="style-profile-head">
+                            <img id="style-profile-avatar" src="avatars/avatar-panda.jpg" alt="Avatar pemain">
+                            <div><strong id="style-profile-name">Player</strong><span id="style-profile-avatar-name">Panda</span></div>
+                            <input class="field-input" id="custom-player-name" maxlength="20" placeholder="Nama pemain" value="Player">
+                        </div>
+                    </div>
+
+                    <div class="style-section">
+                        <div class="style-section-title">AVATAR</div>
+                        <div class="avatar-grid-picker" id="avatar-picker-grid"></div>
+                    </div>
+                </div>
+
+                <div class="profile-style-column">
+                    <div class="style-choice-pair">
+                        <div class="style-section">
+                            <div class="style-section-title">TABLE FELT</div>
+                            <select class="style-choice-select" id="custom-board-select" aria-label="Pilih warna meja">
+                                <option value="green">Dark Green</option>
+                                <option value="jade">Jade</option>
+                                <option value="maroon">Maroon</option>
+                                <option value="burgundy">Burgundy</option>
+                                <option value="black">Black</option>
+                                <option value="wine">Wine</option>
+                            </select>
+                        </div>
+                        <div class="style-section">
+                            <div class="style-section-title">CENTER BOARD BACKGROUND</div>
+                            <select class="style-choice-select" id="custom-center-select" aria-label="Pilih background center board">
+                                <option value="emerald">Emerald</option>
+                                <option value="jade">Jade Ink</option>
+                                <option value="maroon">Maroon Silk</option>
+                                <option value="burgundy">Burgundy Silk</option>
+                                <option value="black">Black Ink</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="style-section style-live-preview">
+                        <div class="style-section-title">LIVE PREVIEW</div>
+                        <div class="style-preview-stage" id="style-preview-stage">
+                            <div class="style-preview-board" id="style-preview-board">
+                                <img class="style-preview-glow" src="assets/centerboard/center-glow.svg" aria-hidden="true" alt="">
+                                <img class="style-preview-pattern" src="assets/centerboard/center-pattern.svg" aria-hidden="true" alt="">
+                                <img class="style-preview-frame" src="assets/centerboard/center-frame-gold.svg" aria-hidden="true" alt="">
+                                <div class="style-preview-score style-preview-score-top">15.000</div>
+                                <div class="style-preview-score style-preview-score-left">15.000</div>
+                                <div class="style-preview-timer">10</div>
+                                <div class="style-preview-remain">SISA 81</div>
+                                <div class="style-preview-score style-preview-score-right">15.000</div>
+                                <div class="style-preview-score style-preview-score-bottom">15.000</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-style-actions">
+                <button class="btn btn-secondary" type="button" onclick="resetCustomizeStyle()">Reset Style</button>
+                <button class="btn btn-primary" type="button" onclick="saveCustomizeProfile()">Simpan &amp; Tutup</button>
             </div>
         </section>
     </div>
@@ -1969,8 +2189,7 @@ body::after{
                 </div>
             </div>
             <div id="mp-setup" class="mp-setup">
-                <label class="field-label" for="mp-name">Nama pemain</label>
-                <input class="field-input" id="mp-name" maxlength="20" placeholder="Nama kamu" value="Player">
+                <input id="mp-name" type="hidden" value="Player">
                 <div class="mp-p2p-choice">
                     <button class="btn btn-primary" onclick="mpCreateRoom()">Buat Room</button>
                     <button class="btn btn-danger" onclick="closeLobbyToMenu()">Keluar</button>
@@ -2763,6 +2982,7 @@ let avatarPickerMode='';
 let playerAvatars=['panda','shiba','turtle','penguin'];
 
 let mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,playerName:'Player',token:null,playerAvatar:selectedAvatar};
+mp.playerName=getStoredPlayerName();
 let mpClientId=null,mpReconnectTimer=null,mpAutoStartTimer=null,mpPendingCalls=[];let mpServerStarted=false;let mpReconnectAttempts=0,mpReconnectDeadline=0,mpLastRoomView=null;let mpGameWatchdogTimer=null;let lastHostServerSeq=0;let mpRejoinMode=false,mpRejoinStateApplied=false,mpRejoinJoined=false,mpRejoinFallbackState=null,mpRejoinFallbackTimer=null,mpRejoinModeTimer=null,mpRejoinHandshakeTimer=null,mpSessionTouchAt=0;const MP_RECONNECT_WINDOW_MS=15*60*1000;const MP_SESSION_TOUCH_MS=5000;const MP_WORKER_URL='https://mahjong-room.mahjongjong.workers.dev',MP_ROOM_PARAM='room',MP_SESSION_KEY='mahjongHKRoomV1',MP_GAME_STATE_KEY='mahjongHKActiveGameV1';
 let aiSeats=new Set();
 const HUMAN_NAMES=['Player','Player 2','Player 3','Player 4'];
@@ -2780,38 +3000,133 @@ function randomAvatarIds(count,exclude=[]){
   }
   return out;
 }
+const PLAYER_PROFILE_NAME_KEY='mahjongHKPlayerNameV1';
+const PLAYER_TABLE_STYLE_KEY='mahjongHKTableStyleV1';
+const PLAYER_CENTER_STYLE_KEY='mahjongHKCenterStyleV1';
+
+const TABLE_STYLE_OPTIONS={
+  green:{name:'Dark Green',a:'#203d2d',b:'#07140e',c:'#0d2b20'},
+  jade:{name:'Jade',a:'#19513f',b:'#061b14',c:'#0c382b'},
+  maroon:{name:'Maroon',a:'#5a1d26',b:'#160a0e',c:'#351118'},
+  burgundy:{name:'Burgundy',a:'#651f30',b:'#16080e',c:'#3a101c'},
+  black:{name:'Black',a:'#252b28',b:'#070908',c:'#101714'},
+  wine:{name:'Wine',a:'#4e202b',b:'#12080c',c:'#2b1119'}
+};
+const CENTER_STYLE_OPTIONS={
+  emerald:{name:'Emerald',top:'#173f32',bottom:'#06130e'},
+  jade:{name:'Jade Ink',top:'#1c4f40',bottom:'#071612'},
+  maroon:{name:'Maroon Silk',top:'#4b171f',bottom:'#13080b'},
+  burgundy:{name:'Burgundy Silk',top:'#541523',bottom:'#14070c'},
+  black:{name:'Black Ink',top:'#222724',bottom:'#080a09'}
+};
+
+let selectedTableStyle='green';
+let selectedCenterStyle='emerald';
+try{selectedTableStyle=Object.prototype.hasOwnProperty.call(TABLE_STYLE_OPTIONS,localStorage.getItem(PLAYER_TABLE_STYLE_KEY)||'')?localStorage.getItem(PLAYER_TABLE_STYLE_KEY):'green'}catch{}
+try{selectedCenterStyle=Object.prototype.hasOwnProperty.call(CENTER_STYLE_OPTIONS,localStorage.getItem(PLAYER_CENTER_STYLE_KEY)||'')?localStorage.getItem(PLAYER_CENTER_STYLE_KEY):'emerald'}catch{}
+
+function getStoredPlayerName(){
+  try{
+    const n=(localStorage.getItem(PLAYER_PROFILE_NAME_KEY)||'Player').trim();
+    return (n||'Player').slice(0,20);
+  }catch{return'Player'}
+}
+function syncProfileNameToInputs(){
+  const name=getStoredPlayerName();
+  const a=byId('mp-name');if(a)a.value=name;
+  setText('main-profile-name',name);
+  setText('style-profile-name',name);
+}
+function applyCustomizeStyle(){
+  const table=TABLE_STYLE_OPTIONS[selectedTableStyle]||TABLE_STYLE_OPTIONS.green;
+  const center=CENTER_STYLE_OPTIONS[selectedCenterStyle]||CENTER_STYLE_OPTIONS.emerald;
+  document.documentElement.style.setProperty('--user-table-a',table.a);
+  document.documentElement.style.setProperty('--user-table-b',table.b);
+  document.documentElement.style.setProperty('--user-table-c',table.c);
+  document.documentElement.style.setProperty('--user-center-top',center.top);
+  document.documentElement.style.setProperty('--user-center-bottom',center.bottom);
+  try{
+    localStorage.setItem(PLAYER_TABLE_STYLE_KEY,selectedTableStyle);
+    localStorage.setItem(PLAYER_CENTER_STYLE_KEY,selectedCenterStyle);
+  }catch{}
+  renderStylePreview();
+}
 function setSelectedAvatar(id){
   if(!AVATAR_IDS.includes(id))return;
+  const input=byId('custom-player-name');
+  const draftName=input?input.value:getStoredPlayerName();
   selectedAvatar=id;
   mp.playerAvatar=id;
   try{localStorage.setItem('hk_avatar',id)}catch{}
-  renderAvatarPicker();
+  renderCustomizeProfile();
+  const restored=byId('custom-player-name');
+  if(restored)restored.value=draftName;
 }
 function renderAvatarPicker(){
   const grid=byId('avatar-picker-grid');
   if(!grid)return;
   grid.innerHTML=AVATAR_OPTIONS.map(a=>`<button class="avatar-option-picker${a.id===selectedAvatar?' selected':''}" type="button" onclick="setSelectedAvatar('${a.id}')"><img src="${a.file}" alt="${esc(a.name)}"><span class="avatar-option-name">${esc(a.name)}</span></button>`).join('');
 }
-function openAvatarPicker(mode){
-  avatarPickerMode=mode==='multi'?'multi':'single';
+function renderCustomizeProfile(){
   renderAvatarPicker();
+  const def=getAvatarDef(selectedAvatar);
+  const name=getStoredPlayerName();
+  const mainAvatar=byId('main-profile-avatar');if(mainAvatar)mainAvatar.src=def.file;
+  const styleAvatar=byId('style-profile-avatar');if(styleAvatar)styleAvatar.src=def.file;
+  setText('main-profile-name',name);setText('main-profile-avatar-name',def.name);
+  setText('style-profile-name',name);setText('style-profile-avatar-name',def.name);
+  const input=byId('custom-player-name');if(input&&document.activeElement!==input)input.value=name;
+  renderStyleChoices();renderStylePreview();
+}
+function renderStyleChoices(){
+  const board=byId('custom-board-select');
+  if(board){board.value=selectedTableStyle;board.onchange=()=>setTableStyle(board.value)}
+  const center=byId('custom-center-select');
+  if(center){center.value=selectedCenterStyle;center.onchange=()=>setCenterStyle(center.value)}
+}
+function setTableStyle(id){if(!TABLE_STYLE_OPTIONS[id])return;selectedTableStyle=id;applyCustomizeStyle();renderStyleChoices()}
+function setCenterStyle(id){if(!CENTER_STYLE_OPTIONS[id])return;selectedCenterStyle=id;applyCustomizeStyle();renderStyleChoices()}
+function renderStylePreview(){
+  const stage=byId('style-preview-stage');
+  const board=byId('style-preview-board');
+  if(!board)return;
+  const table=TABLE_STYLE_OPTIONS[selectedTableStyle]||TABLE_STYLE_OPTIONS.green;
+  const center=CENTER_STYLE_OPTIONS[selectedCenterStyle]||CENTER_STYLE_OPTIONS.emerald;
+  board.style.background=`radial-gradient(circle at 50% 28%,rgba(230,186,92,.12),transparent 42%),linear-gradient(180deg,${center.top},${center.bottom})`;
+  if(stage)stage.style.background=`linear-gradient(145deg,${table.a},${table.b} 56%,${table.c})`;
+}
+function startSinglePlayerFromMenu(){
+  isMultiplayerMode=false;
+  mp.playerName=getStoredPlayerName();
+  mp.playerAvatar=selectedAvatar;
+  start4PGame('Medium',false);
+}
+function openCustomizeProfile(){
+  avatarPickerMode='profile';
+  syncProfileNameToInputs();
+  renderCustomizeProfile();
   setDisplay('modal-avatar-picker','flex');
 }
-function openSingleAvatarPicker(){openAvatarPicker('single')}
-function openMultiAvatarPicker(){openAvatarPicker('multi')}
-function closeAvatarPicker(){avatarPickerMode='';setDisplay('modal-avatar-picker','none')}
-function confirmAvatarSelection(){
-  const mode=avatarPickerMode;
-  const chosen=selectedAvatar;
-  closeAvatarPicker();
-  mp.playerAvatar=chosen;
-  if(mode==='single'){
-    isMultiplayerMode=false;
-    start4PGame('Medium',false);
-  }else if(mode==='multi'){
-    openPlayerLobby();
-  }
+function closeCustomizeProfile(){avatarPickerMode='';setDisplay('modal-avatar-picker','none')}
+function saveCustomizeProfile(){
+  const name=((byId('custom-player-name')?.value||'Player').trim().slice(0,20)||'Player');
+  try{localStorage.setItem(PLAYER_PROFILE_NAME_KEY,name)}catch{}
+  mp.playerName=name;mp.playerAvatar=selectedAvatar;
+  syncProfileNameToInputs();
+  applyCustomizeStyle();
+  closeCustomizeProfile();
 }
+function resetCustomizeStyle(){
+  selectedAvatar='panda';
+  selectedTableStyle='green';
+  selectedCenterStyle='emerald';
+  try{localStorage.removeItem('hk_avatar');localStorage.removeItem(PLAYER_PROFILE_NAME_KEY);localStorage.removeItem(PLAYER_TABLE_STYLE_KEY);localStorage.removeItem(PLAYER_CENTER_STYLE_KEY)}catch{}
+  mp.playerName='Player';mp.playerAvatar='panda';
+  applyCustomizeStyle();syncProfileNameToInputs();renderCustomizeProfile();
+}
+function openAvatarPicker(){openCustomizeProfile()}
+function confirmAvatarSelection(){saveCustomizeProfile()}
+
 function syncHumanAvatars(room){
   if(!room?.players)return;
   for(let i=0;i<4;i++){
@@ -5154,11 +5469,11 @@ function mpEnsureReconnectOnResume(){
     );
   }
 }
-function openPlayerLobby(){isMultiplayerMode=true;mp.playerAvatar=selectedAvatar;clearTimeout(mpReconnectTimer);mpReconnectAttempts=0;mpReconnectDeadline=0;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','grid');setDisplay('mp-reconnect-card','grid');mpSetConnection(false);const code=new URL(location.href).searchParams.get(MP_ROOM_PARAM);const saved=mpLoadSession();if(code&&saved?.room===code&&saved?.token&&saved?.started){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('lobby-help','Menyambungkan kembali ke Room '+code+'…');mpBeginReconnect(saved);return}if(code){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.host=false;mp.ready=true;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};setText('lobby-help','Menghubungkan ke Room '+code+'…');mpConnect(code,'guest')}}
+function openPlayerLobby(){isMultiplayerMode=true;mp.playerAvatar=selectedAvatar;clearTimeout(mpReconnectTimer);mpReconnectAttempts=0;mpReconnectDeadline=0;setDisplay('modal-lobby','flex');setDisplay('mp-setup','grid');setDisplay('mp-room-panel','none');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','grid');setDisplay('mp-reconnect-card','grid');mpSetConnection(false);const code=new URL(location.href).searchParams.get(MP_ROOM_PARAM);const saved=mpLoadSession();if(code&&saved?.room===code&&saved?.token&&saved?.started){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setText('lobby-help','Menyambungkan kembali ke Room '+code+'…');mpBeginReconnect(saved);return}if(code){setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');mp.playerName=getStoredPlayerName();mp.host=false;mp.ready=true;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};setText('lobby-help','Menghubungkan ke Room '+code+'…');mpConnect(code,'guest')}}
 function closeLobby(){gameChatClose();mpServerStarted=false;clearGuestActionRetry();clearTimeout(mpReconnectTimer);clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);clearTimeout(mpRejoinHandshakeTimer);mpRejoinHandshakeTimer=null;mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinFallbackState=null;stopMpGameWatchdog();stopMpPing();try{mpSend('leave')}catch(e){}try{if(mp.ws){mp.ws.onclose=null;mp.ws.close()}}catch(e){}mp.ws=null;mp.connected=false;mpClearSession();mpClearActiveGameState();mp={ws:null,connected:false,room:null,seat:null,host:false,ready:false,started:false,state:null,token:null,playerName:mp.playerName||'Player',playerAvatar:selectedAvatar};isMultiplayerMode=false;setDisplay('modal-lobby','none');mpSetConnection(false)}
 function closeLobbyToMenu(){closeLobby();nav('screen-play')}
-function mpCreateRoom(){mpServerStarted=false;mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinJoined=false;mpRejoinFallbackState=null;clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';mp.playerAvatar=selectedAvatar;const code=String(Math.floor(10000+Math.random()*90000));mp.host=true;mp.seat=0;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();isMultiplayerMode=true;mp.room={code,players:[null,null,null,null],started:false};setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('mp-room-code-display',code);setText('mp-host-room-code',code);setText('lobby-help','Membuat room di Cloudflare…');mpRenderRoomQr(code);mpSaveSession();mpConnect(code,'host')}
-function mpJoinRoom(){mpServerStarted=false;mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinJoined=false;mpRejoinFallbackState=null;clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);mp.playerName=(byId('mp-name')?.value||'Player').trim().slice(0,20)||'Player';const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code)){alert('Masukkan kode room 5 digit.');return}mp.host=false;mp.seat=null;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};isMultiplayerMode=true;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Menghubungkan ke Room '+code+'…');mpSaveSession();mpConnect(code,'guest')}
+function mpCreateRoom(){mpServerStarted=false;mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinJoined=false;mpRejoinFallbackState=null;clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);mp.playerName=getStoredPlayerName();mp.playerAvatar=selectedAvatar;const code=String(Math.floor(10000+Math.random()*90000));mp.host=true;mp.seat=0;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();isMultiplayerMode=true;mp.room={code,players:[null,null,null,null],started:false};setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','grid');setDisplay('mp-guest-invite','none');setText('mp-room-code-display',code);setText('mp-host-room-code',code);setText('lobby-help','Membuat room di Cloudflare…');mpRenderRoomQr(code);mpSaveSession();mpConnect(code,'host')}
+function mpJoinRoom(){mpServerStarted=false;mpRejoinMode=false;mpRejoinStateApplied=false;mpRejoinJoined=false;mpRejoinFallbackState=null;clearTimeout(mpRejoinFallbackTimer);clearTimeout(mpRejoinModeTimer);mp.playerName=getStoredPlayerName();const code=(byId('mp-room-code')?.value||'').trim();if(!/^\d{5}$/.test(code)){alert('Masukkan kode room 5 digit.');return}mp.host=false;mp.seat=null;mp.ready=true;mp.started=false;mp.playerAvatar=selectedAvatar;mpEnsureToken();mp.room={code,players:[null,null,null,null],started:false};isMultiplayerMode=true;setDisplay('mp-setup','none');setDisplay('mp-room-panel','grid');setDisplay('mp-host-invite','none');setDisplay('mp-guest-invite','none');setText('lobby-help','Menghubungkan ke Room '+code+'…');mpSaveSession();mpConnect(code,'guest')}
 function togglePlayerReady(){if(!mp.room)return;mp.ready=!mp.ready;mpSend('ready',{ready:mp.ready});mpSaveSession();if(mp.host&&mp.room.players?.[0])mp.room.players[0].ready=mp.ready;mpRenderLobby(mp.room)}
 function mpStartGame(){
   if(!mp.host)return;
@@ -5716,6 +6031,7 @@ function forceFreshReload(){
   clearCaches.finally(()=>{ location.replace(freshUrl); });
 }
 
+document.addEventListener('DOMContentLoaded',()=>{syncProfileNameToInputs();applyCustomizeStyle();renderCustomizeProfile()},{once:true});
 </script>
 
 
