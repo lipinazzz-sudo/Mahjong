@@ -1929,7 +1929,7 @@ body::after{
 #modal-avatar-picker .avatar-option-picker.selected{background:rgba(76,50,12,.95);border-color:#efc768;box-shadow:0 0 0 2px rgba(235,193,100,.14),0 8px 18px rgba(214,165,74,.13);}
 #modal-avatar-picker .avatar-option-picker img{display:block;width:clamp(32px,4.8vw,56px);height:clamp(32px,4.8vw,56px);margin:0 auto;object-fit:cover;border-radius:50%;border:2px solid rgba(220,177,83,.78);}
 #modal-avatar-picker .avatar-option-picker .avatar-option-name{font-size:7px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.style-choice-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.style-choice-pair{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
 .style-choice-select{width:100%;min-height:40px;padding:8px 34px 8px 11px;border:1px solid rgba(225,181,92,.24);border-radius:11px;background:linear-gradient(180deg,rgba(17,33,28,.96),rgba(5,16,13,.98));color:#f1e6d0;font-size:10px;font-weight:800;outline:none;appearance:auto;}
 .style-choice-select:focus{border-color:#edc568;box-shadow:0 0 0 2px rgba(236,193,95,.10);}
 .style-live-preview{padding-bottom:10px;}
@@ -1973,6 +1973,10 @@ body::after{
   .profile-style-layout{grid-template-columns:1fr;max-height:calc(92dvh - 150px);overflow:auto;padding-right:2px;}
   #modal-avatar-picker .profile-style-box{max-height:94dvh;padding:12px;}
   #modal-avatar-picker .avatar-grid-picker{grid-template-columns:repeat(10,minmax(0,1fr));max-height:none;}
+}
+@media (max-width:800px) and (orientation:portrait){
+  .style-choice-pair{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .style-choice-pair .style-section:nth-child(3){grid-column:1/-1;}
 }
 @media (max-width:480px){
   #screen-main .profile-card{width:57.6vw;min-width:186px;max-width:240px;padding-right:11px;}
@@ -2096,10 +2100,10 @@ body::after{
     font-size:6px;
     margin-top:2px;
   }
-  .style-choice-pair{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;min-width:0;}
+  .style-choice-pair{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;min-width:0;}
   .style-choice-pair .style-section-title{
     white-space:nowrap;
-    font-size:7px;
+    font-size:6.5px;
     letter-spacing:.13em;
     margin-bottom:5px;
   }
@@ -2292,6 +2296,21 @@ body::after{
                                 <option value="obsidian">Black Ink</option>
                             </select>
                         </div>
+                        <div class="style-section">
+                            <div class="style-section-title">CENTER FRAME</div>
+                            <select class="style-choice-select" id="custom-frame-select" aria-label="Pilih frame center board">
+                                <option value="classic-gold">Classic Gold</option>
+                                <option value="jade-dragon">Jade Dragon</option>
+                                <option value="red-lacquer">Red Lacquer</option>
+                                <option value="black-obsidian">Black Obsidian</option>
+                                <option value="sapphire-luxe">Sapphire Luxe</option>
+                                <option value="lotus">Lotus</option>
+                                <option value="bamboo">Bamboo</option>
+                                <option value="oriental-cloud">Oriental Cloud</option>
+                                <option value="modern-minimal">Modern Minimal</option>
+                                <option value="arcadia">Arcadia</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="style-section style-live-preview">
@@ -2300,7 +2319,7 @@ body::after{
                             <div class="style-preview-board" id="style-preview-board">
                                 <img class="style-preview-glow" src="assets/centerboard/center-glow.svg" aria-hidden="true" alt="">
                                 <img class="style-preview-pattern" src="assets/centerboard/center-pattern.svg" aria-hidden="true" alt="">
-                                <img class="style-preview-frame" src="assets/centerboard/center-frame-gold.svg" aria-hidden="true" alt="">
+                                <img class="style-preview-frame" src="assets/centerboard/frames/classic-gold.svg" aria-hidden="true" alt="">
                                 <div class="style-preview-score style-preview-score-top">15.000</div>
                                 <div class="style-preview-score style-preview-score-left">15.000</div>
                                 <div class="style-preview-timer">10</div>
@@ -2542,7 +2561,7 @@ body::after{
             <div class="center-board" id="center-board-box">
                 <img class="centerboard-glow" src="assets/centerboard/center-glow.svg" aria-hidden="true" alt="">
                 <img class="centerboard-pattern" src="assets/centerboard/center-pattern.svg" aria-hidden="true" alt="">
-                <img class="centerboard-frame" src="assets/centerboard/center-frame-gold.svg" aria-hidden="true" alt="">
+                <img class="centerboard-frame" src="assets/centerboard/frames/classic-gold.svg" aria-hidden="true" alt="">
                 <div class="round-info" id="round-title-display">East 1</div>
                 <div class="turn-timer" id="turn-timer-display">--</div>
                 <div class="tiles-left" id="tiles-remaining">SISA 70</div>
@@ -3147,6 +3166,7 @@ function randomAvatarIds(count,exclude=[]){
 const PLAYER_PROFILE_NAME_KEY='mahjongHKPlayerNameV1';
 const PLAYER_TABLE_STYLE_KEY='mahjongHKTableStyleV1';
 const PLAYER_CENTER_STYLE_KEY='mahjongHKCenterStyleV1';
+const PLAYER_CENTER_FRAME_KEY='mahjongHKCenterFrameV1';
 
 const TABLE_STYLE_OPTIONS={
   emerald:{name:'Emerald Forest',a:'#123d32',b:'#06150f',c:'#0d2b20'},
@@ -3168,11 +3188,25 @@ const CENTER_STYLE_OPTIONS={
   copper:{name:'Copper Silk',top:'#553329',bottom:'#170b08'},
   obsidian:{name:'Black Ink',top:'#191c20',bottom:'#070809'}
 };
+const CENTER_FRAME_OPTIONS={
+  'classic-gold':{name:'Classic Gold',file:'classic-gold.svg'},
+  'jade-dragon':{name:'Jade Dragon',file:'jade-dragon.svg'},
+  'red-lacquer':{name:'Red Lacquer',file:'red-lacquer.svg'},
+  'black-obsidian':{name:'Black Obsidian',file:'black-obsidian.svg'},
+  'sapphire-luxe':{name:'Sapphire Luxe',file:'sapphire-luxe.svg'},
+  lotus:{name:'Lotus',file:'lotus.svg'},
+  bamboo:{name:'Bamboo',file:'bamboo.svg'},
+  'oriental-cloud':{name:'Oriental Cloud',file:'oriental-cloud.svg'},
+  'modern-minimal':{name:'Modern Minimal',file:'modern-minimal.svg'},
+  arcadia:{name:'Arcadia',file:'arcadia.svg'}
+};
 
 let selectedTableStyle='emerald';
 let selectedCenterStyle='emerald';
+let selectedCenterFrame='classic-gold';
 try{selectedTableStyle=Object.prototype.hasOwnProperty.call(TABLE_STYLE_OPTIONS,localStorage.getItem(PLAYER_TABLE_STYLE_KEY)||'')?localStorage.getItem(PLAYER_TABLE_STYLE_KEY):'emerald'}catch{}
 try{selectedCenterStyle=Object.prototype.hasOwnProperty.call(CENTER_STYLE_OPTIONS,localStorage.getItem(PLAYER_CENTER_STYLE_KEY)||'')?localStorage.getItem(PLAYER_CENTER_STYLE_KEY):'emerald'}catch{}
+try{selectedCenterFrame=Object.prototype.hasOwnProperty.call(CENTER_FRAME_OPTIONS,localStorage.getItem(PLAYER_CENTER_FRAME_KEY)||'')?localStorage.getItem(PLAYER_CENTER_FRAME_KEY):'classic-gold'}catch{}
 
 function getStoredPlayerName(){
   try{
@@ -3189,6 +3223,7 @@ function syncProfileNameToInputs(){
 function applyCustomizeStyle(){
   const table=TABLE_STYLE_OPTIONS[selectedTableStyle]||TABLE_STYLE_OPTIONS.emerald;
   const center=CENTER_STYLE_OPTIONS[selectedCenterStyle]||CENTER_STYLE_OPTIONS.emerald;
+  const frame=CENTER_FRAME_OPTIONS[selectedCenterFrame]||CENTER_FRAME_OPTIONS['classic-gold'];
   document.documentElement.style.setProperty('--user-table-a',table.a);
   document.documentElement.style.setProperty('--user-table-b',table.b);
   document.documentElement.style.setProperty('--user-table-c',table.c);
@@ -3197,8 +3232,17 @@ function applyCustomizeStyle(){
   try{
     localStorage.setItem(PLAYER_TABLE_STYLE_KEY,selectedTableStyle);
     localStorage.setItem(PLAYER_CENTER_STYLE_KEY,selectedCenterStyle);
+    localStorage.setItem(PLAYER_CENTER_FRAME_KEY,selectedCenterFrame);
   }catch{}
+  applyCenterFrameSelection();
   renderStylePreview();
+}
+function applyCenterFrameSelection(){
+  const frame=CENTER_FRAME_OPTIONS[selectedCenterFrame]||CENTER_FRAME_OPTIONS['classic-gold'];
+  const src=`assets/centerboard/frames/${frame.file}`;
+  document.querySelectorAll('.centerboard-frame,.style-preview-frame').forEach(img=>{
+    if(img&&img.getAttribute('src')!==src)img.setAttribute('src',src);
+  });
 }
 function setSelectedAvatar(id){
   if(!AVATAR_IDS.includes(id))return;
@@ -3232,9 +3276,13 @@ function renderStyleChoices(){
   if(board){board.value=selectedTableStyle;board.onchange=()=>setTableStyle(board.value)}
   const center=byId('custom-center-select');
   if(center){center.value=selectedCenterStyle;center.onchange=()=>setCenterStyle(center.value)}
+  const frame=byId('custom-frame-select');
+  if(frame){frame.value=selectedCenterFrame;frame.onchange=()=>setCenterFrame(frame.value)}
+  applyCenterFrameSelection();
 }
 function setTableStyle(id){if(!TABLE_STYLE_OPTIONS[id])return;selectedTableStyle=id;applyCustomizeStyle();renderStyleChoices()}
 function setCenterStyle(id){if(!CENTER_STYLE_OPTIONS[id])return;selectedCenterStyle=id;applyCustomizeStyle();renderStyleChoices()}
+function setCenterFrame(id){if(!CENTER_FRAME_OPTIONS[id])return;selectedCenterFrame=id;applyCustomizeStyle();renderStyleChoices()}
 function renderStylePreview(){
   const stage=byId('style-preview-stage');
   const board=byId('style-preview-board');
@@ -3243,6 +3291,7 @@ function renderStylePreview(){
   const center=CENTER_STYLE_OPTIONS[selectedCenterStyle]||CENTER_STYLE_OPTIONS.emerald;
   board.style.background=`radial-gradient(circle at 50% 28%,rgba(230,186,92,.12),transparent 42%),linear-gradient(180deg,${center.top},${center.bottom})`;
   if(stage)stage.style.background=`linear-gradient(145deg,${table.a},${table.b} 56%,${table.c})`;
+  applyCenterFrameSelection();
 }
 function startSinglePlayerFromMenu(){
   isMultiplayerMode=false;
@@ -3269,6 +3318,7 @@ function resetCustomizeStyle(){
   selectedAvatar='panda';
   selectedTableStyle='emerald';
   selectedCenterStyle='emerald';
+  selectedCenterFrame='classic-gold';
   try{localStorage.removeItem('hk_avatar');localStorage.removeItem(PLAYER_PROFILE_NAME_KEY);localStorage.removeItem(PLAYER_TABLE_STYLE_KEY);localStorage.removeItem(PLAYER_CENTER_STYLE_KEY)}catch{}
   mp.playerName='Player';mp.playerAvatar='panda';
   applyCustomizeStyle();syncProfileNameToInputs();renderCustomizeProfile();
@@ -6181,7 +6231,7 @@ function forceFreshReload(){
   clearCaches.finally(()=>{ location.replace(freshUrl); });
 }
 
-document.addEventListener('DOMContentLoaded',()=>{syncProfileNameToInputs();applyCustomizeStyle();renderCustomizeProfile()},{once:true});
+document.addEventListener('DOMContentLoaded',()=>{syncProfileNameToInputs();applyCustomizeStyle();applyCenterFrameSelection();renderCustomizeProfile()},{once:true});
 </script>
 
 
@@ -6355,11 +6405,12 @@ html[data-hk-lang="en"] #screen-settings .settings-card::before{content:"GAME OP
     'play.back':{en:'Back',id:'Kembali'},
     'profile.kicker':{en:'PLAYER PROFILE',id:'PROFIL PEMAIN'},
     'profile.title':{en:'Customize Your Style',id:'Sesuaikan Gaya'},
-    'profile.copy':{en:'Name, avatar, table color, and center board background are saved on this device.',id:'Nama, avatar, warna meja, dan background center board tersimpan di perangkat ini.'},
+    'profile.copy':{en:'Name, avatar, table color, center board background, and frame are saved on this device.',id:'Nama, avatar, warna meja, background center board, dan frame tersimpan di perangkat ini.'},
     'profile.profile':{en:'PROFILE',id:'PROFIL'},
     'profile.avatar':{en:'AVATAR',id:'AVATAR'},
     'profile.table':{en:'TABLE FELT',id:'WARNA MEJA'},
     'profile.center':{en:'CENTER BOARD BACKGROUND',id:'LATAR CENTER BOARD'},
+    'profile.frame':{en:'CENTER FRAME',id:'FRAME CENTER BOARD'},
     'profile.preview':{en:'LIVE PREVIEW',id:'PRATINJAU LANGSUNG'},
     'profile.reset':{en:'Reset Style',id:'Atur Ulang Gaya'},
     'profile.save':{en:'Save & Close',id:'Simpan & Tutup'},
@@ -6459,8 +6510,9 @@ html[data-hk-lang="en"] #screen-settings .settings-card::before{content:"GAME OP
     ['#modal-avatar-picker .modal-copy','profile.copy'],
     ['#modal-avatar-picker .style-section-title:nth-child(1)','profile.profile'],
     ['#modal-avatar-picker .profile-style-column:first-child .style-section:nth-child(2) .style-section-title','profile.avatar'],
-    ['#custom-board-select','profile.table'],
-    ['#custom-center-select','profile.center'],
+    ['#modal-avatar-picker .style-choice-pair .style-section:nth-child(1) .style-section-title','profile.table'],
+    ['#modal-avatar-picker .style-choice-pair .style-section:nth-child(2) .style-section-title','profile.center'],
+    ['#modal-avatar-picker .style-choice-pair .style-section:nth-child(3) .style-section-title','profile.frame'],
     ['#modal-avatar-picker .style-live-preview .style-section-title','profile.preview'],
     ['#modal-avatar-picker .profile-style-actions .btn-secondary','profile.reset'],
     ['#modal-avatar-picker .profile-style-actions .btn-primary','profile.save'],
@@ -6702,6 +6754,8 @@ html[data-hk-lang="en"] #screen-settings .settings-card::before{content:"GAME OP
     };
     options.board.forEach(([v,label])=>{const opt=document.querySelector(`#custom-board-select option[value="${v}"]`);if(opt)opt.textContent=label});
     options.center.forEach(([v,label])=>{const opt=document.querySelector(`#custom-center-select option[value="${v}"]`);if(opt)opt.textContent=label});
+    const frameOptions=[['classic-gold','Classic Gold'],['jade-dragon','Jade Dragon'],['red-lacquer','Red Lacquer'],['black-obsidian','Black Obsidian'],['sapphire-luxe','Sapphire Luxe'],['lotus','Lotus'],['bamboo','Bamboo'],['oriental-cloud','Oriental Cloud'],['modern-minimal','Modern Minimal'],['arcadia','Arcadia']];
+    frameOptions.forEach(([v,label])=>{const opt=document.querySelector(`#custom-frame-select option[value="${v}"]`);if(opt)opt.textContent=label});
 
     const remain=document.querySelector('.style-preview-remain');
     if(remain)remain.textContent=hkTranslateRemaining(81);
