@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" fill="none">
+<defs>
+  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4d6"/><stop offset=".28" stop-color="#e9d49a"/><stop offset=".62" stop-color="#9f7f3d"/><stop offset="1" stop-color="#4a4e52"/></linearGradient>
+  <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%"><feDropShadow dx="0" dy="9" stdDeviation="7" flood-opacity=".35"/></filter>
+</defs>
+<g filter="url(#shadow)">
+  <rect x="34" y="34" width="932" height="932" rx="56" fill="url(#edge)" opacity=".18"/>
+  <rect x="84" y="84" width="832" height="832" rx="28" fill="none" stroke="#e9d49a" stroke-width="15"/>
+<rect x="105" y="105" width="790" height="790" rx="20" fill="none" stroke="#9f7f3d" stroke-width="4" opacity=".8"/>
+<path d="M170 112V160 M112 170H160 M830 112V160 M888 170H840 M170 888V840 M112 830H160 M830 888V840 M888 830H840" stroke="#e9d49a" stroke-width="16" stroke-linecap="round"/>
+</g>
+
+<circle cx="500" cy="52" r="17" fill="#e9d49a"/><circle cx="948" cy="500" r="17" fill="#e9d49a"/><circle cx="500" cy="948" r="17" fill="#e9d49a"/><circle cx="52" cy="500" r="17" fill="#e9d49a"/>
+</svg>

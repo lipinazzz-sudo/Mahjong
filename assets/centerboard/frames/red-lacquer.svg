@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" fill="none">
+<defs>
+  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe0a1"/><stop offset=".28" stop-color="#f1c56b"/><stop offset=".62" stop-color="#a06a1e"/><stop offset="1" stop-color="#7d1518"/></linearGradient>
+  <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%"><feDropShadow dx="0" dy="9" stdDeviation="7" flood-opacity=".35"/></filter>
+</defs>
+<g filter="url(#shadow)">
+  <rect x="34" y="34" width="932" height="932" rx="56" fill="url(#edge)" opacity=".18"/>
+  <rect x="62" y="62" width="876" height="876" rx="46" fill="none" stroke="#7d1518" stroke-width="46" opacity=".72"/>
+<rect x="78" y="78" width="844" height="844" rx="41" fill="none" stroke="#f1c56b" stroke-width="22"/>
+<rect x="106" y="106" width="788" height="788" rx="30" fill="none" stroke="#a06a1e" stroke-width="7" opacity=".9"/>
+<path d="M190 90H810 M190 910H810 M90 190V810 M910 190V810" stroke="#f1c56b" stroke-width="7" opacity=".5"/>
+<g fill="#f1c56b"><path d="M80 170 C140 115 178 80 225 80 C192 123 152 159 106 194Z"/><path d="M920 170 C860 115 822 80 775 80 C808 123 848 159 894 194Z"/><path d="M80 830 C140 885 178 920 225 920 C192 877 152 841 106 806Z"/><path d="M920 830 C860 885 822 920 775 920 C808 877 848 841 894 806Z"/></g>
+<g fill="#a06a1e"><rect x="473" y="36" width="54" height="54" rx="10" transform="rotate(45 500 63)"/><rect x="473" y="910" width="54" height="54" rx="10" transform="rotate(45 500 937)"/><rect x="36" y="473" width="54" height="54" rx="10" transform="rotate(45 63 500)"/><rect x="910" y="473" width="54" height="54" rx="10" transform="rotate(45 937 500)"/></g>
+</g>
+<g fill="none" stroke="#f1c56b" stroke-width="19" stroke-linecap="round"><path d="M105 190 C150 135 196 111 259 96"/><path d="M895 190 C850 135 804 111 741 96"/><path d="M105 810 C150 865 196 889 259 904"/><path d="M895 810 C850 865 804 889 741 904"/></g><g fill="none" stroke="#a06a1e" stroke-width="11"><path d="M165 128c32 13 53 36 67 70M835 128c-32 13-53 36-67 70M165 872c32-13 53-36 67-70M835 872c-32-13-53-36-67-70"/></g>
+<circle cx="500" cy="52" r="17" fill="#f1c56b"/><circle cx="948" cy="500" r="17" fill="#f1c56b"/><circle cx="500" cy="948" r="17" fill="#f1c56b"/><circle cx="52" cy="500" r="17" fill="#f1c56b"/>
+</svg>
