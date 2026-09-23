@@ -2441,7 +2441,7 @@ body::after{
                             <div class="style-preview-board" id="style-preview-board">
                                 <img class="style-preview-glow" src="assets/centerboard/center-glow.svg" aria-hidden="true" alt="">
                                 <img class="style-preview-pattern" src="assets/centerboard/center-pattern.svg" aria-hidden="true" alt="">
-                                <img class="style-preview-frame" src="assets/centerboard/frames-png/classic-gold.png" aria-hidden="true" alt="">
+                                <img class="style-preview-frame" src="assets/centerboard/frames-png-clean/classic-gold.png" aria-hidden="true" alt="">
                                 <div class="style-preview-score style-preview-score-top">15.000</div>
                                 <div class="style-preview-score style-preview-score-left">15.000</div>
                                 <div class="style-preview-timer">10</div>
@@ -2683,7 +2683,7 @@ body::after{
             <div class="center-board" id="center-board-box">
                 <img class="centerboard-glow" src="assets/centerboard/center-glow.svg" aria-hidden="true" alt="">
                 <img class="centerboard-pattern" src="assets/centerboard/center-pattern.svg" aria-hidden="true" alt="">
-                <img class="centerboard-frame" src="assets/centerboard/frames-png/classic-gold.png" aria-hidden="true" alt="">
+                <img class="centerboard-frame" src="assets/centerboard/frames-png-clean/classic-gold.png" aria-hidden="true" alt="">
                 <div class="round-info" id="round-title-display">East 1</div>
                 <div class="turn-timer" id="turn-timer-display">--</div>
                 <div class="tiles-left" id="tiles-remaining">SISA 70</div>
@@ -3361,7 +3361,7 @@ function applyCustomizeStyle(){
 }
 function applyCenterFrameSelection(){
   const frame=CENTER_FRAME_OPTIONS[selectedCenterFrame]||CENTER_FRAME_OPTIONS['classic-gold'];
-  const src=`assets/centerboard/frames-png/${frame.file}`;
+  const src=`assets/centerboard/frames-png-clean/${frame.file}`;
   document.querySelectorAll('.centerboard-frame,.style-preview-frame').forEach(img=>{
     if(img&&img.getAttribute('src')!==src)img.setAttribute('src',src);
   });
