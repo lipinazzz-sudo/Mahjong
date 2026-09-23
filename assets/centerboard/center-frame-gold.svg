@@ -1,49 +1,62 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" fill="none">
   <defs>
-    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7d551c"/>
-      <stop offset=".16" stop-color="#d7a747"/>
-      <stop offset=".34" stop-color="#ffe8a3"/>
-      <stop offset=".5" stop-color="#c98f32"/>
-      <stop offset=".68" stop-color="#f6d57f"/>
-      <stop offset=".86" stop-color="#a96d20"/>
-      <stop offset="1" stop-color="#f2c965"/>
+    <linearGradient id="gold" x1="90" y1="60" x2="910" y2="940" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6f4716"/>
+      <stop offset="0.14" stop-color="#c99337"/>
+      <stop offset="0.29" stop-color="#ffe7a1"/>
+      <stop offset="0.44" stop-color="#b87922"/>
+      <stop offset="0.56" stop-color="#f8d476"/>
+      <stop offset="0.72" stop-color="#8f5c1c"/>
+      <stop offset="0.88" stop-color="#f2cb6c"/>
+      <stop offset="1" stop-color="#704718"/>
     </linearGradient>
-    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="8" result="b"/>
+    <filter id="softGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
       <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
-  <rect x="12" y="12" width="876" height="876" rx="86" stroke="#5a3a13" stroke-width="18"/>
-  <rect x="20" y="20" width="860" height="860" rx="80" stroke="url(#gold)" stroke-width="14" filter="url(#glow)"/>
-  <rect x="34" y="34" width="832" height="832" rx="68" stroke="#fff0bd" stroke-opacity=".50" stroke-width="3"/>
-  <rect x="46" y="46" width="808" height="808" rx="60" stroke="#8e6525" stroke-opacity=".75" stroke-width="3"/>
 
-  <!-- diamonds -->
-  <g fill="url(#gold)" stroke="#fff0bd" stroke-opacity=".65" stroke-width="3">
-    <path d="M450 2l28 28-28 28-28-28z"/>
-    <path d="M450 842l28 28-28 28-28-28z"/>
-    <path d="M2 450l28-28 28 28-28 28z"/>
-    <path d="M842 450l28-28 28 28-28 28z"/>
+  <rect x="21" y="21" width="958" height="958" rx="122" stroke="#4d3212" stroke-width="24"/>
+  <rect x="27" y="27" width="946" height="946" rx="116" stroke="url(#gold)" stroke-width="18" filter="url(#softGlow)"/>
+  <rect x="42" y="42" width="916" height="916" rx="103" stroke="#fff1bb" stroke-opacity=".60" stroke-width="4"/>
+  <rect x="55" y="55" width="890" height="890" rx="91" stroke="#a66f26" stroke-opacity=".88" stroke-width="4"/>
+  <rect x="71" y="71" width="858" height="858" rx="78" stroke="#f0c972" stroke-opacity=".28" stroke-width="3"/>
+
+  <!-- diamond ornaments at the middle of every side -->
+  <g fill="url(#gold)" stroke="#fff0b8" stroke-opacity=".72" stroke-width="3">
+    <path d="M500 7l35 35-35 35-35-35z"/>
+    <path d="M500 923l35 35-35 35-35-35z"/>
+    <path d="M7 500l35-35 35 35-35 35z"/>
+    <path d="M923 500l35-35 35 35-35 35z"/>
   </g>
 
-  <!-- corner cloud motifs -->
-  <g stroke="url(#gold)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M78 178c24-38 52-48 84-30 4-42 34-70 72-58 21-34 67-39 92-10 8 10 12 22 12 35"/>
-    <path d="M822 178c-24-38-52-48-84-30-4-42-34-70-72-58-21-34-67-39-92-10-8 10-12 22-12 35"/>
-    <path d="M78 722c24 38 52 48 84 30 4 42 34 70 72 58 21 34 67 39 92 10 8-10 12-22 12-35"/>
-    <path d="M822 722c-24 38-52 48-84 30-4 42-34 70-72 58-21 34-67 39-92 10-8-10-12-22-12-35"/>
-  </g>
-  <g stroke="#f5d98d" stroke-opacity=".42" stroke-width="3">
-    <path d="M86 176c24-25 43-28 63-14 6 4 13 11 18 20"/>
-    <path d="M814 176c-24-25-43-28-63-14-6 4-13 11-18 20"/>
-    <path d="M86 724c24 25 43 28 63 14 6-4 13-11 18-20"/>
-    <path d="M814 724c-24 25-43 28-63 14-6-4-13-11-18-20"/>
+  <!-- upper decorative cloud / ruyi corners -->
+  <g stroke="url(#gold)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M83 184c23-40 57-53 90-30 2-47 40-78 82-63 29-33 78-26 97 8 7 12 10 24 9 36"/>
+    <path d="M917 184c-23-40-57-53-90-30-2-47-40-78-82-63-29-33-78-26-97 8-7 12-10 24-9 36"/>
+    <path d="M83 816c23 40 57 53 90 30 2 47 40 78 82 63 29 33 78 26 97-8 7-12 10-24 9-36"/>
+    <path d="M917 816c-23 40-57 53-90 30-2 47-40 78-82 63-29 33-78 26-97-8-7-12-10-24-9-36"/>
   </g>
 
-  <!-- central side ornaments -->
-  <g fill="url(#gold)">
-    <path d="M42 450c28-21 48-21 76 0-28 21-48 21-76 0z"/>
-    <path d="M782 450c28-21 48-21 76 0-28 21-48 21-76 0z"/>
+  <!-- classic cloud panels -->
+  <g fill="url(#gold)" opacity=".96">
+    <path d="M66 116c22-11 40-6 48 11 8-21 31-27 47-10 11-23 43-26 58-7 8 9 10 20 8 31H66z"/>
+    <path d="M934 116c-22-11-40-6-48 11-8-21-31-27-47-10-11-23-43-26-58-7-8 9-10 20-8 31h161z"/>
+    <path d="M66 884c22 11 40 6 48-11 8 21 31 27 47 10 11 23 43 26 58 7 8-9 10-20 8-31H66z"/>
+    <path d="M934 884c-22 11-40 6-48-11-8 21-31 27-47 10-11 23-43 26-58 7-8-9-10-20-8-31h161z"/>
+  </g>
+
+  <!-- side fan ornaments -->
+  <g fill="url(#gold)" opacity=".88">
+    <path d="M61 500c25-26 55-31 84 0-29 31-59 26-84 0z"/>
+    <path d="M939 500c-25-26-55-31-84 0 29 31 59 26 84 0z"/>
+  </g>
+
+  <!-- tiny knot motifs in corners -->
+  <g stroke="#ffe7a2" stroke-opacity=".8" stroke-width="4">
+    <path d="M92 143h28v28H92z"/>
+    <path d="M880 143h28v28h-28z"/>
+    <path d="M92 829h28v28H92z"/>
+    <path d="M880 829h28v28h-28z"/>
   </g>
 </svg>

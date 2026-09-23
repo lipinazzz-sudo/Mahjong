@@ -1,13 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" fill="none">
-  <g opacity=".16" stroke="#d6ad63" stroke-width="2">
-    <path d="M120 610c90-78 182-78 272 0s182 78 272 0 182-78 272 0"/>
-    <path d="M92 650c102-86 204-86 306 0s204 86 306 0 204-86 306 0"/>
-    <path d="M140 566c74-64 148-64 222 0s148 64 222 0 148-64 222 0"/>
-    <path d="M0 250c90-78 180-78 270 0s180 78 270 0 180-78 270 0 180 78 270 0"/>
-    <path d="M0 290c90-78 180-78 270 0s180 78 270 0 180-78 270 0 180 78 270 0"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" fill="none">
+  <g opacity=".12" stroke="#d8b26c" stroke-width="3">
+    <path d="M110 680c96-85 192-85 288 0s192 85 288 0 192-85 288 0"/>
+    <path d="M76 720c108-95 216-95 324 0s216 95 324 0 216-95 324 0"/>
+    <path d="M128 635c82-73 164-73 246 0s164 73 246 0 164-73 246 0"/>
   </g>
-  <g opacity=".09" stroke="#f0cf88" stroke-width="2">
-    <circle cx="450" cy="450" r="285"/>
-    <circle cx="450" cy="450" r="255"/>
+  <g opacity=".075" stroke="#f3d993" stroke-width="2">
+    <circle cx="500" cy="500" r="335"/>
+    <circle cx="500" cy="500" r="300"/>
+    <circle cx="500" cy="500" r="265"/>
+  </g>
+  <g opacity=".055" stroke="#d8b26c" stroke-width="2">
+    <path d="M190 240h620"/>
+    <path d="M210 760h580"/>
   </g>
 </svg>
