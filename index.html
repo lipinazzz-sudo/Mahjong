@@ -3442,6 +3442,13 @@ const TURN_BASE_SECONDS=10,TIME_BANK_MAX=20,ACTION_WINDOW_SECONDS=5;
 let roundActive=false,roundEnding=false,isDiscardable=false,isActionPhase=false,selectedTileIndex=-1,aiMoveTimer=null,turnTimer=null,actionTimer=null,secondsLeft=10,timeBank=[20,20,20,20],actionSecondsLeft=0,pendingCallChoice=null,actionTimeoutHandler=null,actionSeat=-1,actionMode='';
 let gameTurnEpoch=0;
 let stateHasRemoteCallForLocalGuest=false;
+
+// v8 presentation-only animation trackers. These never alter game state;
+// they only prevent a visual animation from replaying on every renderTable().
+let lastDrawnTileHighlightId=null;
+let lastDiscardAnimationId=null;
+let seenMeldAnimationKeys=new Set();
+let meldAnimationInitialized=false;
 let activeRemoteActions=null;
 // Every multiplayer game interaction gets a context ID. For normal turns the
 // value is TURN-N; for discard-call windows it is CALL-N. All network actions
@@ -4074,10 +4081,10 @@ function showCurrentWaitAdvisor(){
 function countDiscardedTile(id){let n=0;for(const river of playerRivers||[])for(const t of (river||[]))if(t&&t.id===id)n++;return n}
 function countKnownTile(id){const known=advisorKnownCounts();return known[id]||0}
 function highlightMatchingTiles(tileId){document.querySelectorAll('#player-hand-tiles .tile').forEach(x=>x.classList.toggle('same-tile-highlight',Number(x.dataset.tileId)===tileId));document.querySelectorAll('.discard-tile').forEach(x=>x.classList.toggle('same-tile-highlight',Number(x.dataset.tileId)===tileId));}
-function renderHand(){const wrap=byId('player-hand-tiles');if(!wrap)return;const p=mp.seat??0;sortHand(p);wrap.innerHTML='';const h=playerHands[p]||[];const canInteract=p===currentTurn&&p===(mp.seat??0)&&isDiscardable;h.forEach((t,i)=>{const e=document.createElement('div');e.className='tile';if(canInteract)e.classList.add('is-interactive');if(drawnTile&&t.uniqueId===drawnTile.uniqueId)e.classList.add('drawn-tile-gap');if(i===selectedTileIndex)e.classList.add('selected-tile');if(selectedTileIndex>=0&&h[selectedTileIndex]&&h[selectedTileIndex].id===t.id)e.classList.add('same-tile-highlight');e.dataset.index=i;e.dataset.tileId=t.id;e.innerHTML=tileMarkup(t);e.onclick=()=>handleTileTap(i,e);wrap.appendChild(e)})}
+function renderHand(){const wrap=byId('player-hand-tiles');if(!wrap)return;const p=mp.seat??0;sortHand(p);wrap.innerHTML='';const h=playerHands[p]||[];const canInteract=p===currentTurn&&p===(mp.seat??0)&&isDiscardable;const newDrawnId=drawnTile?.uniqueId??null;const shouldAnimateDrawn=!!newDrawnId&&newDrawnId!==lastDrawnTileHighlightId;h.forEach((t,i)=>{const e=document.createElement('div');e.className='tile';if(canInteract)e.classList.add('is-interactive');if(drawnTile&&t.uniqueId===drawnTile.uniqueId){e.classList.add('drawn-tile-gap');if(shouldAnimateDrawn)e.classList.add('drawn-tile-emphasis');}if(i===selectedTileIndex)e.classList.add('selected-tile');if(selectedTileIndex>=0&&h[selectedTileIndex]&&h[selectedTileIndex].id===t.id)e.classList.add('same-tile-highlight');e.dataset.index=i;e.dataset.tileId=t.id;e.innerHTML=tileMarkup(t);e.onclick=()=>handleTileTap(i,e);wrap.appendChild(e)});if(newDrawnId)lastDrawnTileHighlightId=newDrawnId;}
 function renderEnemyHands(){const s=mp.seat??0,m=mappedSeats(s);[[`enemy-hand-top`,m[2]],[`enemy-hand-right`,m[1]],[`enemy-hand-left`,m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const count=Math.max(0,playerHands[p]?.length||0);for(let i=0;i<count;i++){const b=document.createElement('span');b.className='mini-back';e.appendChild(b)}const label=document.createElement('span');label.className='hand-count-label';label.textContent=`×${count}`;e.appendChild(label);})}
-function renderRivers(){const s=mp.seat??0,m=mappedSeats(s);const selectedId=(selectedTileIndex>=0&&playerHands[s]?.[selectedTileIndex])?playerHands[s][selectedTileIndex].id:null;[['river-bottom',m[0]],['river-right',m[1]],['river-top',m[2]],['river-left',m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const tiles=(playerRivers[p]||[]).slice(0,id==='river-top'||id==='river-bottom'?32:30);tiles.forEach((t,index)=>{const d=document.createElement('div');d.className='discard-tile';if(selectedId!==null&&t.id===selectedId)d.classList.add('same-tile-highlight');if(p===lastDiscarderIdx&&index===tiles.length-1&&lastDiscardedTile?.uniqueId===t.uniqueId)d.classList.add('last-discard-highlight');d.dataset.tileId=t.id;d.innerHTML=tileMarkup(t);e.appendChild(d)})})}
-function renderMelds(){const s=mp.seat??0,m=mappedSeats(s);const own=byId('player-melds-container');if(own){own.innerHTML='';(playerMelds[m[0]]||[]).forEach(g=>{const box=document.createElement('div');box.className='meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});own.appendChild(box)})}const enemyMap=[['enemy-meld-top-label','enemy-meld-top-tiles',m[2]],['enemy-meld-right-label','enemy-meld-right-tiles',m[1]],['enemy-meld-left-label','enemy-meld-left-tiles',m[3]]];enemyMap.forEach(([labelId,tilesId,p])=>{const label=byId(labelId),wrap=byId(tilesId);const groups=playerMelds[p]||[];const labels=groups.map(g=>g.length===4?'Kan':(g.length===3&&g.every(t=>t.id===g[0].id)?'Pon':'Chow'));if(label)setText(labelId,labels.length?labels.join(' • '):'');if(!wrap)return;wrap.innerHTML='';groups.forEach(g=>{const box=document.createElement('div');box.className='enemy-meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});wrap.appendChild(box)})})}
+function renderRivers(){const s=mp.seat??0,m=mappedSeats(s);const selectedId=(selectedTileIndex>=0&&playerHands[s]?.[selectedTileIndex])?playerHands[s][selectedTileIndex].id:null;const newDiscardId=lastDiscardedTile?.uniqueId??null;const shouldAnimateDiscard=!!newDiscardId&&newDiscardId!==lastDiscardAnimationId;[['river-bottom',m[0]],['river-right',m[1]],['river-top',m[2]],['river-left',m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const tiles=(playerRivers[p]||[]).slice(0,id==='river-top'||id==='river-bottom'?32:30);tiles.forEach((t,index)=>{const d=document.createElement('div');d.className='discard-tile';if(selectedId!==null&&t.id===selectedId)d.classList.add('same-tile-highlight');if(p===lastDiscarderIdx&&index===tiles.length-1&&lastDiscardedTile?.uniqueId===t.uniqueId){d.classList.add('last-discard-highlight');if(shouldAnimateDiscard)d.classList.add('discard-enter');}d.dataset.tileId=t.id;d.innerHTML=tileMarkup(t);e.appendChild(d)})});if(newDiscardId)lastDiscardAnimationId=newDiscardId;}
+function renderMelds(){const s=mp.seat??0,m=mappedSeats(s);const buildMeldKey=(seat,index,g)=>`${seat}:${index}:${(g||[]).map(t=>t?.uniqueId??`${t?.id??''}-${t?.num??''}`).join(',')}`;const own=byId('player-melds-container');if(own){own.innerHTML='';(playerMelds[m[0]]||[]).forEach((g,gi)=>{const box=document.createElement('div');box.className='meld-group';const key=buildMeldKey(m[0],gi,g);const reveal=meldAnimationInitialized&&!seenMeldAnimationKeys.has(key);if(reveal)box.classList.add('meld-reveal');seenMeldAnimationKeys.add(key);g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});own.appendChild(box)})}const enemyMap=[['enemy-meld-top-label','enemy-meld-top-tiles',m[2]],['enemy-meld-right-label','enemy-meld-right-tiles',m[1]],['enemy-meld-left-label','enemy-meld-left-tiles',m[3]]];enemyMap.forEach(([labelId,tilesId,p])=>{const label=byId(labelId),wrap=byId(tilesId);const groups=playerMelds[p]||[];const labels=groups.map(g=>g.length===4?'Kan':(g.length===3&&g.every(t=>t.id===g[0].id)?'Pon':'Chow'));if(label)setText(labelId,labels.length?labels.join(' • '):'');if(!wrap)return;wrap.innerHTML='';groups.forEach((g,gi)=>{const box=document.createElement('div');box.className='enemy-meld-group';const key=buildMeldKey(p,gi,g);const reveal=meldAnimationInitialized&&!seenMeldAnimationKeys.has(key);if(reveal)box.classList.add('meld-reveal');seenMeldAnimationKeys.add(key);g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});wrap.appendChild(box)})});meldAnimationInitialized=true;}
 function renderTable(){advisorKnownCacheKey='';advisorKnownCache=null;renderNames();renderAvatars();updateTurnHighlight();renderPlayerConnectionStatus(mp.room);renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);if(!isMultiplayerMode){renderLocalTurnTimer(isActionPhase?actionSecondsLeft:secondsLeft,isActionPhase?actionSeat:currentTurn);}else if(isActionPhase){renderLocalTurnTimer(actionSecondsLeft,actionSeat);}else{renderLocalTurnTimer(secondsLeft,currentTurn);}const tilesLeftEl=byId('tiles-remaining');const tilesRemaining=Math.max(0,Number(fullDeck.length)||0);if(tilesLeftEl){tilesLeftEl.classList.toggle('low',tilesRemaining<30);tilesLeftEl.textContent=hkTranslateRemaining(tilesRemaining);}updateMusicIntensity();showCurrentWaitAdvisor();if(currentTurn===(mp.seat??0)){setText('hand-status-main','Giliran Anda');setText('hand-status-sub','Pilih tile untuk membuang.');}else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');}}
 
 function isSequenceGroup(group){
@@ -4285,7 +4292,7 @@ function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKe
   activeCallId=nextMpCallId('TURN');
   mpPendingCalls=[];
   activeRemoteActions=null;
-  fullDeck=makeDeck();playerHands=[[],[],[],[]];playerRivers=[[],[],[],[]];playerMelds=[[],[],[],[]];lastDiscardedTile=null;lastDiscarderIdx=-1;selectedTileIndex=-1;roundEnding=false;roundActive=true;secondsLeft=TURN_BASE_SECONDS;timeBank=[TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX];actionSecondsLeft=0;pendingCallChoice=null;clearInterval(turnTimer);clearInterval(actionTimer);
+  fullDeck=makeDeck();playerHands=[[],[],[],[]];playerRivers=[[],[],[],[]];playerMelds=[[],[],[],[]];lastDiscardedTile=null;lastDiscarderIdx=-1;lastDrawnTileHighlightId=null;lastDiscardAnimationId=null;seenMeldAnimationKeys=new Set();meldAnimationInitialized=false;selectedTileIndex=-1;roundEnding=false;roundActive=true;secondsLeft=TURN_BASE_SECONDS;timeBank=[TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX,TIME_BANK_MAX];actionSecondsLeft=0;pendingCallChoice=null;clearInterval(turnTimer);clearInterval(actionTimer);
   for(let n=0;n<13;n++)for(let p=0;p<4;p++)playerHands[p].push(fullDeck.pop());
   for(let p=0;p<4;p++)sortHand(p);
   currentTurn=currentDealerIdx;drawnTile=null;renderTable();processTurn();
@@ -6998,6 +7005,79 @@ html[data-hk-lang="en"] #screen-settings .settings-card::before{content:"GAME OP
 }
 @media (orientation:landscape) and (max-height:520px){
   #screen-settings .language-control > span{display:none;}
+}
+
+
+/* v8 — presentation-only interaction polish. Engine/network logic untouched. */
+.act-btn{
+  position:relative;
+  will-change:transform,filter,box-shadow;
+  transform:translateZ(0);
+}
+.act-btn::before{
+  content:"";
+  position:absolute;
+  inset:1px;
+  border-radius:inherit;
+  pointer-events:none;
+  opacity:0;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16);
+  transition:opacity .12s ease;
+}
+.act-btn:focus-visible{
+  outline:none;
+  box-shadow:
+    0 0 0 2px rgba(245,214,139,.44),
+    0 8px 18px rgba(0,0,0,.28),
+    0 0 14px rgba(226,181,89,.18),
+    inset 0 1px 0 rgba(255,255,255,.15),
+    inset 0 -2px 0 rgba(0,0,0,.13);
+}
+.act-btn:hover::before,.act-btn:active::before{opacity:1;}
+.act-btn:active{
+  transform:translateY(1px) scale(.975);
+}
+
+/* Newly drawn tile: subtle gold separation + one-shot lift, then settles. */
+.drawn-tile-gap{
+  margin-left:8px;
+  transform:translateY(-5px);
+  border:1.5px solid rgba(239,199,111,.78)!important;
+  box-shadow:
+    0 0 0 2px rgba(239,199,111,.10),
+    0 0 12px rgba(232,184,87,.20),
+    0 10px 18px rgba(0,0,0,.30);
+}
+.drawn-tile-emphasis{
+  animation:drawnTileSettle .46s cubic-bezier(.2,.82,.22,1) both;
+}
+@keyframes drawnTileSettle{
+  0%{transform:translateY(-9px) scale(1.025);box-shadow:0 0 0 2px rgba(239,199,111,.18),0 0 18px rgba(232,184,87,.32),0 12px 21px rgba(0,0,0,.32);}
+  62%{transform:translateY(-6px) scale(1.008);box-shadow:0 0 0 2px rgba(239,199,111,.13),0 0 14px rgba(232,184,87,.24),0 10px 19px rgba(0,0,0,.31);}
+  100%{transform:translateY(-5px) scale(1);box-shadow:0 0 0 2px rgba(239,199,111,.10),0 0 12px rgba(232,184,87,.20),0 10px 18px rgba(0,0,0,.30);}
+}
+
+/* New discard: short physical-looking arrival into the river. */
+.discard-tile.discard-enter{
+  animation:discardTileEnter .24s cubic-bezier(.18,.78,.22,1) both;
+  transform-origin:center bottom;
+}
+@keyframes discardTileEnter{
+  0%{opacity:0;transform:translateY(-7px) scale(.94);filter:brightness(1.12)}
+  65%{opacity:1;transform:translateY(1px) scale(1.015);filter:brightness(1.03)}
+  100%{opacity:1;transform:translateY(0) scale(1);filter:brightness(1)}
+}
+
+/* Meld reveal: quick lift/glow, used once per newly created meld group. */
+.meld-group.meld-reveal,
+.enemy-meld-group.meld-reveal{
+  animation:meldReveal .32s cubic-bezier(.18,.78,.22,1) both;
+  transform-origin:center bottom;
+}
+@keyframes meldReveal{
+  0%{opacity:0;transform:translateY(5px) scale(.965);filter:brightness(1.04)}
+  55%{opacity:1;transform:translateY(-1px) scale(1.012);filter:brightness(1.10)}
+  100%{opacity:1;transform:translateY(0) scale(1);filter:brightness(1)}
 }
 </style>
 
