@@ -233,7 +233,7 @@
 .action-announce{
   position:absolute;
   left:50%;
-  top:50%;
+  top:43%;
   z-index:220;
   width:min(194px,46vw);
   min-height:74px;
@@ -438,7 +438,7 @@
   background:linear-gradient(180deg,rgba(19,25,21,.96),rgba(7,12,10,.97));
   box-shadow:0 10px 22px rgba(0,0,0,.36),0 0 12px rgba(230,191,102,.08),inset 0 1px 0 rgba(255,243,207,.05);
   pointer-events:none;
-  animation:chatBubbleInOut 3.8s ease-out forwards;
+  animation:chatBubbleInOut 2.5s ease-out forwards;
 }
 .player-seat .game-chat-bubble::after{
   content:"";
@@ -3728,7 +3728,11 @@ function showActionAnnouncement(seat,type,tiles=[],duration=3000){
 }
 function actionFeedbackDuration(type){
   const key=String(type||'').trim().toLowerCase();
-  return (key==='ron'||key==='tsumo')?4500:3000;
+  if(key==='chi')return 2000;
+  if(key==='pon')return 2500;
+  if(key==='kan')return 3000;
+  if(key==='ron'||key==='tsumo')return 4000;
+  return 2000;
 }
 function beginActionFeedback(seat,type,duration=3000,resume,tiles=[]){
   clearTimeout(actionFeedbackTimer);
@@ -4083,7 +4087,14 @@ function showRoundTransition(){
   el.classList.add('is-visible');
   roundTransitionTimer=setTimeout(hideRoundTransition,1100);
 }
-function playerName(i){if(mp.room?.players?.[i]?.name)return mp.room.players[i].name;if(aiSeats.has(i))return `AI ${['Red','Jade','Bamboo','Pearl'][i]||'Bot'}`;return HUMAN_NAMES[i]}
+function playerName(i){
+  const localSeat=mp.seat??0;
+  if(aiSeats.has(i))return `AI ${['Red','Jade','Bamboo','Pearl'][i]||'Bot'}`;
+  if(!isMultiplayerMode&&i===localSeat)return getStoredPlayerName();
+  if(mp.room?.players?.[i]?.name)return mp.room.players[i].name;
+  if(i===localSeat)return String(mp.playerName||getStoredPlayerName()||'Player').trim().slice(0,20)||'Player';
+  return HUMAN_NAMES[i];
+}
 function mappedSeats(seat){const s=seat??0;return[s,(s+1)%4,(s+2)%4,(s+3)%4]}
 function sortHand(p){if(!autoSortSetting||!playerHands[p])return;const h=playerHands[p];h.sort((a,b)=>a.id-b.id);if(drawnTile&&p===currentTurn){const i=h.findIndex(t=>t.uniqueId===drawnTile.uniqueId);if(i>=0&&i!==h.length-1)h.push(h.splice(i,1)[0])}}
 function renderNames(){
@@ -6007,7 +6018,7 @@ function gameChatShowBubble(msg){
   text.textContent=String(msg.text||'').replace(/\s+/g,' ').trim().slice(0,180);
   bubble.append(name,text);
   seatEl.appendChild(bubble);
-  gameChatBubbleTimers.set(seat,setTimeout(()=>{bubble.remove();gameChatBubbleTimers.delete(seat)},3900));
+  gameChatBubbleTimers.set(seat,setTimeout(()=>{bubble.remove();gameChatBubbleTimers.delete(seat)},2500));
 }
 function gameChatClearBubbles(){
   gameChatBubbleTimers.forEach(clearTimeout);
