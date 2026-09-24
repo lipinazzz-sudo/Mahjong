@@ -3125,7 +3125,7 @@ async function historyGetAll(){try{const db=await historyDb();return await new P
 async function historyPut(match){try{const db=await historyDb();await new Promise((resolve,reject)=>{const tx=db.transaction(HISTORY_STORE,'readwrite');tx.objectStore(HISTORY_STORE).put(match);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}catch(e){console.warn('History save failed',e)}}
 function historyDate(ts){try{return new Date(ts).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}catch{return '-'}}
 function historyRoomCode(){return String(mp.room?.code||'Multiplayer')}
-function historyPlayersSnapshot(){return [0,1,2,3].map(i=>({seat:i,name:playerName(i),avatar:playerAvatars[i]||'panda',wind:['South','East','North','West'][i]}))}
+function historyPlayersSnapshot(){return [0,1,2,3].map(i=>{const roomAvatar=mp.room?.players?.[i]?.avatar;const avatar=AVATAR_IDS.includes(roomAvatar)?roomAvatar:(playerAvatars[i]||'panda');return {seat:i,name:playerName(i),avatar,wind:['South','East','North','West'][i]}})}
 function historyRoundRecord(title,desc,resultMeta){return {round:currentRoundIndex,name:getRoundName(),title:String(title||'Ronde Selesai'),desc:String(desc||''),scores:playerScores.map(x=>Math.round(Number(x)||0)),winner:resultMeta?.winner?JSON.parse(JSON.stringify(resultMeta.winner)):null,playedAt:Date.now()}}
 async function historyRecordRound(title,desc,resultMeta){
   if(!isMultiplayerMode)return;
@@ -6215,13 +6215,14 @@ function mpApplyRemoteState(state){
     renderResultModal(state.result.title,state.result.desc,state.result);
   }
   if(state.phase==='matchFinished'&&state.result){
+    const finish=()=>{renderResultModal(state.result.title,state.result.desc,state.result);setTimeout(()=>leaveFinishedRoom(),500)};
     if(state.historyMatch){
       mpHistoryCompletedMatch=state.historyMatch;
       mpHistoryRounds=Array.isArray(state.historyMatch.rounds)?state.historyMatch.rounds.slice():mpHistoryRounds;
-      historyPut(state.historyMatch);
+      historyPut(state.historyMatch).finally(finish);
+    }else{
+      historyRecordRound(state.result.title,state.result.desc,state.result).finally(finish);
     }
-    renderResultModal(state.result.title,state.result.desc,state.result);
-    setTimeout(()=>leaveFinishedRoom(),500);
   }
 }
 function roomCanAct(seat){return !!(mp.room?.players?.[seat] || seat===mp.seat || (mp.host&&seat===0))}
