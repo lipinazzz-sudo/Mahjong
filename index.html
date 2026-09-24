@@ -2250,6 +2250,70 @@ body::after{
 }
 </style>
 
+<style>
+/* ========================================================================
+   PREMIUM ACTION TRAY — refined compact presentation
+   Gameplay / action handlers remain unchanged.
+   ======================================================================== */
+#action-overlay{
+  --action-progress:100%;
+  --action-glow-1:rgba(227,183,92,0);
+  --action-glow-2:rgba(227,183,92,0);
+  --action-glow-3:rgba(227,183,92,0);
+  --action-glow-4:rgba(227,183,92,0);
+  position:absolute;
+  right:clamp(10px,2.6vw,38px);
+  bottom:calc(var(--tileH) + 14px);
+  left:auto;
+  top:auto;
+  width:min(264px,31vw);
+  max-width:min(31vw,264px);
+  display:none;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  align-items:stretch;
+  gap:6px;
+  padding:7px;
+  border-radius:12px;
+  background:linear-gradient(180deg,rgba(24,20,15,.975),rgba(7,12,10,.985));
+  border:1px solid rgba(235,199,119,.62);
+  box-shadow:0 12px 26px rgba(0,0,0,.40),0 0 10px var(--action-glow-1),0 0 16px var(--action-glow-2),0 0 22px var(--action-glow-3),0 0 28px var(--action-glow-4),0 0 0 1px rgba(255,239,198,.045),inset 0 1px 0 rgba(255,245,214,.11),inset 0 -7px 16px rgba(0,0,0,.22);
+  backdrop-filter:blur(11px) saturate(1.08);
+  -webkit-backdrop-filter:blur(11px) saturate(1.08);
+  overflow:hidden;
+  transform:translateZ(0);
+}
+#action-overlay::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(circle at 12% 0%,rgba(244,202,113,.08),transparent 34%),radial-gradient(circle at 100% 100%,rgba(196,141,46,.045),transparent 30%);}
+#action-overlay::after{content:"";position:absolute;inset:-7px;border-radius:inherit;pointer-events:none;background:linear-gradient(105deg,var(--action-glow-1),var(--action-glow-2) 34%,var(--action-glow-3) 66%,var(--action-glow-4));filter:blur(11px);opacity:.85;z-index:0;}
+.action-overlay-head,.action-overlay-track,.action-overlay-buttons{position:relative;z-index:1;width:100%;}
+.action-overlay-head{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;padding:1px 2px 0;}
+.action-overlay-title{color:#f4e5c6;font-size:8.4px;font-weight:950;letter-spacing:.06em;line-height:1.05;text-shadow:0 0 12px rgba(240,198,112,.10);}
+.action-overlay-phase{flex:0 0 auto;color:#ddb96e;font-size:6.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;}
+.action-overlay-track{height:3px;margin:2px 1px 3px;border-radius:999px;background:rgba(255,255,255,.075);border:1px solid rgba(255,240,202,.10);box-shadow:inset 0 1px 2px rgba(0,0,0,.36);overflow:hidden;}
+.action-overlay-progress{display:block;width:var(--action-progress,100%);height:100%;border-radius:inherit;background:linear-gradient(90deg,#b97829,#e8bf6c 58%,#f8dfa1);box-shadow:0 0 8px rgba(234,190,92,.36);transition:width .82s linear,filter .16s ease,background .16s ease;transform-origin:left center;}
+#action-overlay.action-time-danger .action-overlay-progress{background:linear-gradient(90deg,#9f403c,#de6a5f,#f19a83);box-shadow:0 0 8px rgba(217,86,76,.34);}
+#action-overlay.action-time-bank .action-overlay-progress{background:linear-gradient(90deg,#8e672e,#c99a49,#e5c87d);box-shadow:0 0 8px rgba(214,166,71,.24);}
+.action-overlay-buttons{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:stretch;gap:6px;}
+#action-overlay .act-btn{position:relative;min-width:50px;min-height:35px;flex:1 1 50px;max-width:77px;padding:5px 6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:9px;border-width:1px;color:#fff;font-size:7.7px;font-weight:950;letter-spacing:.045em;line-height:1;text-shadow:0 1px 2px rgba(0,0,0,.28);box-shadow:0 6px 12px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.15),inset 0 -2px 0 rgba(0,0,0,.13);transition:transform .10s ease,filter .12s ease,box-shadow .16s ease,border-color .16s ease;}
+#action-overlay .act-btn::before{display:block;min-height:12px;margin:0 0 1px;font-family:"Noto Serif CJK SC","Noto Serif SC","PingFang SC","Microsoft YaHei",serif;font-size:12.5px;font-weight:900;line-height:1;letter-spacing:0;color:#fff9ea;text-shadow:0 1px 5px rgba(0,0,0,.30),0 0 9px rgba(255,238,194,.10);}
+#action-overlay .btn-ron::before,#action-overlay .btn-hu::before{content:"和";}
+#action-overlay .btn-pon::before{content:"碰";}
+#action-overlay .btn-chi::before{content:"吃";}
+#action-overlay .btn-kan::before{content:"槓";}
+#action-overlay .btn-tsumo::before{content:"自摸";font-size:11px;}
+#action-overlay .btn-skip::before{content:"跳过";font-size:10.5px;color:rgba(255,255,255,.86);}
+#action-overlay .act-btn:hover{filter:brightness(1.07) saturate(1.02);transform:translateY(-1px);}
+#action-overlay .act-btn:active{transform:translateY(1px) scale(.985);}
+#action-overlay .btn-ron,#action-overlay .btn-hu{border:1.5px solid rgba(255,157,148,.86);box-shadow:0 7px 14px rgba(0,0,0,.25),0 0 4px rgba(255,116,104,.62),0 0 18px rgba(190,66,58,.46),0 0 30px rgba(190,66,58,.18),inset 0 1px 0 rgba(255,239,235,.22),inset 0 -2px 0 rgba(0,0,0,.13);}
+#action-overlay .btn-pon{border:1.5px solid rgba(220,194,245,.82);box-shadow:0 7px 14px rgba(0,0,0,.25),0 0 4px rgba(224,194,250,.64),0 0 18px rgba(129,99,155,.48),0 0 30px rgba(129,99,155,.20),inset 0 1px 0 rgba(255,255,255,.21),inset 0 -2px 0 rgba(0,0,0,.13);}
+#action-overlay .btn-chi{border:1.5px solid rgba(151,241,198,.78);box-shadow:0 7px 14px rgba(0,0,0,.25),0 0 4px rgba(130,237,183,.62),0 0 18px rgba(46,147,96,.44),0 0 30px rgba(46,147,96,.18),inset 0 1px 0 rgba(240,255,245,.19),inset 0 -2px 0 rgba(0,0,0,.13);}
+#action-overlay .btn-kan{border:1.5px solid rgba(132,237,228,.82);box-shadow:0 7px 14px rgba(0,0,0,.25),0 0 4px rgba(117,224,217,.64),0 0 18px rgba(45,153,148,.48),0 0 30px rgba(45,153,148,.20),inset 0 1px 0 rgba(240,255,255,.20),inset 0 -2px 0 rgba(0,0,0,.13);}
+#action-overlay .btn-tsumo{border:1.5px solid rgba(255,226,154,.88);box-shadow:0 7px 14px rgba(0,0,0,.25),0 0 4px rgba(255,218,133,.68),0 0 18px rgba(210,155,70,.48),0 0 30px rgba(210,155,70,.20),inset 0 1px 0 rgba(255,247,220,.22),inset 0 -2px 0 rgba(0,0,0,.13);}
+#action-overlay .btn-skip{flex:0 0 auto;min-width:58px;max-width:none;min-height:29px;padding:4px 9px;background:linear-gradient(180deg,#656c68,#474d4a);border:1px solid rgba(223,229,222,.30);box-shadow:0 6px 12px rgba(0,0,0,.21),0 0 9px rgba(203,211,204,.14),inset 0 1px 0 rgba(255,255,255,.10),inset 0 -2px 0 rgba(0,0,0,.11);}
+#action-overlay .btn-skip::before{display:none;}
+@media (max-width:700px){#action-overlay{width:min(78vw,272px);max-width:78vw;padding:6px;gap:5px;border-radius:11px}.action-overlay-head{padding-top:1px}.action-overlay-title{font-size:7.8px}.action-overlay-phase{font-size:6px}.action-overlay-track{height:3px;margin-top:2px;margin-bottom:3px}#action-overlay .act-btn{min-width:47px;min-height:34px;flex-basis:47px;max-width:none;padding:5px 6px 4px;font-size:7.5px}#action-overlay .act-btn::before{font-size:12px;min-height:11px}#action-overlay .btn-tsumo::before{font-size:10.5px}#action-overlay .btn-skip{min-width:56px;min-height:27px}}
+@media (orientation:portrait){#action-overlay{left:50%!important;right:auto!important;top:auto!important;bottom:calc(var(--tileH) + 48px)!important;transform:translateX(-50%)!important;width:min(78vw,272px)!important;max-width:78vw!important;}}
+</style>
 </head>
 <body>
     <audio id="bg-music" loop preload="auto" aria-hidden="true"></audio>
@@ -3113,6 +3177,7 @@ let actionFeedbackToken=0;
 let aiDecisionToken=0;
 let autoSortSetting=true,activeScreenId='screen-main',previousScreenId='screen-main',isMultiplayerMode=false;
 let mpHistoryMatchStartedAt=null;
+let mpHistoryMatchId=null;
 let mpHistoryRounds=[];
 let mpHistorySavedKeys=new Set();
 let mpHistoryCompletedMatch=null;
@@ -3127,6 +3192,14 @@ function historyDate(ts){try{return new Date(ts).toLocaleString('id-ID',{day:'2-
 function historyRoomCode(){return String(mp.room?.code||'Multiplayer')}
 function historyPlayersSnapshot(){return [0,1,2,3].map(i=>{const roomAvatar=mp.room?.players?.[i]?.avatar;const avatar=AVATAR_IDS.includes(roomAvatar)?roomAvatar:(playerAvatars[i]||'panda');return {seat:i,name:playerName(i),avatar,wind:['South','East','North','West'][i]}})}
 function historyRoundRecord(title,desc,resultMeta){return {round:currentRoundIndex,name:getRoundName(),title:String(title||'Ronde Selesai'),desc:String(desc||''),scores:playerScores.map(x=>Math.round(Number(x)||0)),winner:resultMeta?.winner?JSON.parse(JSON.stringify(resultMeta.winner)):null,playedAt:Date.now()}}
+function historyBuildMatch(rounds=mpHistoryRounds,finalScores=playerScores,winner=null){
+  const list=(Array.isArray(rounds)?rounds:[]).filter(Boolean).slice(0,4);
+  if(list.length<4)return null;
+  const startedAt=mpHistoryMatchStartedAt||Number(list[0]?.playedAt)||Date.now();
+  const id=String(mpHistoryMatchId||`${historyRoomCode()}-${startedAt}`);
+  const scores=(Array.isArray(finalScores)?finalScores:playerScores).map(x=>Math.round(Number(x)||0));
+  return {id,playedAt:Number(list[3]?.playedAt)||Date.now(),startedAt,room:historyRoomCode(),players:historyPlayersSnapshot(),rounds:list,finalScores:scores,winner:winner?JSON.parse(JSON.stringify(winner)):computeStandings().map(x=>({...x}))[0]||null,durationMs:Math.max(0,Date.now()-startedAt)};
+}
 async function historyRecordRound(title,desc,resultMeta){
   if(!isMultiplayerMode)return;
   const key=`${historyRoomCode()}:${currentRoundIndex}`;
@@ -3135,10 +3208,31 @@ async function historyRecordRound(title,desc,resultMeta){
   const rec=historyRoundRecord(title,desc,resultMeta);
   mpHistoryRounds=mpHistoryRounds.filter(r=>r.round!==rec.round);mpHistoryRounds.push(rec);mpHistoryRounds.sort((a,b)=>a.round-b.round);
   if(mpHistoryRounds.length>=4){
-    const match={id:`${historyRoomCode()}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,playedAt:Date.now(),startedAt:mpHistoryMatchStartedAt||rec.playedAt,room:historyRoomCode(),players:historyPlayersSnapshot(),rounds:mpHistoryRounds.slice(0,4),finalScores:rec.scores.slice(),winner:computeStandings().map(x=>({...x}))[0]||null,durationMs:Math.max(0,Date.now()-(mpHistoryMatchStartedAt||rec.playedAt))};
+    const match=historyBuildMatch(mpHistoryRounds,rec.scores,computeStandings().map(x=>({...x}))[0]||null);
+    if(!match)return;
     mpHistoryCompletedMatch=match;
     await historyPut(match);
   }
+}
+async function historyPersistRemoteState(state){
+  if(!state||!isMultiplayerMode)return false;
+  if(state.historyMatchId)mpHistoryMatchId=String(state.historyMatchId);
+  if(Array.isArray(state.historyRounds))mpHistoryRounds=state.historyRounds.slice(0,4);
+  if(state.historyMatch){
+    mpHistoryCompletedMatch=state.historyMatch;
+    mpHistoryRounds=Array.isArray(state.historyMatch.rounds)?state.historyMatch.rounds.slice():mpHistoryRounds;
+    await historyPut(state.historyMatch);
+    return true;
+  }
+  if(state.phase==='matchFinished'&&mpHistoryRounds.length>=4){
+    const match=historyBuildMatch(mpHistoryRounds,state.playerScores,state.result?.winner||null);
+    if(match){mpHistoryCompletedMatch=match;await historyPut(match);return true;}
+  }
+  if(state.phase==='result'&&state.result){
+    await historyRecordRound(state.result.title,state.result.desc,state.result);
+    return !!mpHistoryCompletedMatch;
+  }
+  return false;
 }
 function avatarUrl(id){const def=getAvatarDef(id||'panda');return def?.file||''}
 function historyTileHtml(tile){if(!tile)return '';const wrap=document.createElement('div');wrap.className='history-tile';wrap.innerHTML=tileMarkup(tile);const img=wrap.querySelector('img');if(img)img.removeAttribute('onerror');return wrap.outerHTML}
@@ -3871,7 +3965,7 @@ function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKe
   currentTurn=currentDealerIdx;drawnTile=null;renderTable();processTurn();
   if(typeof gameChatRefreshVisibility==='function')gameChatRefreshVisibility();
 }
-function start4PGame(diff='Medium',multi=false){mpHistoryRounds=[];mpHistorySavedKeys=new Set();mpHistoryCompletedMatch=null;mpHistoryMatchStartedAt=Date.now();activeRemoteActions=null;mpPendingCalls=[];activeActionFeedback=null;actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;lastActionFeedbackId='';clearPlayerActionFeedback();activeCallId=null;mpCallSeq=0;mpActionSeq=0;mpProcessedActionIds=new Set();cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
+function start4PGame(diff='Medium',multi=false){mpHistoryRounds=[];mpHistorySavedKeys=new Set();mpHistoryCompletedMatch=null;mpHistoryMatchStartedAt=Date.now();mpHistoryMatchId=multi&&mp.host?`${mp.room?.code||'Multiplayer'}-${mpHistoryMatchStartedAt}`:null;activeRemoteActions=null;mpPendingCalls=[];activeActionFeedback=null;actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;lastActionFeedbackId='';clearPlayerActionFeedback();activeCallId=null;mpCallSeq=0;mpActionSeq=0;mpProcessedActionIds=new Set();cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
   aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
   if(!multi){
     mp.seat=0;mp.room=null;mp.host=true;mp.connected=false;mp.playerAvatar=selectedAvatar;
@@ -3986,6 +4080,11 @@ function startActionWindow(timeoutHandler,seat=currentTurn,mode='call',resume=fa
   clearGameTimers();
   isActionPhase=true; if(!resume)actionSecondsLeft=ACTION_WINDOW_SECONDS;
   actionTimeoutHandler=timeoutHandler; actionSeat=seat; actionMode=mode;
+  const o=byId('action-overlay');
+  if(o&&!o.hidden){
+    if(!Number(o.dataset.actionTotal))o.dataset.actionTotal=String(ACTION_WINDOW_SECONDS+(timeBank[seat]||0));
+    updateActionOverlayTimer(actionSecondsLeft+(timeBank[seat]||0),seat,'action');
+  }
   const epoch=gameTurnEpoch;
   renderLocalTurnTimer(actionSecondsLeft,seat);
   updateTimeBankUI(seat); broadcastTimerState({actionMode:mode,seat});
@@ -3997,20 +4096,24 @@ function startActionWindow(timeoutHandler,seat=currentTurn,mode='call',resume=fa
       if(actionSecondsLeft>0){
         actionSecondsLeft--;
         renderLocalTurnTimer(Math.max(0,actionSecondsLeft),seat);
+        updateActionOverlayTimer(actionSecondsLeft+(timeBank[seat]||0),seat,'action');
         broadcastTimerState({actionMode:mode,seat}); return;
       }
       if((timeBank[seat]||0)>0){
         timeBank[seat]--;
         renderLocalTurnTimer(timeBank[seat],seat); updateTimeBankUI(seat);
+        updateActionOverlayTimer(actionSecondsLeft+(timeBank[seat]||0),seat,'bank');
         broadcastTimerState({actionMode:mode,seat});
         if(timeBank[seat]<=0){
           clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
+          updateActionOverlayTimer(0,seat,'bank');
           const cb=actionTimeoutHandler; actionTimeoutHandler=null;
           actionSeat=-1; actionMode=''; cb?.();
         }
         return;
       }
       clearInterval(actionTimer); actionTimer=null; isActionPhase=false;
+      updateActionOverlayTimer(0,seat,'action');
       const cb=actionTimeoutHandler; actionTimeoutHandler=null;
       actionSeat=-1; actionMode=''; cb?.();
     }catch(err){
@@ -4574,9 +4677,21 @@ function snapshotWinningHand(seat,result,isTsumo){
   };
 }
 function resolveWin(seat,result,isTsumo){playSfx(isTsumo?'tsumo':'ron');roundEnding=true;clearInterval(turnTimer);clearInterval(actionTimer);const payer=isTsumo?null:lastDiscarderIdx;let amount=Number.isFinite(Number(result?.points))?Number(result.points):0;if(isTsumo){for(let p=0;p<4;p++)if(p!==seat)playerScores[p]-=amount/3;playerScores[seat]+=amount}else{playerScores[seat]+=amount; if(payer>=0)playerScores[payer]-=amount}renderTable();flashBoard('win');const title=`${isTsumo?'TSUMO':'RON'} • ${playerName(seat)}`;const desc=`${result.yakuStr} • ${result.points} poin`;const winner=snapshotWinningHand(seat,result,isTsumo);beginActionFeedback(seat,isTsumo?'Tsumo':'Ron',3000,()=>endRound(title,desc,{winner}))}
+function updateActionOverlayTimer(remaining=null,seat=actionSeat,phase=isActionPhase?'action':'bank'){
+  const o=byId('action-overlay');
+  if(!o)return;
+  const numeric=Math.max(0,Number(remaining==null?(actionSecondsLeft+(timeBank[seat]||0)):remaining)||0);
+  const total=Math.max(1,Number(o.dataset.actionTotal)||Number(ACTION_WINDOW_SECONDS+(timeBank[seat]||0))||1);
+  const pct=Math.max(0,Math.min(100,(numeric/total)*100));
+  o.style.setProperty('--action-progress',pct+'%');
+  o.classList.toggle('action-time-danger',numeric<=3);
+  o.classList.toggle('action-time-bank',phase==='bank');
+  const phaseEl=o.querySelector('.action-overlay-phase');
+  if(phaseEl)phaseEl.textContent=phase==='bank'?'TIME BANK':'PILIH';
+}
 function hideAvailableActions(){
   const o=byId('action-overlay');
-  if(o){o.innerHTML='';o.style.display='none';o.hidden=true;}
+  if(o){o.innerHTML='';o.style.display='none';o.hidden=true;o.removeAttribute('data-action-total');o.style.removeProperty('--action-progress');['--action-glow-1','--action-glow-2','--action-glow-3','--action-glow-4'].forEach(key=>o.style.removeProperty(key));o.classList.remove('action-time-danger','action-time-bank');}
   isActionPhase=false;
   showCurrentWaitAdvisor();
 }
@@ -4597,6 +4712,30 @@ function showAvailableActions(actions,contextId=activeCallId){
   isActionPhase=true;
   o.hidden=false;
   o.style.display='flex';
+  o.dataset.actionTotal=String(ACTION_WINDOW_SECONDS+(timeBank[actionSeat>=0?actionSeat:currentTurn]||0));
+  const actionGlowMap={
+    Ron:'rgba(217,93,84,.36)',
+    Hu:'rgba(217,93,84,.36)',
+    Pong:'rgba(144,103,177,.34)',
+    Pung:'rgba(144,103,177,.34)',
+    Chi:'rgba(67,176,116,.34)',
+    Kan:'rgba(58,173,168,.34)',
+    Tsumo:'rgba(224,171,72,.36)'
+  };
+  const glowTypes=[...new Set((actions||[]).map(a=>String(typeof a==='string'?a:a?.type||'')).filter(t=>actionGlowMap[t]))];
+  ['--action-glow-1','--action-glow-2','--action-glow-3','--action-glow-4'].forEach((key,i)=>{
+    o.style.setProperty(key,glowTypes[i]?actionGlowMap[glowTypes[i]]:'rgba(227,183,92,0)');
+  });
+  const actionTitle=(window.hkLanguage==='id'?'TINDAKAN':'ACTION');
+  o.innerHTML=`
+    <div class="action-overlay-head">
+      <strong class="action-overlay-title">${actionTitle}</strong>
+      <span class="action-overlay-phase">PILIH</span>
+    </div>
+    <div class="action-overlay-track"><span class="action-overlay-progress"></span></div>
+    <div class="action-overlay-buttons"></div>
+  `;
+  const wrap=o.querySelector('.action-overlay-buttons');
 
   actions.forEach(a=>{
     const type=typeof a==='string'?a:a?.type;
@@ -4613,7 +4752,7 @@ function showAvailableActions(actions,contextId=activeCallId){
           combo:[...a.combos[0]],
           callId
         });
-        o.appendChild(b);
+        wrap?.appendChild(b);
         return;
       }
 
@@ -4627,7 +4766,7 @@ function showAvailableActions(actions,contextId=activeCallId){
           combo:[...combo],
           callId
         });
-        o.appendChild(b);
+        wrap?.appendChild(b);
       });
       return;
     }
@@ -4637,8 +4776,9 @@ function showAvailableActions(actions,contextId=activeCallId){
     b.className=`act-btn btn-${String(type).toLowerCase()}`;
     b.textContent=hkActionLabel(type);
     b.onclick=()=>triggerAction({type,callId});
-    o.appendChild(b);
+    wrap?.appendChild(b);
   });
+  updateActionOverlayTimer(actionSecondsLeft+(timeBank[actionSeat>=0?actionSeat:currentTurn]||0),actionSeat>=0?actionSeat:currentTurn,'action');
 }
 function triggerAction(a){
   const guestAction=isMultiplayerMode&&!mp.host;
@@ -5986,11 +6126,7 @@ function mpHandle(msg){
         setDisplay('modal-match-over','none');
         nav('screen-game');
         renderResultModal(msg.state.result.title,msg.state.result.desc,msg.state.result);
-        if(msg.state.historyMatch){
-          mpHistoryCompletedMatch=msg.state.historyMatch;
-          mpHistoryRounds=Array.isArray(msg.state.historyMatch.rounds)?msg.state.historyMatch.rounds.slice():mpHistoryRounds;
-          historyPut(msg.state.historyMatch);
-        }
+        historyPersistRemoteState(msg.state).catch(()=>{});
         restored=true;
       }
       mpRejoinStateApplied=!!restored;
@@ -6057,7 +6193,7 @@ function stopMpGameWatchdog(){
   clearInterval(mpGameWatchdogTimer);
   mpGameWatchdogTimer=null;
 }
-function mpStateSnapshot(extra={}){const hasRemote=Object.prototype.hasOwnProperty.call(extra,'remoteActions');if(hasRemote)activeRemoteActions=extra.remoteActions;const hasFeedback=Object.prototype.hasOwnProperty.call(extra,'actionFeedback');if(hasFeedback)activeActionFeedback=extra.actionFeedback||null;return{currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,playerHands,playerRivers,playerMelds,playerScores,lastDiscardedTile,lastDiscarderIdx,drawnTile,secondsLeft,timeBank,actionSecondsLeft,isActionPhase,isDiscardable,pendingCalls:mpPendingCalls,roundActive,roundEnding,roomPlayers:mp.room?.players||[],aiSeats:[...aiSeats],playerAvatars:[...playerAvatars],actionContextId:activeCallId,remoteActions:activeRemoteActions,actionFeedback:activeActionFeedback,historyMatch:mpHistoryCompletedMatch,...extra}}
+function mpStateSnapshot(extra={}){const hasRemote=Object.prototype.hasOwnProperty.call(extra,'remoteActions');if(hasRemote)activeRemoteActions=extra.remoteActions;const hasFeedback=Object.prototype.hasOwnProperty.call(extra,'actionFeedback');if(hasFeedback)activeActionFeedback=extra.actionFeedback||null;return{currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,playerHands,playerRivers,playerMelds,playerScores,lastDiscardedTile,lastDiscarderIdx,drawnTile,secondsLeft,timeBank,actionSecondsLeft,isActionPhase,isDiscardable,pendingCalls:mpPendingCalls,roundActive,roundEnding,roomPlayers:mp.room?.players||[],aiSeats:[...aiSeats],playerAvatars:[...playerAvatars],actionContextId:activeCallId,remoteActions:activeRemoteActions,actionFeedback:activeActionFeedback,historyRounds:mpHistoryRounds.slice(0,4),historyMatchId:mpHistoryMatchId,historyMatch:mpHistoryCompletedMatch,...extra}}
 function mpBroadcastState(extra={}){const state=mpStateSnapshot(extra);if(isMultiplayerMode&&mp.host){mpSaveActiveGameState(state);mpTouchSession()}if(isMultiplayerMode&&mp.host&&mp.connected)mpSend('state',{state})}
 function mpApplyRemoteState(state){
   if(mp.host)return;
@@ -6205,23 +6341,13 @@ function mpApplyRemoteState(state){
   }
 
   if(state.roundActive&&state.currentRoundIndex===0&&!mpHistoryMatchStartedAt)mpHistoryMatchStartedAt=Date.now();
-  if(state.historyMatch){
-    mpHistoryCompletedMatch=state.historyMatch;
-    mpHistoryRounds=Array.isArray(state.historyMatch.rounds)?state.historyMatch.rounds.slice():mpHistoryRounds;
-    historyPut(state.historyMatch);
-  }
-  if(state.phase==='result'&&state.result){
-    if(!state.historyMatch)historyRecordRound(state.result.title,state.result.desc,state.result);
-    renderResultModal(state.result.title,state.result.desc,state.result);
-  }
   if(state.phase==='matchFinished'&&state.result){
     const finish=()=>{renderResultModal(state.result.title,state.result.desc,state.result);setTimeout(()=>leaveFinishedRoom(),500)};
-    if(state.historyMatch){
-      mpHistoryCompletedMatch=state.historyMatch;
-      mpHistoryRounds=Array.isArray(state.historyMatch.rounds)?state.historyMatch.rounds.slice():mpHistoryRounds;
-      historyPut(state.historyMatch).finally(finish);
-    }else{
-      historyRecordRound(state.result.title,state.result.desc,state.result).finally(finish);
+    historyPersistRemoteState(state).finally(finish);
+  }else{
+    historyPersistRemoteState(state).catch(()=>{});
+    if(state.phase==='result'&&state.result){
+      renderResultModal(state.result.title,state.result.desc,state.result);
     }
   }
 }
@@ -6900,6 +7026,13 @@ html[data-hk-lang="en"] #screen-settings .settings-card::before{content:"GAME OP
     try{if(typeof renderNames==='function' && (typeof roundActive!=='undefined'))renderNames();}catch(e){}
     try{if(typeof renderPlayerConnectionStatus==='function' && (typeof mp!=='undefined'))renderPlayerConnectionStatus(mp.room);}catch(e){}
     try{if(typeof gameChatRefreshVisibility==='function')gameChatRefreshVisibility();}catch(e){}
+    try{
+      const actionTitle=document.querySelector('#action-overlay .action-overlay-title');
+      if(actionTitle)actionTitle.textContent=window.hkLanguage==='id'?'TINDAKAN':'ACTION';
+      const actionPhase=document.querySelector('#action-overlay .action-overlay-phase');
+      if(actionPhase&&document.getElementById('action-overlay')?.classList.contains('action-time-bank'))actionPhase.textContent='TIME BANK';
+      else if(actionPhase)actionPhase.textContent='PILIH';
+    }catch(e){}
     try{
       const tiles=document.getElementById('tiles-remaining');
       if(tiles){const m=String(tiles.textContent||'').match(/(?:SISA|LEFT)\s+(\d+)/);if(m)tiles.textContent=hkTranslateRemaining(m[1]);}
