@@ -88,6 +88,278 @@
 .player-seat{position:absolute;z-index:35;display:flex;flex-direction:column;align-items:center;text-align:center}.avatar-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;width:max-content;height:max-content}.action-badge{position:absolute;top:calc(50% + 2px);width:clamp(22px,3.2vw,25px);height:clamp(22px,3.2vw,25px);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:clamp(10px,1.5vw,12px);line-height:1;font-weight:950;letter-spacing:0;opacity:0;pointer-events:none;z-index:90;box-shadow:0 4px 12px rgba(0,0,0,.38),0 0 0 1px rgba(255,255,255,.10);transition:opacity .14s ease,transform .14s ease;transform:translateY(-50%) scale(.82)}.action-badge.show{opacity:1;transform:translateY(-50%) scale(1)}.pos-top .action-badge,.pos-right .action-badge{right:calc(100% + 6px);left:auto}.pos-bottom .action-badge,.pos-left .action-badge{left:calc(100% + 6px);right:auto}.pos-top .player-connection-indicator,.pos-right .player-connection-indicator{left:auto;right:calc(100% + 8px);top:-10px}.pos-bottom .player-connection-indicator,.pos-left .player-connection-indicator{left:calc(100% + 8px);right:auto;top:-10px}.action-badge-chi{background:#26945f;border:1px solid #72d8a2;color:#effff5}.action-badge-pon{background:linear-gradient(180deg,#81639b,#58406e);border:1px solid rgba(230,211,245,.55);color:#fbf5ff}.action-badge-kan{background:#198c82;border:1px solid #65d8d0;color:#ecfffd}.action-badge-ron{background:#b74642;border:1px solid #f08b84;color:#fff4f3}.action-badge-tsumo{background:#bf7a29;border:1px solid #f0c16e;color:#fff7df}.avatar-img{width:clamp(31px,min(4.7vw,5.8vh),44px);height:clamp(31px,min(4.7vw,5.8vh),44px);border-radius:10px;border:2px solid #e2b55c;background:radial-gradient(circle at 34% 28%,#ffdb86,#8e4d27 50%,#261714 100%);box-shadow:0 5px 10px rgba(0,0,0,.30),0 8px 16px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,245,213,.13),inset 0 -2px 4px rgba(0,0,0,.18)}.player-seat.turn-active .avatar-img{border-color:#f8d57c;box-shadow:0 0 0 2px rgba(248,213,124,.50),0 0 0 5px rgba(248,213,124,.12),0 0 18px rgba(248,213,124,.38),0 0 30px rgba(248,213,124,.18),0 7px 15px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,245,213,.18);filter:brightness(1.11)}.player-seat.turn-active .avatar-name{border-color:rgba(248,213,124,.74);color:#fff2d0;background:rgba(43,32,18,.90);box-shadow:0 0 0 1px rgba(248,213,124,.12),0 0 13px rgba(248,213,124,.22)}
 .player-connection-indicator{position:absolute;right:auto;left:calc(100% + 8px);top:-10px;display:inline-flex;align-items:center;gap:3px;min-height:14px;padding:2px 5px;border-radius:999px;background:rgba(10,9,8,.90);border:1px solid rgba(255,255,255,.12);font-size:6px;line-height:1;font-weight:950;letter-spacing:.04em;white-space:nowrap;pointer-events:none;z-index:91;box-shadow:0 3px 8px rgba(0,0,0,.28)}.player-connection-dot{width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:#808080;box-shadow:0 0 0 1px rgba(255,255,255,.12)}.player-connection-indicator.online{color:#7bedb7;border-color:rgba(92,230,159,.34)}.player-connection-indicator.online .player-connection-dot{background:#4fe39a;box-shadow:0 0 7px rgba(79,227,154,.7)}.player-connection-indicator.disconnected{color:#ff9b91;border-color:rgba(255,120,110,.30)}.player-connection-indicator.disconnected .player-connection-dot{background:#ff665d;box-shadow:0 0 7px rgba(255,102,93,.62)}.player-connection-indicator.offline{color:#c0b7ae}.player-connection-indicator.offline .player-connection-dot{background:#8d8177}.player-connection-indicator.ai{color:#cdb98c;border-color:rgba(215,181,107,.22)}.player-connection-indicator.ai .player-connection-dot{background:#c5a45e;box-shadow:0 0 6px rgba(197,164,94,.35)}.player-connection-indicator.hidden{display:none}@media (max-width:430px){.player-connection-indicator{right:auto;left:calc(100% + 7px);top:-8px;min-height:12px;padding:2px 4px;font-size:5px;gap:2px}.pos-top .player-connection-indicator,.pos-right .player-connection-indicator{left:auto;right:calc(100% + 7px);top:-8px}.pos-bottom .player-connection-indicator,.pos-left .player-connection-indicator{left:calc(100% + 7px);right:auto;top:-8px}.player-connection-dot{width:5px;height:5px;flex-basis:5px}}
 .avatar-name{margin-top:3px;padding:2px 6px;border-radius:6px;font-size:8px;font-weight:900;background:rgba(13,11,10,.86);border:1px solid rgba(255,255,255,.08);white-space:nowrap}.seat-direction{opacity:.65}.time-bank-tag{margin-top:2px;font-size:7px;color:#f0c66b}.pos-bottom{left:clamp(15px,7vw,92px);bottom:calc(var(--tileH) + 4px);transform:none;align-items:center}.pos-top{top:12px;right:clamp(46px,13vw,174px);left:auto;transform:none}.pos-left{left:clamp(12px,3vw,38px);top:45%;transform:translateY(-50%)}.pos-right{right:clamp(12px,3vw,38px);top:45%;transform:translateY(-50%)}
+
+/* ============================================================
+   PREMIUM TABLE VISUAL PASS — PRESENTATION ONLY
+   ============================================================ */
+#game-board::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 45%,rgba(232,190,101,.035),transparent 38%),
+    radial-gradient(circle at 18% 72%,rgba(39,117,94,.055),transparent 34%),
+    radial-gradient(circle at 84% 28%,rgba(41,95,79,.045),transparent 32%),
+    linear-gradient(180deg,rgba(0,0,0,.025),transparent 25%,transparent 74%,rgba(0,0,0,.15));
+}
+#game-board::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:3;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse at center,transparent 54%,rgba(0,0,0,.12) 100%),
+    repeating-linear-gradient(135deg,rgba(255,255,255,.005) 0 1px,transparent 1px 7px);
+  opacity:.72;
+}
+
+/* Last discarded tile — tiny recording-style marker. */
+@keyframes lastDiscardRecordingPulse{
+  0%,100%{
+    transform:scale(.82);
+    opacity:.72;
+    box-shadow:
+      0 0 2px rgba(255,92,84,.72),
+      0 0 5px rgba(239,79,74,.32);
+  }
+  50%{
+    transform:scale(1.12);
+    opacity:1;
+    box-shadow:
+      0 0 3px rgba(255,92,84,1),
+      0 0 7px rgba(239,79,74,.62),
+      0 0 11px rgba(239,79,74,.24);
+  }
+}
+.discard-tile.last-discard-highlight{
+  position:relative;
+  z-index:5;
+}
+.discard-tile.last-discard-highlight::after{
+  content:"";
+  position:absolute;
+  right:4px;
+  top:4px;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  transform:scale(.82);
+  transform-origin:center;
+  background:#ef4f4a;
+  box-shadow:
+    0 0 2px rgba(255,92,84,.72),
+    0 0 5px rgba(239,79,74,.32);
+  animation:lastDiscardRecordingPulse 1.8s ease-in-out infinite;
+  pointer-events:none;
+}
+
+/* Tile interaction / selection feedback. */
+#player-hand-tiles .tile.is-interactive{
+  cursor:pointer;
+  transition:transform .12s ease,filter .12s ease,box-shadow .14s ease,border-color .14s ease;
+}
+@media (hover:hover){
+  #player-hand-tiles .tile.is-interactive:hover{
+    filter:brightness(1.045) saturate(1.02);
+    box-shadow:
+      0 0 0 1px rgba(241,205,125,.40),
+      0 6px 14px rgba(0,0,0,.33),
+      0 0 11px rgba(229,185,93,.14);
+  }
+}
+#player-hand-tiles .tile.is-interactive:active{
+  filter:brightness(.985);
+  box-shadow:
+    0 0 0 2px rgba(231,188,96,.62),
+    0 3px 7px rgba(0,0,0,.30),
+    inset 0 1px 0 rgba(255,247,220,.18);
+}
+.tile.selected-tile{
+  border-color:rgba(236,197,112,.82)!important;
+  filter:brightness(1.035);
+  box-shadow:
+    0 0 0 2.5px #d9ad58,
+    0 0 13px rgba(218,169,79,.28),
+    0 10px 20px rgba(0,0,0,.38)!important;
+}
+
+/* Score change feedback: count-up plus a restrained floating delta. */
+.score-tag{position:absolute;}
+.score-tag.score-change-up,
+.score-tag.score-change-down{
+  animation:scoreTagPulse .46s ease-out;
+}
+.score-tag.score-change-up{
+  box-shadow:0 0 0 2px rgba(92,211,159,.22),0 0 13px rgba(84,204,151,.22),0 2px 8px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,243,196,.12)!important;
+}
+.score-tag.score-change-down{
+  box-shadow:0 0 0 2px rgba(228,105,96,.20),0 0 13px rgba(224,95,86,.18),0 2px 8px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,243,196,.12)!important;
+}
+.score-change-float{
+  position:absolute;
+  left:50%;
+  top:-14px;
+  transform:translateX(-50%);
+  z-index:80;
+  font-size:7px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:.03em;
+  white-space:nowrap;
+  pointer-events:none;
+  animation:scoreDeltaFloat .72s cubic-bezier(.18,.8,.22,1) forwards;
+  text-shadow:0 1px 5px rgba(0,0,0,.42);
+}
+.score-change-float.up{color:#7df1bd;}
+.score-change-float.down{color:#ff9b90;}
+.score-south .score-change-float,.score-north .score-change-float{top:-15px;}
+.score-west .score-change-float,.score-east .score-change-float{display:none;}
+@keyframes scoreTagPulse{
+  0%{filter:brightness(1)}
+  45%{filter:brightness(1.18)}
+  100%{filter:brightness(1)}
+}
+@keyframes scoreDeltaFloat{
+  0%{opacity:0;transform:translate(-50%,4px) scale(.92)}
+  18%{opacity:1;transform:translate(-50%,0) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-13px) scale(.98)}
+}
+
+/* Round transition card — brief and non-blocking. */
+.round-transition{
+  position:absolute;
+  inset:0;
+  z-index:210;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 45%,rgba(227,183,94,.06),transparent 28%),
+    linear-gradient(180deg,rgba(3,8,7,.06),rgba(3,8,7,.34));
+  opacity:0;
+  visibility:hidden;
+}
+.round-transition[hidden]{display:none!important;}
+.round-transition.is-visible{visibility:visible;}
+.round-transition-card{
+  min-width:min(260px,62vw);
+  padding:13px 18px 12px;
+  border:1px solid rgba(235,198,120,.42);
+  border-radius:14px;
+  background:linear-gradient(180deg,rgba(24,28,23,.90),rgba(7,12,10,.94));
+  box-shadow:
+    0 22px 50px rgba(0,0,0,.42),
+    0 0 20px rgba(226,181,88,.11),
+    inset 0 1px 0 rgba(255,245,212,.07);
+  text-align:center;
+  transform:translateY(6px) scale(.975);
+}
+.round-transition-kicker{
+  color:#a99672;
+  font-size:6px;
+  font-weight:900;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
+.round-transition-title{
+  margin-top:4px;
+  color:#f2d58f;
+  font-size:22px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:.055em;
+  text-shadow:0 0 16px rgba(242,202,119,.14);
+}
+.round-transition-rule{
+  width:66%;
+  height:1px;
+  margin:8px auto 5px;
+  background:linear-gradient(90deg,transparent,rgba(226,181,89,.72),transparent);
+}
+.round-transition-sub{
+  color:#8f877b;
+  font-size:7px;
+  font-weight:700;
+  letter-spacing:.05em;
+}
+.round-transition.is-visible .round-transition-card{
+  animation:roundTransitionInOut 1.05s cubic-bezier(.18,.78,.22,1) forwards;
+}
+.round-transition.is-visible{animation:roundTransitionOverlay 1.05s ease-out forwards;}
+@keyframes roundTransitionInOut{
+  0%{opacity:0;transform:translateY(8px) scale(.97)}
+  18%,78%{opacity:1;transform:translateY(0) scale(1)}
+  100%{opacity:0;transform:translateY(-4px) scale(1.01)}
+}
+@keyframes roundTransitionOverlay{
+  0%{opacity:0}
+  15%,76%{opacity:1}
+  100%{opacity:0}
+}
+
+/* Floating chat bubbles near player seats. */
+.player-seat .game-chat-bubble{
+  position:absolute;
+  z-index:140;
+  width:max-content;
+  max-width:min(153px,25vw);
+  padding:4.5px 6.3px 5.4px;
+  transform:none;
+  border-radius:9px;
+  border:1px solid rgba(233,199,132,.28);
+  background:linear-gradient(180deg,rgba(19,25,21,.96),rgba(7,12,10,.97));
+  box-shadow:0 10px 22px rgba(0,0,0,.36),0 0 12px rgba(230,191,102,.08),inset 0 1px 0 rgba(255,243,207,.05);
+  pointer-events:none;
+  animation:chatBubbleInOut 3.8s ease-out forwards;
+}
+.player-seat .game-chat-bubble::after{
+  content:"";
+  position:absolute;
+  width:7px;
+  height:7px;
+  background:#0a100d;
+  border-right:1px solid rgba(233,199,132,.28);
+  border-bottom:1px solid rgba(233,199,132,.28);
+  transform:rotate(45deg);
+}
+.pos-bottom .game-chat-bubble{left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);}
+.pos-bottom .game-chat-bubble::after{left:50%;bottom:-4px;margin-left:-4px;}
+.pos-top .game-chat-bubble{left:50%;top:calc(100% + 8px);transform:translateX(-50%);}
+.pos-top .game-chat-bubble::after{left:50%;top:-4px;margin-left:-4px;transform:rotate(225deg);}
+.pos-left .game-chat-bubble{left:calc(100% + 8px);top:50%;transform:translateY(-50%);}
+.pos-left .game-chat-bubble::after{left:-4px;top:50%;margin-top:-4px;transform:rotate(135deg);}
+.pos-right .game-chat-bubble{right:calc(100% + 8px);top:50%;transform:translateY(-50%);}
+.pos-right .game-chat-bubble::after{right:-4px;top:50%;margin-top:-4px;transform:rotate(-45deg);}
+.game-chat-bubble-name{display:block;margin-bottom:2px;color:#edcf87;font-size:5px;line-height:1;font-weight:950;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.game-chat-bubble-text{display:block;max-width:140px;color:#f1ede5;font-size:6.5px;line-height:1.25;font-weight:700;white-space:normal;overflow-wrap:anywhere;text-align:left;}
+.game-chat-bubble.avatar-shiba,.game-chat-bubble.avatar-tiger{border-color:rgba(222,157,66,.42)}
+.game-chat-bubble.avatar-penguin,.game-chat-bubble.avatar-turtle,.game-chat-bubble.avatar-dragon{border-color:rgba(96,205,175,.38)}
+.game-chat-bubble.avatar-rubah{border-color:rgba(224,106,97,.42)}
+.game-chat-bubble.avatar-rabbit{border-color:rgba(240,140,173,.42)}
+.game-chat-bubble.avatar-owl{border-color:rgba(162,143,228,.42)}
+.game-chat-bubble.avatar-panda{border-color:rgba(232,237,244,.30)}
+.game-chat-bubble.avatar-squirrel{border-color:rgba(189,138,88,.38)}
+@keyframes chatBubbleInOut{
+  0%{opacity:0;filter:blur(1.5px)}
+  8%{opacity:1;filter:blur(0)}
+  78%{opacity:1}
+  100%{opacity:0}
+}
+.pos-left .game-chat-bubble,.pos-right .game-chat-bubble{animation-name:chatBubbleInOut}
+@media(max-width:700px){
+  .player-seat .game-chat-bubble{max-width:min(128px,30vw);padding:4px 5.5px 4.8px;}
+  .game-chat-bubble-text{max-width:116px;font-size:6.1px;}
+  .game-chat-bubble-name{font-size:4.7px;}
+}
+@media(prefers-reduced-motion:reduce){
+  .discard-tile.last-discard-highlight,.round-transition.is-visible,.round-transition.is-visible .round-transition-card,.player-seat .game-chat-bubble{animation:none!important}
+  .round-transition.is-visible{opacity:1}
+}
+
 .tile-back{display:block;border-radius:3px;border:1px solid #6c3b1e;background:linear-gradient(160deg,#d47d35,#8c3d12);box-shadow:inset 0 1px 0 rgba(255,236,197,.25),0 1px 3px rgba(0,0,0,.28)}.enemy-hand-count{display:flex;justify-content:center;gap:1px;margin-top:3px;min-height:12px;max-width:112px;overflow:hidden}.enemy-hand-count .mini-back{width:5px;height:9px;border-radius:1.5px;background:linear-gradient(160deg,#d47d35,#8c3d12);border:1px solid #6c3b1e;box-shadow:0 1px 2px rgba(0,0,0,.25)}.enemy-hand-count .hand-count-label{margin-left:3px;padding:2px 4px;border-radius:5px;background:rgba(13,11,10,.88);color:#f2d18b;font-size:9px;font-weight:900;line-height:11px;border:1px solid rgba(255,255,255,.08);white-space:nowrap}.enemy-meld-summary{display:none}.enemy-melds-visible{display:flex;justify-content:center;gap:3px;margin-top:3px;pointer-events:none}.enemy-meld-group{display:flex;gap:1px;padding:2px 2px 1px;border-radius:4px;background:rgba(11,9,8,.76);border:1px solid rgba(255,255,255,.10);box-shadow:0 2px 6px rgba(0,0,0,.22)}.enemy-meld-group .tile{width:clamp(12px,min(1.75vw,2.5vh),20px);height:clamp(18px,min(2.55vw,3.55vh),29px);cursor:default}.enemy-meld-group .tile .tile-char{font-size:.72em}.pos-left .enemy-hand-count,.pos-right .enemy-hand-count{max-width:94px}.pos-left .enemy-hand-count .mini-back,.pos-right .enemy-hand-count .mini-back{width:4px;height:8px}.pos-left .enemy-melds-visible,.pos-right .enemy-melds-visible{position:static;top:auto;left:auto;right:auto;transform:none;flex-direction:column;align-items:center;margin-top:3px;max-width:112px;overflow:visible}.pos-left .enemy-meld-group,.pos-right .enemy-meld-group{flex-direction:row}
 /* Compact four-sided river around a protected center, matching a digital Mahjong table. */
 #game-board{--centerSize:clamp(86px,min(10vw,12.5vh),110px);--centerHalf:calc(var(--centerSize)/2);--riverGap:clamp(12.5px,1.65vh,16.5px);--riverRowsH:calc(var(--discH)*3 + 8px);--riverRowsH-TB:calc(var(--discH)*4 + 10px);--riverColsW:calc(var(--discW)*6 + 15px);--riverColsW-TB:calc(var(--discW)*8 + 17px);--sideGap:clamp(12px,2vw,22px)}
@@ -2758,6 +3030,14 @@ body::after{
             </div>
 
             <div id="action-overlay" aria-live="polite"></div>
+            <div id="round-transition" class="round-transition" hidden aria-live="polite" aria-hidden="true">
+                <div class="round-transition-card">
+                    <div id="round-transition-kicker" class="round-transition-kicker">NEXT ROUND</div>
+                    <div id="round-transition-title" class="round-transition-title">EAST 2</div>
+                    <div class="round-transition-rule"></div>
+                    <div id="round-transition-sub" class="round-transition-sub">Prepare for the next hand</div>
+                </div>
+            </div>
             <div id="game-chat" hidden aria-live="polite">
                 <button id="game-chat-toggle" type="button" aria-label="Buka chat multiplayer" aria-expanded="false" title="Chat multiplayer">
                     <span class="chat-icon" aria-hidden="true">💬</span>
@@ -3575,12 +3855,30 @@ function renderAvatars(){
     el.setAttribute('aria-label',`${def.name} avatar`);
   });
 }
+function showScoreChange(el,delta){
+  if(!el||!delta)return;
+  el.classList.remove('score-change-up','score-change-down');
+  void el.offsetWidth;
+  el.classList.add(delta>0?'score-change-up':'score-change-down');
+  if(el._scoreChangeTimer)clearTimeout(el._scoreChangeTimer);
+  el._scoreChangeTimer=setTimeout(()=>el.classList.remove('score-change-up','score-change-down'),520);
+  if(!el.classList.contains('score-south')&&!el.classList.contains('score-north'))return;
+  const old=el.querySelector('.score-change-float');
+  old?.remove();
+  const badge=document.createElement('span');
+  badge.className=`score-change-float ${delta>0?'up':'down'}`;
+  badge.textContent=(delta>0?'+':'')+Math.round(delta).toLocaleString('id-ID');
+  el.appendChild(badge);
+  setTimeout(()=>badge.remove(),760);
+}
 function animateScoreValue(el,target,duration=520){
   if(!el)return;
   const next=Math.round(Number(target)||0);
   const raw=el.dataset.scoreValue;
-  const current=raw!==undefined?Number(raw):Number(String(el.textContent||'').replace(/\D/g,''))||0;
+  const hadValue=raw!==undefined;
+  const current=hadValue?Number(raw):Number(String(el.textContent||'').replace(/\D/g,''))||0;
   if(current===next){el.textContent=next.toLocaleString('id-ID');el.dataset.scoreValue=String(next);return;}
+  if(hadValue)showScoreChange(el,next-current);
   const start=current,t0=performance.now(),ease=t=>1-Math.pow(1-t,3);
   const frame=now=>{const p=Math.min(1,(now-t0)/duration);const value=Math.round(start+(next-start)*ease(p));el.textContent=value.toLocaleString('id-ID');el.dataset.scoreValue=String(value);if(p<1)requestAnimationFrame(frame)};
   requestAnimationFrame(frame);
@@ -3605,6 +3903,34 @@ function updateTurnHighlight(){
   });
 }
 function getRoundName(){return ['East 1','East 2','East 3','East 4','East 5','East 6'][currentRoundIndex]||`East ${currentRoundIndex+1}`}
+function getLocalizedRoundName(){
+  const base=getRoundName();
+  return hkLanguage==='id'?base.replace(/^East/i,'Timur').toUpperCase():base.toUpperCase();
+}
+let roundTransitionTimer=null;
+function hideRoundTransition(){
+  const el=byId('round-transition');
+  if(!el)return;
+  clearTimeout(roundTransitionTimer);
+  roundTransitionTimer=null;
+  el.classList.remove('is-visible');
+  el.hidden=true;
+  el.setAttribute('aria-hidden','true');
+}
+function showRoundTransition(){
+  const el=byId('round-transition');
+  if(!el)return;
+  clearTimeout(roundTransitionTimer);
+  setText('round-transition-kicker',hkLanguage==='id'?'RONDE BERIKUTNYA':'NEXT ROUND');
+  setText('round-transition-title',getLocalizedRoundName());
+  setText('round-transition-sub',hkLanguage==='id'?'Bersiap untuk ronde berikutnya':'Prepare for the next hand');
+  el.hidden=false;
+  el.setAttribute('aria-hidden','false');
+  el.classList.remove('is-visible');
+  void el.offsetWidth;
+  el.classList.add('is-visible');
+  roundTransitionTimer=setTimeout(hideRoundTransition,1100);
+}
 function playerName(i){if(mp.room?.players?.[i]?.name)return mp.room.players[i].name;if(aiSeats.has(i))return `AI ${['Red','Jade','Bamboo','Pearl'][i]||'Bot'}`;return HUMAN_NAMES[i]}
 function mappedSeats(seat){const s=seat??0;return[s,(s+1)%4,(s+2)%4,(s+3)%4]}
 function sortHand(p){if(!autoSortSetting||!playerHands[p])return;const h=playerHands[p];h.sort((a,b)=>a.id-b.id);if(drawnTile&&p===currentTurn){const i=h.findIndex(t=>t.uniqueId===drawnTile.uniqueId);if(i>=0&&i!==h.length-1)h.push(h.splice(i,1)[0])}}
@@ -3748,9 +4074,9 @@ function showCurrentWaitAdvisor(){
 function countDiscardedTile(id){let n=0;for(const river of playerRivers||[])for(const t of (river||[]))if(t&&t.id===id)n++;return n}
 function countKnownTile(id){const known=advisorKnownCounts();return known[id]||0}
 function highlightMatchingTiles(tileId){document.querySelectorAll('#player-hand-tiles .tile').forEach(x=>x.classList.toggle('same-tile-highlight',Number(x.dataset.tileId)===tileId));document.querySelectorAll('.discard-tile').forEach(x=>x.classList.toggle('same-tile-highlight',Number(x.dataset.tileId)===tileId));}
-function renderHand(){const wrap=byId('player-hand-tiles');if(!wrap)return;const p=mp.seat??0;sortHand(p);wrap.innerHTML='';const h=playerHands[p]||[];h.forEach((t,i)=>{const e=document.createElement('div');e.className='tile';if(drawnTile&&t.uniqueId===drawnTile.uniqueId)e.classList.add('drawn-tile-gap');if(i===selectedTileIndex)e.classList.add('selected-tile');if(selectedTileIndex>=0&&h[selectedTileIndex]&&h[selectedTileIndex].id===t.id)e.classList.add('same-tile-highlight');e.dataset.index=i;e.dataset.tileId=t.id;e.innerHTML=tileMarkup(t);e.onclick=()=>handleTileTap(i,e);wrap.appendChild(e)})}
+function renderHand(){const wrap=byId('player-hand-tiles');if(!wrap)return;const p=mp.seat??0;sortHand(p);wrap.innerHTML='';const h=playerHands[p]||[];const canInteract=p===currentTurn&&p===(mp.seat??0)&&isDiscardable;h.forEach((t,i)=>{const e=document.createElement('div');e.className='tile';if(canInteract)e.classList.add('is-interactive');if(drawnTile&&t.uniqueId===drawnTile.uniqueId)e.classList.add('drawn-tile-gap');if(i===selectedTileIndex)e.classList.add('selected-tile');if(selectedTileIndex>=0&&h[selectedTileIndex]&&h[selectedTileIndex].id===t.id)e.classList.add('same-tile-highlight');e.dataset.index=i;e.dataset.tileId=t.id;e.innerHTML=tileMarkup(t);e.onclick=()=>handleTileTap(i,e);wrap.appendChild(e)})}
 function renderEnemyHands(){const s=mp.seat??0,m=mappedSeats(s);[[`enemy-hand-top`,m[2]],[`enemy-hand-right`,m[1]],[`enemy-hand-left`,m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const count=Math.max(0,playerHands[p]?.length||0);for(let i=0;i<count;i++){const b=document.createElement('span');b.className='mini-back';e.appendChild(b)}const label=document.createElement('span');label.className='hand-count-label';label.textContent=`×${count}`;e.appendChild(label);})}
-function renderRivers(){const s=mp.seat??0,m=mappedSeats(s);const selectedId=(selectedTileIndex>=0&&playerHands[s]?.[selectedTileIndex])?playerHands[s][selectedTileIndex].id:null;[['river-bottom',m[0]],['river-right',m[1]],['river-top',m[2]],['river-left',m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const tiles=(playerRivers[p]||[]).slice(0,id==='river-top'||id==='river-bottom'?32:30);tiles.forEach(t=>{const d=document.createElement('div');d.className='discard-tile';if(selectedId!==null&&t.id===selectedId)d.classList.add('same-tile-highlight');d.dataset.tileId=t.id;d.innerHTML=tileMarkup(t);e.appendChild(d)})})}
+function renderRivers(){const s=mp.seat??0,m=mappedSeats(s);const selectedId=(selectedTileIndex>=0&&playerHands[s]?.[selectedTileIndex])?playerHands[s][selectedTileIndex].id:null;[['river-bottom',m[0]],['river-right',m[1]],['river-top',m[2]],['river-left',m[3]]].forEach(([id,p])=>{const e=byId(id);if(!e)return;e.innerHTML='';const tiles=(playerRivers[p]||[]).slice(0,id==='river-top'||id==='river-bottom'?32:30);tiles.forEach((t,index)=>{const d=document.createElement('div');d.className='discard-tile';if(selectedId!==null&&t.id===selectedId)d.classList.add('same-tile-highlight');if(p===lastDiscarderIdx&&index===tiles.length-1&&lastDiscardedTile?.uniqueId===t.uniqueId)d.classList.add('last-discard-highlight');d.dataset.tileId=t.id;d.innerHTML=tileMarkup(t);e.appendChild(d)})})}
 function renderMelds(){const s=mp.seat??0,m=mappedSeats(s);const own=byId('player-melds-container');if(own){own.innerHTML='';(playerMelds[m[0]]||[]).forEach(g=>{const box=document.createElement('div');box.className='meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});own.appendChild(box)})}const enemyMap=[['enemy-meld-top-label','enemy-meld-top-tiles',m[2]],['enemy-meld-right-label','enemy-meld-right-tiles',m[1]],['enemy-meld-left-label','enemy-meld-left-tiles',m[3]]];enemyMap.forEach(([labelId,tilesId,p])=>{const label=byId(labelId),wrap=byId(tilesId);const groups=playerMelds[p]||[];const labels=groups.map(g=>g.length===4?'Kan':(g.length===3&&g.every(t=>t.id===g[0].id)?'Pon':'Chow'));if(label)setText(labelId,labels.length?labels.join(' • '):'');if(!wrap)return;wrap.innerHTML='';groups.forEach(g=>{const box=document.createElement('div');box.className='enemy-meld-group';g.forEach(t=>{const x=document.createElement('div');x.className='tile';x.innerHTML=tileMarkup(t);box.appendChild(x)});wrap.appendChild(box)})})}
 function renderTable(){advisorKnownCacheKey='';advisorKnownCache=null;renderNames();renderAvatars();updateTurnHighlight();renderPlayerConnectionStatus(mp.room);renderHand();renderEnemyHands();renderRivers();renderMelds();updateScoresUI();updateTimeBankUI(mp.seat??0);if(!isMultiplayerMode){renderLocalTurnTimer(isActionPhase?actionSecondsLeft:secondsLeft,isActionPhase?actionSeat:currentTurn);}else if(isActionPhase){renderLocalTurnTimer(actionSecondsLeft,actionSeat);}else{renderLocalTurnTimer(secondsLeft,currentTurn);}const tilesLeftEl=byId('tiles-remaining');const tilesRemaining=Math.max(0,Number(fullDeck.length)||0);if(tilesLeftEl){tilesLeftEl.classList.toggle('low',tilesRemaining<30);tilesLeftEl.textContent=hkTranslateRemaining(tilesRemaining);}updateMusicIntensity();showCurrentWaitAdvisor();if(currentTurn===(mp.seat??0)){setText('hand-status-main','Giliran Anda');setText('hand-status-sub','Pilih tile untuk membuang.');}else{setText('hand-status-main',`Giliran ${playerName(currentTurn)}`);setText('hand-status-sub','Menunggu giliran pemain.');}}
 
@@ -3965,7 +4291,7 @@ function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKe
   currentTurn=currentDealerIdx;drawnTile=null;renderTable();processTurn();
   if(typeof gameChatRefreshVisibility==='function')gameChatRefreshVisibility();
 }
-function start4PGame(diff='Medium',multi=false){mpHistoryRounds=[];mpHistorySavedKeys=new Set();mpHistoryCompletedMatch=null;mpHistoryMatchStartedAt=Date.now();mpHistoryMatchId=multi&&mp.host?`${mp.room?.code||'Multiplayer'}-${mpHistoryMatchStartedAt}`:null;activeRemoteActions=null;mpPendingCalls=[];activeActionFeedback=null;actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;lastActionFeedbackId='';clearPlayerActionFeedback();activeCallId=null;mpCallSeq=0;mpActionSeq=0;mpProcessedActionIds=new Set();cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
+function start4PGame(diff='Medium',multi=false){hideRoundTransition();mpHistoryRounds=[];mpHistorySavedKeys=new Set();mpHistoryCompletedMatch=null;mpHistoryMatchStartedAt=Date.now();mpHistoryMatchId=multi&&mp.host?`${mp.room?.code||'Multiplayer'}-${mpHistoryMatchStartedAt}`:null;activeRemoteActions=null;mpPendingCalls=[];activeActionFeedback=null;actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;lastActionFeedbackId='';clearPlayerActionFeedback();activeCallId=null;mpCallSeq=0;mpActionSeq=0;mpProcessedActionIds=new Set();cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
   aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
   if(!multi){
     mp.seat=0;mp.room=null;mp.host=true;mp.connected=false;mp.playerAvatar=selectedAvatar;
@@ -5021,6 +5347,7 @@ function leaveFinishedRoom(){
   isMultiplayerMode=false;
 }
 function finishMatchToMenu(){
+  hideRoundTransition();
   setDisplay('modal-result','none');
   setDisplay('modal-match-over','none');
   roundActive=false;
@@ -5147,10 +5474,12 @@ function nextRoundOrFinish(){
   }
   currentRoundIndex++;
   if(currentRoundIndex>=4){
+    hideRoundTransition();
     finishMatchToMenu();
     return;
   }
   currentDealerIdx=(currentDealerIdx+1)%4;
+  showRoundTransition();
   setupRound();
   // Keep the same BGM session alive across round transitions. If the previous
   // track ended while the result screen was open, playGameMusic() will select
@@ -5159,10 +5488,10 @@ function nextRoundOrFinish(){
   mpBroadcastState();
 }
 function flashBoard(kind){const e=byId('center-board-box');if(!e)return;e.classList.remove('win-flash','draw-flash');void e.offsetWidth;e.classList.add(kind==='draw'?'draw-flash':'win-flash')}
-function quitGame(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();roundActive=false;mpClearActiveGameState();stopGameMusic();nav('screen-main');if(mp.connected)mpSend('leave')}
+function quitGame(){hideRoundTransition();cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';clearPlayerActionFeedback();roundActive=false;mpClearActiveGameState();stopGameMusic();nav('screen-main');if(mp.connected)mpSend('leave')}
 function openSettingsFromGame(){previousScreenId=activeScreenId==='screen-game'?'screen-game':(previousScreenId||'screen-main');nav('screen-settings');applyAudioSettings()}
 function returnToGameFromSettings(){nav(previousScreenId||'screen-main')}
-function exitGameFromSettings(){cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;mpClearActiveGameState();stopGameMusic();previousScreenId='screen-main';nav('screen-main')}
+function exitGameFromSettings(){hideRoundTransition();cancelAiTurn();clearInterval(turnTimer);clearInterval(actionTimer);clearTimeout(aiMoveTimer);roundActive=false;mpClearActiveGameState();stopGameMusic();previousScreenId='screen-main';nav('screen-main')}
 function exitSettings(){returnToGameFromSettings()}
 function toggleAutoSortSetting(){autoSortSetting=!autoSortSetting;try{localStorage.setItem('hk_auto_sort',autoSortSetting?'1':'0')}catch{};setText('btn-toggle-autosort',autoSortSetting?'ON':'OFF');if(roundActive)renderTable()}
 
@@ -5182,6 +5511,7 @@ let gameChatStartLeft=0;
 let gameChatStartTop=0;
 let gameChatSuppressToggle=false;
 let gameChatAiReplyTimers=[];
+const gameChatBubbleTimers=new Map();
 const gameChatSeenIds=new Set();
 // ============================================================
 // CHAT AI REPLIES — UBAH BALASAN AI DI SINI
@@ -5381,6 +5711,7 @@ function gameChatRender(){
 }
 
 function gameChatReset(){
+  gameChatClearBubbles();
   gameChatAiReplyTimers.forEach(clearTimeout);
   gameChatAiReplyTimers=[];
   gameChatMessages=[];
@@ -5473,6 +5804,8 @@ function gameChatPush(msg){
     ts:Number(msg.ts)||Date.now()
   });
 
+  gameChatShowBubble(msg);
+
   while(gameChatMessages.length>MP_CHAT_MAX_MESSAGES){
     const removed=gameChatMessages.shift();
     if(removed?.id)gameChatSeenIds.delete(removed.id);
@@ -5490,6 +5823,43 @@ function gameChatPush(msg){
   gameChatUnreadRender();
 }
 
+function gameChatSeatElement(seat){
+  const s=mp.seat??0,m=mappedSeats(s);
+  if(Number(seat)===m[0])return document.querySelector('.player-seat.pos-bottom');
+  if(Number(seat)===m[1])return document.querySelector('.player-seat.pos-right');
+  if(Number(seat)===m[2])return document.querySelector('.player-seat.pos-top');
+  if(Number(seat)===m[3])return document.querySelector('.player-seat.pos-left');
+  return null;
+}
+function gameChatShowBubble(msg){
+  if(!msg||msg.from===undefined||msg.from===null)return;
+  const seat=Number(msg.from);
+  if(!Number.isInteger(seat)||seat<0||seat>3)return;
+  const seatEl=gameChatSeatElement(seat);
+  if(!seatEl)return;
+  const old=seatEl.querySelector('.game-chat-bubble');
+  old?.remove();
+  const timer=gameChatBubbleTimers.get(seat);
+  if(timer)clearTimeout(timer);
+  const avatar=String(msg.avatar||playerAvatars?.[seat]||'panda').toLowerCase();
+  const avatarClass=['panda','shiba','turtle','penguin','rubah','rabbit','dragon','tiger','owl','squirrel'].includes(avatar)?` avatar-${avatar}`:' avatar-panda';
+  const bubble=document.createElement('div');
+  bubble.className=`game-chat-bubble${avatarClass}`;
+  const name=document.createElement('span');
+  name.className='game-chat-bubble-name';
+  name.textContent=String(msg.name||playerName(seat)||'Player').trim().slice(0,20)||'Player';
+  const text=document.createElement('span');
+  text.className='game-chat-bubble-text';
+  text.textContent=String(msg.text||'').replace(/\s+/g,' ').trim().slice(0,180);
+  bubble.append(name,text);
+  seatEl.appendChild(bubble);
+  gameChatBubbleTimers.set(seat,setTimeout(()=>{bubble.remove();gameChatBubbleTimers.delete(seat)},3900));
+}
+function gameChatClearBubbles(){
+  gameChatBubbleTimers.forEach(clearTimeout);
+  gameChatBubbleTimers.clear();
+  document.querySelectorAll('.game-chat-bubble').forEach(el=>el.remove());
+}
 function gameChatRandomAiReply(){
   const templates=GAME_CHAT_AI_TEMPLATES.filter(v=>String(v||'').trim());
   if(!templates.length)return '';
@@ -6218,6 +6588,9 @@ function mpApplyRemoteState(state){
     mpRejoinMode=false;
     mpRejoinFallbackState=null;
   }
+  const previousRemoteRoundIndex=currentRoundIndex;
+  const incomingRemoteRoundIndex=Number(state.currentRoundIndex??0);
+
   mp.state=state;
   mp.seat=mp.seat??0;
 
@@ -6226,7 +6599,10 @@ function mpApplyRemoteState(state){
   playerHands=state.playerHands||playerHands;
   playerRivers=state.playerRivers||playerRivers;
   playerMelds=state.playerMelds||playerMelds;
-  currentRoundIndex=state.currentRoundIndex??0;
+  currentRoundIndex=incomingRemoteRoundIndex;
+  if(state.roundActive&&incomingRemoteRoundIndex>previousRemoteRoundIndex){
+    showRoundTransition();
+  }
   currentDealerIdx=state.currentDealerIdx??currentDealerIdx;
   currentTurn=state.currentTurn??0;
   lastDiscardedTile=state.lastDiscardedTile||null;
