@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'mahjong-soul-p2p-v11-2026-08-28';
+const CACHE_VERSION = 'mahjong-dj-v26-2026-10-08';
 const APP_SHELL = [
   './',
   './index.html',
@@ -15,6 +15,8 @@ const APP_SHELL = [
   './assets/css/04-custom-profile-style.css',
   './assets/css/05-premium-action.css',
   './assets/css/06-game-language.css',
+  './assets/css/07-v26-features.css',
+  './assets/js/03-v26-features.js',
 ];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE_VERSION).then(cache => cache.addAll(APP_SHELL).catch(()=>{}))); self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE_VERSION).map(k=>caches.delete(k))))); self.clients.claim(); });
