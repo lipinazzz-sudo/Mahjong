@@ -35,7 +35,7 @@
 #screen-main .main-settings-btn{position:absolute;right:2.3vw;bottom:3vh;display:flex;align-items:center;gap:9px;padding:0 22px;height:56px;border-radius:17px;border:1px solid rgba(233,198,120,.86);background:linear-gradient(180deg,rgba(15,18,14,.97),rgba(4,8,7,.99));color:#f2dfb8;font-size:16px;font-weight:900;box-shadow:0 14px 28px rgba(0,0,0,.35),0 0 16px rgba(227,178,77,.08),inset 0 1px 0 rgba(255,244,207,.08);z-index:20;}
 #screen-main .main-settings-btn span:first-child{font-size:21px;color:#f0cb76;}
 
-#screen-play{background-image:url('assets/backgrounds/bg-play.jpg')!important;background-size:cover;background-position:center;}
+#screen-play{background-image:url('../backgrounds/bg-play.jpg')!important;background-size:cover;background-position:center;}
 #screen-play .screen-card{width:min(94vw,900px);min-height:0;max-height:calc(100dvh - 16px);padding:26px 28px 18px;background:linear-gradient(180deg,rgba(3,25,21,.28),rgba(2,14,12,.58));border-color:rgba(229,189,103,.40);}
 #screen-play .screen-card::before{inset:8px;border-radius:18px;}
 #screen-play .brand-lockup{margin-bottom:15px;}
@@ -45,9 +45,9 @@
 #screen-play .menu-actions .btn{position:relative;min-height:clamp(184px,30vh,238px);height:clamp(184px,30vh,238px);padding:calc(clamp(184px,30vh,238px) - 94px) 12px 12px;border-radius:17px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;background-position:center;background-size:cover;background-repeat:no-repeat;border:1px solid rgba(236,195,103,.56);overflow:hidden;text-align:center;backdrop-filter:none;-webkit-backdrop-filter:none;}
 #screen-play .menu-actions .btn::before{position:relative;z-index:2;width:42px;height:42px;font-size:18px;margin:0 auto 6px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(3,21,18,.78);border:1px solid rgba(237,194,99,.56);box-shadow:0 0 0 4px rgba(221,176,77,.08),0 0 18px rgba(227,183,92,.14);color:#f2ce79;}
 #screen-play .menu-actions .btn span,#screen-play .menu-actions .btn{position:relative;z-index:2;}
-#screen-play .menu-actions .btn:nth-child(1){background-image:linear-gradient(180deg,rgba(1,12,9,.04) 12%,rgba(1,8,7,.10) 44%,rgba(1,8,7,.78) 76%,rgba(0,6,5,.97) 100%),url('assets/backgrounds/bg-ai-card.jpg');}
+#screen-play .menu-actions .btn:nth-child(1){background-image:linear-gradient(180deg,rgba(1,12,9,.04) 12%,rgba(1,8,7,.10) 44%,rgba(1,8,7,.78) 76%,rgba(0,6,5,.97) 100%),url('../backgrounds/bg-ai-card.jpg');}
 #screen-play .menu-actions .btn:nth-child(1)::before{content:"AI";font-size:11px;letter-spacing:.04em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:950;}
-#screen-play .menu-actions .btn:nth-child(2){background-image:linear-gradient(180deg,rgba(1,12,9,.04) 12%,rgba(1,8,7,.10) 44%,rgba(1,8,7,.78) 76%,rgba(0,6,5,.97) 100%),url('assets/backgrounds/bg-multiplayer-card.jpg');}
+#screen-play .menu-actions .btn:nth-child(2){background-image:linear-gradient(180deg,rgba(1,12,9,.04) 12%,rgba(1,8,7,.10) 44%,rgba(1,8,7,.78) 76%,rgba(0,6,5,.97) 100%),url('../backgrounds/bg-multiplayer-card.jpg');}
 #screen-play .menu-actions .btn:nth-child(2)::before{content:"4P";font-size:11px;letter-spacing:.02em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:950;}
 #screen-play .menu-actions .btn:nth-child(3){grid-column:1/-1;justify-self:center;width:150px;min-height:36px;height:36px;padding:7px 16px;border-radius:9px;font-size:10px;background:rgba(2,20,17,.78);border-color:rgba(222,175,77,.38);}
 #screen-play .menu-actions .btn:nth-child(3)::before{content:"←";width:auto;height:auto;border:0;box-shadow:none;background:none;margin:0 5px 0 0;font-size:13px;}
