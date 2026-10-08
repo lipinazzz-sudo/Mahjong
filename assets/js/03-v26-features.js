@@ -11,10 +11,10 @@
   const VALID_LEVELS = ['easy','normal','hard','expert'];
 
   const AI_LEVELS = {
-    easy:   {label:'Easy',   thinkMs:1500, waitWeight:0,  safetyWeight:0, callThreshold:999, noise:2.2},
-    normal: {label:'Normal', thinkMs:1900, waitWeight:7, safetyWeight:0, callThreshold:2.0, noise:0.65},
-    hard:   {label:'Hard',   thinkMs:2400, waitWeight:14, safetyWeight:1.2, callThreshold:0.8, noise:0.25},
-    expert: {label:'Expert', thinkMs:2900, waitWeight:22, safetyWeight:3.2, callThreshold:0.2, noise:0.08}
+    easy:   {label:'Easy',   thinkMs:1100, shantenWeight:4.0,  ukeireWeight:0.18, waitWeight:2.5,  defenseWeight:0.20, callThreshold:2.8, callRisk:-1.00, noise:1.35},
+    normal: {label:'Normal', thinkMs:1700, shantenWeight:8.0,  ukeireWeight:0.32, waitWeight:6.0,  defenseWeight:0.65, callThreshold:1.2, callRisk:-0.45, noise:0.45},
+    hard:   {label:'Hard',   thinkMs:2300, shantenWeight:11.5, ukeireWeight:0.46, waitWeight:11.0, defenseWeight:1.25, callThreshold:0.45, callRisk:-0.25, noise:0.16},
+    expert: {label:'Expert', thinkMs:2800, shantenWeight:15.0, ukeireWeight:0.62, waitWeight:17.0, defenseWeight:2.25, callThreshold:0.10, callRisk:-0.10, noise:0.035}
   };
 
   const DEFAULT_STATS = {
