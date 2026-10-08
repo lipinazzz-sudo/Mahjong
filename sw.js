@@ -4,7 +4,17 @@ const APP_SHELL = [
   './index.html',
   './manifest.webmanifest',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './assets/js/00-game-core.js',
+  './assets/js/01-portrait-runtime.js',
+  './assets/js/02-game-language-runtime.js',
+  './assets/css/00-base-inline.css',
+  './assets/css/01-ui-polish.css',
+  './assets/css/02-portrait-playability.css',
+  './assets/css/03-multiplayer-chat.css',
+  './assets/css/04-custom-profile-style.css',
+  './assets/css/05-premium-action.css',
+  './assets/css/06-game-language.css',
 ];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE_VERSION).then(cache => cache.addAll(APP_SHELL).catch(()=>{}))); self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE_VERSION).map(k=>caches.delete(k))))); self.clients.claim(); });
