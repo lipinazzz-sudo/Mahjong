@@ -1,0 +1,15 @@
+# Mahjong DJ v26.1 isolated browser preview
+# This service is intentionally pinned to the test branch and never changes main.
+services:
+  - type: web
+    name: mahjong-dj-v261-preview
+    runtime: static
+    branch: feature/mahjong-v26-modular-ai-stats
+    buildCommand: ""
+    staticPublishPath: .
+    previews:
+      generation: automatic
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-store
