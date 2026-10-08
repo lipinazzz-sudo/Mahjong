@@ -751,21 +751,25 @@
     return {hand:next,melds:nextMelds};
   }
 
-  function aiCallUtility(sim,action,level,seat){
+  function aiStateUtility(hand,melds,level,seat){
     const cfg=AI_LEVELS[level];
-    let nextHand=sim.hand.slice();
+    const p=aiProgressAfterDiscard(hand,melds,seat);
+    return handValue(hand,melds)
+      -(p.sh*cfg.shantenWeight)
+      +(p.ukeire*cfg.ukeireWeight)
+      +(p.liveWaits.length*cfg.waitWeight);
+  }
+
+  function aiCallUtility(sim,action,level,seat){
+    const nextHand=sim.hand.slice();
     const discardIndex=chooseBestDiscard(nextHand,sim.melds,level,seat);
     if(nextHand[discardIndex])nextHand.splice(discardIndex,1);
 
-    const p=aiProgressAfterDiscard(nextHand,sim.melds,seat);
-    let score=handValue(nextHand,sim.melds);
-    score-=p.sh*cfg.shantenWeight;
-    score+=p.ukeire*cfg.ukeireWeight;
-    score+=p.liveWaits.length*cfg.waitWeight;
+    let score=aiStateUtility(nextHand,sim.melds,level,seat);
     if(action.type==='Kan')score+=4.0;
     if(action.type==='Pon')score+=1.8;
     if(action.type==='Chi')score+=1.1;
-    score+=cfg.callRisk;
+    score+=AI_LEVELS[level].callRisk;
     return score;
   }
 
@@ -777,26 +781,33 @@
     const seat=Number.isInteger(Number(seatOverride))?Number(seatOverride):currentTurn;
     const level=aiLevel;
     const cfg=AI_LEVELS[level];
+    const hand=playerHands[seat]||[];
+    const melds=playerMelds[seat]||[];
+    const baseline=aiStateUtility(hand,melds,level,seat);
     const candidates=[];
 
     for(const action of actions){
       if(action?.type==='Chi'&&Array.isArray(action.combos)&&action.combos.length){
         for(const combo of action.combos){
-          const simulated=simulateCall(playerHands[seat]||[],playerMelds[seat]||[],{type:'Chi',combo});
-          candidates.push({action:{...action,type:'Chi',combo:[...combo]},score:aiCallUtility(simulated,{type:'Chi',combo},level,seat)});
+          const simulated=simulateCall(hand,melds,{type:'Chi',combo});
+          candidates.push({
+            action:{...action,type:'Chi',combo:[...combo]},
+            score:aiCallUtility(simulated,{type:'Chi',combo},level,seat)
+          });
         }
       }else if(action?.type==='Pon'||action?.type==='Kan'){
-        const simulated=simulateCall(playerHands[seat]||[],playerMelds[seat]||[],action);
+        const simulated=simulateCall(hand,melds,action);
         candidates.push({action,score:aiCallUtility(simulated,action,level,seat)});
       }
     }
 
     if(!candidates.length)return null;
-    candidates.sort((a,b)=>b.score-a.score);
+    candidates.sort((x,y)=>y.score-x.score);
     const best=candidates[0];
+    const delta=best.score-baseline;
 
-    if(best.score>=cfg.callThreshold)return best.action;
-    if(level==='easy'&&Math.random()<0.06)return best.action;
+    if(delta>=cfg.callThreshold)return best.action;
+    if(level==='easy'&&delta>-0.30&&Math.random()<0.05)return best.action;
     return null;
   }
 
@@ -843,6 +854,24 @@
             promptNextCall();
             return;
           }
+
+          const win=checkCurrentWin(seat,null,true);
+          if(win?.valid){
+            stopCallWindow();
+            resolveWin(seat,win,true);
+            return;
+          }
+
+          const selfKans=getSelfKanOptions(seat)||[];
+          if(selfKans.length){
+            const chance={easy:0.35,normal:0.65,hard:0.90,expert:1.00}[aiLevel]??0.65;
+            if(Math.random()<chance){
+              stopCallWindow();
+              executeSelfKan(seat,selfKans[0]);
+              return;
+            }
+          }
+
           window.aiDiscard(seat);
         };
         aiMoveTimer=setTimeout(run,cfg.thinkMs);
