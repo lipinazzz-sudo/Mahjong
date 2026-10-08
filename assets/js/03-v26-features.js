@@ -261,6 +261,8 @@
     const avg=s.finalScoreSamples?(s.totalFinalScore/s.finalScoreSamples):15000;
     const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
     set('stats-title',tr('stats'));
+    const statsIntro=document.getElementById('stats-intro'); if(statsIntro)statsIntro.textContent=v26Lang()==='en'?'Statistics are stored on this device.':'Statistik pertandingan disimpan di perangkat ini.';
+    const statsButton=document.querySelector('.v26-stats-btn'); if(statsButton)statsButton.textContent=tr('stats');
     set('stats-games',s.gamesPlayed.toLocaleString('id-ID'));
     set('stats-wins',s.wins.toLocaleString('id-ID'));
     set('stats-losses',s.losses.toLocaleString('id-ID'));
@@ -573,7 +575,9 @@
     if(title)title.textContent=tr('aiTitle');
     if(sub)sub.textContent=tr('aiSub');
     const close=document.getElementById('ai-level-close');if(close)close.textContent=tr('close');
+    const descriptions={easy:tr('easyDesc'),normal:tr('normalDesc'),hard:tr('hardDesc'),expert:tr('expertDesc')};
     document.querySelectorAll('.v26-ai-level-btn').forEach(btn=>{
+      const desc=btn.querySelector('small'); if(desc)desc.textContent=descriptions[btn.dataset.level]||'';
       const level=btn.dataset.level;
       const current=level===aiLevel;
       btn.classList.toggle('is-selected',current);
