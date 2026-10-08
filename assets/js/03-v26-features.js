@@ -229,7 +229,7 @@
         {label:{id:'Sequence',en:'Sequence'},tiles:['man_4.png','man_5.png','man_6.png']},
         {label:{id:'Sequence',en:'Sequence'},tiles:['pin_7.png','pin_8.png','pin_9.png']},
         {label:{id:'Triplet',en:'Triplet'},tiles:['pin_5.png','pin_5.png','pin_5.png']},
-        {label:{id:'Pair',en:'Pair'},tiles:['sou_2.png','sou_2.png']}
+        {label:{id:'Pair',en:'Pair'},tiles:['sou_3.png','sou_3.png']}
       ]
     },
     {
@@ -251,14 +251,14 @@
     {
       title:'tutorial4Title',text:'tutorial4Text',
       groups:[
-        {label:{id:'RON',en:'RON'},tiles:['man_1.png','man_2.png','man_3.png','man_4.png','man_5.png','man_6.png','pin_7.png','pin_8.png','pin_9.png','pin_5.png','pin_5.png','pin_5.png','sou_2.png','sou_2.png'],mark:'win'},
-        {label:{id:'TSUMO',en:'TSUMO'},tiles:['man_1.png','man_2.png','man_3.png','man_4.png','man_5.png','man_6.png','pin_7.png','pin_8.png','pin_9.png','pin_5.png','pin_5.png','pin_5.png','sou_2.png','sou_2.png'],mark:'win'}
+        {label:{id:'RON',en:'RON'},tiles:['man_1.png','man_2.png','man_3.png','man_4.png','man_5.png','man_6.png','pin_7.png','pin_8.png','pin_9.png','pin_5.png','pin_5.png','pin_5.png','sou_3.png','sou_3.png'],mark:'win'},
+        {label:{id:'TSUMO',en:'TSUMO'},tiles:['man_1.png','man_2.png','man_3.png','man_4.png','man_5.png','man_6.png','pin_7.png','pin_8.png','pin_9.png','pin_5.png','pin_5.png','pin_5.png','sou_3.png','sou_3.png'],mark:'win'}
       ]
     },
     {
       title:'tutorial5Title',text:'tutorial5Text',
       groups:[
-        {label:{id:'Winning hand',en:'Winning hand'},tiles:['man_1.png','man_2.png','man_3.png','man_4.png','man_5.png','man_6.png','pin_7.png','pin_8.png','pin_9.png','pin_5.png','pin_5.png','pin_5.png','sou_2.png','sou_2.png'],mark:'win'},
+        {label:{id:'Winning hand',en:'Winning hand'},tiles:['man_1.png','man_2.png','man_3.png','man_4.png','man_5.png','man_6.png','pin_7.png','pin_8.png','pin_9.png','pin_5.png','pin_5.png','pin_5.png','sou_3.png','sou_3.png'],mark:'win'},
         {label:{id:'FAN',en:'FAN'},tiles:[],badge:'+'}
       ]
     },
@@ -267,7 +267,7 @@
       groups:[
         {label:{id:'YOU',en:'YOU'},tiles:['man_2.png','man_3.png']},
         {label:{id:'LEFT',en:'LEFT'},tiles:['pin_2.png','pin_3.png']},
-        {label:{id:'TOP',en:'TOP'},tiles:['sou_2.png','sou_3.png']},
+        {label:{id:'TOP',en:'TOP'},tiles:['sou_3.png','sou_3.png']},
         {label:{id:'RIGHT',en:'RIGHT'},tiles:['man_7.png','man_8.png']}
       ]
     }
