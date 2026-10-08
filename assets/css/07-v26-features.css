@@ -74,3 +74,194 @@
 @media(prefers-reduced-motion:reduce){
   .v26-achievement-toast.is-visible{animation:none;opacity:1;transform:none}
 }
+/* Interactive tutorial + modal navigation */
+.v26-info-card-button{
+  width:100%;
+  color:inherit;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+.v26-info-card-button:hover{
+  border-color:rgba(239,201,116,.38);
+  transform:translateY(-1px);
+}
+.v26-info-card-button:focus-visible{
+  outline:2px solid rgba(241,200,112,.68);
+  outline-offset:2px;
+}
+.v26-info-card-hint{
+  display:block;
+  margin-top:8px;
+  color:#d1ae68;
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+.v26-info-footer{
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.v26-tutorial{
+  margin-top:14px;
+}
+.v26-tutorial[hidden]{display:none!important}
+.v26-tutorial-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  padding-bottom:10px;
+  border-bottom:1px solid rgba(225,179,88,.12);
+}
+.v26-tutorial-step{
+  color:#9e916e;
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.v26-tutorial-title{
+  margin-top:3px;
+  color:#f0d18a;
+  font-size:16px;
+  font-weight:900;
+}
+.v26-tutorial-home{
+  flex:0 0 auto;
+  min-height:28px;
+  padding:0 9px;
+  border:1px solid rgba(225,179,88,.20);
+  border-radius:9px;
+  background:rgba(20,17,13,.88);
+  color:#bfae8f;
+  font-size:8px;
+  font-weight:900;
+}
+.v26-tutorial-visual{
+  display:grid;
+  gap:10px;
+  margin-top:13px;
+  padding:12px;
+  border:1px solid rgba(225,179,88,.13);
+  border-radius:13px;
+  background:
+    radial-gradient(circle at 50% 0,rgba(213,171,90,.08),transparent 44%),
+    linear-gradient(180deg,rgba(11,12,11,.96),rgba(6,8,7,.99));
+  box-shadow:inset 0 1px 0 rgba(255,244,207,.035);
+}
+.v26-tutorial-group{
+  display:grid;
+  gap:5px;
+}
+.v26-tutorial-group-label{
+  color:#817864;
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+}
+.v26-tutorial-tile-row{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  gap:5px;
+}
+.v26-tile-wrap{
+  position:relative;
+  display:inline-flex;
+  width:30px;
+  height:42px;
+  align-items:center;
+  justify-content:center;
+  border-radius:4px;
+  background:linear-gradient(180deg,#eadfc8,#c9bda4);
+  box-shadow:0 2px 5px rgba(0,0,0,.36),inset 0 0 0 1px rgba(89,75,53,.24);
+  overflow:visible;
+}
+.v26-tile-wrap img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  border-radius:4px;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+.v26-tile-wrap.is-draw{
+  box-shadow:0 0 0 2px rgba(118,204,142,.72),0 0 13px rgba(118,204,142,.26);
+}
+.v26-tile-wrap.is-discard{
+  box-shadow:0 0 0 2px rgba(232,83,74,.78),0 0 13px rgba(232,83,74,.20);
+  transform:translateY(-2px);
+}
+.v26-tile-wrap.is-win{
+  box-shadow:0 0 0 2px rgba(241,200,112,.62),0 0 13px rgba(241,200,112,.16);
+}
+.v26-tile-mark{
+  position:absolute;
+  left:50%;
+  bottom:-13px;
+  transform:translateX(-50%);
+  white-space:nowrap;
+  color:#d7c089;
+  font-size:5px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.v26-tutorial-badge{
+  display:grid;
+  place-items:center;
+  min-width:30px;
+  height:42px;
+  padding:0 9px;
+  border-radius:5px;
+  border:1px solid rgba(241,200,112,.42);
+  color:#f0d18a;
+  font-size:15px;
+  font-weight:900;
+  background:rgba(241,200,112,.06);
+}
+.v26-tutorial-text{
+  margin:12px 2px 0;
+  color:#aaa194;
+  font-size:9px;
+  line-height:1.55;
+}
+.v26-tutorial-dots{
+  display:flex;
+  justify-content:center;
+  gap:5px;
+  margin-top:11px;
+}
+.v26-tutorial-dot{
+  width:6px;
+  height:6px;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:rgba(176,163,133,.24);
+  cursor:pointer;
+}
+.v26-tutorial-dot.is-active{
+  width:18px;
+  border-radius:999px;
+  background:#d5b66e;
+}
+.v26-tutorial-controls{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:12px;
+}
+.v26-tutorial-controls .btn:disabled{
+  opacity:.35;
+  cursor:default;
+}
+@media(max-width:700px){
+  .v26-tile-wrap{width:28px;height:39px}
+  .v26-tutorial-visual{padding:10px}
+  .v26-tutorial-title{font-size:14px}
+}
