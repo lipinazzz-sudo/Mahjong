@@ -109,6 +109,24 @@
       infoMulti:'Multiplayer',
       infoMultiText:'Host controls the authoritative game state. Reconnect can restore a reserved seat.',
       close:'Close',
+      back:'Back',
+      backProfile:'Back to Profile',
+      tutorial:'Interactive Tutorial',
+      tutorialStep:'Step',
+      prev:'Back',
+      next:'Next',
+      tutorial1Title:'Build a Winning Hand',
+      tutorial1Text:'A basic winning hand is 4 melds plus 1 pair. Melds can be sequences or triplets; the exact scoring depends on the hand.',
+      tutorial2Title:'Draw Then Discard',
+      tutorial2Text:'On your turn, draw one tile, check what improves the hand, then discard one tile. The tile you discard may also give another player a Ron or call.',
+      tutorial3Title:'Chi, Pon, Kan',
+      tutorial3Text:'Chi uses a sequence with the previous player\'s discard. Pon uses three matching tiles. Kan uses four matching tiles.',
+      tutorial4Title:'Ron or Tsumo',
+      tutorial4Text:'Ron wins from another player\'s discard. Tsumo wins when your own draw completes the hand.',
+      tutorial5Title:'Fan & Score',
+      tutorial5Text:'After a win, the game evaluates the hand and displays its Fan and score. Stronger combinations can produce higher Fan.',
+      tutorial6Title:'Multiplayer Table',
+      tutorial6Text:'In multiplayer, each player has a seat around the same table. The host keeps the authoritative game state while players reconnect through their reserved seat.',
       stats:'Statistics',
       games:'Games',
       wins:'Wins',
@@ -151,6 +169,24 @@
       infoMulti:'Multiplayer',
       infoMultiText:'Host memegang state game authoritative. Reconnect dapat memulihkan kursi yang masih dicadangkan.',
       close:'Tutup',
+      back:'Kembali',
+      backProfile:'Kembali ke Profile',
+      tutorial:'Tutorial Interaktif',
+      tutorialStep:'Langkah',
+      prev:'Kembali',
+      next:'Lanjut',
+      tutorial1Title:'Membentuk Hand Menang',
+      tutorial1Text:'Hand menang dasar terdiri dari 4 meld dan 1 pair. Meld bisa berupa sequence atau triplet; nilai akhirnya tetap mengikuti kombinasi hand yang terdeteksi game.',
+      tutorial2Title:'Ambil Lalu Buang',
+      tutorial2Text:'Saat giliran Anda, ambil satu tile, lihat tile mana yang paling membantu hand, lalu buang satu tile. Buangan Anda juga bisa memberi pemain lain kesempatan Ron atau call.',
+      tutorial3Title:'Chi, Pon, Kan',
+      tutorial3Text:'Chi memakai sequence dari buangan pemain sebelumnya. Pon memakai tiga tile yang sama. Kan memakai empat tile yang sama.',
+      tutorial4Title:'Ron atau Tsumo',
+      tutorial4Text:'Ron menang dari tile buangan pemain lain. Tsumo menang ketika tile yang Anda ambil sendiri melengkapi hand.',
+      tutorial5Title:'Fan & Score',
+      tutorial5Text:'Setelah menang, game menghitung kombinasi hand lalu menampilkan Fan dan score. Kombinasi yang lebih kuat dapat menghasilkan Fan lebih tinggi.',
+      tutorial6Title:'Meja Multiplayer',
+      tutorial6Text:'Dalam multiplayer, setiap pemain menempati kursi di meja yang sama. Host menjaga state game authoritative dan pemain dapat reconnect ke kursi yang masih dicadangkan.',
       stats:'Statistik',
       games:'Game',
       wins:'Menang',
@@ -185,11 +221,133 @@
   function openModal(id){const e=document.getElementById(id);if(e){e.hidden=false;e.style.display='flex';}}
   function closeModal(id){const e=document.getElementById(id);if(e){e.hidden=true;e.style.display='none';}}
 
+  const TUTORIAL_SLIDES=[
+    {
+      title:'tutorial1Title',text:'tutorial1Text',
+      groups:[
+        {label:{id:'Sequence',en:'Sequence'},tiles:['man_1.png','man_2.png','man_3.png']},
+        {label:{id:'Sequence',en:'Sequence'},tiles:['man_4.png','man_5.png','man_6.png']},
+        {label:{id:'Sequence',en:'Sequence'},tiles:['pin_7.png','pin_8.png','pin_9.png']},
+        {label:{id:'Triplet',en:'Triplet'},tiles:['pin_5.png','pin_5.png','pin_5.png']},
+        {label:{id:'Pair',en:'Pair'},tiles:['sou_2.png','sou_2.png']}
+      ]
+    },
+    {
+      title:'tutorial2Title',text:'tutorial2Text',
+      groups:[
+        {label:{id:'Hand before draw',en:'Hand before draw'},tiles:['man_2.png','man_3.png','man_4.png','man_5.png','pin_5.png','pin_6.png']},
+        {label:{id:'DRAW',en:'DRAW'},tiles:['man_6.png'],mark:'draw'},
+        {label:{id:'DISCARD',en:'DISCARD'},tiles:['man_1.png'],mark:'discard'}
+      ]
+    },
+    {
+      title:'tutorial3Title',text:'tutorial3Text',
+      groups:[
+        {label:{id:'CHI',en:'CHI'},tiles:['man_2.png','man_3.png','man_4.png'],mark:'action'},
+        {label:{id:'PON',en:'PON'},tiles:['pin_5.png','pin_5.png','pin_5.png'],mark:'action'},
+        {label:{id:'KAN',en:'KAN'},tiles:['sou_7.png','sou_7.png','sou_7.png','sou_7.png'],mark:'action'}
+      ]
+    },
+    {
+      title:'tutorial4Title',text:'tutorial4Text',
+      groups:[
+        {label:{id:'RON',en:'RON'},tiles:['man_1.png','man_2.png','man_3.png','man_4.png','man_5.png','man_6.png','pin_7.png','pin_8.png','pin_9.png','pin_5.png','pin_5.png','pin_5.png','sou_2.png','sou_2.png'],mark:'win'},
+        {label:{id:'TSUMO',en:'TSUMO'},tiles:['man_1.png','man_2.png','man_3.png','man_4.png','man_5.png','man_6.png','pin_7.png','pin_8.png','pin_9.png','pin_5.png','pin_5.png','pin_5.png','sou_2.png','sou_2.png'],mark:'win'}
+      ]
+    },
+    {
+      title:'tutorial5Title',text:'tutorial5Text',
+      groups:[
+        {label:{id:'Winning hand',en:'Winning hand'},tiles:['man_1.png','man_2.png','man_3.png','man_4.png','man_5.png','man_6.png','pin_7.png','pin_8.png','pin_9.png','pin_5.png','pin_5.png','pin_5.png','sou_2.png','sou_2.png'],mark:'win'},
+        {label:{id:'FAN',en:'FAN'},tiles:[],badge:'+'}
+      ]
+    },
+    {
+      title:'tutorial6Title',text:'tutorial6Text',
+      groups:[
+        {label:{id:'YOU',en:'YOU'},tiles:['man_2.png','man_3.png']},
+        {label:{id:'LEFT',en:'LEFT'},tiles:['pin_2.png','pin_3.png']},
+        {label:{id:'TOP',en:'TOP'},tiles:['sou_2.png','sou_3.png']},
+        {label:{id:'RIGHT',en:'RIGHT'},tiles:['man_7.png','man_8.png']}
+      ]
+    }
+  ];
+
+  let tutorialIndex=0;
+
+  function tutorialText(id){
+    return tr(id);
+  }
+
+  function v26TutorialTileMarkup(file,mark){
+    const markClass=mark?' is-'+mark:'';
+    return '<span class="v26-tile-wrap'+markClass+'"><img src="icons/tiles/'+file+'" alt="" draggable="false" loading="eager"><span class="v26-tile-mark">'+(mark==='draw'?'DRAW':mark==='discard'?'DISCARD':'')+'</span></span>';
+  }
+
+  function v26RenderTutorial(){
+    const slide=TUTORIAL_SLIDES[tutorialIndex]||TUTORIAL_SLIDES[0];
+    const lang=v26Lang();
+    const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+    set('tutorial-step',tr('tutorialStep')+' '+(tutorialIndex+1)+' / '+TUTORIAL_SLIDES.length);
+    set('tutorial-title',tr(slide.title));
+    set('tutorial-text',tr(slide.text));
+    const visual=document.getElementById('tutorial-visual');
+    if(visual){
+      visual.innerHTML=slide.groups.map(g=>{
+        const label=(g.label?.[lang]||g.label?.id||'');
+        const tiles=(g.tiles||[]).map(f=>v26TutorialTileMarkup(f,g.mark)).join('');
+        const badge=g.badge?'<span class="v26-tutorial-badge">'+g.badge+'</span>':'';
+        return '<div class="v26-tutorial-group"><span class="v26-tutorial-group-label">'+label+'</span><div class="v26-tutorial-tile-row">'+tiles+badge+'</div></div>';
+      }).join('');
+    }
+    const dots=document.getElementById('tutorial-dots');
+    if(dots){
+      dots.innerHTML=TUTORIAL_SLIDES.map((x,i)=>'<button type="button" class="v26-tutorial-dot '+(i===tutorialIndex?'is-active':'')+'" aria-label="'+tr('tutorialStep')+' '+(i+1)+'" onclick="openGameTutorial('+i+')"></button>').join('');
+    }
+    const prev=document.getElementById('tutorial-prev');
+    const next=document.getElementById('tutorial-next');
+    if(prev){prev.textContent='‹ '+tr('prev');prev.disabled=tutorialIndex===0;}
+    if(next){next.textContent=tutorialIndex===TUTORIAL_SLIDES.length-1?tr('back')+' ✓':tr('next')+' ›';}
+  }
+
+  window.openGameTutorial=function(index=0){
+    tutorialIndex=Math.max(0,Math.min(TUTORIAL_SLIDES.length-1,Number(index)||0));
+    const overview=document.getElementById('game-info-overview');
+    const tutorial=document.getElementById('game-info-tutorial');
+    if(overview)overview.hidden=true;
+    if(tutorial){tutorial.hidden=false;}
+    v26RenderTutorial();
+  };
+  window.closeGameTutorial=function(){
+    const overview=document.getElementById('game-info-overview');
+    const tutorial=document.getElementById('game-info-tutorial');
+    if(tutorial)tutorial.hidden=true;
+    if(overview)overview.hidden=false;
+    v26RenderInfo();
+  };
+  window.prevGameTutorial=function(){
+    if(tutorialIndex<=0)return;
+    tutorialIndex--;
+    v26RenderTutorial();
+  };
+  window.nextGameTutorial=function(){
+    if(tutorialIndex<TUTORIAL_SLIDES.length-1){
+      tutorialIndex++;
+      v26RenderTutorial();
+    }else{
+      window.closeGameTutorial();
+    }
+  };
+
   window.openGameInfo=function(){
+    window.closeGameTutorial();
     v26RenderInfo();
     openModal('modal-game-info');
   };
-  window.closeGameInfo=function(){closeModal('modal-game-info');};
+  window.closeGameInfo=function(){
+    window.closeGameTutorial();
+    closeModal('modal-game-info');
+  };
 
   function v26RenderInfo(){
     const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
@@ -206,6 +364,7 @@
     set('game-info-multi-title',tr('infoMulti'));
     set('game-info-multi-text',tr('infoMultiText'));
     set('game-info-close',tr('close'));
+    const tutBtn=document.getElementById('game-info-tutorial-btn');if(tutBtn)tutBtn.textContent='▶ '+tr('tutorial');
     const mainInfo=document.getElementById('main-info-label'); if(mainInfo)mainInfo.textContent=tr('info');
   }
 
@@ -249,11 +408,24 @@
     clearTimeout(toast._timer); toast._timer=setTimeout(()=>toast.classList.remove('is-visible'),2600);
   }
 
+  let statsOpenedFromProfile=false;
+
   window.openPlayerStatistics=function(){
+    const profile=document.getElementById('modal-avatar-picker');
+    statsOpenedFromProfile=!!profile && !profile.hidden && profile.style.display!=='none';
+    if(statsOpenedFromProfile && typeof window.closeCustomizeProfile==='function'){
+      window.closeCustomizeProfile();
+    }
     v26RenderStats();
     openModal('modal-player-stats');
   };
-  window.closePlayerStatistics=function(){closeModal('modal-player-stats');};
+  window.closePlayerStatistics=function(){
+    closeModal('modal-player-stats');
+    if(statsOpenedFromProfile){
+      statsOpenedFromProfile=false;
+      requestAnimationFrame(()=>{if(typeof window.openCustomizeProfile==='function')window.openCustomizeProfile();});
+    }
+  };
 
   function v26RenderStats(){
     const s=stats, games=s.gamesPlayed;
@@ -275,7 +447,7 @@
     set('stats-average-score',Math.round(avg).toLocaleString('id-ID'));
     set('stats-achievements-title',tr('achievements'));
     set('stats-unlocked-count',s.unlocked.length.toLocaleString('id-ID'));
-    set('stats-close',tr('close'));
+    set('stats-close',tr('backProfile'));
     set('stats-games-label',tr('games')); set('stats-wins-label',tr('wins')); set('stats-losses-label',tr('losses')); set('stats-draws-label',tr('draws')); set('stats-winrate-label',tr('winRate'));
     set('stats-tsumo-label',tr('tsumo')); set('stats-ron-label',tr('ron')); set('stats-highest-fan-label',tr('highestFan')); set('stats-highest-score-label',tr('highestScore')); set('stats-average-score-label',tr('avgScore')); set('stats-unlocked-count-label',tr('achievements'));
     const box=document.getElementById('stats-achievement-grid');
@@ -622,13 +794,13 @@
   const originalApplyLang=window.applyGameLanguage;
   window.applyGameLanguage=function(){
     const out=originalApplyLang?.();
-    v26RenderInfo();v26RenderStats();v26RenderAiLevel();
+    v26RenderInfo();v26RenderTutorial();v26RenderStats();v26RenderAiLevel();
     return out;
   };
   const originalToggleLang=window.toggleGameLanguage;
   window.toggleGameLanguage=function(){
     const out=originalToggleLang?.();
-    v26RenderInfo();v26RenderStats();v26RenderAiLevel();
+    v26RenderInfo();v26RenderTutorial();v26RenderStats();v26RenderAiLevel();
     return out;
   };
 
