@@ -146,10 +146,10 @@
       normal:'Normal',
       hard:'Hard',
       expert:'Expert',
-      easyDesc:'Simple decisions. Best for learning.',
-      normalDesc:'Balanced hand efficiency.',
-      hardDesc:'Stronger efficiency, waits and calls.',
-      expertDesc:'Most calculated decisions and conservative discards.',
+      easyDesc:'Basic efficiency with visible mistakes and more variation.',
+      normalDesc:'Balanced hand efficiency and sensible calls.',
+      hardDesc:'Strong hand efficiency, ukeire and defensive discards.',
+      expertDesc:'Highest consistency, efficient calls and stronger defense.',
       selected:'Selected',
       viewStats:'View Statistics',
       info:'Info',
@@ -519,23 +519,134 @@
 
   /* -------------------- AI decision layer -------------------- */
 
-  function tileKey(t){return t?String(t.type)+':'+String(t.num||t.id):'';}
-
   function countForHand(hand){
     const c=Array(34).fill(0);
     for(const t of hand||[])if(t&&Number.isInteger(t.id))c[t.id]++;
     return c;
   }
 
-  function sequencePotential(c){
-    let score=0;
-    for(let start=0;start<27;start++){
-      if(start%9>6)continue;
-      const a=c[start],b=c[start+1],d=c[start+2];
-      if(a&&b&&d)score+=5;
-      else if((a&&b)||(b&&d)||(a&&d))score+=1.7;
+  const aiShantenCache=new Map();
+
+  function aiKnownCounts(seat){
+    const c=Array(34).fill(0);
+    for(const t of playerHands[seat]||[])if(t)c[t.id]++;
+    for(const river of playerRivers||[])for(const t of river||[])if(t)c[t.id]++;
+    for(const groups of playerMelds||[])for(const group of groups||[])for(const t of group||[])if(t)c[t.id]++;
+    return c;
+  }
+
+  function aiRemainingCopies(id,known){
+    return Math.max(0,4-(known?.[id]||0));
+  }
+
+  function aiNormalShantenFromCounts(source,openMelds=0){
+    const counts=source.slice();
+    const memo=new Map();
+    let best=8;
+
+    function dfs(index,mentsu,taatsu,pair){
+      while(index<34&&counts[index]===0)index++;
+      taatsu=Math.min(taatsu,4-mentsu);
+      if(index>=34){
+        best=Math.min(best,8-(mentsu*2)-taatsu-pair);
+        return;
+      }
+      const key=counts.join('')+'|'+mentsu+'|'+taatsu+'|'+pair;
+      const prev=memo.get(key);
+      if(prev!==undefined&&prev<=best)return;
+      memo.set(key,best);
+
+      if(counts[index]>=3){
+        counts[index]-=3;dfs(index,mentsu+1,taatsu,pair);counts[index]+=3;
+      }
+      if(index<27&&index%9<=6&&counts[index+1]>0&&counts[index+2]>0){
+        counts[index]--;counts[index+1]--;counts[index+2]--;
+        dfs(index,mentsu+1,taatsu,pair);
+        counts[index]++;counts[index+1]++;counts[index+2]++;
+      }
+      if(counts[index]>=2){
+        counts[index]-=2;
+        dfs(index,mentsu,taatsu,pair+1);
+        dfs(index,mentsu,taatsu+1,pair);
+        counts[index]+=2;
+      }
+      if(index<27&&index%9<=7&&counts[index+1]>0){
+        counts[index]--;counts[index+1]--;dfs(index,mentsu,taatsu+1,pair);counts[index]++;counts[index+1]++;
+      }
+      if(index<27&&index%9<=6&&counts[index+2]>0){
+        counts[index]--;counts[index+2]--;dfs(index,mentsu,taatsu+1,pair);counts[index]++;counts[index+2]++;
+      }
+      counts[index]--;dfs(index,mentsu,taatsu,pair);counts[index]++;
     }
-    return score;
+
+    dfs(0,openMelds,0,0);
+    return best;
+  }
+
+  function aiSevenPairsShanten(counts,openMelds){
+    if(openMelds>0)return 99;
+    let pairs=0,unique=0;
+    for(const n of counts){if(n>0)unique++;if(n>=2)pairs++;}
+    return 6-pairs+Math.max(0,7-unique);
+  }
+
+  function aiShanten(hand,melds=[]){
+    const counts=countForHand(hand);
+    const key=(melds?.length||0)+'|'+counts.join(',');
+    const cached=aiShantenCache.get(key);
+    if(cached!==undefined)return cached;
+    const out=Math.min(
+      aiNormalShantenFromCounts(counts,melds?.length||0),
+      aiSevenPairsShanten(counts,melds?.length||0)
+    );
+    aiShantenCache.set(key,out);
+    if(aiShantenCache.size>1800)aiShantenCache.delete(aiShantenCache.keys().next().value);
+    return out;
+  }
+
+  function aiProgressAfterDiscard(hand,melds,seat){
+    const known=aiKnownCounts(seat);
+    const baseSh=aiShanten(hand,melds);
+    let ukeire=0;
+    const improving=[];
+    for(const t of TILE_TYPES){
+      const left=aiRemainingCopies(t.id,known);
+      if(left<=0)continue;
+      const next=hand.concat([{...t,uniqueId:'ai-probe-'+t.id}]);
+      const nextSh=aiShanten(next,melds);
+      if(nextSh<baseSh){
+        improving.push({id:t.id,left,nextSh});
+        ukeire+=left;
+      }
+    }
+    const waits=hand.length%3===1?getWaitIds(hand,melds?.length||0):[];
+    const liveWaits=waits.filter(id=>aiRemainingCopies(id,known)>0);
+    return {sh:baseSh,ukeire,improving,waits,liveWaits,known};
+  }
+
+  function aiTileDanger(tile,seat,known){
+    if(!tile)return 0;
+    let danger=0;
+    for(let p=0;p<4;p++){
+      if(p===seat)continue;
+      const river=playerRivers[p]||[];
+      const seen=river.filter(d=>d?.id===tile.id).length;
+      if(seen>0)danger-=2.8*Math.min(seen,2);
+
+      for(const d of river.slice(-6)){
+        if(!d||d.type==='honor'||tile.type==='honor'||d.type!==tile.type)continue;
+        const diff=Math.abs((d.num||0)-(tile.num||0));
+        if(diff===1)danger+=0.50;
+        else if(diff===2)danger+=0.20;
+      }
+    }
+    if(tile.type==='honor'){
+      const seen=known?.[tile.id]||0;
+      if(seen===0)danger+=0.90;
+      else if(seen>=2)danger-=0.35;
+    }
+    danger+=aiRemainingCopies(tile.id,known)*0.03;
+    return Math.max(-5,Math.min(5,danger));
   }
 
   function handValue(hand,melds){
@@ -543,135 +654,149 @@
     let score=0;
     for(let id=0;id<34;id++){
       const n=c[id];
-      if(n>=2)score+=3;
-      if(n>=3)score+=5;
-      if(n===4)score+=1.5;
+      if(n>=2)score+=2.8;
+      if(n>=3)score+=4.6;
+      if(n===4)score+=1.2;
       if(n===1){
         const t=TILE_TYPES?.[id];
-        if(t?.type==='honor')score-=1.4;
-        else if(t?.num===1||t?.num===9)score-=0.55;
-        else score+=0.45;
+        if(t?.type==='honor')score-=1.5;
+        else if(t?.num===1||t?.num===9)score-=0.45;
+        else score+=0.38;
       }
     }
-    score+=sequencePotential(c);
-    for(const g of melds||[])score+=Array.isArray(g)&&g.length>=3?5:2;
+    for(let start=0;start<27;start++){
+      if(start%9>6)continue;
+      const a=c[start],b=c[start+1],d=c[start+2];
+      if(a&&b&&d)score+=5.0;
+      else if((a&&b)||(b&&d)||(a&&d))score+=1.55;
+    }
+    for(const g of melds||[])score+=Array.isArray(g)&&g.length>=3?5.4:1.5;
     return score;
   }
 
-  function remainingCopies(id){
-    try{return Math.max(0,4-(Number(countKnownTile(id))||0));}catch{return 0;}
-  }
-
-  function discardScore(hand,melds,index,level){
+  function discardScore(hand,melds,index,level,seat){
     const t=hand[index];
-    const kept=hand.slice();
-    kept.splice(index,1);
+    if(!t)return-Infinity;
+    const kept=hand.slice();kept.splice(index,1);
+    const cfg=AI_LEVELS[level];
+    const before=aiShanten(hand,melds);
+    const p=aiProgressAfterDiscard(kept,melds,seat);
     let score=handValue(kept,melds);
-    const counts=countForHand(hand);
-    const id=Number(t?.id);
-    const n=Number(counts[id]||0);
-    if(n>=2)score-=level==='easy'?2.5:5.5;
-    if(t?.type==='honor'&&n===1)score+=2.2;
-    if(t?.type!=='honor'&&n===1&&t.num>=2&&t.num<=8)score-=0.4;
-    if(t?.type!=='honor'){
-      const left=counts[id-1]||0, right=counts[id+1]||0;
-      if(t.num>1&&t.num<9)score-=(left+right)*1.2;
-      if(t.num>2&&t.num<8)score-=(counts[id-2]||0)*0.55-(counts[id+2]||0)*-0.55;
+    score-=p.sh*cfg.shantenWeight;
+    score+=p.ukeire*cfg.ukeireWeight;
+    score+=p.liveWaits.length*cfg.waitWeight;
+    if(p.sh<before)score+=cfg.shantenWeight*1.4;
+    if(p.sh===0)score+=cfg.waitWeight*2.0;
+
+    const c=countForHand(hand),n=c[t.id]||0;
+    if(n>=2)score-=4.2;
+    if(n>=3)score-=5.5;
+    if(t.type==='honor'&&n===1)score+=2.0;
+    if(t.type!=='honor'&&(t.num===1||t.num===9)&&n===1)score+=0.75;
+
+    if(t.type!=='honor'){
+      const near=(c[t.id-1]||0)+(c[t.id+1]||0);
+      const gap=(c[t.id-2]||0)+(c[t.id+2]||0);
+      score-=near*1.10+gap*0.35;
     }
-    if(level==='hard'||level==='expert'){
-      try{
-        const waits=getWaitIds(kept,(playerMelds[index]||[]).length);
-        if(waits.length)score+=AI_LEVELS[level].waitWeight*waits.length;
-        let live=0;
-        for(const id2 of waits)live+=remainingCopies(id2);
-        score+=live*0.32;
-      }catch{}
-    }
-    if(level==='expert'){
-      try{
-        const seen=Math.max(0,Number(countDiscardedTile(id))||0);
-        score+=seen*AI_LEVELS.expert.safetyWeight;
-      }catch{}
-    }
-    return score + (Math.random()-0.5)*AI_LEVELS[level].noise;
+
+    const danger=aiTileDanger(t,seat,p.known);
+    score-=danger*cfg.defenseWeight;
+    if(level==='expert'&&danger<0)score+=Math.abs(danger)*0.65;
+    score+=(Math.random()-0.5)*cfg.noise*3;
+    return score;
   }
 
-  function chooseBestDiscard(hand,melds,level){
-    if(!hand?.length)return 0;
-    if(level==='easy'){
-      let best=0,bestScore=-Infinity;
-      for(let i=0;i<hand.length;i++){
-        const t=hand[i],c=countForHand(hand),n=c[t.id]||0;
-        let s=0;
-        if(n===1)s+=2;
-        if(t.type==='honor')s+=1.4;
-        if(t.type!=='honor'&&(t.num===1||t.num===9))s+=0.7;
-        s+=Math.random()*AI_LEVELS.easy.noise;
-        if(s>bestScore){bestScore=s;best=i;}
-      }
-      return best;
-    }
+  function chooseBestDiscard(hand,melds,level,seat){
+    if(!Array.isArray(hand)||!hand.length)return 0;
     let best=0,bestScore=-Infinity;
     for(let i=0;i<hand.length;i++){
-      const s=discardScore(hand,melds,i,level);
-      if(s>bestScore){bestScore=s;best=i;}
+      let score;
+      if(level==='easy'){
+        const t=hand[i],c=countForHand(hand),n=c[t.id]||0;
+        score=(n===1?2.4:0)+(t.type==='honor'?1.7:0);
+        if(t.type!=='honor'&&(t.num===1||t.num===9))score+=0.9;
+        if(t.type!=='honor')score-=((c[t.id-1]||0)+(c[t.id+1]||0))*0.75;
+        score-=aiTileDanger(t,seat,aiKnownCounts(seat))*0.10;
+        score+=(Math.random()-0.5)*AI_LEVELS.easy.noise*3;
+      }else{
+        score=discardScore(hand,melds,i,level,seat);
+      }
+      if(score>bestScore){bestScore=score;best=i;}
     }
     return best;
   }
 
   function simulateCall(hand,melds,action){
     const next=(hand||[]).slice();
-    const nextMelds=(melds||[]).slice();
+    const nextMelds=(melds||[]).map(g=>(g||[]).slice());
     const discard=window.lastDiscardedTile||lastDiscardedTile;
     if(!action||!discard)return {hand:next,melds:nextMelds};
+
     if(action.type==='Pon'){
-      let removed=0;
-      for(let i=next.length-1;i>=0&&removed<2;i--)if(next[i]?.id===discard.id){next.splice(i,1);removed++;}
-      if(removed===2)nextMelds.push([discard.clone?discard.clone():{...discard},...Array(2).fill(null).map(()=>({...discard}))]);
+      const used=takeTilesById(next,discard.id,2);
+      if(used.length===2){used.push({...discard});nextMelds.push(used);}
     }else if(action.type==='Kan'){
-      let removed=0,group=[{...discard}];
-      for(let i=next.length-1;i>=0&&removed<3;i--)if(next[i]?.id===discard.id){group.push(next[i]);next.splice(i,1);removed++;}
-      if(removed===3)nextMelds.push(group);
+      const used=takeTilesById(next,discard.id,3);
+      if(used.length===3){used.push({...discard});nextMelds.push(used);}
     }else if(action.type==='Chi'&&Array.isArray(action.combo)){
-      const values=action.combo.slice();
-      const sameType=next.filter(x=>x?.type===discard.type);
-      for(const n of values){
-        if(n===discard.num)continue;
+      const group=[];
+      for(const n of action.combo){
+        if(n===discard.num){group.push({...discard});continue;}
         const idx=next.findIndex(x=>x?.type===discard.type&&x?.num===n);
-        if(idx>=0)next.splice(idx,1);
+        if(idx>=0)group.push(next.splice(idx,1)[0]);
       }
-      nextMelds.push(values.map(n=>({...discard,num:n,id:TILE_TYPES.find(x=>x.type===discard.type&&x.num===n)?.id})));
+      if(group.length===3)nextMelds.push(group);
     }
     return {hand:next,melds:nextMelds};
+  }
+
+  function aiCallUtility(sim,action,level,seat){
+    const cfg=AI_LEVELS[level];
+    let nextHand=sim.hand.slice();
+    const discardIndex=chooseBestDiscard(nextHand,sim.melds,level,seat);
+    if(nextHand[discardIndex])nextHand.splice(discardIndex,1);
+
+    const p=aiProgressAfterDiscard(nextHand,sim.melds,seat);
+    let score=handValue(nextHand,sim.melds);
+    score-=p.sh*cfg.shantenWeight;
+    score+=p.ukeire*cfg.ukeireWeight;
+    score+=p.liveWaits.length*cfg.waitWeight;
+    if(action.type==='Kan')score+=4.0;
+    if(action.type==='Pon')score+=1.8;
+    if(action.type==='Chi')score+=1.1;
+    score+=cfg.callRisk;
+    return score;
   }
 
   function chooseBetterCall(actions,seatOverride=null){
     if(!Array.isArray(actions)||!actions.length)return null;
     const ron=actions.find(a=>a?.type==='Ron');
     if(ron)return ron;
+
+    const seat=Number.isInteger(Number(seatOverride))?Number(seatOverride):currentTurn;
     const level=aiLevel;
-    if(level==='easy'){
-      const kan=actions.find(a=>a?.type==='Kan');
-      if(kan)return kan;
-      const pon=actions.find(a=>a?.type==='Pon');
-      if(pon)return pon;
-      const chi=actions.find(a=>a?.type==='Chi'&&Array.isArray(a.combos)&&a.combos.length);
-      return chi?{type:'Chi',combo:chi.combos[0].slice()}:null;
-    }
-    const p=Number.isInteger(Number(seatOverride))?Number(seatOverride):(currentTurn===undefined?0:currentTurn);
-    const hand=playerHands[p]||[];
-    const melds=playerMelds[p]||[];
-    const base=handValue(hand,melds);
-    let best=null,bestDelta=-Infinity;
+    const cfg=AI_LEVELS[level];
+    const candidates=[];
+
     for(const action of actions){
-      if(action?.type==='Ron')continue;
-      if(action?.type==='Chi'&&!action.combos?.length)continue;
-      const sim=simulateCall(hand,melds,action);
-      const val=handValue(sim.hand,sim.melds);
-      const delta=val-base;
-      if(delta>bestDelta){bestDelta=delta;best=action;}
+      if(action?.type==='Chi'&&Array.isArray(action.combos)&&action.combos.length){
+        for(const combo of action.combos){
+          const simulated=simulateCall(playerHands[seat]||[],playerMelds[seat]||[],{type:'Chi',combo});
+          candidates.push({action:{...action,type:'Chi',combo:[...combo]},score:aiCallUtility(simulated,{type:'Chi',combo},level,seat)});
+        }
+      }else if(action?.type==='Pon'||action?.type==='Kan'){
+        const simulated=simulateCall(playerHands[seat]||[],playerMelds[seat]||[],action);
+        candidates.push({action,score:aiCallUtility(simulated,action,level,seat)});
+      }
     }
-    if(best&&bestDelta>=AI_LEVELS[level].callThreshold)return best;
+
+    if(!candidates.length)return null;
+    candidates.sort((a,b)=>b.score-a.score);
+    const best=candidates[0];
+
+    if(best.score>=cfg.callThreshold)return best.action;
+    if(level==='easy'&&Math.random()<0.06)return best.action;
     return null;
   }
 
@@ -684,7 +809,7 @@
         const hand=playerHands[p];
         if(!Array.isArray(hand)||!hand.length)return;
         if(level==='easy')return originalAiDiscard(p);
-        const idx=chooseBestDiscard(hand,playerMelds[p]||[],level);
+        const idx=chooseBestDiscard(hand,playerMelds[p]||[],level,p);
         const tile=hand.splice(idx,1)[0];
         drawnTile=null;
         commitDiscard(p,tile);
