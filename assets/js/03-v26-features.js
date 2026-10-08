@@ -137,7 +137,7 @@
       info:'Info',
       howToPlay:'Cara Bermain'
     };
-    const id={
+    const idText={
       infoTitle:'Info & Cara Bermain',
       infoIntro:'Panduan ringkas Hong Kong Mahjong.',
       infoBasic:'Cara Bermain',
@@ -179,7 +179,7 @@
       info:'Info',
       howToPlay:'Cara Bermain'
     };
-    return (v26Lang()==='en'?en:id)[id]||id;
+    return (v26Lang()==='en'?en:idText)[id]||id;
   }
 
   function openModal(id){const e=document.getElementById(id);if(e){e.hidden=false;e.style.display='flex';}}
