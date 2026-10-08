@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="26.0-mahjong-dj-modular-ai-stats">
+    <meta name="app-version" content="26.1-mahjong-dj-modular-ai-stats">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#08131f">
     <meta name="description" content="MAHJONG DJ - HongKong Mahjong dengan AI dan Cloudflare multiplayer.">
@@ -155,15 +155,45 @@
                 </div>
                 <button class="icon-btn" type="button" onclick="closeGameInfo()" aria-label="Tutup">×</button>
             </div>
-            <div class="v26-info-grid">
-                <article class="v26-info-card"><strong id="game-info-basic-title">Cara Bermain</strong><p id="game-info-basic-text"></p></article>
-                <article class="v26-info-card"><strong id="game-info-actions-title">Tindakan</strong><p id="game-info-actions-text"></p></article>
-                <article class="v26-info-card"><strong id="game-info-score-title">Score &amp; Fan</strong><p id="game-info-score-text"></p></article>
-                <article class="v26-info-card"><strong id="game-info-match-title">Pertandingan</strong><p id="game-info-match-text"></p></article>
-                <article class="v26-info-card"><strong id="game-info-multi-title">Multiplayer</strong><p id="game-info-multi-text"></p></article>
+            <div id="game-info-overview">
+                <div class="v26-info-grid">
+                    <button class="v26-info-card v26-info-card-button" type="button" onclick="openGameTutorial(0)">
+                        <strong id="game-info-basic-title">Cara Bermain</strong><p id="game-info-basic-text"></p><span class="v26-info-card-hint">▶ Tutorial</span>
+                    </button>
+                    <button class="v26-info-card v26-info-card-button" type="button" onclick="openGameTutorial(2)">
+                        <strong id="game-info-actions-title">Tindakan</strong><p id="game-info-actions-text"></p><span class="v26-info-card-hint">▶ Tutorial</span>
+                    </button>
+                    <button class="v26-info-card v26-info-card-button" type="button" onclick="openGameTutorial(4)">
+                        <strong id="game-info-score-title">Score &amp; Fan</strong><p id="game-info-score-text"></p><span class="v26-info-card-hint">▶ Tutorial</span>
+                    </button>
+                    <button class="v26-info-card v26-info-card-button" type="button" onclick="openGameTutorial(0)">
+                        <strong id="game-info-match-title">Pertandingan</strong><p id="game-info-match-text"></p><span class="v26-info-card-hint">▶ Tutorial</span>
+                    </button>
+                    <button class="v26-info-card v26-info-card-button" type="button" onclick="openGameTutorial(3)">
+                        <strong id="game-info-multi-title">Multiplayer</strong><p id="game-info-multi-text"></p><span class="v26-info-card-hint">▶ Tutorial</span>
+                    </button>
+                </div>
+                <div class="v26-info-footer">
+                    <button class="btn btn-primary" type="button" id="game-info-tutorial-btn" onclick="openGameTutorial(0)">▶ Tutorial Interaktif</button>
+                    <button class="btn btn-secondary" type="button" id="game-info-close" onclick="closeGameInfo()">Tutup</button>
+                </div>
             </div>
-            <div class="v26-info-footer">
-                <button class="btn btn-secondary" type="button" id="game-info-close" onclick="closeGameInfo()">Tutup</button>
+
+            <div id="game-info-tutorial" class="v26-tutorial" hidden>
+                <div class="v26-tutorial-head">
+                    <div>
+                        <div class="v26-tutorial-step" id="tutorial-step">1 / 5</div>
+                        <div class="v26-tutorial-title" id="tutorial-title">Cara menang</div>
+                    </div>
+                    <button class="v26-tutorial-home" type="button" onclick="closeGameTutorial()" aria-label="Kembali ke info">Info</button>
+                </div>
+                <div class="v26-tutorial-visual" id="tutorial-visual"></div>
+                <p class="v26-tutorial-text" id="tutorial-text"></p>
+                <div class="v26-tutorial-dots" id="tutorial-dots" aria-label="Posisi tutorial"></div>
+                <div class="v26-tutorial-controls">
+                    <button class="btn btn-secondary" type="button" id="tutorial-prev" onclick="prevGameTutorial()">‹ Back</button>
+                    <button class="btn btn-primary" type="button" id="tutorial-next" onclick="nextGameTutorial()">Next ›</button>
+                </div>
             </div>
         </section>
     </div>
@@ -220,7 +250,7 @@
             <div class="v26-section-head" id="stats-achievements-title">Achievement</div>
             <div id="stats-achievement-grid" class="v26-achievement-grid"></div>
             <div class="v26-stats-footer">
-                <button class="btn btn-secondary" id="stats-close" type="button" onclick="closePlayerStatistics()">Tutup</button>
+                <button class="btn btn-secondary" id="stats-close" type="button" onclick="closePlayerStatistics()">Kembali ke Profile</button>
             </div>
         </section>
     </div>
