@@ -34,6 +34,7 @@
     <audio id="bg-music" loop preload="auto" aria-hidden="true"></audio>
 
     <main id="screen-main" class="screen active" aria-labelledby="main-title">
+        <button id="main-info-btn" type="button" onclick="openGameInfo()" aria-label="Info"><span class="main-info-icon" aria-hidden="true">ⓘ</span><span id="main-info-label">Info</span></button>
         <button id="btn-cache-refresh" type="button" onclick="forceFreshReload()" aria-label="Refresh dan ambil versi terbaru" title="Refresh versi terbaru">↻</button>
         <section class="screen-card glass main-menu-canvas">
             <button class="profile-card" id="main-profile-card" type="button" onclick="openCustomizeProfile()" aria-label="Customize Your Style">
@@ -130,7 +131,7 @@
                 <p class="brand-subtitle">Profile dan style sudah tersimpan. Pilih mode untuk langsung bermain.</p>
             </div>
             <div class="menu-actions mode-actions">
-                <button class="btn btn-primary mode-card" onclick="startSinglePlayerFromMenu()">
+                <button class="btn btn-primary mode-card" onclick="openAiLevelPicker()">
                     <strong>VS AI</strong><span>Singleplayer</span>
                 </button>
                 <button class="btn btn-secondary mode-card" onclick="openPlayerLobby()">
@@ -140,6 +141,87 @@
             </div>
         </section>
     </main>
+
+    <!-- Mahjong DJ v26 feature panels -->
+    <div id="modal-game-info" class="modal" role="dialog" aria-modal="true" aria-labelledby="game-info-title">
+        <section class="modal-box glass v26-modal-box">
+            <div class="modal-head">
+                <div>
+                    <div class="modal-kicker">MAHJONG DJ</div>
+                    <div class="modal-title" id="game-info-title">Info &amp; Cara Bermain</div>
+                    <p class="v26-info-intro" id="game-info-intro">Panduan ringkas Hong Kong Mahjong.</p>
+                </div>
+                <button class="icon-btn" type="button" onclick="closeGameInfo()" aria-label="Tutup">×</button>
+            </div>
+            <div class="v26-info-grid">
+                <article class="v26-info-card"><strong id="game-info-basic-title">Cara Bermain</strong><p id="game-info-basic-text"></p></article>
+                <article class="v26-info-card"><strong id="game-info-actions-title">Tindakan</strong><p id="game-info-actions-text"></p></article>
+                <article class="v26-info-card"><strong id="game-info-score-title">Score &amp; Fan</strong><p id="game-info-score-text"></p></article>
+                <article class="v26-info-card"><strong id="game-info-match-title">Pertandingan</strong><p id="game-info-match-text"></p></article>
+                <article class="v26-info-card"><strong id="game-info-multi-title">Multiplayer</strong><p id="game-info-multi-text"></p></article>
+            </div>
+            <div class="v26-info-footer">
+                <button class="btn btn-secondary" type="button" id="game-info-close" onclick="closeGameInfo()">Tutup</button>
+            </div>
+        </section>
+    </div>
+
+    <div id="modal-ai-level" class="modal" role="dialog" aria-modal="true" aria-labelledby="ai-level-title">
+        <section class="modal-box glass v26-modal-box">
+            <div class="modal-head">
+                <div>
+                    <div class="modal-kicker">VS AI</div>
+                    <div class="modal-title" id="ai-level-title">Level AI</div>
+                    <p class="v26-info-intro" id="ai-level-sub">Pilih tingkat tantangan.</p>
+                </div>
+                <button class="icon-btn" type="button" onclick="closeAiLevelPicker()" aria-label="Tutup">×</button>
+            </div>
+            <div class="v26-ai-grid">
+                <button class="v26-ai-level-btn" type="button" data-level="easy" onclick="selectAiLevel('easy')"><strong>Easy</strong><small>Keputusan sederhana. Cocok untuk belajar.</small><span class="v26-ai-level-selected"></span></button>
+                <button class="v26-ai-level-btn" type="button" data-level="normal" onclick="selectAiLevel('normal')"><strong>Normal</strong><small>Efisiensi hand yang seimbang.</small><span class="v26-ai-level-selected"></span></button>
+                <button class="v26-ai-level-btn" type="button" data-level="hard" onclick="selectAiLevel('hard')"><strong>Hard</strong><small>Efisiensi, wait, dan call lebih kuat.</small><span class="v26-ai-level-selected"></span></button>
+                <button class="v26-ai-level-btn" type="button" data-level="expert" onclick="selectAiLevel('expert')"><strong>Expert</strong><small>Keputusan paling terukur dan buangan konservatif.</small><span class="v26-ai-level-selected"></span></button>
+            </div>
+            <div class="v26-ai-footer">
+                <button class="btn btn-secondary" id="ai-level-close" type="button" onclick="closeAiLevelPicker()">Tutup</button>
+            </div>
+        </section>
+    </div>
+
+    <div id="modal-player-stats" class="modal" role="dialog" aria-modal="true" aria-labelledby="stats-title">
+        <section class="modal-box glass v26-modal-box">
+            <div class="modal-head">
+                <div>
+                    <div class="modal-kicker">PLAYER PROFILE</div>
+                    <div class="modal-title" id="stats-title">Statistik</div>
+                    <p class="v26-info-intro">Statistik pertandingan disimpan di perangkat ini.</p>
+                </div>
+                <button class="icon-btn" type="button" onclick="closePlayerStatistics()" aria-label="Tutup">×</button>
+            </div>
+            <div class="v26-stats-grid">
+                <div class="v26-stat-card"><b id="stats-games">0</b><span id="stats-games-label">Game</span></div>
+                <div class="v26-stat-card"><b id="stats-wins">0</b><span id="stats-wins-label">Menang</span></div>
+                <div class="v26-stat-card"><b id="stats-losses">0</b><span id="stats-losses-label">Kalah</span></div>
+                <div class="v26-stat-card"><b id="stats-draws">0</b><span id="stats-draws-label">Draw</span></div>
+                <div class="v26-stat-card"><b id="stats-winrate">0.0%</b><span id="stats-winrate-label">Win Rate</span></div>
+            </div>
+            <div class="v26-stats-secondary">
+                <div class="v26-stat-card"><b id="stats-tsumo">0</b><span id="stats-tsumo-label">Tsumo</span></div>
+                <div class="v26-stat-card"><b id="stats-ron">0</b><span id="stats-ron-label">Ron</span></div>
+                <div class="v26-stat-card"><b id="stats-highest-fan">0</b><span id="stats-highest-fan-label">Fan Tertinggi</span></div>
+            </div>
+            <div class="v26-stats-secondary">
+                <div class="v26-stat-card"><b id="stats-highest-score">15.000</b><span id="stats-highest-score-label">Score Tertinggi</span></div>
+                <div class="v26-stat-card"><b id="stats-average-score">15.000</b><span id="stats-average-score-label">Rata-rata Score</span></div>
+                <div class="v26-stat-card"><b id="stats-unlocked-count">0</b><span id="stats-unlocked-count-label">Achievement</span></div>
+            </div>
+            <div class="v26-section-head" id="stats-achievements-title">Achievement</div>
+            <div id="stats-achievement-grid" class="v26-achievement-grid"></div>
+            <div class="v26-stats-footer">
+                <button class="btn btn-secondary" id="stats-close" type="button" onclick="closePlayerStatistics()">Tutup</button>
+            </div>
+        </section>
+    </div>
 
     <div id="modal-avatar-picker" class="modal" role="dialog" aria-modal="true" aria-labelledby="avatar-picker-title">
         <section class="modal-box glass profile-style-box">
@@ -234,6 +316,7 @@
             </div>
 
             <div class="profile-style-actions">
+                <button class="btn btn-secondary v26-stats-btn" type="button" onclick="openPlayerStatistics()">Statistics</button>
                 <button class="btn btn-secondary" type="button" onclick="resetCustomizeStyle()">Reset Style</button>
                 <button class="btn btn-primary" type="button" onclick="saveCustomizeProfile()">Simpan &amp; Tutup</button>
             </div>
@@ -526,8 +609,10 @@
 
 
 <link rel="stylesheet" href="assets/css/06-game-language.css">
+    <link rel="stylesheet" href="assets/css/07-v26-features.css">
 
 <script src="assets/js/02-game-language-runtime.js"></script>
+<script src="assets/js/03-v26-features.js"></script>
 
 </body>
 </html>
