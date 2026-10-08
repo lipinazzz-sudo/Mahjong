@@ -1,0 +1,167 @@
+
+@media (orientation:portrait){
+  html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    touch-action:manipulation!important;
+  }
+
+  #screen-game{
+    position:fixed!important;
+    inset:0;
+    width:100vw;
+    height:100vh!important;
+    padding:0!important;
+    overflow:hidden!important;
+    touch-action:manipulation!important;
+  }
+
+  #screen-game.active{
+    display:flex;
+  }
+
+  #game-board{
+    position:fixed!important;
+    inset:0;
+    width:100%;
+    height:100%;
+    min-width:0;
+    min-height:0;
+    overflow:hidden;
+    isolation:isolate;
+    touch-action:manipulation!important;
+  }
+
+  /* Lapisan dekorasi tidak boleh pernah menangkap sentuhan. */
+  #game-board .table-plane,
+  #game-board .table-plane::before,
+  #game-board .table-plane::after,
+  #game-board .center-board::before{
+    pointer-events:none!important;
+  }
+
+  /* Kontrol utama dibuat selalu berada di atas elemen meja. */
+  #game-board .topbar{
+    z-index:500!important;
+    pointer-events:none;
+  }
+  #game-board .topbar button,
+  #game-board #btn-score-guide,
+  #game-board .score-guide-launcher{
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+  }
+
+  /* Ukuran tile portrait diperkecil agar 14 tile tangan tetap masuk viewport. */
+  #player-hand-tiles{
+    width:max-content;
+    max-width:100%;
+    gap:1px!important;
+    justify-content:center;
+    overflow:visible;
+  }
+  #player-hand-tiles .tile{
+    width:clamp(18px,5.55vw,27px)!important;
+    height:clamp(28px,8.55vw,40px)!important;
+    min-width:0;
+    touch-action:manipulation!important;
+    pointer-events:auto!important;
+  }
+
+  #game-board .hand-bottom-container{
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:180!important;
+    min-width:0;
+    padding-left:3px;
+    padding-right:3px;
+    padding-bottom:max(2px,env(safe-area-inset-bottom));
+    pointer-events:none;
+  }
+  #game-board .hand-bottom-container #player-hand-tiles,
+  #game-board .hand-bottom-container .hand-status-bar{
+    pointer-events:auto;
+  }
+
+  /* Posisi pemain dibuat sedikit keluar sehingga tidak menutup tangan. */
+  #game-board .pos-bottom{
+    left:6px;
+    bottom:calc(var(--tileH) + 7px);
+    z-index:170!important;
+  }
+  #game-board .pos-top{
+    top:6px;
+    right:7px;
+    z-index:170!important;
+  }
+  #game-board .pos-left{
+    left:2px;
+    top:45%;
+    z-index:170!important;
+  }
+  #game-board .pos-right{
+    right:2px;
+    top:45%;
+    z-index:170!important;
+  }
+
+  /* Tombol aksi selalu tampil di area yang aman untuk tap. */
+  #action-overlay{
+    left:50%!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:calc(var(--tileH) + 48px)!important;
+    transform:translateX(-50%)!important;
+    z-index:600!important;
+    width:auto;
+    max-width:94vw!important;
+    justify-content:center!important;
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+  }
+  #action-overlay .act-btn{
+    min-width:60px;
+    min-height:40px;
+    padding:8px 10px;
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+  }
+
+  /* Score Guide pada portrait menggunakan hampir seluruh lebar layar. */
+  #score-guide-drawer{
+    z-index:900!important;
+    width:min(92vw,430px)!important;
+    max-width:92vw;
+    touch-action:pan-y!important;
+  }
+  #score-guide-drawer .score-guide-close{
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+  }
+
+  /* Semua kontrol yang memang interaktif di papan tetap bisa ditap. */
+  #game-board button,
+  #game-board .tile,
+  #game-board input,
+  #game-board [role="button"]{
+    pointer-events:auto;
+    touch-action:manipulation!important;
+  }
+
+  /* Elemen status/dekorasi tidak menghalangi hit-area. */
+  #game-board .player-seat,
+  #game-board .river-container,
+  #game-board .melds-container,
+  #game-board .enemy-melds,
+  #game-board .center-board{
+    pointer-events:none;
+  }
+
+  #game-board .player-seat button,
+  #game-board .player-seat .tile,
+  #game-board .center-board button{
+    pointer-events:auto;
+  }
+}
