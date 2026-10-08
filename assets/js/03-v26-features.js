@@ -52,7 +52,8 @@
   let activeMatchId=null;
   let matchStartedAt=0;
   let matchRecorded=false;
-  let sessionWinType='';
+  let sessionTsumoWins=0;
+  let sessionRonWins=0;
   let sessionHighestFan=0;
 
   function localSeat(){
@@ -64,7 +65,8 @@
     activeMatchId='v26-'+Date.now()+'-'+Math.random().toString(36).slice(2,8);
     matchStartedAt=Date.now();
     matchRecorded=false;
-    sessionWinType='';
+    sessionTsumoWins=0;
+    sessionRonWins=0;
     sessionHighestFan=0;
   }
 
@@ -270,7 +272,10 @@
     set('stats-highest-score',Math.round(s.highestScore).toLocaleString('id-ID'));
     set('stats-average-score',Math.round(avg).toLocaleString('id-ID'));
     set('stats-achievements-title',tr('achievements'));
+    set('stats-unlocked-count',s.unlocked.length.toLocaleString('id-ID'));
     set('stats-close',tr('close'));
+    set('stats-games-label',tr('games')); set('stats-wins-label',tr('wins')); set('stats-losses-label',tr('losses')); set('stats-draws-label',tr('draws')); set('stats-winrate-label',tr('winRate'));
+    set('stats-tsumo-label',tr('tsumo')); set('stats-ron-label',tr('ron')); set('stats-highest-fan-label',tr('highestFan')); set('stats-highest-score-label',tr('highestScore')); set('stats-average-score-label',tr('avgScore')); set('stats-unlocked-count-label',tr('achievements'));
     const box=document.getElementById('stats-achievement-grid');
     if(box){
       box.innerHTML=ACHIEVEMENTS.map(a=>{
@@ -289,7 +294,9 @@
     if(!winner)return;
     const seat=Number(winner.winnerSeat);
     if(seat!==localSeat())return;
-    sessionWinType=String(winner.winType||'').toLowerCase();
+    const winType=String(winner.winType||'').toLowerCase();
+    if(winType==='tsumo')sessionTsumoWins++;
+    if(winType==='ron')sessionRonWins++;
     const fan=Array.isArray(winner.yaku)?winner.yaku.reduce((n,x)=>n+(Number(x?.[1])||0),0):0;
     sessionHighestFan=Math.max(sessionHighestFan,fan);
     if(fan>stats.highestFan)stats.highestFan=fan;
@@ -297,7 +304,8 @@
   }
 
   function recordCompletedMatch(){
-    if(matchRecorded||!activeMatchId)return;
+    if(matchRecorded)return;
+    if(!activeMatchId)activeMatchId='v26-recovered-'+Date.now()+'-'+Math.random().toString(36).slice(2,8);
     if(typeof computeStandings!=='function'||!Array.isArray(window.playerScores) && typeof playerScores==='undefined')return;
     const scores=Array.isArray(window.playerScores)?window.playerScores:playerScores;
     if(!Array.isArray(scores)||scores.length<4)return;
@@ -324,8 +332,8 @@
       stats.losses++;
       stats.currentWinStreak=0;
     }
-    if(sessionWinType==='tsumo')stats.tsumoWins++;
-    if(sessionWinType==='ron')stats.ronWins++;
+    stats.tsumoWins+=sessionTsumoWins;
+    stats.ronWins+=sessionRonWins;
     safeWrite(STATS_KEY,stats);
     matchRecorded=true;
     checkAchievements();
@@ -463,7 +471,7 @@
     return {hand:next,melds:nextMelds};
   }
 
-  function chooseBetterCall(actions){
+  function chooseBetterCall(actions,seatOverride=null){
     if(!Array.isArray(actions)||!actions.length)return null;
     const ron=actions.find(a=>a?.type==='Ron');
     if(ron)return ron;
@@ -476,7 +484,7 @@
       const chi=actions.find(a=>a?.type==='Chi'&&Array.isArray(a.combos)&&a.combos.length);
       return chi?{type:'Chi',combo:chi.combos[0].slice()}:null;
     }
-    const p=currentTurn===undefined?0:currentTurn;
+    const p=Number.isInteger(Number(seatOverride))?Number(seatOverride):(currentTurn===undefined?0:currentTurn);
     const hand=playerHands[p]||[];
     const melds=playerMelds[p]||[];
     const base=handValue(hand,melds);
@@ -529,7 +537,7 @@
           if(mode==='call'){
             const live=mpPendingCalls.find(x=>x.seat===seat);
             if(!live){promptNextCall();return;}
-            const pick=chooseBetterCall(live.actions);
+            const pick=chooseBetterCall(live.actions,seat);
             if(pick){resolveCallChoice(seat,pick);return;}
             mpPendingCalls=mpPendingCalls.filter(x=>x!==live);
             mpBroadcastState({remoteActions:[]});
