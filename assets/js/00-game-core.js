@@ -1628,7 +1628,8 @@ function executePon(p){
   mpPendingCalls=[];
   const resume=()=>{
     if(aiSeats.has(p)){
-      aiDiscard(p);
+      if(window.MahjongV26?.aiAfterAction)window.MahjongV26.aiAfterAction(p);
+      else aiDiscard(p);
     }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
       isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
       startTurnTimer();
@@ -1671,7 +1672,8 @@ function executeChi(p,combo){
   mpPendingCalls=[];
   const resume=()=>{
     if(aiSeats.has(p)){
-      aiDiscard(p);
+      if(window.MahjongV26?.aiAfterAction)window.MahjongV26.aiAfterAction(p);
+      else aiDiscard(p);
     }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
       isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
       startTurnTimer();
@@ -1714,7 +1716,8 @@ function executeKan(p){
   mpPendingCalls=[];
   const resume=()=>{
     if(aiSeats.has(p)){
-      aiDiscard(p);
+      if(window.MahjongV26?.aiAfterAction)window.MahjongV26.aiAfterAction(p);
+      else aiDiscard(p);
     }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
       isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
       startTurnTimer();
@@ -1759,7 +1762,8 @@ function executeSelfKan(p,opt){
 
   const resume=()=>{
     if(aiSeats.has(p)){
-      aiDiscard(p);
+      if(window.MahjongV26?.aiAfterAction)window.MahjongV26.aiAfterAction(p);
+      else aiDiscard(p);
     }else if(!isMultiplayerMode||p===(mp.seat??0)||mp.host){
       isDiscardable=p===(mp.seat??0)||!isMultiplayerMode;
       startTurnTimer();
