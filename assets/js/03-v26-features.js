@@ -6,6 +6,13 @@
   'use strict';
 
   const NS = window.MahjongV26 = window.MahjongV26 || {};
+  NS.aiAfterAction=function(seat){
+    if(typeof window.scheduleAiTurn==='function'){
+      window.scheduleAiTurn(seat,'discard');
+      return;
+    }
+    if(typeof window.aiDiscard==='function')window.aiDiscard(seat);
+  };
   const AI_KEY = 'mahjongDJAiLevelV1';
   const STATS_KEY = 'mahjongDJStatsV1';
   const VALID_LEVELS = ['easy','normal','hard','expert'];
