@@ -625,6 +625,12 @@
     v26RenderInfo();v26RenderStats();v26RenderAiLevel();
     return out;
   };
+  const originalToggleLang=window.toggleGameLanguage;
+  window.toggleGameLanguage=function(){
+    const out=originalToggleLang?.();
+    v26RenderInfo();v26RenderStats();v26RenderAiLevel();
+    return out;
+  };
 
   window.addEventListener('load',()=>{
     v26RenderInfo();v26RenderStats();v26RenderAiLevel();
