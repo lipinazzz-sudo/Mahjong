@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'mahjong-dj-discard-reveal-and-ui-2026-10-09-3';
+const CACHE_VERSION = 'mahjong-dj-discard-reveal-and-ui-2026-10-09-4';
 const APP_SHELL = [
   './',
   './index.html',
