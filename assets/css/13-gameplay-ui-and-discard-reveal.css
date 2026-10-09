@@ -1,0 +1,72 @@
+/* Main-menu compact pass + discard recording marker.
+   Isolated presentation changes only; no game rules or controls are removed. */
+
+/* Lift and scale only the upper-right utility toolbar, leaving the profile
+   card's approved position intact. Scale keeps the original tap target. */
+#screen-main .main-menu-utilities{
+  transform:translateY(-4px) scale(.85) !important;
+  transform-origin:top right !important;
+}
+
+/* Shorten the profile card by 20%, then scale the whole card down by 10%. */
+#screen-main .profile-card{
+  flex:0 1 206px !important;
+  width:min(206px,18.4vw) !important;
+  min-width:163px !important;
+  max-width:206px !important;
+  transform:scale(.9) !important;
+  transform-origin:top left !important;
+}
+
+@media(max-width:800px){
+  #screen-main .profile-card{
+    flex-basis:168px !important;
+    width:168px !important;
+    min-width:139px !important;
+    max-width:168px !important;
+  }
+}
+@media(max-width:560px){
+  #screen-main .profile-card{
+    flex-basis:114px !important;
+    width:114px !important;
+    min-width:0 !important;
+    max-width:114px !important;
+  }
+}
+@media(max-width:360px){
+  #screen-main .profile-card{
+    flex-basis:101px !important;
+    width:101px !important;
+    max-width:101px !important;
+  }
+}
+
+/* 20% smaller red recording point and correspondingly softer glow. */
+@keyframes lastDiscardRecordingPulseCompact{
+  0%,100%{
+    transform:scale(.82);
+    opacity:.72;
+    box-shadow:
+      0 0 1.6px rgba(255,92,84,.72),
+      0 0 4px rgba(239,79,74,.32);
+  }
+  50%{
+    transform:scale(1.12);
+    opacity:1;
+    box-shadow:
+      0 0 2.4px rgba(255,92,84,1),
+      0 0 5.6px rgba(239,79,74,.62),
+      0 0 8.8px rgba(239,79,74,.24);
+  }
+}
+.discard-tile.last-discard-highlight::after{
+  right:3.2px !important;
+  top:3.2px !important;
+  width:3.2px !important;
+  height:3.2px !important;
+  box-shadow:
+    0 0 1.6px rgba(255,92,84,.72),
+    0 0 4px rgba(239,79,74,.32) !important;
+  animation:lastDiscardRecordingPulseCompact 1.8s ease-in-out infinite !important;
+}
