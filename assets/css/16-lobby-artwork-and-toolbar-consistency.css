@@ -1,0 +1,71 @@
+/* Main-menu utility consistency + visible lobby artwork.
+   Additive overrides only: keep existing layout, actions and gameplay intact. */
+
+/* The Settings gear was rendered as a colorful emoji while the other toolbar
+   glyphs were text symbols. Force text presentation and match their gold tone. */
+#screen-main .main-menu-utilities #main-settings-btn > span:first-child{
+  display:grid !important;
+  place-items:center !important;
+  width:100% !important;
+  height:100% !important;
+  color:#ffd27b !important;
+  font-family:Arial,Helvetica,sans-serif !important;
+  font-size:20px !important;
+  font-weight:500 !important;
+  line-height:1 !important;
+  text-shadow:0 0 10px rgba(255,190,60,.20) !important;
+  filter:none !important;
+  opacity:1 !important;
+}
+@media(max-width:800px){
+  #screen-main .main-menu-utilities #main-settings-btn > span:first-child{font-size:18px !important;}
+}
+@media(max-width:560px){
+  #screen-main .main-menu-utilities #main-settings-btn > span:first-child{font-size:16px !important;}
+}
+@media(max-width:360px){
+  #screen-main .main-menu-utilities #main-settings-btn > span:first-child{font-size:14px !important;}
+}
+
+/* VS AI / Multiplayer selection: use the actual lobby artwork inside the
+   selection shell instead of a flat charcoal fill. Keep a subtle dark veil
+   so text and the illustrated mode cards remain legible. */
+#screen-play .screen-card{
+  background:
+    linear-gradient(145deg,rgba(10,8,8,.30),rgba(8,7,8,.48)),
+    url('../backgrounds/bg-lobby.jpg') center/cover no-repeat !important;
+  border-color:rgba(229,190,110,.48) !important;
+  box-shadow:0 28px 82px rgba(0,0,0,.64),inset 0 1px 0 rgba(255,241,204,.10) !important;
+  -webkit-backdrop-filter:blur(1.2px) saturate(.97) !important;
+  backdrop-filter:blur(1.2px) saturate(.97) !important;
+}
+#screen-play .screen-card::before{
+  background:linear-gradient(180deg,rgba(8,7,7,.04),rgba(8,7,7,.12)) !important;
+  border-color:rgba(229,190,110,.18) !important;
+  pointer-events:none !important;
+}
+
+/* Multiplayer lobby: make the background image genuinely visible. The
+   surrounding modal remains slightly dimmed, but no longer heavily blurred. */
+#modal-lobby{
+  background:rgba(0,0,0,.36) !important;
+  -webkit-backdrop-filter:blur(1.4px) !important;
+  backdrop-filter:blur(1.4px) !important;
+}
+#modal-lobby .lobby-box{
+  background:
+    linear-gradient(145deg,rgba(20,14,11,.32),rgba(6,6,7,.53)),
+    url('../backgrounds/bg-lobby.jpg') center/cover no-repeat !important;
+  background-blend-mode:normal !important;
+  border-color:rgba(229,190,110,.48) !important;
+  box-shadow:0 28px 82px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,241,204,.10) !important;
+  -webkit-backdrop-filter:blur(1.2px) saturate(.98) !important;
+  backdrop-filter:blur(1.2px) saturate(.98) !important;
+}
+#modal-lobby .p2p-card,
+#modal-lobby .room-share-card,
+#modal-lobby .ready-item,
+#modal-lobby .reconnect-card{
+  background:linear-gradient(145deg,rgba(21,15,12,.72),rgba(7,7,8,.79)) !important;
+  border-color:rgba(229,190,110,.25) !important;
+}
