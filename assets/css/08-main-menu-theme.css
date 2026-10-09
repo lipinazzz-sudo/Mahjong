@@ -82,85 +82,58 @@
 }
 @media(prefers-reduced-motion:reduce){#screen-main .btn{transition:none!important;}}
 
-/* Top navigation: visible, functional and aligned as one component. */
-#screen-main .main-menu-topbar{
-  position:absolute;left:clamp(10px,2vw,28px);right:clamp(10px,2vw,28px);top:clamp(10px,1.8vh,22px);
-  z-index:35;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;pointer-events:none;
-}
+/* Compact icon-only toolbar — consistent red/black/gold luxe style. */
+#screen-main .main-menu-topbar{position:absolute;left:clamp(10px,2vw,28px);right:clamp(10px,2vw,28px);top:clamp(10px,1.8vh,22px);z-index:35;display:flex;align-items:center;justify-content:space-between;gap:14px;pointer-events:none;}
 #screen-main .main-menu-topbar>*{pointer-events:auto;}
-#screen-main .main-menu-utilities{display:flex;align-items:flex-start;justify-content:flex-end;gap:9px;min-width:0;}
-#screen-main .main-menu-utility-btn{
-  appearance:none;position:relative;display:flex;flex:0 0 72px;flex-direction:column;align-items:center;justify-content:center;gap:5px;
-  width:72px;height:65px;padding:6px 4px;border:1px solid rgba(239,193,92,.76);border-radius:17px;
-  color:#f2d8a0;background:linear-gradient(150deg,rgba(29,23,18,.96),rgba(5,6,8,.98));
-  box-shadow:0 8px 20px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,242,207,.15),0 0 13px rgba(232,173,55,.07);
-  font-family:inherit;font-size:10px;font-weight:850;line-height:1.05;letter-spacing:.025em;text-shadow:0 1px 6px rgba(0,0,0,.9);cursor:pointer;touch-action:manipulation;
-  transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;
-}
-#screen-main .main-menu-utility-btn>span:first-child{display:grid;place-items:center;width:30px;height:30px;color:#ffcf73;font-size:22px;line-height:1;text-shadow:0 0 13px rgba(255,191,67,.3);}
-#screen-main .main-menu-utility-btn:hover{transform:translateY(-2px);filter:brightness(1.12);box-shadow:0 12px 25px rgba(0,0,0,.48),0 0 20px rgba(239,178,53,.18);}
-#screen-main .main-menu-utility-btn:active{transform:translateY(1px) scale(.98);}
-#screen-main #main-info-btn,#screen-main #main-history-top-btn,#screen-main .main-menu-utilities .main-settings-btn{
-  position:relative;top:auto;right:auto;bottom:auto;left:auto;z-index:auto;margin:0;min-height:65px;
-}
-#screen-main #main-info-btn .main-info-icon{color:#ffcf73;font-size:23px;}
-#screen-main .main-menu-utilities .main-settings-btn>span:first-child{color:#ffcf73;font-size:23px;}
-#screen-main #btn-cache-refresh{
-  position:relative;top:auto;right:auto;bottom:auto;left:auto;z-index:auto;flex:0 0 38px;align-self:flex-start;
-  display:grid;place-items:center;width:38px;height:38px;margin:0;padding:0;border:1px solid rgba(239,193,92,.65);border-radius:12px;
-  background:linear-gradient(150deg,rgba(29,23,18,.96),rgba(5,6,8,.98));color:#f7d38a;font-size:20px;line-height:1;
-  box-shadow:0 8px 20px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,242,207,.15);cursor:pointer;touch-action:manipulation;
-}
-#screen-main .profile-card{
-  position:relative;left:auto;top:auto;right:auto;bottom:auto;z-index:auto;flex:0 1 258px;
-  width:min(258px,23vw);min-width:204px;max-width:258px;display:grid;grid-template-columns:55px minmax(0,1fr) 25px;
-  align-items:center;gap:10px;margin:0;padding:9px 12px 9px 9px;border:1px solid rgba(244,199,103,.88);border-radius:18px;
-  color:#f8e4bb;text-align:left;background:linear-gradient(145deg,rgba(17,12,10,.92),rgba(4,5,6,.94));
-  box-shadow:0 9px 26px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,241,203,.13),0 0 17px rgba(235,170,50,.09);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:pointer;
-}
-#screen-main .profile-avatar-frame{display:block;width:53px;height:53px;overflow:hidden;border:1px solid #e4b85f;border-radius:13px;background:#17100b;box-shadow:0 0 0 2px rgba(0,0,0,.45),0 0 13px rgba(238,181,60,.20);}
+#screen-main .main-menu-utilities{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0;}
+#screen-main .main-menu-utility-btn{appearance:none;position:relative;display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;min-height:42px;margin:0;padding:0;border:1px solid rgba(228,181,91,.61);border-radius:12px;color:#f4d99e;background:linear-gradient(145deg,rgba(27,22,19,.88),rgba(5,6,8,.94));box-shadow:0 5px 13px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,241,205,.10);font-family:inherit;font-size:10px;font-weight:850;line-height:1;text-shadow:0 1px 5px rgba(0,0,0,.9);cursor:pointer;touch-action:manipulation;transition:transform .16s ease,filter .16s ease,box-shadow .16s ease;-webkit-tap-highlight-color:transparent;}
+#screen-main .main-menu-utility-btn>span:first-child{display:grid;place-items:center;width:100%;height:100%;color:#ffd27b;font-size:20px;line-height:1;text-shadow:0 0 10px rgba(255,190,60,.20);}
+#screen-main .main-menu-utility-btn:hover{transform:translateY(-1px);filter:brightness(1.12);box-shadow:0 8px 17px rgba(0,0,0,.43),0 0 13px rgba(239,178,53,.13);}
+#screen-main .main-menu-utility-btn:active{transform:scale(.96);}
+#screen-main #main-info-btn,#screen-main #main-stats-top-btn,#screen-main .main-menu-utilities .main-settings-btn{position:relative;top:auto;right:auto;bottom:auto;left:auto;z-index:auto;}
+#screen-main .main-menu-utilities .main-settings-btn{display:grid;flex:0 0 42px;align-items:center;justify-content:center;}
+#screen-main .main-menu-utilities #btn-cache-refresh{position:relative;top:auto;right:auto;bottom:auto;left:auto;z-index:auto;flex:0 0 32px;align-self:center;display:grid;place-items:center;width:32px;height:32px;min-height:32px;margin:0;padding:0;border:1px solid rgba(228,181,91,.48);border-radius:10px;background:rgba(6,7,8,.78);color:#f4cd7c;font-size:17px;line-height:1;box-shadow:0 5px 12px rgba(0,0,0,.32);cursor:pointer;touch-action:manipulation;}
+#screen-main .profile-card{position:relative;left:auto;top:auto;right:auto;bottom:auto;z-index:auto;flex:0 1 258px;width:min(258px,23vw);min-width:204px;max-width:258px;display:grid;grid-template-columns:55px minmax(0,1fr) 25px;align-items:center;gap:10px;margin:0;padding:9px 12px 9px 9px;border:1px solid rgba(244,199,103,.75);border-radius:16px;color:#f8e4bb;text-align:left;background:linear-gradient(145deg,rgba(17,12,10,.87),rgba(4,5,6,.91));box-shadow:0 7px 18px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,241,203,.10);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);cursor:pointer;}
+#screen-main .profile-avatar-frame{display:block;width:53px;height:53px;overflow:hidden;border:1px solid #e4b85f;border-radius:13px;background:#17100b;box-shadow:0 0 0 2px rgba(0,0,0,.40),0 0 10px rgba(238,181,60,.15);}
 #screen-main .profile-avatar-frame img{width:100%;height:100%;display:block;object-fit:cover;border-radius:11px;}
 #screen-main .profile-card-copy{display:grid;gap:4px;min-width:0;}
 #screen-main .profile-card-copy strong{overflow:hidden;color:#fff0d2;font-size:clamp(12px,1.2vw,15px);font-weight:900;text-overflow:ellipsis;white-space:nowrap;}
 #screen-main .profile-card-copy span{overflow:hidden;color:#e7bf6b;font-size:10px;text-overflow:ellipsis;white-space:nowrap;}
 #screen-main .profile-card-copy small{margin-top:1px;color:#f2d18c;font-size:9px;letter-spacing:.02em;}
-#screen-main .profile-edit{display:grid;place-items:center;width:25px;height:25px;border:1px solid rgba(237,193,91,.48);border-radius:8px;background:rgba(240,183,59,.07);color:#f5cb71;font-size:16px;}
-#screen-main .main-menu-utilities .main-settings-btn{display:flex;flex:0 0 72px;align-items:center;justify-content:center;gap:5px;}
+#screen-main .profile-edit{display:grid;place-items:center;width:25px;height:25px;border:1px solid rgba(237,193,91,.42);border-radius:8px;background:rgba(240,183,59,.06);color:#f5cb71;font-size:16px;}
 @media(max-width:800px){
-  #screen-main .main-menu-topbar{left:10px;right:10px;top:10px;gap:8px;}
-  #screen-main .main-menu-utilities{gap:6px;}
-  #screen-main .main-menu-utility-btn{flex-basis:58px;width:58px;height:58px;border-radius:14px;gap:3px;font-size:9px;}
-  #screen-main .main-menu-utility-btn>span:first-child{width:25px;height:25px;font-size:19px;}
-  #screen-main #main-info-btn,#screen-main #main-history-top-btn,#screen-main .main-menu-utilities .main-settings-btn{min-height:58px;}
-  #screen-main .main-menu-utilities .main-settings-btn{flex-basis:58px;}
-  #screen-main .profile-card{flex-basis:210px;width:210px;min-width:174px;grid-template-columns:43px minmax(0,1fr) 21px;gap:8px;padding:7px;}
-  #screen-main .profile-avatar-frame{width:42px;height:42px;}
-  #screen-main .profile-edit{width:21px;height:21px;font-size:13px;}
+#screen-main .main-menu-topbar{left:10px;right:10px;top:10px;gap:8px;}
+#screen-main .main-menu-utilities{gap:5px;}
+#screen-main .main-menu-utility-btn{flex-basis:37px;width:37px;height:37px;min-height:37px;border-radius:10px;}
+#screen-main .main-menu-utility-btn>span:first-child{font-size:18px;}
+#screen-main .main-menu-utilities .main-settings-btn{flex-basis:37px;}
+#screen-main .main-menu-utilities #btn-cache-refresh{flex-basis:29px;width:29px;height:29px;font-size:15px;}
+#screen-main .profile-card{flex-basis:210px;width:210px;min-width:174px;grid-template-columns:43px minmax(0,1fr) 21px;gap:8px;padding:7px;}
+#screen-main .profile-avatar-frame{width:42px;height:42px;}
+#screen-main .profile-edit{width:21px;height:21px;font-size:13px;}
 }
 @media(max-width:560px){
-  #screen-main .main-menu-topbar{left:8px;right:8px;top:8px;gap:5px;}
-  #screen-main .profile-card{flex:0 1 142px;width:142px;min-width:0;grid-template-columns:34px minmax(0,1fr);gap:6px;padding:5px 7px;border-radius:13px;}
-  #screen-main .profile-avatar-frame{width:33px;height:33px;border-radius:9px;}
-  #screen-main .profile-avatar-frame img{border-radius:8px;}
-  #screen-main .profile-card-copy{gap:2px;}
-  #screen-main .profile-card-copy strong{font-size:10px;}
-  #screen-main .profile-card-copy span{font-size:8px;}
-  #screen-main .profile-card-copy small,#screen-main .profile-edit{display:none;}
-  #screen-main .main-menu-utilities{gap:4px;}
-  #screen-main .main-menu-utility-btn{flex:0 0 43px;width:43px;height:47px;min-height:47px;padding:4px 2px;border-radius:11px;gap:2px;font-size:7px;letter-spacing:0;}
-  #screen-main .main-menu-utility-btn>span:first-child{width:19px;height:20px;font-size:16px;}
-  #screen-main #main-info-btn,#screen-main #main-history-top-btn,#screen-main .main-menu-utilities .main-settings-btn{min-height:47px;}
-  #screen-main .main-menu-utilities .main-settings-btn{flex-basis:43px;}
-  #screen-main #btn-cache-refresh{flex-basis:27px;width:27px;height:27px;border-radius:9px;font-size:15px;}
+#screen-main .main-menu-topbar{left:8px;right:8px;top:8px;gap:5px;}
+#screen-main .profile-card{flex:0 1 142px;width:142px;min-width:0;grid-template-columns:34px minmax(0,1fr);gap:6px;padding:5px 7px;border-radius:12px;}
+#screen-main .profile-avatar-frame{width:33px;height:33px;border-radius:9px;}
+#screen-main .profile-avatar-frame img{border-radius:8px;}
+#screen-main .profile-card-copy{gap:2px;}
+#screen-main .profile-card-copy strong{font-size:10px;}
+#screen-main .profile-card-copy span{font-size:8px;}
+#screen-main .profile-card-copy small,#screen-main .profile-edit{display:none;}
+#screen-main .main-menu-utilities{gap:4px;}
+#screen-main .main-menu-utility-btn{flex-basis:32px;width:32px;height:32px;min-height:32px;border-radius:9px;}
+#screen-main .main-menu-utility-btn>span:first-child{font-size:16px;}
+#screen-main .main-menu-utilities .main-settings-btn{flex-basis:32px;}
+#screen-main .main-menu-utilities #btn-cache-refresh{flex-basis:25px;width:25px;height:25px;min-height:25px;border-radius:7px;font-size:13px;}
 }
 @media(max-width:360px){
-  #screen-main .main-menu-topbar{gap:3px;}
-  #screen-main .profile-card{flex-basis:126px;width:126px;}
-  #screen-main .main-menu-utilities{gap:3px;}
-  #screen-main .main-menu-utility-btn{flex-basis:37px;width:37px;height:43px;min-height:43px;font-size:6px;}
-  #screen-main .main-menu-utility-btn>span:first-child{font-size:14px;}
-  #screen-main #main-info-btn,#screen-main #main-history-top-btn,#screen-main .main-menu-utilities .main-settings-btn{min-height:43px;}
-  #screen-main .main-menu-utilities .main-settings-btn{flex-basis:37px;}
+#screen-main .main-menu-topbar{gap:3px;}
+#screen-main .profile-card{flex-basis:126px;width:126px;}
+#screen-main .main-menu-utilities{gap:3px;}
+#screen-main .main-menu-utility-btn{flex-basis:29px;width:29px;height:29px;min-height:29px;border-radius:8px;}
+#screen-main .main-menu-utility-btn>span:first-child{font-size:14px;}
+#screen-main .main-menu-utilities .main-settings-btn{flex-basis:29px;}
+#screen-main .main-menu-utilities #btn-cache-refresh{flex-basis:23px;width:23px;height:23px;min-height:23px;font-size:12px;}
 }
 @media(prefers-reduced-motion:reduce){#screen-main .main-menu-utility-btn{transition:none!important;}}

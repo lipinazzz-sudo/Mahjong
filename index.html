@@ -49,15 +49,9 @@
                     <span class="profile-edit" aria-hidden="true">✎</span>
                 </button>
                 <nav class="main-menu-utilities" aria-label="Menu cepat">
-                    <button class="main-menu-utility-btn" id="main-info-btn" type="button" onclick="openGameInfo()" aria-label="Info" title="Info">
-                        <span class="main-info-icon" aria-hidden="true">ⓘ</span><span id="main-info-label">Info</span>
-                    </button>
-                    <button class="main-menu-utility-btn main-history-top-btn" id="main-history-top-btn" type="button" onclick="openHistory()" aria-label="History" title="History">
-                        <span class="main-utility-icon" aria-hidden="true">▤</span><span>History</span>
-                    </button>
-                    <button class="main-menu-utility-btn main-settings-btn" id="main-settings-btn" type="button" onclick="nav('screen-settings')" aria-label="Settings" title="Settings">
-                        <span aria-hidden="true">⚙</span><span>Settings</span>
-                    </button>
+                    <button class="main-menu-utility-btn" id="main-info-btn" type="button" onclick="openGameInfo()" aria-label="Info" title="Info"><span class="main-info-icon" aria-hidden="true">ⓘ</span></button>
+                    <button class="main-menu-utility-btn main-stats-top-btn" id="main-stats-top-btn" type="button" onclick="openPlayerStatistics()" aria-label="Statistics" title="Statistics"><span class="main-utility-icon" aria-hidden="true">▥</span></button>
+                    <button class="main-menu-utility-btn main-settings-btn" id="main-settings-btn" type="button" onclick="nav('screen-settings')" aria-label="Settings" title="Settings"><span aria-hidden="true">⚙</span></button>
                     <button id="btn-cache-refresh" type="button" onclick="forceFreshReload()" aria-label="Refresh dan ambil versi terbaru" title="Refresh versi terbaru">↻</button>
                 </nav>
             </div>
@@ -356,7 +350,6 @@
             </div>
 
             <div class="profile-style-actions">
-                <button class="btn btn-secondary v26-stats-btn" type="button" onclick="openPlayerStatistics()">Statistics</button>
                 <button class="btn btn-secondary" type="button" onclick="resetCustomizeStyle()">Reset Style</button>
                 <button class="btn btn-primary" type="button" onclick="saveCustomizeProfile()">Simpan &amp; Tutup</button>
             </div>
