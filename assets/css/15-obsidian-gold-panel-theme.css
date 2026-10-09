@@ -275,3 +275,13 @@
     max-width:108.78px !important;
   }
 }
+
+
+/* Warm the outer settings and mode-selection shells as well; their individual
+   controls and illustrated VS AI/VS PLAYER cards remain unchanged. */
+#screen-settings .settings-card,
+#screen-play .screen-card{
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(219,173,82,.085),transparent 45%),
+    linear-gradient(145deg,rgba(34,25,18,.965),rgba(8,8,8,.985)) !important;
+}
