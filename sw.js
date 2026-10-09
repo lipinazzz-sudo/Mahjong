@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'mahjong-dj-history-mode-tabs-2026-10-09-1';
+const CACHE_VERSION = 'mahjong-dj-river-dot-glow-2026-10-09-1';
 const APP_SHELL = [
   './',
   './index.html',
@@ -31,7 +31,7 @@ const APP_SHELL = [
   './assets/css/10-game-background-underlay.css?v=20261009-1',
   './assets/css/11-iphone-safe-area.css?v=20261009-1',
   './assets/css/12-score-guide-layout-fix.css?v=20261009-1',
-  './assets/css/13-gameplay-ui-and-discard-reveal.css?v=20261009-4',
+  './assets/css/13-gameplay-ui-and-discard-reveal.css?v=20261009-5',
   './assets/css/14-main-menu-score-guide-layout.css?v=20261009-1',
   './assets/css/15-obsidian-gold-panel-theme.css?v=20261009-2',
   './assets/css/16-lobby-artwork-and-toolbar-consistency.css?v=20261009-3',
