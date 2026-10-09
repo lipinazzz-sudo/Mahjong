@@ -139,3 +139,65 @@
 #screen-main .main-menu-utilities #btn-cache-refresh{flex-basis:29px;width:29px;min-width:29px;height:29px;min-height:29px;font-size:12px;}
 }
 @media(prefers-reduced-motion:reduce){#screen-main .main-menu-utility-btn{transition:none!important;}}
+
+
+/* Background artwork already contains the Mahjong DJ logo and tagline.
+   Hide duplicate HTML branding and reserve a clear lower action zone. */
+#screen-main .main-menu-center{
+  top:auto!important;
+  bottom:clamp(26px,4.5vh,54px)!important;
+  left:50%;
+  transform:translateX(-50%);
+  height:auto;
+  margin:0;
+}
+#screen-main .menu-emblem,
+#screen-main .brand-lockup{
+  display:none!important;
+}
+#screen-main .main-menu-actions{
+  width:min(100%,590px);
+  margin:0 auto;
+  gap:12px;
+}
+#screen-main .main-play-btn{min-height:68px;}
+#screen-main .main-history-btn{min-height:50px;}
+@media(max-width:800px){
+  #screen-main .main-menu-center{
+    top:auto!important;
+    bottom:clamp(20px,4.5vh,42px)!important;
+    transform:translateX(-50%);
+  }
+  #screen-main .main-menu-actions{width:min(90vw,530px);gap:10px;}
+  #screen-main .main-play-btn{min-height:60px;}
+  #screen-main .main-history-btn{min-height:46px;}
+}
+@media(max-width:560px){
+  #screen-main .main-menu-center{
+    top:auto!important;
+    bottom:clamp(18px,4vh,34px)!important;
+    width:96vw;
+    transform:translateX(-50%);
+  }
+  #screen-main .main-menu-actions{width:min(88vw,420px);gap:9px;}
+  #screen-main .main-play-btn{min-height:56px;}
+  #screen-main .main-history-btn{min-height:43px;}
+}
+@media(max-width:380px){
+  #screen-main .main-menu-center{
+    top:auto!important;
+    bottom:clamp(14px,3.5vh,28px)!important;
+    width:97vw;
+  }
+}
+@media(orientation:landscape) and (max-height:650px){
+  #screen-main .main-menu-center{
+    top:auto!important;
+    bottom:clamp(12px,3.5vh,26px)!important;
+    width:min(82vw,820px);
+    transform:translateX(-50%);
+  }
+  #screen-main .main-menu-actions{width:min(60vw,460px);gap:7px;}
+  #screen-main .main-play-btn{min-height:44px;padding:7px 12px;font-size:14px;}
+  #screen-main .main-history-btn{min-height:35px;padding:6px 12px;font-size:12px;}
+}
