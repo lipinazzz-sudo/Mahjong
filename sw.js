@@ -1,8 +1,17 @@
-const CACHE_VERSION = 'mahjong-dj-v26.2-bgfix--2026-10-08';
+const CACHE_VERSION = 'mahjong-dj-v26.2-bgfix-2026-10-09';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
+  './assets/backgrounds/bg-main.jpg',
+  './assets/backgrounds/bg-lobby.jpg',
+  './assets/backgrounds/bg-game.jpg',
+  './assets/backgrounds/bg-ai-card.jpg',
+  './assets/backgrounds/bg-avatar.jpg',
+  './assets/backgrounds/bg-multiplayer-card.jpg',
+  './assets/backgrounds/bg-play.jpg',
+  './assets/backgrounds/bg-result.jpg',
+  './assets/backgrounds/bg-settings.jpg',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './assets/js/00-game-core.js',

@@ -1,15 +1,23 @@
 {
-  "name": "Mahjong Soul Web — Local P2P",
-  "short_name": "Mahjong Soul",
+  "name": "Mahjong DJ - HongKong",
+  "short_name": "Mahjong DJ",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#06101a",
   "theme_color": "#08131f",
   "orientation": "any",
-  "description": "Riichi Mahjong untuk desktop, HP, iPad, portrait, landscape, dan local P2P.",
+  "description": "Mahjong DJ — Hong Kong-style Mahjong with AI opponents and multiplayer rooms.",
   "icons": [
-    {"src":"./icons/icon-192.png","sizes":"192x192","type":"image/png"},
-    {"src":"./icons/icon-512.png","sizes":"512x512","type":"image/png"}
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
