@@ -37,19 +37,30 @@
     <audio id="bg-music" loop preload="auto" aria-hidden="true"></audio>
 
     <main id="screen-main" class="screen active" aria-labelledby="main-title">
-        <button id="main-info-btn" type="button" onclick="openGameInfo()" aria-label="Info"><span class="main-info-icon" aria-hidden="true">ⓘ</span><span id="main-info-label">Info</span></button>
-        <button id="btn-cache-refresh" type="button" onclick="forceFreshReload()" aria-label="Refresh dan ambil versi terbaru" title="Refresh versi terbaru">↻</button>
         <section class="screen-card glass main-menu-canvas">
-            <button class="profile-card" id="main-profile-card" type="button" onclick="openCustomizeProfile()" aria-label="Customize Your Style">
-                <span class="profile-avatar-frame"><img id="main-profile-avatar" src="avatars/avatar-panda.jpg" alt="Avatar pemain"></span>
-                <span class="profile-card-copy">
-                    <strong id="main-profile-name">Player</strong>
-                    <span id="main-profile-avatar-name">Panda</span>
-                    <small>Customize Profile <b aria-hidden="true">›</b></small>
-                </span>
-                <span class="profile-edit" aria-hidden="true">✎</span>
-            </button>
-
+            <div class="main-menu-topbar">
+                <button class="profile-card" id="main-profile-card" type="button" onclick="openCustomizeProfile()" aria-label="Customize Your Style">
+                    <span class="profile-avatar-frame"><img id="main-profile-avatar" src="avatars/avatar-panda.jpg" alt="Avatar pemain"></span>
+                    <span class="profile-card-copy">
+                        <strong id="main-profile-name">Player</strong>
+                        <span id="main-profile-avatar-name">Panda</span>
+                        <small>Customize Profile <b aria-hidden="true">›</b></small>
+                    </span>
+                    <span class="profile-edit" aria-hidden="true">✎</span>
+                </button>
+                <nav class="main-menu-utilities" aria-label="Menu cepat">
+                    <button class="main-menu-utility-btn" id="main-info-btn" type="button" onclick="openGameInfo()" aria-label="Info" title="Info">
+                        <span class="main-info-icon" aria-hidden="true">ⓘ</span><span id="main-info-label">Info</span>
+                    </button>
+                    <button class="main-menu-utility-btn main-history-top-btn" id="main-history-top-btn" type="button" onclick="openHistory()" aria-label="History" title="History">
+                        <span class="main-utility-icon" aria-hidden="true">▤</span><span>History</span>
+                    </button>
+                    <button class="main-menu-utility-btn main-settings-btn" id="main-settings-btn" type="button" onclick="nav('screen-settings')" aria-label="Settings" title="Settings">
+                        <span aria-hidden="true">⚙</span><span>Settings</span>
+                    </button>
+                    <button id="btn-cache-refresh" type="button" onclick="forceFreshReload()" aria-label="Refresh dan ambil versi terbaru" title="Refresh versi terbaru">↻</button>
+                </nav>
+            </div>
             <div class="main-menu-center">
                 <div class="menu-emblem" aria-hidden="true"><span class="menu-tile menu-tile-left">發</span><span class="menu-tile menu-tile-center">中</span><span class="menu-tile menu-tile-right">✿</span></div>
                 <div class="brand-lockup">
@@ -62,10 +73,6 @@
                     <button class="btn btn-secondary main-history-btn history-menu-btn" onclick="openHistory()"><span class="history-menu-symbol" aria-hidden="true">↺</span>History</button>
                 </div>
             </div>
-
-            <button class="main-settings-btn" type="button" onclick="nav('screen-settings')">
-                <span aria-hidden="true">⚙</span><span>Settings</span>
-            </button>
         </section>
     </main>
 
