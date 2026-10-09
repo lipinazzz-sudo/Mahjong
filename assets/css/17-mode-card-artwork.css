@@ -3,13 +3,13 @@
 
 #screen-play .menu-actions.mode-actions{
   display:grid !important;
-  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  grid-template-columns:repeat(2,minmax(0,168px)) !important;
   justify-content:center !important;
   justify-items:center !important;
   align-items:start !important;
-  column-gap:clamp(14px,3vw,26px) !important;
+  column-gap:clamp(12px,2vw,20px) !important;
   row-gap:14px !important;
-  width:max-content !important;
+  width:fit-content !important;
   max-width:100% !important;
   margin-inline:auto !important;
 }
@@ -108,14 +108,14 @@
 }
 @media(max-width:900px){
   #screen-play .menu-actions.mode-actions{
-    width:max-content !important;
+    width:fit-content !important;
     max-width:100% !important;
     grid-template-columns:repeat(2,minmax(0,150px)) !important;
-    column-gap:clamp(14px,4vw,22px) !important;
+    column-gap:clamp(10px,2.8vw,18px) !important;
     justify-content:center !important;
   }
   #screen-play .menu-actions.mode-actions .mode-card{
-    width:clamp(128px,35vw,150px) !important;
+    width:150px !important;
     min-width:0 !important;
     max-width:100% !important;
     border-radius:10px !important;
@@ -123,13 +123,13 @@
 }
 @media(max-width:900px) and (orientation:landscape) and (max-height:620px){
   #screen-play .menu-actions.mode-actions{
-    width:max-content !important;
+    width:fit-content !important;
     max-width:100% !important;
-    grid-template-columns:repeat(2,minmax(0,150px)) !important;
-    column-gap:clamp(14px,3vw,22px) !important;
+    grid-template-columns:repeat(2,minmax(0,145px)) !important;
+    column-gap:12px !important;
   }
   #screen-play .menu-actions.mode-actions .mode-card{
-    width:clamp(118px,22vw,145px) !important;
+    width:145px !important;
     min-width:0 !important;
     max-width:100% !important;
   }
@@ -154,3 +154,26 @@
 
 
 /* Mobile card sizing and centering are handled in the responsive rules above. */
+
+/* Compact, centered two-card layout: equal columns, controlled gap, no stretching. */
+@media(max-width:560px){
+  #screen-play .menu-actions.mode-actions{
+    width:fit-content !important;
+    grid-template-columns:repeat(2,minmax(0,138px)) !important;
+    column-gap:10px !important;
+    justify-content:center !important;
+  }
+  #screen-play .menu-actions.mode-actions .mode-card{
+    width:138px !important;
+    max-width:100% !important;
+  }
+}
+@media(max-width:360px){
+  #screen-play .menu-actions.mode-actions{
+    grid-template-columns:repeat(2,minmax(0,124px)) !important;
+    column-gap:8px !important;
+  }
+  #screen-play .menu-actions.mode-actions .mode-card{
+    width:124px !important;
+  }
+}
