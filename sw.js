@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'mahjong-dj-score-guide-layout-fix-2026-10-09-1';
+const CACHE_VERSION = 'mahjong-dj-discard-reveal-and-ui-2026-10-09-1';
 const APP_SHELL = [
   './',
   './index.html',
@@ -31,6 +31,7 @@ const APP_SHELL = [
   './assets/css/10-game-background-underlay.css?v=20261009-1',
   './assets/css/11-iphone-safe-area.css?v=20261009-1',
   './assets/css/12-score-guide-layout-fix.css?v=20261009-1',
+  './assets/css/13-gameplay-ui-and-discard-reveal.css?v=20261009-1',
 ];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE_VERSION).then(cache => cache.addAll(APP_SHELL).catch(()=>{}))); self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE_VERSION).map(k=>caches.delete(k))))); self.clients.claim(); });
