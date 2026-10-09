@@ -1,0 +1,9 @@
+/* Gameplay outer underlay — presentation only.
+   This image sits behind the existing table-plane, so the table surface,
+   tiles, seats, HUD and gameplay DOM remain unchanged. */
+.screen#screen-game{
+  background:
+    linear-gradient(180deg,rgba(2,5,5,.46) 0%,rgba(0,0,0,.68) 100%),
+    url("../backgrounds/bg-game.jpg") center center / cover no-repeat !important;
+  background-color:#080908 !important;
+}
