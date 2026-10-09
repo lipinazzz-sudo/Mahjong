@@ -1243,7 +1243,7 @@ function evaluateHK(pIdx,winningTile,isTsumo=false){
   };
 }
 function drawTile(){if(!fullDeck.length)return null;return fullDeck.pop()}
-function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKey='';advisorKnownCache=null;
+function setupRound(){cancelDiscardRevealWait();cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKey='';advisorKnownCache=null;
   actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;activeActionFeedback=null;lastActionFeedbackId='';
   activeCallId=nextMpCallId('TURN');
   mpPendingCalls=[];
@@ -1254,7 +1254,7 @@ function setupRound(){cancelAiTurn();assistantDecisionKey='';advisorKnownCacheKe
   currentTurn=currentDealerIdx;drawnTile=null;renderTable();processTurn();
   if(typeof gameChatRefreshVisibility==='function')gameChatRefreshVisibility();
 }
-function start4PGame(diff='Medium',multi=false){hideRoundTransition();mpHistoryRounds=[];mpHistorySavedKeys=new Set();mpHistoryCompletedMatch=null;mpHistoryMatchStartedAt=Date.now();mpHistoryMatchId=multi&&mp.host?`${mp.room?.code||'Multiplayer'}-${mpHistoryMatchStartedAt}`:null;activeRemoteActions=null;mpPendingCalls=[];activeActionFeedback=null;actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;lastActionFeedbackId='';activeCallId=null;mpCallSeq=0;mpActionSeq=0;mpProcessedActionIds=new Set();cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
+function start4PGame(diff='Medium',multi=false){cancelDiscardRevealWait();hideRoundTransition();mpHistoryRounds=[];mpHistorySavedKeys=new Set();mpHistoryCompletedMatch=null;mpHistoryMatchStartedAt=Date.now();mpHistoryMatchId=multi&&mp.host?`${mp.room?.code||'Multiplayer'}-${mpHistoryMatchStartedAt}`:null;activeRemoteActions=null;mpPendingCalls=[];activeActionFeedback=null;actionFeedbackToken++;clearTimeout(actionFeedbackTimer);actionFeedbackTimer=null;lastActionFeedbackId='';activeCallId=null;mpCallSeq=0;mpActionSeq=0;mpProcessedActionIds=new Set();cancelAiTurn();clearGameTimers();gameTurnEpoch++;if(!multi){stopMpGameWatchdog();lastHostServerSeq=0;}
   aiMoveTimer&&clearTimeout(aiMoveTimer);clearInterval(turnTimer);isMultiplayerMode=!!multi;roundActive=false;roundEnding=false;currentRoundIndex=0;currentDealerIdx=1;currentTurn=currentDealerIdx;
   if(!multi){
     mp.seat=0;mp.room=null;mp.host=true;mp.connected=false;mp.playerAvatar=selectedAvatar;
@@ -1836,21 +1836,44 @@ function finishCallWindow(){
   }
   promptNextCall();
 }
+let discardRevealTimer=null,discardRevealToken=0;
+function cancelDiscardRevealWait(){
+  clearTimeout(discardRevealTimer);
+  discardRevealTimer=null;
+  discardRevealToken++;
+}
 function commitDiscard(p,tile){
   if(!roundActive||roundEnding||!tile)return;
-  clearInterval(turnTimer);stopCallWindow();isDiscardable=false;
+
+  // Reveal every discard to all seats before allowing any call or AI response.
+  cancelDiscardRevealWait();
+  const revealToken=discardRevealToken;
+  clearInterval(turnTimer);turnTimer=null;stopCallWindow();isDiscardable=false;
+  hideAvailableActions();
   playerRivers[p].push(tile);lastDiscardedTile=tile;lastDiscarderIdx=p;playSfx('discard');renderTable();
-  const claims=[];
   const callId=nextMpCallId('CALL');
   activeCallId=callId;
-  for(const q of [0,1,2,3]){
-    if(q===p)continue;
-    const actions=getDiscardCallOptions(q,tile);
-    if(actions.length)claims.push({seat:q,actions,callId});
-  }
-  mpPendingCalls=claims;pendingCallChoice=null;
-  if(mpPendingCalls.length){promptNextCall();return}
-  mpBroadcastState();nextTurn();
+  mpPendingCalls=[];pendingCallChoice=null;
+
+  // Publish the river immediately with no actionable claims; the one-second
+  // reveal window starts after renderTable so everyone can identify the tile.
+  mpBroadcastState({remoteActions:[]});
+  discardRevealTimer=setTimeout(()=>{
+    if(revealToken!==discardRevealToken)return;
+    discardRevealTimer=null;
+    if(!roundActive||roundEnding||lastDiscarderIdx!==p||lastDiscardedTile?.uniqueId!==tile.uniqueId)return;
+
+    const claims=[];
+    for(const q of [0,1,2,3]){
+      if(q===p)continue;
+      const actions=getDiscardCallOptions(q,tile);
+      if(actions.length)claims.push({seat:q,actions,callId});
+    }
+    mpPendingCalls=claims;pendingCallChoice=null;
+    if(mpPendingCalls.length){promptNextCall();return}
+    mpBroadcastState({remoteActions:[]});
+    nextTurn();
+  },1000);
 }
 function promptNextCall(resumeRuntime=false){
   if(!mpPendingCalls.length){
