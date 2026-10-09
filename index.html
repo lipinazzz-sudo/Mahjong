@@ -37,6 +37,7 @@
 <link rel="stylesheet" href="assets/css/11-iphone-safe-area.css?v=20261009-1">
 <link rel="stylesheet" href="assets/css/12-score-guide-layout-fix.css?v=20261009-1">
 <link rel="stylesheet" href="assets/css/13-gameplay-ui-and-discard-reveal.css?v=20261009-4">
+<link rel="stylesheet" href="assets/css/14-main-menu-score-guide-layout.css?v=20261009-1">
 </head>
 <body>
     <audio id="bg-music" loop preload="auto" aria-hidden="true"></audio>
@@ -54,8 +55,9 @@
                     <span class="profile-edit" aria-hidden="true">✎</span>
                 </button>
                 <nav class="main-menu-utilities" aria-label="Menu cepat">
-                    <button class="main-menu-utility-btn" id="main-info-btn" type="button" onclick="openGameInfo()" aria-label="Info"><span class="main-info-icon" aria-hidden="true">ⓘ</span></button>
+                    <button class="main-menu-utility-btn main-history-top-btn" id="main-history-top-btn" type="button" onclick="openHistory()" aria-label="History"><span class="history-menu-symbol" aria-hidden="true">↺</span></button>
                     <button class="main-menu-utility-btn main-stats-top-btn" id="main-stats-top-btn" type="button" onclick="openPlayerStatistics()" aria-label="Statistics"><span class="main-utility-icon" aria-hidden="true">▥</span></button>
+                    <button class="main-menu-utility-btn" id="main-info-btn" type="button" onclick="openGameInfo()" aria-label="Info"><span class="main-info-icon" aria-hidden="true">ⓘ</span></button>
                     <button class="main-menu-utility-btn main-settings-btn" id="main-settings-btn" type="button" onclick="nav('screen-settings')" aria-label="Settings"><span aria-hidden="true">⚙</span></button>
                     <button id="btn-cache-refresh" type="button" onclick="forceFreshReload()" aria-label="Refresh dan ambil versi terbaru">↻</button>
                 </nav>
@@ -69,7 +71,6 @@
                 </div>
                 <div class="menu-actions main-menu-actions">
                     <button class="btn btn-primary main-play-btn" onclick="nav('screen-play')">Play Game</button>
-                    <button class="btn btn-secondary main-history-btn history-menu-btn" onclick="openHistory()"><span class="history-menu-symbol" aria-hidden="true">↺</span>History</button>
                 </div>
             </div>
         </section>
