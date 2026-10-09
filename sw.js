@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'mahjong-dj-mainlux-icons-2026-10-09';
+const CACHE_VERSION = 'mahjong-dj-toolbar-uniform-2026-10-09';
 const APP_SHELL = [
   './',
   './index.html',
