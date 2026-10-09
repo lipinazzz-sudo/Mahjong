@@ -1836,10 +1836,11 @@ function finishCallWindow(){
   }
   promptNextCall();
 }
-let discardRevealTimer=null,discardRevealToken=0;
+let discardRevealTimer=null,discardRevealToken=0,discardRevealActive=false;
 function cancelDiscardRevealWait(){
   clearTimeout(discardRevealTimer);
   discardRevealTimer=null;
+  discardRevealActive=false;
   discardRevealToken++;
 }
 function commitDiscard(p,tile){
@@ -1853,7 +1854,7 @@ function commitDiscard(p,tile){
   playerRivers[p].push(tile);lastDiscardedTile=tile;lastDiscarderIdx=p;playSfx('discard');renderTable();
   const callId=nextMpCallId('CALL');
   activeCallId=callId;
-  mpPendingCalls=[];pendingCallChoice=null;
+  mpPendingCalls=[];pendingCallChoice=null;discardRevealActive=true;
 
   // Publish the river immediately with no actionable claims; the one-second
   // reveal window starts after renderTable so everyone can identify the tile.
@@ -1861,6 +1862,7 @@ function commitDiscard(p,tile){
   discardRevealTimer=setTimeout(()=>{
     if(revealToken!==discardRevealToken)return;
     discardRevealTimer=null;
+    discardRevealActive=false;
     if(!roundActive||roundEnding||lastDiscarderIdx!==p||lastDiscardedTile?.uniqueId!==tile.uniqueId)return;
 
     const claims=[];
@@ -3555,7 +3557,7 @@ function stopMpGameWatchdog(){
   clearInterval(mpGameWatchdogTimer);
   mpGameWatchdogTimer=null;
 }
-function mpStateSnapshot(extra={}){const hasRemote=Object.prototype.hasOwnProperty.call(extra,'remoteActions');if(hasRemote)activeRemoteActions=extra.remoteActions;const hasFeedback=Object.prototype.hasOwnProperty.call(extra,'actionFeedback');if(hasFeedback)activeActionFeedback=extra.actionFeedback||null;return{currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,playerHands,playerRivers,playerMelds,playerScores,lastDiscardedTile,lastDiscarderIdx,drawnTile,secondsLeft,timeBank,actionSecondsLeft,isActionPhase,isDiscardable,pendingCalls:mpPendingCalls,roundActive,roundEnding,roomPlayers:mp.room?.players||[],aiSeats:[...aiSeats],playerAvatars:[...playerAvatars],actionContextId:activeCallId,remoteActions:activeRemoteActions,actionFeedback:activeActionFeedback,historyRounds:mpHistoryRounds.slice(0,4),historyMatchId:mpHistoryMatchId,historyMatch:mpHistoryCompletedMatch,...extra}}
+function mpStateSnapshot(extra={}){const hasRemote=Object.prototype.hasOwnProperty.call(extra,'remoteActions');if(hasRemote)activeRemoteActions=extra.remoteActions;const hasFeedback=Object.prototype.hasOwnProperty.call(extra,'actionFeedback');if(hasFeedback)activeActionFeedback=extra.actionFeedback||null;return{currentRoundIndex,currentDealerIdx,currentTurn,fullDeck,playerHands,playerRivers,playerMelds,playerScores,lastDiscardedTile,lastDiscarderIdx,drawnTile,secondsLeft,timeBank,actionSecondsLeft,isActionPhase,isDiscardable,pendingCalls:mpPendingCalls,discardRevealActive,roundActive,roundEnding,roomPlayers:mp.room?.players||[],aiSeats:[...aiSeats],playerAvatars:[...playerAvatars],actionContextId:activeCallId,remoteActions:activeRemoteActions,actionFeedback:activeActionFeedback,historyRounds:mpHistoryRounds.slice(0,4),historyMatchId:mpHistoryMatchId,historyMatch:mpHistoryCompletedMatch,...extra}}
 function mpBroadcastState(extra={}){const state=mpStateSnapshot(extra);if(isMultiplayerMode&&mp.host){mpSaveActiveGameState(state);mpTouchSession()}if(isMultiplayerMode&&mp.host&&mp.connected)mpSend('state',{state})}
 function mpApplyRemoteState(state){
   if(mp.host)return;
@@ -3636,6 +3638,7 @@ function mpApplyRemoteState(state){
   isDiscardable=
     roundActive&&
     !roundEnding&&
+    !state.discardRevealActive&&
     currentTurn===(mp.seat??0)&&
     !stateHasRemoteCallForLocalGuest;
 
@@ -3676,7 +3679,13 @@ function mpApplyRemoteState(state){
     if(!localActionStillOpen&&!localTurnStillActive)clearGuestActionRetry();
   }
 
-  if(!feedbackActive&&
+  if(!feedbackActive&&state.discardRevealActive){
+    isDiscardable=false;
+    isActionPhase=false;
+    hideAvailableActions();
+    setText('hand-status-main',hkLanguage==='id'?'Tile baru dibuang':'Tile just discarded');
+    setText('hand-status-sub',hkLanguage==='id'?'Tunggu sebentar sebelum aksi berikutnya.':'Wait briefly before the next action.');
+  }else if(!feedbackActive&&
     state.remoteActions?.callId===activeCallId&&
     state.remoteActions?.seat===(mp.seat??0)&&
     Array.isArray(state.remoteActions.actions)&&
@@ -3722,7 +3731,7 @@ function mpApplyRemoteState(state){
 }
 function roomCanAct(seat){return !!(mp.room?.players?.[seat] || seat===mp.seat || (mp.host&&seat===0))}
 function mpHandlePlayerAction(seat,action){
-  if(!mp.host||!roundActive||!roomCanAct(seat))return;
+  if(!mp.host||!roundActive||!roomCanAct(seat)||discardRevealActive)return;
   if(!action||typeof action!=='object')return;
 
   const incomingCallId=String(action.callId||'').trim();
