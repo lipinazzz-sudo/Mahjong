@@ -1,0 +1,221 @@
+/* Mahjong DJ visual harmony pass — additive presentation only.
+   Obsidian charcoal, smoked bronze and champagne-gold across interface panels.
+   Action buttons keep their distinct Chi/Pon/Kan/Ron meaning colors. */
+
+/* A shared warm obsidian surface language for game panels. */
+#screen-game #game-board{
+  --mahjong-panel-top:rgba(34,26,19,.97);
+  --mahjong-panel-bottom:rgba(9,8,8,.985);
+  --mahjong-panel-border:rgba(225,184,100,.36);
+  --mahjong-panel-inset:rgba(255,241,202,.055);
+}
+
+/* The Score Guide frame was showing only its right border; restore the full
+   champagne edge and clip its contents to a proper rounded rectangle. */
+#screen-game #game-board #score-guide-drawer{
+  border:1px solid rgba(230,190,111,.50) !important;
+  border-radius:16px !important;
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(223,173,79,.10),transparent 42%),
+    linear-gradient(145deg,rgba(35,26,18,.985),rgba(10,9,8,.995) 70%) !important;
+  background-clip:padding-box !important;
+  box-shadow:
+    0 18px 42px rgba(0,0,0,.58),
+    0 0 0 1px rgba(239,202,126,.06),
+    0 0 20px rgba(201,151,64,.07),
+    inset 0 1px 0 rgba(255,242,203,.08) !important;
+  isolation:isolate;
+  overflow:hidden !important;
+}
+#screen-game #game-board #score-guide-drawer .score-guide-drawer-head{
+  border-bottom-color:rgba(228,186,103,.18) !important;
+}
+#screen-game #game-board #score-guide-drawer .score-guide-grid{
+  padding:2px 5px 5px 1px !important;
+  scrollbar-color:rgba(202,160,83,.55) rgba(12,10,9,.55);
+}
+#screen-game #game-board #score-guide-drawer .score-guide-grid > div{
+  border-bottom-color:rgba(229,190,113,.10) !important;
+}
+
+/* Game action and informational panels use the same smoked-metal treatment. */
+#screen-game #game-board #action-overlay,
+#screen-game #game-board .action-announce,
+#screen-game #game-board .round-transition-card,
+#screen-game #game-board .smart-assistant,
+#screen-game #game-board .player-seat .game-chat-bubble{
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(219,174,83,.085),transparent 43%),
+    linear-gradient(150deg,rgba(34,26,19,.975),rgba(8,8,8,.99)) !important;
+  border-color:rgba(229,190,110,.48) !important;
+  box-shadow:
+    0 16px 34px rgba(0,0,0,.48),
+    0 0 15px rgba(200,151,65,.055),
+    inset 0 1px 0 rgba(255,241,204,.075) !important;
+}
+#screen-game #game-board .round-transition-card{
+  border-radius:15px !important;
+}
+#screen-game #game-board .action-announce{
+  border-color:var(--action-border,rgba(229,190,110,.58)) !important;
+  box-shadow:
+    0 14px 30px rgba(0,0,0,.48),
+    0 0 16px var(--action-glow,rgba(200,151,65,.10)),
+    inset 0 1px 0 rgba(255,241,204,.075) !important;
+}
+#screen-game #game-board #action-overlay{
+  border-radius:13px !important;
+}
+#screen-game #game-board .smart-assistant{
+  border-radius:11px !important;
+}
+#screen-game #game-board #game-chat-panel{
+  border:1px solid rgba(229,190,110,.42) !important;
+  border-radius:15px !important;
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(219,174,83,.08),transparent 44%),
+    linear-gradient(150deg,rgba(32,25,19,.985),rgba(8,8,8,.995)) !important;
+  box-shadow:0 24px 54px rgba(0,0,0,.62),0 0 16px rgba(200,151,65,.06),inset 0 1px 0 rgba(255,241,204,.065) !important;
+}
+#screen-game #game-board #game-chat-head{
+  background:linear-gradient(180deg,rgba(216,171,87,.09),rgba(10,9,8,.02)) !important;
+  border-bottom-color:rgba(228,186,103,.20) !important;
+}
+#screen-game #game-board #game-chat-form{
+  background:linear-gradient(180deg,rgba(16,13,11,.60),rgba(6,6,6,.82)) !important;
+  border-top-color:rgba(228,186,103,.18) !important;
+}
+
+/* Dialog shells: retain each dialog's own size and behavior, unify surface tone. */
+#modal-game-info .modal-box,
+#modal-ai-level .modal-box,
+#modal-player-stats .modal-box,
+#modal-avatar-picker .profile-style-box,
+#modal-lobby .lobby-box,
+#modal-history .history-box,
+#modal-history-detail .history-box,
+#modal-history-round .history-box,
+#modal-result .result-modal-box,
+#modal-match-over .result-modal-box,
+#screen-settings .settings-card,
+#screen-play .screen-card{
+  border-color:rgba(229,190,110,.38) !important;
+  box-shadow:0 28px 82px rgba(0,0,0,.64),inset 0 1px 0 rgba(255,241,204,.065) !important;
+}
+#modal-game-info .modal-box,
+#modal-ai-level .modal-box,
+#modal-player-stats .modal-box{
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(218,170,75,.09),transparent 44%),
+    linear-gradient(145deg,#251c15,#0b0908 76%) !important;
+}
+#modal-avatar-picker .profile-style-box{
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(218,170,75,.09),transparent 44%),
+    linear-gradient(145deg,#241b15,#0a0908 78%) !important;
+}
+#modal-lobby .lobby-box{
+  background-image:
+    linear-gradient(155deg,rgba(31,23,17,.88),rgba(7,7,7,.96)),
+    url('../backgrounds/bg-lobby.jpg') !important;
+  background-position:center !important;
+  background-size:cover !important;
+}
+#modal-history .history-box,
+#modal-history-detail .history-box,
+#modal-history-round .history-box,
+#modal-result .result-modal-box,
+#modal-match-over .result-modal-box{
+  background-image:
+    radial-gradient(ellipse at 50% 0%,rgba(218,170,75,.09),transparent 44%),
+    linear-gradient(145deg,rgba(34,25,18,.90),rgba(7,7,7,.97)),
+    url('../backgrounds/bg-result.jpg') !important;
+  background-position:center !important;
+  background-size:cover !important;
+}
+
+/* Secondary cards inside dialogs: black-brown glass with quiet gold edges. */
+#modal-lobby .p2p-card,
+#modal-lobby .room-share-card,
+#modal-lobby .ready-item,
+#modal-lobby .reconnect-card,
+#modal-history .history-row,
+#modal-history-detail .history-card,
+#modal-history-detail .history-score-line,
+#modal-history-round .history-round-selector,
+#modal-history-round .history-round-hand-card,
+#modal-history-round .history-round-score-card,
+#modal-result .result-summary,
+#modal-result .result-winning-hand-section,
+#modal-result .result-score-list,
+#modal-match-over .result-score-list,
+#modal-avatar-picker .style-section,
+#screen-settings .settings-row,
+#screen-settings .settings-pair .settings-row{
+  background:linear-gradient(145deg,rgba(33,25,18,.78),rgba(9,8,8,.90)) !important;
+  border-color:rgba(225,184,100,.19) !important;
+}
+#modal-history .history-row:hover{
+  background:linear-gradient(145deg,rgba(48,35,22,.90),rgba(13,10,8,.96)) !important;
+  border-color:rgba(232,194,111,.48) !important;
+}
+#modal-history-detail .history-card-title,
+#modal-history .history-kicker,
+#modal-history .history-result,
+#modal-history .history-score,
+#modal-history-detail .history-score-line strong,
+#modal-history-round .history-points{
+  color:#f0cf82 !important;
+}
+#modal-history-round .history-round-tab,
+#modal-history-detail .history-round-tab{
+  background:linear-gradient(145deg,rgba(34,26,19,.86),rgba(9,8,8,.95)) !important;
+  border-color:rgba(225,184,100,.24) !important;
+}
+#modal-history-round .history-round-tab.active,
+#modal-history-detail .history-round-tab.active{
+  background:linear-gradient(180deg,#edca79,#bd842f) !important;
+  color:#211507 !important;
+  border-color:#f2dba4 !important;
+}
+#modal-result .btn-secondary,
+#modal-match-over .btn-secondary{
+  background:linear-gradient(145deg,rgba(35,25,18,.92),rgba(9,8,8,.98)) !important;
+  border-color:rgba(226,186,103,.34) !important;
+}
+#modal-lobby .p2p-card-title,
+#modal-result .result-section-title{
+  color:#e8c77f !important;
+}
+
+/* V26 info, stats and tutorial cards share the same warm charcoal material. */
+#modal-game-info .v26-info-card,
+#modal-ai-level .v26-ai-level-btn,
+#modal-player-stats .v26-stat-card,
+#modal-player-stats .v26-achievement-card,
+#modal-game-info .v26-tutorial-visual,
+#modal-game-info .v26-tutorial-home{
+  background:linear-gradient(145deg,rgba(35,26,19,.82),rgba(9,8,8,.94)) !important;
+  border-color:rgba(225,184,100,.23) !important;
+}
+#modal-game-info .v26-tutorial-visual{
+  box-shadow:inset 0 1px 0 rgba(255,241,204,.045) !important;
+}
+
+/* Soft bronze trim replaces the remaining deep-green surfaces in profile and
+   settings controls without changing state colors or interaction semantics. */
+#modal-avatar-picker .avatar-option-picker,
+#modal-avatar-picker .style-choice-select,
+#modal-avatar-picker .avatar-picker-preview,
+#screen-settings .settings-pair .toggle-btn{
+  background:linear-gradient(145deg,rgba(33,26,20,.94),rgba(9,8,8,.98)) !important;
+  border-color:rgba(225,184,100,.25) !important;
+}
+#modal-avatar-picker .avatar-option-picker.selected{
+  background:linear-gradient(145deg,rgba(92,62,25,.96),rgba(35,22,12,.98)) !important;
+  border-color:#efc768 !important;
+}
+#screen-settings .settings-row:nth-of-type(2)::before,
+#screen-settings .settings-row:nth-of-type(4)::before{
+  background:#15100c !important;
+}
