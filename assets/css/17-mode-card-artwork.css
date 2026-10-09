@@ -4,11 +4,13 @@
 #screen-play .menu-actions.mode-actions{
   display:grid !important;
   grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  justify-content:center !important;
   justify-items:center !important;
   align-items:start !important;
-  gap:clamp(8px,1.5vw,14px) !important;
-  row-gap:12px !important;
-  width:min(100%,720px) !important;
+  column-gap:clamp(14px,3vw,26px) !important;
+  row-gap:14px !important;
+  width:max-content !important;
+  max-width:100% !important;
   margin-inline:auto !important;
 }
 #screen-play .menu-actions.mode-actions .mode-card{
@@ -104,24 +106,32 @@
   box-shadow:none !important;
   font-size:13px !important;
 }
-@media(max-width:560px){
+@media(max-width:900px){
   #screen-play .menu-actions.mode-actions{
-    gap:8px !important;
-    width:100% !important;
+    width:max-content !important;
+    max-width:100% !important;
+    grid-template-columns:repeat(2,minmax(0,150px)) !important;
+    column-gap:clamp(14px,4vw,22px) !important;
+    justify-content:center !important;
   }
   #screen-play .menu-actions.mode-actions .mode-card{
-    width:min(90px,100%) !important;
-    max-width:90px !important;
-    border-radius:8px !important;
+    width:clamp(128px,35vw,150px) !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    border-radius:10px !important;
   }
 }
-@media(orientation:landscape) and (max-height:620px){
+@media(max-width:900px) and (orientation:landscape) and (max-height:620px){
   #screen-play .menu-actions.mode-actions{
-    width:min(100%,620px) !important;
-    gap:8px !important;
+    width:max-content !important;
+    max-width:100% !important;
+    grid-template-columns:repeat(2,minmax(0,150px)) !important;
+    column-gap:clamp(14px,3vw,22px) !important;
   }
   #screen-play .menu-actions.mode-actions .mode-card{
-    width:min(100%,clamp(112px,17vw,180px)) !important;
+    width:clamp(118px,22vw,145px) !important;
+    min-width:0 !important;
+    max-width:100% !important;
   }
 }
 @media(prefers-reduced-motion:reduce){
@@ -143,20 +153,4 @@
 }
 
 
-/* Enforce the requested 90px phone width even in short landscape viewports. */
-@media(max-width:900px){
-  #screen-play .menu-actions.mode-actions .mode-card{
-    width:90px !important;
-    min-width:90px !important;
-    max-width:90px !important;
-  }
-}
-
-/* Phone/tablet landscape can exceed 560 CSS px: force 90px card width there too. */
-@media(max-width:900px){
-  #screen-play .menu-actions.mode-actions .mode-card{
-    width:90px !important;
-    min-width:90px !important;
-    max-width:90px !important;
-  }
-}
+/* Mobile card sizing and centering are handled in the responsive rules above. */
