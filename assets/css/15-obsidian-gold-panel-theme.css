@@ -219,3 +219,59 @@
 #screen-settings .settings-row:nth-of-type(4)::before{
   background:#15100c !important;
 }
+
+
+/* Final micro-adjustments requested: raise Play Game by 3px and widen the
+   profile card by 4px on screen while preserving the established 90% scale. */
+#screen-main .main-menu-center{
+  bottom:calc(max(env(safe-area-inset-bottom, 0px), clamp(12px, 2.8vh, 30px)) + 3px) !important;
+}
+@media(max-width:800px){
+  #screen-main .main-menu-center{
+    bottom:calc(max(env(safe-area-inset-bottom, 0px), clamp(10px, 2.4vh, 24px)) + 3px) !important;
+  }
+}
+@media(max-width:560px){
+  #screen-main .main-menu-center{
+    bottom:calc(max(env(safe-area-inset-bottom, 0px), clamp(9px, 2.1vh, 21px)) + 3px) !important;
+  }
+}
+@media(max-width:380px){
+  #screen-main .main-menu-center{
+    bottom:calc(max(env(safe-area-inset-bottom, 0px), clamp(7px, 1.6vh, 14px)) + 3px) !important;
+  }
+}
+@media(orientation:landscape) and (max-height:650px){
+  #screen-main .main-menu-center{
+    bottom:calc(max(env(safe-area-inset-bottom, 0px), clamp(6px, 1.5vh, 12px)) + 3px) !important;
+  }
+}
+#screen-main .profile-card{
+  flex-basis:213.78px !important;
+  width:min(213.78px, calc(18.4vw + 7.78px)) !important;
+  min-width:170.78px !important;
+  max-width:213.78px !important;
+}
+@media(max-width:800px){
+  #screen-main .profile-card{
+    flex-basis:175.78px !important;
+    width:175.78px !important;
+    min-width:146.78px !important;
+    max-width:175.78px !important;
+  }
+}
+@media(max-width:560px){
+  #screen-main .profile-card{
+    flex-basis:121.78px !important;
+    width:121.78px !important;
+    min-width:0 !important;
+    max-width:121.78px !important;
+  }
+}
+@media(max-width:360px){
+  #screen-main .profile-card{
+    flex-basis:108.78px !important;
+    width:108.78px !important;
+    max-width:108.78px !important;
+  }
+}
