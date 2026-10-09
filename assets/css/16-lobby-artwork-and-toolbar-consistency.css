@@ -48,19 +48,22 @@
 /* Multiplayer lobby: make the background image genuinely visible. The
    surrounding modal remains slightly dimmed, but no longer heavily blurred. */
 #modal-lobby{
-  background:rgba(0,0,0,.36) !important;
-  -webkit-backdrop-filter:blur(1.4px) !important;
-  backdrop-filter:blur(1.4px) !important;
+  background:
+    linear-gradient(145deg,rgba(5,5,7,.28),rgba(5,5,7,.42)),
+    url('../backgrounds/bg-lobby.jpg') center center / cover no-repeat !important;
+  background-attachment:fixed !important;
+  -webkit-backdrop-filter:blur(1px) !important;
+  backdrop-filter:blur(1px) !important;
 }
 #modal-lobby .lobby-box{
   background:
-    linear-gradient(145deg,rgba(20,14,11,.32),rgba(6,6,7,.53)),
-    url('../backgrounds/bg-lobby.jpg') center/cover no-repeat !important;
+    linear-gradient(145deg,rgba(20,14,11,.22),rgba(6,6,7,.38)),
+    url('../backgrounds/bg-lobby.jpg') center center / cover no-repeat !important;
   background-blend-mode:normal !important;
   border-color:rgba(229,190,110,.48) !important;
   box-shadow:0 28px 82px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,241,204,.10) !important;
-  -webkit-backdrop-filter:blur(1.2px) saturate(.98) !important;
-  backdrop-filter:blur(1.2px) saturate(.98) !important;
+  -webkit-backdrop-filter:blur(.6px) saturate(.99) !important;
+  backdrop-filter:blur(.6px) saturate(.99) !important;
 }
 #modal-lobby .p2p-card,
 #modal-lobby .room-share-card,
