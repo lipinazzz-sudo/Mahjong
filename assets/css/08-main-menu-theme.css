@@ -94,7 +94,7 @@
   width:72px;height:65px;padding:6px 4px;border:1px solid rgba(239,193,92,.76);border-radius:17px;
   color:#f2d8a0;background:linear-gradient(150deg,rgba(29,23,18,.96),rgba(5,6,8,.98));
   box-shadow:0 8px 20px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,242,207,.15),0 0 13px rgba(232,173,55,.07);
-  font:850 10px/1.05 inherit;letter-spacing:.025em;text-shadow:0 1px 6px rgba(0,0,0,.9);cursor:pointer;touch-action:manipulation;
+  font-family:inherit;font-size:10px;font-weight:850;line-height:1.05;letter-spacing:.025em;text-shadow:0 1px 6px rgba(0,0,0,.9);cursor:pointer;touch-action:manipulation;
   transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;
 }
 #screen-main .main-menu-utility-btn>span:first-child{display:grid;place-items:center;width:30px;height:30px;color:#ffcf73;font-size:22px;line-height:1;text-shadow:0 0 13px rgba(255,191,67,.3);}
