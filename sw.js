@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'mahjong-dj-mode-card-solid-lobby-2026-10-09-3';
+const CACHE_VERSION = 'mahjong-dj-mode-card-90px-phone-2026-10-09-4';
 const APP_SHELL = [
   './',
   './index.html',
@@ -35,7 +35,7 @@ const APP_SHELL = [
   './assets/css/14-main-menu-score-guide-layout.css?v=20261009-1',
   './assets/css/15-obsidian-gold-panel-theme.css?v=20261009-2',
   './assets/css/16-lobby-artwork-and-toolbar-consistency.css?v=20261009-3',
-  './assets/css/17-mode-card-artwork.css?v=20261009-3',
+  './assets/css/17-mode-card-artwork.css?v=20261009-4',
   './assets/backgrounds/card-vs-ai.webp',
   './assets/backgrounds/card-multiplayer.webp',
 ];
