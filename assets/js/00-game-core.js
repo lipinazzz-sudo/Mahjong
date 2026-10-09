@@ -443,9 +443,12 @@ async function historyPersistRemoteState(state){
   if(state.historyMatchId)mpHistoryMatchId=String(state.historyMatchId);
   if(Array.isArray(state.historyRounds))mpHistoryRounds=state.historyRounds.slice(0,4);
   if(state.historyMatch){
-    mpHistoryCompletedMatch=state.historyMatch;
-    mpHistoryRounds=Array.isArray(state.historyMatch.rounds)?state.historyMatch.rounds.slice():mpHistoryRounds;
-    await historyPut(state.historyMatch);
+    const shared=state.historyMatch;
+    const localSeat=Number.isInteger(mp.seat)?mp.seat:0;
+    const match={...shared,mode:historyMatchMode(shared),localSeat,localRank:historyRankForScores(shared.finalScores,localSeat)};
+    mpHistoryCompletedMatch=match;
+    mpHistoryRounds=Array.isArray(match.rounds)?match.rounds.slice():mpHistoryRounds;
+    await historyPut(match);
     return true;
   }
   if(state.phase==='matchFinished'&&mpHistoryRounds.length>=4){
@@ -3477,7 +3480,7 @@ function mpHandle(msg){
     return
   }
   if(msg.type==='startGame'){
-    mpHistoryRounds=[];mpHistorySavedKeys=new Set();mpHistoryMatchStartedAt=Date.now();
+    mpHistoryRounds=[];mpHistorySavedKeys=new Set();mpHistoryMatchStartedAt=Date.now();mpHistoryLocalSeat=Number.isInteger(mp.seat)?mp.seat:0;
     mp.started=true;mpServerStarted=true;if(mp.room)mp.room.started=true;mpTouchSession(true);setDisplay('modal-lobby','none');setDisplay('modal-match-over','none');setDisplay('modal-result','none');nav('screen-game');playGameMusic();
     if(mpRejoinMode||mpRejoinStateApplied){
       if(mp.host&&mpRejoinMode&&!mpRejoinStateApplied&&mpRejoinJoined&&mpRejoinFallbackState){
