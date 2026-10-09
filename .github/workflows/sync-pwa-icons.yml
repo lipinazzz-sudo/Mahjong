@@ -1,0 +1,85 @@
+name: Sync PWA icons with Mahjong DJ logo
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'IMG_6682.PNG'
+      - '.github/workflows/sync-pwa-icons.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync-icons:
+    name: Build the 192px and 512px app icons
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Generate PNG icons and refresh the Service Worker cache key
+        run: |
+          python -m pip install --disable-pip-version-check pillow
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import os
+          import re
+
+          source_path = Path("IMG_6682.PNG")
+          source = Image.open(source_path).convert("RGB")
+          if source.width != source.height:
+              raise SystemExit(
+                  f"Expected a square app logo, received {source.size}; no crop was applied."
+              )
+
+          for size in (192, 512):
+              resized = source.resize((size, size), Image.Resampling.LANCZOS)
+              icon = resized.quantize(
+                  colors=128,
+                  method=Image.Quantize.MEDIANCUT,
+                  dither=Image.Dither.NONE
+              )
+              icon.save(
+                  Path(f"icons/icon-{size}.png"),
+                  format="PNG",
+                  optimize=True,
+                  compress_level=9
+              )
+
+          sw_path = Path("sw.js")
+          sw = sw_path.read_text(encoding="utf-8")
+          pattern = r"const CACHE_VERSION = '[^']+';"
+          version = f"const CACHE_VERSION = 'mahjong-dj-logo-{os.environ['GITHUB_SHA'][:8]}';"
+          if not re.search(pattern, sw):
+              raise SystemExit("CACHE_VERSION declaration was not found; no commit made.")
+          sw_path.write_text(re.sub(pattern, version, sw, count=1), encoding="utf-8")
+
+          for size in (192, 512):
+              path = Path(f"icons/icon-{size}.png")
+              with Image.open(path) as check:
+                  if check.format != "PNG" or check.size != (size, size):
+                      raise SystemExit(f"Invalid output icon: {path}")
+              print(f"{path}: {path.stat().st_size} bytes")
+          print(version)
+          PY
+
+      - name: Commit the synchronized icons
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add icons/icon-192.png icons/icon-512.png sw.js
+          if git diff --cached --quiet; then
+            echo "PWA icons are already synchronized."
+            exit 0
+          fi
+          git commit -m "sync PWA icons with approved Mahjong DJ logo"
+          git push origin HEAD:main
