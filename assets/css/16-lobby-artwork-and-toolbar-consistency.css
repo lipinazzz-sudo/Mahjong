@@ -72,3 +72,16 @@
   background:linear-gradient(145deg,rgba(21,15,12,.72),rgba(7,7,8,.79)) !important;
   border-color:rgba(229,190,110,.25) !important;
 }
+
+
+/* Keep the lobby backdrop visible outside the dialog, but give the inner
+   Multiplayer panel an opaque, solid obsidian surface. Intentionally do not
+   touch width, max-width, padding, height or layout dimensions. */
+#modal-lobby .lobby-box{
+  background:#15100d !important;
+  background-image:linear-gradient(145deg,#292017 0%,#17110d 48%,#0d0b0a 100%) !important;
+  background-blend-mode:normal !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+  border-color:rgba(229,190,110,.48) !important;
+}
