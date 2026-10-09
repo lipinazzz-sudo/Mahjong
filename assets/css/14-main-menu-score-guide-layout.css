@@ -1,0 +1,101 @@
+/* Additive layout refinement: main-menu toolbar order, lower Play Game,
+   and compact two-column Score Guide drawer. No game logic is changed. */
+
+/* History now lives in the top-right toolbar. With only Play Game remaining,
+   anchor the action lower while preserving the iPhone home-indicator inset. */
+#screen-main .main-menu-center{
+  bottom:max(env(safe-area-inset-bottom, 0px), clamp(12px, 2.8vh, 30px)) !important;
+}
+@media(max-width:800px){
+  #screen-main .main-menu-center{
+    bottom:max(env(safe-area-inset-bottom, 0px), clamp(10px, 2.4vh, 24px)) !important;
+  }
+}
+@media(max-width:560px){
+  #screen-main .main-menu-center{
+    bottom:max(env(safe-area-inset-bottom, 0px), clamp(9px, 2.1vh, 21px)) !important;
+  }
+}
+@media(max-width:380px){
+  #screen-main .main-menu-center{
+    bottom:max(env(safe-area-inset-bottom, 0px), clamp(7px, 1.6vh, 14px)) !important;
+  }
+}
+@media(orientation:landscape) and (max-height:650px){
+  #screen-main .main-menu-center{
+    bottom:max(env(safe-area-inset-bottom, 0px), clamp(6px, 1.5vh, 12px)) !important;
+  }
+}
+
+/* Keep the Score Guide panel at its current width, but put it below its
+   launcher instead of letting its top edge cover the launcher/title area. */
+#screen-game #game-board #score-guide-drawer{
+  top:max(44px, calc(env(safe-area-inset-top, 0px) + 44px)) !important;
+  bottom:auto !important;
+  height:auto !important;
+  max-height:calc(100vh - 60px) !important;
+  max-height:calc(
+    100dvh
+    - max(env(safe-area-inset-top, 0px), 8px)
+    - max(env(safe-area-inset-bottom, 0px), 8px)
+    - 44px
+  ) !important;
+  overflow:hidden !important;
+  z-index:230 !important;
+}
+#screen-game #game-board #score-guide-drawer .score-guide-grid{
+  flex:0 1 auto !important;
+  min-height:0 !important;
+  display:grid !important;
+  grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+  grid-template-rows:none !important;
+  grid-auto-flow:row !important;
+  grid-auto-rows:minmax(18px, auto) !important;
+  align-content:start !important;
+  gap:4px 8px !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  overscroll-behavior:contain;
+}
+#screen-game #game-board #score-guide-drawer .score-guide-grid > div{
+  grid-template-columns:clamp(29px, 3.1vw, 36px) minmax(0, 1fr) !important;
+  align-items:start !important;
+  min-height:18px !important;
+  padding:2px 0 !important;
+  gap:4px !important;
+}
+#screen-game #game-board #score-guide-drawer .score-guide-grid span{
+  line-height:1.15 !important;
+  white-space:nowrap !important;
+}
+#screen-game #game-board #score-guide-drawer .score-guide-grid strong{
+  min-width:0 !important;
+  line-height:1.2 !important;
+  overflow-wrap:anywhere !important;
+}
+@media (orientation:portrait) and (max-width:900px){
+  #screen-game #game-board #score-guide-drawer .score-guide-grid{
+    grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows:none !important;
+    grid-auto-rows:minmax(19px, auto) !important;
+    gap:4px 7px !important;
+  }
+  #screen-game #game-board #score-guide-drawer .score-guide-grid > div{
+    grid-template-columns:30px minmax(0, 1fr) !important;
+    gap:4px !important;
+  }
+}
+@media (orientation:landscape) and (max-height:620px){
+  #screen-game #game-board #score-guide-drawer{
+    max-height:calc(100vh - 54px) !important;
+    max-height:calc(
+      100dvh
+      - max(env(safe-area-inset-top, 0px), 8px)
+      - max(env(safe-area-inset-bottom, 0px), 8px)
+      - 44px
+    ) !important;
+  }
+  #screen-game #game-board #score-guide-drawer .score-guide-grid{
+    gap:3px 6px !important;
+  }
+}
