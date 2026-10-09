@@ -547,26 +547,22 @@
 }
 body{
   background:#04110f;
-}
-.screen#screen-main::before,.screen#screen-play::before,.screen#screen-settings::before{
+}.screen#screen-play::before,
+.screen#screen-settings::before{
   content:"";
   position:absolute;
   inset:0;
   pointer-events:none;
   background:radial-gradient(circle at 50% 30%,rgba(239,193,92,.08),transparent 30%),linear-gradient(180deg,rgba(1,12,10,.10),rgba(1,9,8,.48));
-}
-#screen-main,#screen-play,#screen-settings{
+}#screen-play,
+#screen-settings{
   background-position:center;
   background-size:cover;
   background-repeat:no-repeat;
   isolation:isolate;
 }
-#screen-main{background-image:linear-gradient(180deg,rgba(2,12,10,.26),rgba(2,8,7,.62)),
-    url("../backgrounds/bg-main.jpg");background-position:center;background-size:cover;}
 #screen-play{background-image:url('../backgrounds/bg-play.jpg');}
-#screen-settings{background-image:url('../backgrounds/bg-settings.jpg');background:linear-gradient(180deg,rgba(0,10,8,.36),rgba(0,6,5,.62)),url("../backgrounds/bg-settings.jpg") center/cover;}
-#screen-main .screen-card,
-#screen-play .screen-card{
+#screen-settings{background-image:url('../backgrounds/bg-settings.jpg');background:linear-gradient(180deg,rgba(0,10,8,.36),rgba(0,6,5,.62)),url("../backgrounds/bg-settings.jpg") center/cover;}#screen-play .screen-card{
   position:relative;
   z-index:2;
   width:min(92vw,980px);
@@ -576,90 +572,17 @@ body{
   background:linear-gradient(180deg,rgba(3,25,21,.54),rgba(2,14,12,.76));
   box-shadow:0 30px 100px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,244,212,.10),inset 0 0 0 1px rgba(255,205,105,.045);
   backdrop-filter:blur(5px);
-}
-#screen-main .screen-card::before,
-#screen-play .screen-card::before{
+}#screen-play .screen-card::before{
   content:"";
   position:absolute;
   inset:10px;
   border:1px solid rgba(233,188,87,.20);
   border-radius:19px;
   pointer-events:none;
-}
-#screen-main .brand-lockup{margin-bottom:34px;}
-#screen-main .brand-kicker,
-#screen-play .brand-kicker{
+}#screen-play .brand-kicker{
   color:var(--ui-gold-soft);
   text-shadow:0 0 16px rgba(226,178,72,.16);
 }
-#screen-main .brand-dot{background:#f3c25d;box-shadow:0 0 10px rgba(229,187,91,.38);}
-#screen-main h1{
-  font-size:0;
-  margin:15px 0 12px;
-  letter-spacing:.02em;
-  line-height:.96;
-}
-#screen-main h1::before{
-  content:"MAHJONG DJ";
-  display:block;
-  font-size:clamp(42px,8.2vw,82px);
-  font-weight:950;
-  letter-spacing:-.055em;
-  color:#fff4db;
-  text-shadow:0 5px 30px rgba(0,0,0,.52),0 0 22px rgba(227,183,92,.12);
-}
-#screen-main h1::after{
-  content:"HONGKONG";
-  display:block;
-  margin-top:10px;
-  font-size:clamp(12px,1.8vw,19px);
-  letter-spacing:.44em;
-  font-weight:900;
-  color:var(--ui-gold-soft);
-  text-shadow:0 0 16px rgba(227,183,92,.22);
-}
-#screen-main .brand-subtitle{max-width:480px;margin:0 auto;color:rgba(246,235,211,.65);font-size:clamp(12px,1.6vw,15px);letter-spacing:.11em;}
-#screen-main .menu-actions{
-  width:min(100%,520px);
-  margin:0 auto;
-  gap:12px;
-}
-#screen-main .btn{
-  min-height:58px;
-  border-radius:14px;
-  font-size:clamp(14px,1.8vw,17px);
-  letter-spacing:.02em;
-  position:relative;
-  overflow:hidden;
-  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
-}
-#screen-main .btn::before{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:26px;
-  margin-right:7px;
-  font-size:16px;
-  vertical-align:-1px;
-  pointer-events:none;
-}
-#screen-main .btn-primary{
-  background:linear-gradient(180deg,#a7342f,#64151a 72%,#421014);
-  border:1px solid #efc86b;
-  color:#fff2dc;
-  box-shadow:0 13px 30px rgba(42,0,0,.40),inset 0 1px 0 rgba(255,229,169,.26),0 0 0 1px rgba(156,30,30,.25);
-}
-#screen-main .btn-primary::before{content:"▶";color:#ffd26c;}
-#screen-main .btn-secondary{
-  background:linear-gradient(180deg,rgba(8,39,33,.94),rgba(3,18,15,.96));
-  border:1px solid rgba(224,183,91,.52);
-  color:#f2dfb4;
-  box-shadow:0 10px 24px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,238,194,.08);
-}
-#screen-main .btn-secondary::before{content:"⚙";color:#efc66b;}
-#screen-main .history-menu-btn::before{content:none!important;display:none!important;}
-#screen-main .history-menu-symbol{display:inline-flex;align-items:center;justify-content:center;width:23px;margin-right:6px;font-size:17px;line-height:1;color:#efc66b;pointer-events:none;}
-#screen-main .btn:hover{transform:translateY(-2px);filter:brightness(1.05);box-shadow:0 16px 34px rgba(0,0,0,.42),0 0 24px rgba(218,172,74,.10)}
 /* Game mode cards */
 #screen-play .screen-card{padding-top:42px;padding-bottom:36px;}
 #screen-play .brand-lockup{margin-bottom:24px;}
@@ -843,17 +766,21 @@ body{
 @media(max-width:760px){#modal-history .history-box,#modal-history-detail .history-box,#modal-history-round .history-box{width:96vw;max-height:calc(100dvh - 12px);padding:12px}.history-title{font-size:20px}.history-row{grid-template-columns:minmax(130px,1.7fr) minmax(65px,.7fr) 42px 18px;gap:6px;padding:8px}.history-row .history-meta:nth-child(3){display:none}.history-detail-grid{grid-template-columns:1fr}.history-round-result{grid-template-columns:auto 1fr}.history-points{grid-column:2}.history-winning-pack{gap:4px}.history-winning-hand{padding:5px;gap:2px}.history-winning-hand .history-tile{width:clamp(20px,4.2vw,32px);height:clamp(29px,6.2vw,44px)}.history-meld-inline{padding:3px 4px}.history-meld-mini .history-tile{width:15px;height:22px}.history-meld-inline-label{font-size:6px}}
 
 /* Small screens: keep cards usable and game untouched */
-@media (max-width:760px){
-  #screen-main .screen-card,#screen-play .screen-card{width:min(94vw,720px);padding:26px 18px;}
+@media (max-width:760px){#screen-play .screen-card{width:min(94vw,720px);padding:26px 18px;}
   #screen-play .menu-actions{grid-template-columns:1fr;}
   #screen-play .menu-actions .btn{min-height:220px;padding-top:142px;}
   #screen-play .menu-actions .btn:nth-child(3){grid-column:auto;width:190px;min-height:42px;padding:10px 20px;justify-self:center;}
   #screen-settings .settings-card{width:min(94vw,540px);padding:18px 15px;}
   #screen-settings .settings-row{grid-template-columns:1fr;gap:9px;}
-}
-
-/* v9 precision UI fixes: sharper mode cards, compact dialogs, no pinch zoom. */
-html,body,#screen-main,#screen-play,#screen-settings,#modal-avatar-picker,#modal-lobby,#modal-result,#modal-match-over{touch-action:pan-y pinch-zoom;}
+}/* v9 precision UI fixes: sharper mode cards, compact dialogs, no pinch zoom. */
+html,
+body,
+#screen-play,
+#screen-settings,
+#modal-avatar-picker,
+#modal-lobby,
+#modal-result,
+#modal-match-over{touch-action:pan-y pinch-zoom;}
 html,body{touch-action:pan-x pan-y;overscroll-behavior:none;}
 @media (pointer:coarse){html,body{touch-action:pan-x pan-y;}}
 
@@ -936,20 +863,19 @@ html,body{touch-action:pan-x pan-y;overscroll-behavior:none;}
 
 /* v10: reference-inspired menu presentation; gameplay JS remains untouched. */
 html,body{touch-action:manipulation!important;-webkit-user-select:none;user-select:none;overscroll-behavior:none;}
-body{background:#04110f;}
-.screen#screen-main,.screen#screen-play,.screen#screen-settings{
+body{background:#04110f;}.screen#screen-play,
+.screen#screen-settings{
   overflow:hidden;
   background-position:center;
   background-size:cover;
   background-repeat:no-repeat;
-}
-.screen#screen-main::before,.screen#screen-play::before,.screen#screen-settings::before{
+}.screen#screen-play::before,
+.screen#screen-settings::before{
   background:
     radial-gradient(circle at 50% 30%,rgba(240,196,95,.055),transparent 34%),
     linear-gradient(180deg,rgba(0,12,10,.04),rgba(0,8,7,.26));
   backdrop-filter:blur(1.6px) saturate(.96);
-}
-#screen-main .screen-card,#screen-play .screen-card{
+}#screen-play .screen-card{
   max-height:calc(100dvh - 20px);
   overflow:hidden;
   backdrop-filter:blur(3px);
@@ -993,11 +919,9 @@ body{background:#04110f;}
   border-radius:9px;
   font-size:10px;
 }
-#screen-play .menu-actions .btn:nth-child(3)::before{font-size:13px;margin-right:5px;}
-
-/* Keep the chosen background visible rather than drowning it in a dark/blurred layer. */
-#screen-main,#screen-play,#screen-settings{isolation:isolate;}
-#screen-main .screen-card{backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
+#screen-play .menu-actions .btn:nth-child(3)::before{font-size:13px;margin-right:5px;}/* Keep the chosen background visible rather than drowning it in a dark/blurred layer. */
+#screen-play,
+#screen-settings{isolation:isolate;}
 
 @media (max-width:760px){
   #screen-play .screen-card{
@@ -1077,26 +1001,20 @@ body::after{
 }
 .screen{
   z-index:2;
-}
-.screen#screen-main,
-.screen#screen-play,
+}.screen#screen-play,
 .screen#screen-settings{
   background:transparent !important;
 }
 .screen#screen-game{
   z-index:10;
   background:#0b0a09 !important;
-}
-.screen#screen-main::before,
-.screen#screen-play::before,
+}.screen#screen-play::before,
 .screen#screen-settings::before{
   background:
     radial-gradient(circle at 50% 30%,rgba(239,193,92,.045),transparent 34%),
     linear-gradient(180deg,rgba(1,12,10,.025),rgba(1,9,8,.12));
   backdrop-filter:blur(.6px) saturate(.98);
-}
-#screen-main .screen-card,
-#screen-play .screen-card{
+}#screen-play .screen-card{
   background:linear-gradient(180deg,rgba(3,25,21,.28),rgba(2,14,12,.60));
   backdrop-filter:blur(2px);
   -webkit-backdrop-filter:blur(2px);
@@ -1332,18 +1250,6 @@ body::after{
   #modal-lobby .modal-copy{font-size:9px;}
   #modal-lobby .signal-qr{width:132px;height:132px;}
   #modal-lobby .ready-item{padding:6px 7px;font-size:9px;}
-}
-
-
-/* v13 UI-only precision fit:
-   - Select Mode back control stays on one horizontal line.
-   - Multiplayer lobby fits in one viewport without scrolling, including waiting/room states.
-   - Settings Audio and Auto-Sort cards are more compact without removing their text.
-   - Main menu slogan sits lower so it does not collide with Settings.
-*/
-#screen-main::after{
-  bottom:6px;
-  font-size:8.5px;
 }
 
 #screen-play .menu-actions .btn:nth-child(3){
@@ -1691,29 +1597,4 @@ body::after{
     max-width:110px;
   }
 }
-
-
-/* v18: small global cache refresh control. Never clears game data/history. */
-#btn-cache-refresh{
-  position:fixed;
-  top:12px;
-  right:12px;
-  z-index:99999;
-  width:34px;
-  height:34px;
-  padding:0;
-  border:1px solid rgba(220,180,86,.55);
-  border-radius:50%;
-  background:rgba(5,22,19,.82);
-  color:#f3d27b;
-  font-size:18px;
-  line-height:32px;
-  text-align:center;
-  cursor:pointer;
-  box-shadow:0 4px 14px rgba(0,0,0,.35);
-  backdrop-filter:blur(4px);
-  -webkit-backdrop-filter:blur(4px);
-}
-#btn-cache-refresh:hover{filter:brightness(1.12);transform:rotate(20deg)}
-#btn-cache-refresh:active{transform:scale(.94)}
-@media (max-width:600px){#btn-cache-refresh{top:8px;right:8px;width:30px;height:30px;line-height:28px;font-size:16px}}
+@media (max-width:600px){}

@@ -72,12 +72,6 @@
 .btn,.icon-btn,.history-row,.history-round-tab,#game-chat-send,.toggle-btn,.score-guide-launcher-btn{transition:transform .16s ease,filter .16s ease,box-shadow .16s ease,border-color .16s ease,background .16s ease;}
 .btn:hover,.icon-btn:hover,.history-row:hover,.history-round-tab:hover{filter:brightness(1.055);}
 .btn:active,.icon-btn:active,.history-round-tab:active,#game-chat-send:active,.toggle-btn:active{transform:translateY(1px);}
-#screen-main::before{background:radial-gradient(circle at 50% 20%,rgba(241,204,118,.11),transparent 30%),
-    radial-gradient(circle at 50% 74%,rgba(16,66,52,.10),transparent 42%),
-    linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,8,7,.38));backdrop-filter:blur(1.2px) saturate(.96);}
-#screen-main .brand-kicker{color:#e9c77a;}
-#screen-main .menu-actions .btn-primary{border-color:rgba(249,219,149,.78);box-shadow:0 10px 24px rgba(0,0,0,.28),0 0 22px rgba(218,169,80,.08),inset 0 1px 0 rgba(255,250,224,.26);}
-#screen-main .history-menu-btn{background:linear-gradient(180deg,rgba(39,33,26,.92),rgba(18,18,15,.96));}
 #modal-history{background:radial-gradient(circle at 50% 15%,rgba(220,178,91,.07),transparent 32%),
     linear-gradient(180deg,rgba(0,12,10,.76),rgba(0,5,4,.86));backdrop-filter:blur(6px);}
 #modal-history .history-box{width:min(94vw,760px);max-height:min(82dvh,620px);padding:20px;border-color:rgba(229,189,105,.26);background:radial-gradient(circle at 50% 0%,rgba(218,170,75,.06),transparent 36%),

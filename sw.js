@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'mahjong-dj-logo-fce0110c';
+const CACHE_VERSION = 'mahjong-dj-mainlux-2026-10-09';
 const APP_SHELL = [
   './',
   './index.html',
@@ -26,6 +26,7 @@ const APP_SHELL = [
   './assets/css/06-game-language.css',
   './assets/css/07-v26-features.css',
   './assets/js/03-v26-features.js',
+  './assets/css/08-main-menu-theme.css',
 ];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE_VERSION).then(cache => cache.addAll(APP_SHELL).catch(()=>{}))); self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE_VERSION).map(k=>caches.delete(k))))); self.clients.claim(); });

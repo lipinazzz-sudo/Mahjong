@@ -1,25 +1,4 @@
-/* Mahjong DJ v26 feature layer: compact main-menu info, AI level picker,
-   local statistics and lightweight achievements. */
-#main-info-btn{
-  position:absolute;
-  right:2.3vw;
-  top:3vh;
-  z-index:30;
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-  min-height:38px;
-  padding:0 14px;
-  border-radius:12px;
-  border:1px solid rgba(233,198,120,.78);
-  background:linear-gradient(180deg,rgba(15,18,14,.96),rgba(4,8,7,.99));
-  color:#f2dfb8;
-  font-size:12px;
-  font-weight:900;
-  box-shadow:0 10px 24px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,244,207,.08);
-}
-#main-info-btn:active{transform:translateY(1px)}
-#main-info-btn .main-info-icon{font-size:18px;color:#f0cb76;line-height:1}
+
 
 .v26-modal-box{width:min(92vw,520px);max-height:min(82dvh,680px);overflow:auto}
 .v26-info-intro{margin-top:5px;color:#a9a092;font-size:10px;line-height:1.45}
@@ -66,7 +45,6 @@
   100%{opacity:0;transform:translateY(-5px)}
 }
 @media(max-width:700px){
-  #main-info-btn{right:3vw;top:2.5vh;min-height:34px;padding:0 10px;font-size:10px}
   .v26-info-grid,.v26-ai-grid,.v26-achievement-grid{grid-template-columns:1fr}
   .v26-stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .v26-stats-secondary{grid-template-columns:1fr}
