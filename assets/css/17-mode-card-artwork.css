@@ -177,3 +177,13 @@
     width:124px !important;
   }
 }
+
+/* Narrow only the Select Mode panel shell by 20%; leave cards and controls untouched. */
+#screen-play > .mode-select-card{
+  width:min(75.2vw,720px) !important;
+}
+@media(max-width:560px){
+  #screen-play > .mode-select-card{
+    width:min(75.2vw,calc(100vw - 24px)) !important;
+  }
+}
