@@ -90,3 +90,61 @@
     0 0 4px rgba(239,79,74,.32);
   animation:lastDiscardRecordingPulseCompact 1.8s ease-in-out infinite !important;
 }
+
+
+/* Final alignment/finish pass requested after visual review. */
+/* Align the scaled upper-right toolbar with the top edge of the profile card.
+   The larger profile card sets the row height; align-self prevents toolbar
+   buttons from sitting noticeably lower within that row. */
+#screen-main .main-menu-utilities{
+  align-self:flex-start !important;
+  transform:translateY(0) scale(.85) !important;
+  transform-origin:top right !important;
+}
+
+/* Add about 3 visible pixels to the profile card while preserving its 90% scale. */
+#screen-main .profile-card{
+  flex-basis:209.33px !important;
+  width:min(209.33px, calc(18.4vw + 3.33px)) !important;
+  min-width:166.33px !important;
+  max-width:209.33px !important;
+}
+@media(max-width:800px){
+  #screen-main .profile-card{
+    flex-basis:171.33px !important;
+    width:171.33px !important;
+    min-width:142.33px !important;
+    max-width:171.33px !important;
+  }
+}
+@media(max-width:560px){
+  #screen-main .profile-card{
+    flex-basis:117.33px !important;
+    width:117.33px !important;
+    min-width:0 !important;
+    max-width:117.33px !important;
+  }
+}
+@media(max-width:360px){
+  #screen-main .profile-card{
+    flex-basis:104.33px !important;
+    width:104.33px !important;
+    max-width:104.33px !important;
+  }
+}
+
+/* Subtle depth on discarded tiles: retain an edge shadow without the heavy
+   floating-card effect. Highlights are kept but their glow is reduced too. */
+#screen-game .river-container .discard-tile{
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.20),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+#screen-game .river-container .discard-tile.same-tile-highlight{
+  outline:1px solid rgba(217,173,88,.48) !important;
+  outline-offset:1px !important;
+  box-shadow:
+    0 0 0 1px rgba(217,173,88,.30),
+    0 0 5px rgba(217,173,88,.16),
+    0 1px 2px rgba(0,0,0,.20) !important;
+}
