@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'mahjong-dj-v26.2-bgfix-2026-10-09';
+const CACHE_VERSION = 'mahjong-dj-logo-fce0110c';
 const APP_SHELL = [
   './',
   './index.html',
