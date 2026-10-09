@@ -6,14 +6,15 @@
   grid-template-columns:repeat(2,minmax(0,1fr)) !important;
   justify-items:center !important;
   align-items:start !important;
-  gap:clamp(8px,1.8vw,18px) !important;
+  gap:clamp(8px,1.5vw,14px) !important;
+  row-gap:12px !important;
   width:min(100%,720px) !important;
   margin-inline:auto !important;
 }
 #screen-play .menu-actions.mode-actions .mode-card{
   position:relative !important;
   display:block !important;
-  width:min(100%,clamp(148px,30vw,270px)) !important;
+  width:min(100%,clamp(145px,19vw,225px)) !important;
   height:auto !important;
   min-height:0 !important;
   aspect-ratio:240 / 304 !important;
@@ -32,7 +33,7 @@
   color:transparent !important;
   font-size:0 !important;
   line-height:0 !important;
-  box-shadow:0 15px 30px rgba(0,0,0,.36),0 0 0 1px rgba(231,190,106,.16) !important;
+  box-shadow:0 10px 22px rgba(0,0,0,.32),0 0 0 1px rgba(231,190,106,.14) !important;
   transform:translateZ(0);
   transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;
   -webkit-tap-highlight-color:transparent;
@@ -78,6 +79,7 @@
   grid-column:1 / -1 !important;
   justify-self:center !important;
   width:min(150px,60%) !important;
+  margin-top:2px !important;
   min-height:36px !important;
   height:36px !important;
   padding:7px 16px !important;
@@ -108,7 +110,7 @@
     width:100% !important;
   }
   #screen-play .menu-actions.mode-actions .mode-card{
-    width:min(100%,clamp(136px,42vw,220px)) !important;
+    width:min(100%,clamp(124px,36vw,180px)) !important;
     border-radius:10px !important;
   }
 }
@@ -118,9 +120,23 @@
     gap:8px !important;
   }
   #screen-play .menu-actions.mode-actions .mode-card{
-    width:min(100%,clamp(118px,21vw,205px)) !important;
+    width:min(100%,clamp(112px,17vw,180px)) !important;
   }
 }
 @media(prefers-reduced-motion:reduce){
   #screen-play .menu-actions.mode-actions .mode-card{transition:none !important;}
+}
+
+/* Keep the mode-selection shell distinct from the page artwork. The cards
+   contain their own illustrations, so the panel itself stays opaque obsidian. */
+#screen-play .screen-card{
+  background:radial-gradient(ellipse at 50% 0%,rgba(219,173,82,.075),transparent 44%),
+    linear-gradient(145deg,#241b15 0%,#100d0b 58%,#090808 100%) !important;
+  background-image:radial-gradient(ellipse at 50% 0%,rgba(219,173,82,.075),transparent 44%),
+    linear-gradient(145deg,#241b15 0%,#100d0b 58%,#090808 100%) !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
+#screen-play .screen-card::before{
+  background:linear-gradient(180deg,rgba(255,225,167,.025),rgba(0,0,0,.06)) !important;
 }
