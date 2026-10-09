@@ -42,6 +42,26 @@
   }
 }
 
+/* Every tile in the discard rivers gets a small camera-style marker.
+   Keep the newest discard animated; older discard markers remain steady. */
+.discard-tile{
+  position:relative;
+}
+.discard-tile::after{
+  content:"";
+  position:absolute;
+  right:3.2px;
+  top:3.2px;
+  width:3.2px;
+  height:3.2px;
+  border-radius:50%;
+  background:#ef4f4a;
+  box-shadow:0 0 1.6px rgba(255,92,84,.72),0 0 4px rgba(239,79,74,.32);
+  opacity:.72;
+  pointer-events:none;
+  z-index:2;
+}
+
 /* 20% smaller red recording point and correspondingly softer glow. */
 @keyframes lastDiscardRecordingPulseCompact{
   0%,100%{
