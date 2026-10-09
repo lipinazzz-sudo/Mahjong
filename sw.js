@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'mahjong-dj-toolbar-hardfix-2026-10-09';
+const CACHE_VERSION = 'mahjong-dj-toolbar-runtime-fix-2026-10-09';
 const APP_SHELL = [
   './',
   './index.html',

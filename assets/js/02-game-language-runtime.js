@@ -106,7 +106,6 @@
     ['#screen-settings .settings-actions .btn-danger','settings.backMenu'],
     ['#screen-main .main-play-btn','main.play'],
     ['#screen-main .main-history-btn','main.history'],
-    ['#screen-main .main-settings-btn > span:last-child','main.settings'],
     ['#modal-lobby .setup-actions .btn-primary','lobby.ready'],
     ['#mp-setup .mp-p2p-choice .btn-primary','lobby.create'],
     ['#mp-setup .btn-danger','lobby.leave'],
@@ -364,8 +363,7 @@
     // Main menu buttons contain icons/arrow spans; replace only their text nodes.
     const hist=document.querySelector('#screen-main .main-history-btn');
     if(hist){for(const n of hist.childNodes){if(n.nodeType===3){n.textContent=`${TEXT['main.history'][window.hkLanguage]}`;break}}}
-    const settings=document.querySelector('#screen-main .main-settings-btn');
-    if(settings){const spans=settings.querySelectorAll('span');if(spans[1])spans[1].textContent=TEXT['main.settings'][window.hkLanguage];}
+    // The top Settings control is icon-only; do not replace its gear icon with translated text.
     const profileSmall=document.querySelector('#screen-main .profile-card-copy small');
     if(profileSmall){for(const n of profileSmall.childNodes){if(n.nodeType===3){n.textContent=TEXT['profile.customize'][window.hkLanguage]+' ';break}}}
 
