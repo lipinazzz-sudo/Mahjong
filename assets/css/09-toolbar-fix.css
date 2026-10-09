@@ -1,0 +1,46 @@
+/* Hard override for compact top toolbar.
+   Loaded after legacy styles with a versioned URL to defeat stale CSS caches. */
+#screen-main .main-menu-utilities .main-menu-utility-btn,
+#screen-main .main-menu-utilities #btn-cache-refresh{
+  box-sizing:border-box!important;display:grid!important;place-items:center!important;position:relative!important;inset:auto!important;
+  flex:0 0 42px!important;width:42px!important;min-width:42px!important;max-width:42px!important;height:42px!important;min-height:42px!important;max-height:42px!important;
+  margin:0!important;padding:0!important;overflow:hidden!important;border:1px solid rgba(228,181,91,.62)!important;border-radius:12px!important;
+  background:linear-gradient(145deg,rgba(27,22,19,.90),rgba(5,6,8,.96))!important;color:#f4d99e!important;
+  font-family:inherit!important;font-size:0!important;font-weight:800!important;line-height:0!important;letter-spacing:0!important;text-shadow:none!important;
+  box-shadow:0 5px 13px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,241,205,.10)!important;vertical-align:middle!important;
+}
+#screen-main .main-menu-utilities .main-menu-utility-btn::before,
+#screen-main .main-menu-utilities .main-menu-utility-btn::after,
+#screen-main .main-menu-utilities #btn-cache-refresh::before,
+#screen-main .main-menu-utilities #btn-cache-refresh::after{content:none!important;display:none!important;}
+#screen-main .main-menu-utilities .main-menu-utility-btn>span{
+  display:grid!important;place-items:center!important;box-sizing:border-box!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;
+  font-family:inherit!important;font-size:20px!important;font-weight:700!important;line-height:1!important;color:#ffd27b!important;text-shadow:0 0 10px rgba(255,190,60,.20)!important;
+}
+#screen-main .main-menu-utilities #main-settings-btn>span{font-size:20px!important;}
+#screen-main .main-menu-utilities #btn-cache-refresh{font-size:18px!important;line-height:1!important;}
+#screen-main .main-menu-utilities .main-menu-utility-btn:hover,
+#screen-main .main-menu-utilities #btn-cache-refresh:hover{filter:brightness(1.10)!important;transform:translateY(-1px)!important;}
+#screen-main .main-menu-utilities .main-menu-utility-btn:active,
+#screen-main .main-menu-utilities #btn-cache-refresh:active{transform:scale(.96)!important;}
+@media(max-width:800px){
+#screen-main .main-menu-utilities .main-menu-utility-btn,#screen-main .main-menu-utilities #btn-cache-refresh{
+  flex-basis:37px!important;width:37px!important;min-width:37px!important;max-width:37px!important;height:37px!important;min-height:37px!important;max-height:37px!important;border-radius:10px!important;
+}
+#screen-main .main-menu-utilities .main-menu-utility-btn>span{font-size:18px!important;}
+#screen-main .main-menu-utilities #btn-cache-refresh{font-size:16px!important;}
+}
+@media(max-width:560px){
+#screen-main .main-menu-utilities .main-menu-utility-btn,#screen-main .main-menu-utilities #btn-cache-refresh{
+  flex-basis:32px!important;width:32px!important;min-width:32px!important;max-width:32px!important;height:32px!important;min-height:32px!important;max-height:32px!important;border-radius:9px!important;
+}
+#screen-main .main-menu-utilities .main-menu-utility-btn>span{font-size:16px!important;}
+#screen-main .main-menu-utilities #btn-cache-refresh{font-size:14px!important;}
+}
+@media(max-width:360px){
+#screen-main .main-menu-utilities .main-menu-utility-btn,#screen-main .main-menu-utilities #btn-cache-refresh{
+  flex-basis:29px!important;width:29px!important;min-width:29px!important;max-width:29px!important;height:29px!important;min-height:29px!important;max-height:29px!important;border-radius:8px!important;
+}
+#screen-main .main-menu-utilities .main-menu-utility-btn>span{font-size:14px!important;}
+#screen-main .main-menu-utilities #btn-cache-refresh{font-size:12px!important;}
+}
