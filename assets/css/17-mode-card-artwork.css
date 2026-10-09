@@ -1,0 +1,126 @@
+/* Use the user's selected combined artwork as the two mode cards.
+   Only the presentation of VS AI / Multiplayer selection buttons changes. */
+
+#screen-play .menu-actions.mode-actions{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  justify-items:center !important;
+  align-items:start !important;
+  gap:clamp(8px,1.8vw,18px) !important;
+  width:min(100%,720px) !important;
+  margin-inline:auto !important;
+}
+#screen-play .menu-actions.mode-actions .mode-card{
+  position:relative !important;
+  display:block !important;
+  width:min(100%,clamp(148px,30vw,270px)) !important;
+  height:auto !important;
+  min-height:0 !important;
+  aspect-ratio:240 / 304 !important;
+  align-self:start !important;
+  justify-self:center !important;
+  box-sizing:border-box !important;
+  margin:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+  border:0 !important;
+  border-radius:13px !important;
+  background-color:transparent !important;
+  background-position:center !important;
+  background-size:100% 100% !important;
+  background-repeat:no-repeat !important;
+  color:transparent !important;
+  font-size:0 !important;
+  line-height:0 !important;
+  box-shadow:0 15px 30px rgba(0,0,0,.36),0 0 0 1px rgba(231,190,106,.16) !important;
+  transform:translateZ(0);
+  transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+#screen-play .menu-actions.mode-actions .mode-card:nth-child(1){
+  background-image:url('../backgrounds/card-vs-ai.webp') !important;
+}
+#screen-play .menu-actions.mode-actions .mode-card:nth-child(2){
+  background-image:url('../backgrounds/card-multiplayer.webp') !important;
+}
+#screen-play .menu-actions.mode-actions .mode-card > strong,
+#screen-play .menu-actions.mode-actions .mode-card > span{
+  position:absolute !important;
+  width:1px !important;
+  height:1px !important;
+  padding:0 !important;
+  margin:-1px !important;
+  overflow:hidden !important;
+  clip:rect(0,0,0,0) !important;
+  clip-path:inset(50%) !important;
+  white-space:nowrap !important;
+  border:0 !important;
+}
+#screen-play .menu-actions.mode-actions .mode-card::before,
+#screen-play .menu-actions.mode-actions .mode-card::after{
+  content:none !important;
+  display:none !important;
+}
+#screen-play .menu-actions.mode-actions .mode-card:hover{
+  transform:translateY(-3px) scale(1.012) !important;
+  filter:brightness(1.06) saturate(1.03) !important;
+  box-shadow:0 21px 38px rgba(0,0,0,.44),0 0 20px rgba(226,182,83,.17) !important;
+}
+#screen-play .menu-actions.mode-actions .mode-card:active{
+  transform:translateY(1px) scale(.99) !important;
+  filter:brightness(.98) !important;
+}
+#screen-play .menu-actions.mode-actions .mode-card:focus-visible{
+  outline:2px solid #f2d18c !important;
+  outline-offset:3px !important;
+}
+#screen-play .menu-actions.mode-actions .mode-back{
+  grid-column:1 / -1 !important;
+  justify-self:center !important;
+  width:min(150px,60%) !important;
+  min-height:36px !important;
+  height:36px !important;
+  padding:7px 16px !important;
+  border-radius:9px !important;
+  font-size:10px !important;
+  line-height:1.2 !important;
+  color:#f3dfb3 !important;
+  background:linear-gradient(145deg,rgba(33,25,18,.94),rgba(8,8,8,.98)) !important;
+  border:1px solid rgba(222,175,77,.42) !important;
+  box-shadow:0 7px 17px rgba(0,0,0,.28) !important;
+}
+#screen-play .menu-actions.mode-actions .mode-back::before{
+  content:"←" !important;
+  display:inline-flex !important;
+  position:static !important;
+  width:auto !important;
+  height:auto !important;
+  margin:0 6px 0 0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:none !important;
+  box-shadow:none !important;
+  font-size:13px !important;
+}
+@media(max-width:560px){
+  #screen-play .menu-actions.mode-actions{
+    gap:8px !important;
+    width:100% !important;
+  }
+  #screen-play .menu-actions.mode-actions .mode-card{
+    width:min(100%,clamp(136px,42vw,220px)) !important;
+    border-radius:10px !important;
+  }
+}
+@media(orientation:landscape) and (max-height:620px){
+  #screen-play .menu-actions.mode-actions{
+    width:min(100%,620px) !important;
+    gap:8px !important;
+  }
+  #screen-play .menu-actions.mode-actions .mode-card{
+    width:min(100%,clamp(118px,21vw,205px)) !important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #screen-play .menu-actions.mode-actions .mode-card{transition:none !important;}
+}
