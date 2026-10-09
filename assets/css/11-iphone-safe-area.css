@@ -1,0 +1,21 @@
+/* iPhone/iPad safe-area guard — visual layout only.
+   Keep #screen-game full-bleed for the background, while the game board
+   and its interactive elements stay inside the physical safe area. */
+#screen-game #game-board{
+  position:fixed !important;
+  inset:
+    max(env(safe-area-inset-top, 0px), 10px)
+    max(env(safe-area-inset-right, 0px), 10px)
+    max(env(safe-area-inset-bottom, 0px), 10px)
+    max(env(safe-area-inset-left, 0px), 10px) !important;
+  width:auto !important;
+  height:auto !important;
+  min-width:0 !important;
+  min-height:0 !important;
+}
+
+/* The board itself already respects the safe area, so avoid adding the
+   iPhone home-indicator inset a second time to the bottom hand container. */
+#screen-game #game-board .hand-bottom-container{
+  padding-bottom:2px !important;
+}
