@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'mahjong-dj-balanced-mode-cards-2026-10-09-6';
+const CACHE_VERSION = 'mahjong-dj-history-mode-tabs-2026-10-09-1';
 const APP_SHELL = [
   './',
   './index.html',
@@ -36,6 +36,7 @@ const APP_SHELL = [
   './assets/css/15-obsidian-gold-panel-theme.css?v=20261009-2',
   './assets/css/16-lobby-artwork-and-toolbar-consistency.css?v=20261009-3',
   './assets/css/17-mode-card-artwork.css?v=20261009-6',
+  './assets/css/18-history-mode-tabs.css?v=20261009-1',
   './assets/backgrounds/card-vs-ai.webp',
   './assets/backgrounds/card-multiplayer.webp',
 ];
