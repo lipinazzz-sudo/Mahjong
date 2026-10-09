@@ -110,8 +110,9 @@
     width:100% !important;
   }
   #screen-play .menu-actions.mode-actions .mode-card{
-    width:min(100%,clamp(124px,36vw,180px)) !important;
-    border-radius:10px !important;
+    width:min(90px,100%) !important;
+    max-width:90px !important;
+    border-radius:8px !important;
   }
 }
 @media(orientation:landscape) and (max-height:620px){
