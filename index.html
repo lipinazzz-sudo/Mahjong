@@ -41,6 +41,7 @@
 <link rel="stylesheet" href="assets/css/15-obsidian-gold-panel-theme.css?v=20261009-2">
 <link rel="stylesheet" href="assets/css/16-lobby-artwork-and-toolbar-consistency.css?v=20261009-3">
 <link rel="stylesheet" href="assets/css/17-mode-card-artwork.css?v=20261009-6">
+<link rel="stylesheet" href="assets/css/18-history-mode-tabs.css?v=20261009-1">
 </head>
 <body>
     <audio id="bg-music" loop preload="auto" aria-hidden="true"></audio>
@@ -426,8 +427,12 @@
     <div id="modal-history" class="modal" role="dialog" aria-modal="true" aria-labelledby="history-title">
       <section class="modal-box glass history-box">
         <div class="history-head">
-          <div class="history-head-copy"><div class="history-kicker">MULTIPLAYER</div><div class="history-title" id="history-title">Game History</div><div class="history-subtitle">Riwayat pertandingan multiplayer yang tersimpan di perangkat ini.</div></div>
+          <div class="history-head-copy"><div class="history-kicker">MATCH HISTORY</div><div class="history-title" id="history-title">Game History</div><div class="history-subtitle">Riwayat pertandingan tersimpan di perangkat ini.</div></div>
           <button class="icon-btn" type="button" onclick="closeHistory()" aria-label="Tutup History">×</button>
+        </div>
+        <div class="history-mode-tabs" role="group" aria-label="Filter jenis pertandingan">
+            <button class="history-mode-tab active" id="history-mode-multiplayer" type="button" onclick="selectHistoryMode('multiplayer')" aria-pressed="true">Multiplayer</button>
+            <button class="history-mode-tab" id="history-mode-ai" type="button" onclick="selectHistoryMode('ai')" aria-pressed="false">VS AI</button>
         </div>
         <div id="history-list" class="history-list"></div>
       </section>
