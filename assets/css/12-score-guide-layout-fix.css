@@ -1,0 +1,114 @@
+/* Score Guide layout repair — make the full rules list readable without
+   changing any scoring/game logic. Use a compact single column so all 16
+   rules flow vertically instead of stopping halfway down the drawer. */
+#screen-game #game-board #score-guide-drawer{
+  position:fixed !important;
+  top:max(env(safe-area-inset-top, 0px), 8px) !important;
+  bottom:max(env(safe-area-inset-bottom, 0px), 8px) !important;
+  left:max(env(safe-area-inset-left, 0px), 8px) !important;
+  right:auto !important;
+  width:min(31vw, 360px) !important;
+  max-width:calc(100vw - 16px) !important;
+  height:auto !important;
+  max-height:none !important;
+  box-sizing:border-box !important;
+  display:none;
+  flex-direction:column !important;
+  gap:0 !important;
+  padding:12px !important;
+  overflow:hidden !important;
+  overscroll-behavior:contain;
+}
+#screen-game #game-board #score-guide-drawer.open{
+  display:flex !important;
+}
+#screen-game #game-board #score-guide-drawer .score-guide-drawer-head{
+  flex:0 0 auto;
+  gap:8px;
+  padding-bottom:8px;
+  margin-bottom:8px;
+}
+#screen-game #game-board #score-guide-drawer .score-guide-drawer-kicker{
+  font-size:7px;
+  letter-spacing:.14em;
+}
+#screen-game #game-board #score-guide-drawer .score-guide-drawer-title{
+  margin-top:2px;
+  font-size:15px;
+  line-height:1.15;
+}
+#screen-game #game-board #score-guide-drawer .score-guide-close{
+  width:28px;
+  height:28px;
+}
+#screen-game #game-board #score-guide-drawer .score-guide-grid{
+  flex:1 1 auto;
+  min-height:0;
+  min-width:0;
+  display:grid !important;
+  grid-template-columns:minmax(0, 1fr) !important;
+  grid-template-rows:repeat(16, minmax(0, 1fr)) !important;
+  grid-auto-flow:row;
+  align-content:stretch;
+  gap:2px !important;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:0 2px 2px 0;
+}
+#screen-game #game-board #score-guide-drawer .score-guide-grid > div{
+  display:grid !important;
+  grid-template-columns:clamp(31px, 3.2vw, 38px) minmax(0, 1fr) !important;
+  align-items:center !important;
+  gap:5px !important;
+  min-width:0;
+  min-height:0;
+  padding:1px 0;
+  line-height:1.15;
+  border-bottom:1px solid rgba(225,179,88,.075);
+}
+#screen-game #game-board #score-guide-drawer .score-guide-grid span{
+  font-size:clamp(6px, .58vw, 7.5px) !important;
+  line-height:1.15;
+  letter-spacing:0 !important;
+  white-space:nowrap;
+}
+#screen-game #game-board #score-guide-drawer .score-guide-grid strong{
+  min-width:0;
+  font-size:clamp(7px, .66vw, 8.5px) !important;
+  font-weight:700;
+  line-height:1.18;
+  overflow-wrap:anywhere;
+}
+@media (orientation:portrait) and (max-width:900px){
+  #screen-game #game-board #score-guide-drawer{
+    width:min(92vw, 380px) !important;
+    max-width:calc(100vw - 16px) !important;
+    left:max(env(safe-area-inset-left, 0px), 8px) !important;
+    padding:11px !important;
+  }
+  #screen-game #game-board #score-guide-drawer .score-guide-grid > div{
+    grid-template-columns:36px minmax(0, 1fr) !important;
+  }
+  #screen-game #game-board #score-guide-drawer .score-guide-grid span{
+    font-size:7px !important;
+  }
+  #screen-game #game-board #score-guide-drawer .score-guide-grid strong{
+    font-size:8px !important;
+  }
+}
+@media (orientation:landscape) and (max-height:620px){
+  #screen-game #game-board #score-guide-drawer{
+    width:min(34vw, 340px) !important;
+    padding:9px 10px !important;
+  }
+  #screen-game #game-board #score-guide-drawer .score-guide-drawer-head{
+    padding-bottom:5px;
+    margin-bottom:5px;
+  }
+  #screen-game #game-board #score-guide-drawer .score-guide-drawer-title{
+    font-size:13px;
+  }
+  #screen-game #game-board #score-guide-drawer .score-guide-grid{
+    gap:1px !important;
+  }
+}
