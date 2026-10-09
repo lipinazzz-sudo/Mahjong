@@ -144,9 +144,19 @@
 
 
 /* Enforce the requested 90px phone width even in short landscape viewports. */
-@media(max-width:560px){
+@media(max-width:900px){
   #screen-play .menu-actions.mode-actions .mode-card{
-    width:min(90px,100%) !important;
+    width:90px !important;
+    min-width:90px !important;
+    max-width:90px !important;
+  }
+}
+
+/* Phone/tablet landscape can exceed 560 CSS px: force 90px card width there too. */
+@media(max-width:900px){
+  #screen-play .menu-actions.mode-actions .mode-card{
+    width:90px !important;
+    min-width:90px !important;
     max-width:90px !important;
   }
 }
