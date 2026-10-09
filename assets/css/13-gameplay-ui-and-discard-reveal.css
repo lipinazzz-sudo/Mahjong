@@ -87,6 +87,6 @@
   height:3.2px !important;
   box-shadow:
     0 0 1.6px rgba(255,92,84,.72),
-    0 0 4px rgba(239,79,74,.32) !important;
+    0 0 4px rgba(239,79,74,.32);
   animation:lastDiscardRecordingPulseCompact 1.8s ease-in-out infinite !important;
 }
