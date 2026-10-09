@@ -1,0 +1,74 @@
+name: Install main-menu landscape background
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.staging/bg-main-b64/part-*.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  install-background:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install image validation dependency
+        run: python -m pip install --disable-pip-version-check pillow
+      - name: Decode approved JPG and clean temporary staging files
+        env:
+          SOURCE_COMMIT: \${{ github.sha }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          from io import BytesIO
+          import base64
+          import os
+          import re
+
+          staging = Path(".staging/bg-main-b64")
+          parts = sorted(staging.glob("part-*.txt"))
+          if len(parts) != 10:
+              raise SystemExit(f"Expected 10 background chunks, found {len(parts)}; stopped.")
+          encoded = "".join(p.read_text(encoding="ascii").strip() for p in parts)
+          data = base64.b64decode(encoded, validate=True)
+          image = Image.open(BytesIO(data))
+          image.load()
+          if image.format != "JPEG" or image.size != (832, 468):
+              raise SystemExit(f"Unexpected background: format={image.format}, size={image.size}")
+          Path("assets/backgrounds/bg-main.jpg").write_bytes(data)
+
+          sw_path = Path("sw.js")
+          sw = sw_path.read_text(encoding="utf-8")
+          version = f"const CACHE_VERSION = 'mahjong-dj-main-scenery-{os.environ['SOURCE_COMMIT'][:8]}';"
+          pattern = r"const CACHE_VERSION = '[^']+';"
+          if not re.search(pattern, sw):
+              raise SystemExit("CACHE_VERSION was not found; stopped.")
+          sw_path.write_text(re.sub(pattern, version, sw, count=1), encoding="utf-8")
+
+          for p in parts:
+              p.unlink()
+          staging.rmdir()
+          Path(".github/workflows/install-main-background.yml").unlink()
+          with Image.open("assets/backgrounds/bg-main.jpg") as check:
+              if check.format != "JPEG" or check.size != (832, 468):
+                  raise SystemExit("The installed JPG failed validation.")
+          print(f"Installed assets/backgrounds/bg-main.jpg ({len(data)} bytes, 832x468 JPEG)")
+          print(version)
+          PY
+      - name: Commit the final background and updated cache
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A assets/backgrounds/bg-main.jpg sw.js .staging .github/workflows/install-main-background.yml
+          git commit -m "Use cohesive cinematic landscape for main menu"
+          git push origin HEAD:main
