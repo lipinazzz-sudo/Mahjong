@@ -1,0 +1,47 @@
+/* History mode tabs and rank visibility — additive styles only. */
+.history-mode-tabs{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  width:fit-content;
+  max-width:100%;
+  margin:0 0 12px;
+  padding:4px;
+  border:1px solid rgba(231,188,91,.20);
+  border-radius:12px;
+  background:rgba(1,13,11,.72);
+}
+.history-mode-tab{
+  appearance:none;
+  min-width:124px;
+  padding:9px 15px;
+  border:1px solid transparent;
+  border-radius:8px;
+  background:transparent;
+  color:rgba(255,244,220,.68);
+  font:800 11px/1.2 inherit;
+  letter-spacing:.03em;
+  cursor:pointer;
+  transition:background .16s ease,color .16s ease,border-color .16s ease,transform .16s ease;
+}
+.history-mode-tab:hover{
+  color:#fff3d5;
+  border-color:rgba(231,188,91,.25);
+}
+.history-mode-tab.active{
+  color:#1d1104;
+  border-color:#f2d494;
+  background:linear-gradient(180deg,#f1d182,#c98a34);
+  box-shadow:0 4px 12px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,248,222,.45);
+}
+.history-mode-tab:active{transform:scale(.985)}
+.history-mode-tab:focus-visible{outline:2px solid #f2d494;outline-offset:2px}
+@media(max-width:560px){
+  .history-mode-tabs{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    width:100%;
+  }
+  .history-mode-tab{min-width:0;padding:10px 8px}
+}
+@media(prefers-reduced-motion:reduce){.history-mode-tab{transition:none}}
