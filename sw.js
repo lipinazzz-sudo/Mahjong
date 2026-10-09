@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'mahjong-dj-lobby-artwork-toolbar-2026-10-09-2';
+const CACHE_VERSION = 'mahjong-dj-mode-card-artwork-2026-10-09-1';
 const APP_SHELL = [
   './',
   './index.html',
@@ -33,8 +33,11 @@ const APP_SHELL = [
   './assets/css/12-score-guide-layout-fix.css?v=20261009-1',
   './assets/css/13-gameplay-ui-and-discard-reveal.css?v=20261009-4',
   './assets/css/14-main-menu-score-guide-layout.css?v=20261009-1',
-  './assets/css/15-obsidian-gold-panel-theme.css?v=20261009-2
-  './assets/css/16-lobby-artwork-and-toolbar-consistency.css?v=20261009-2'',
+  './assets/css/15-obsidian-gold-panel-theme.css?v=20261009-2',
+  './assets/css/16-lobby-artwork-and-toolbar-consistency.css?v=20261009-2',
+  './assets/css/17-mode-card-artwork.css?v=20261009-1',
+  './assets/backgrounds/card-vs-ai.webp',
+  './assets/backgrounds/card-multiplayer.webp',
 ];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE_VERSION).then(cache => cache.addAll(APP_SHELL).catch(()=>{}))); self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE_VERSION).map(k=>caches.delete(k))))); self.clients.claim(); });
