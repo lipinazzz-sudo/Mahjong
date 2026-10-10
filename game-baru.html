@@ -46,6 +46,10 @@ h1{font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(21px,2.7vw,29px);
 .opponent-hand.opponent-4{right:4%;top:37%}
 .card-back{position:relative;width:22px;height:31px;flex:0 0 22px;border:1px solid #d7b56e;border-radius:4px;background:repeating-linear-gradient(135deg,#193b2d 0 4px,#0d261d 4px 8px);box-shadow:0 2px 4px #0005}
 .card-back::after{content:"✦";position:absolute;inset:0;display:grid;place-items:center;color:#e1c17a;font-size:11px}
+.opponent-reveal-card{display:block;width:clamp(14px,2.1vw,24px);flex:0 0 clamp(14px,2.1vw,24px);padding:1px;border:1px solid #b79a5c;border-radius:3px;background:#efe3c5;box-shadow:0 1px 3px #0006}
+.opponent-reveal-card .domino-face{aspect-ratio:1.7/1;border-radius:1px;border-color:#b9a681}
+.opponent-reveal-card .pip-half{padding:0}
+.opponent-reveal-card .pip{width:2px;height:2px}
 .pot-area{position:absolute;z-index:1;left:50%;top:46%;transform:translate(-50%,-50%);width:min(34%,310px);min-width:160px;text-align:center}
 .pot-oval{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;height:111px;padding:12px 12px 24px;border:2px solid #d7b46d;border-radius:50% / 48%;background:radial-gradient(ellipse at 50% 25%,#18513c 0%,#0a2d22 73%,#071e17 100%);box-shadow:inset 0 0 0 4px #080f0b,inset 0 0 0 5px #c39c515c,0 8px 19px #0004}
 .pot-label{font-size:9px;font-weight:900;letter-spacing:.2em;color:#d8c28f}
@@ -114,6 +118,8 @@ h1{font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(21px,2.7vw,29px);
  .opponent-hand.opponent-4{right:2%;top:36%}
  .card-back{width:clamp(10px,3.8vw,17px);height:clamp(17px,5.8vw,25px);flex-basis:clamp(10px,3.8vw,17px);border-radius:3px}
  .card-back::after{font-size:8px}
+ .opponent-reveal-card{width:clamp(12px,3.2vw,16px);flex-basis:clamp(12px,3.2vw,16px);padding:1px}
+ .opponent-reveal-card .pip{width:2px;height:2px}
  .pot-area{width:42%;min-width:130px;top:45%}
  .pot-oval{height:clamp(77px,24vw,94px);padding:8px 7px 19px}
  .pot-label{font-size:7px;letter-spacing:.14em}
@@ -270,11 +276,11 @@ function bestBotCombo(hand){
 }
 function makePlayers(){
  players=[
-  {id:"A",name:"Anda",letter:"A",human:true,chips:STARTING_CHIPS,hand:[],inHand:true,folded:false,stageBet:0,actedAtBet:0,reveal:false,combo:null},
-  {id:"B",name:"Pemain B",letter:"B",human:false,chips:STARTING_CHIPS,hand:[],inHand:true,folded:false,stageBet:0,actedAtBet:0,reveal:false,combo:null},
-  {id:"C",name:"Pemain C",letter:"C",human:false,chips:STARTING_CHIPS,hand:[],inHand:true,folded:false,stageBet:0,actedAtBet:0,reveal:false,combo:null},
-  {id:"D",name:"Pemain D",letter:"D",human:false,chips:STARTING_CHIPS,hand:[],inHand:true,folded:false,stageBet:0,actedAtBet:0,reveal:false,combo:null},
-  {id:"E",name:"Pemain E",letter:"E",human:false,chips:STARTING_CHIPS,hand:[],inHand:true,folded:false,stageBet:0,actedAtBet:0,reveal:false,combo:null}
+  {id:"A",name:"Anda",letter:"A",human:true,chips:STARTING_CHIPS,hand:[],inHand:true,folded:false,stageBet:0,actedAtBet:0,reveal:false,combo:null,invalidShow:false},
+  {id:"B",name:"Pemain B",letter:"B",human:false,chips:STARTING_CHIPS,hand:[],inHand:true,folded:false,stageBet:0,actedAtBet:0,reveal:false,combo:null,invalidShow:false},
+  {id:"C",name:"Pemain C",letter:"C",human:false,chips:STARTING_CHIPS,hand:[],inHand:true,folded:false,stageBet:0,actedAtBet:0,reveal:false,combo:null,invalidShow:false},
+  {id:"D",name:"Pemain D",letter:"D",human:false,chips:STARTING_CHIPS,hand:[],inHand:true,folded:false,stageBet:0,actedAtBet:0,reveal:false,combo:null,invalidShow:false},
+  {id:"E",name:"Pemain E",letter:"E",human:false,chips:STARTING_CHIPS,hand:[],inHand:true,folded:false,stageBet:0,actedAtBet:0,reveal:false,combo:null,invalidShow:false}
  ];
 }
 function pushLog(text,amount){
@@ -307,7 +313,7 @@ function renderSeats(){
   if(p.chips<=0||p.folded&&phase!=="result")return;
   var n=p.hand.length;
   if(p.reveal&&phase==="result"){
-   p.hand.forEach(function(tile){var mini=document.createElement("span");mini.className="card-back";mini.style.background="#e7d9b8";mini.style.borderColor="#a98a51";mini.textContent="";mini.setAttribute("aria-label","Kartu terbuka");host.appendChild(mini);});
+   p.hand.forEach(function(tile){var mini=document.createElement("span");mini.className="opponent-reveal-card";mini.setAttribute("aria-label","Kartu domino "+tile.a+" dan "+tile.b);var face=document.createElement("span");face.className="domino-face";face.append(buildHalf(tile.a),buildHalf(tile.b));mini.appendChild(face);host.appendChild(mini);});
   }else{
    for(var i=0;i<n;i++){var back=document.createElement("span");back.className="card-back";back.setAttribute("aria-hidden","true");host.appendChild(back);}
   }
@@ -389,7 +395,7 @@ function startHand(initial){
  maxBet=minBet*8;
  deck=createDeck();pot=0;selectedIndexes=[];userChosenCombo=null;lastResult=null;handEnded=false;
  players.forEach(function(p){
-  p.hand=[];p.folded=false;p.inHand=p.chips>0;p.stageBet=0;p.actedAtBet=0;p.reveal=false;p.combo=null;
+  p.hand=[];p.folded=false;p.inHand=p.chips>0;p.stageBet=0;p.actedAtBet=0;p.reveal=false;p.combo=null;p.invalidShow=false;
  });
  var eligible=players.filter(function(p){return p.chips>0;});
  eligible.forEach(function(p){
@@ -496,10 +502,10 @@ function enterShowdown(){
   if(!p.inHand||p.folded)return;
   if(p.hand.length!==5){p.folded=true;return;}
   if(p.human){
-   if(!hasValidTriple(p.hand)){p.folded=true;pushLog("Anda · Fold otomatis (tidak ada kombinasi 10/20/30)");}
+   if(!hasValidTriple(p.hand)){p.folded=true;p.invalidShow=true;pushLog("Anda · Fold otomatis (tidak ada kombinasi 10/20/30)");}
   }else{
    p.combo=bestBotCombo(p.hand);
-   if(!p.combo){p.folded=true;pushLog(p.name+" · Fold otomatis (kombinasi tidak valid)");}
+   if(!p.combo){p.folded=true;p.invalidShow=true;pushLog(p.name+" · Fold otomatis (kombinasi tidak valid)");}
   }
  });
  renderAll();
@@ -544,7 +550,7 @@ function showSelectedCards(){
 }
 function resolveBotShowdown(){
  if(activeCount()<=1){awardLastPlayer();return;}
- players.forEach(function(p){if(p.inHand&&!p.folded&&!p.human){p.combo=bestBotCombo(p.hand);if(!p.combo)p.folded=true;}});
+ players.forEach(function(p){if(p.inHand&&!p.folded&&!p.human){p.combo=bestBotCombo(p.hand);if(!p.combo){p.folded=true;p.invalidShow=true;}}});
  renderAll();
  if(activeCount()<=1){awardLastPlayer();return;}
  resolveShowdown();
@@ -571,9 +577,24 @@ function awardLastPlayer(){
  if(handEnded)return;
  var contenders=liveHandPlayers();
  if(contenders.length===0){
+  var invalids=players.filter(function(p){return p.invalidShow&&p.hand.length===5;});
+  if(invalids.length){
+   var noValidPot=pot,each=Math.floor(noValidPot/invalids.length),extra=noValidPot-each*invalids.length;
+   invalids.forEach(function(p,i){p.chips+=each+(i<extra?1:0);p.reveal=true;});
+   lastResult={winners:invalids.map(function(p){return p.name;}),amount:noValidPot,score:null,byShow:false,noValid:true};
+   handEnded=true;phase="result";actingIndex=-1;
+   pushLog("Tidak ada kombinasi valid · pot dibagi",noValidPot);
+   renderAll();showResultPrompt();return;
+  }
   var alive=liveTournamentPlayers();
   if(alive.length===1){endTournament(alive[0]);return;}
-  if(alive.length>1){resolveBotShowdown();return;}
+  if(alive.length>1){
+   var fallback=alive.slice().sort(function(a,b){return b.chips-a.chips;})[0];
+   var fallbackPot=pot;fallback.chips+=fallbackPot;
+   lastResult={winners:[fallback.name],amount:fallbackPot,score:null,byShow:false,noValid:true};
+   handEnded=true;phase="result";actingIndex=-1;pushLog("Pot diberikan kepada pemain dengan chip tertinggi",fallbackPot);
+   renderAll();showResultPrompt();return;
+  }
   endTournament(null);return;
  }
  var winner=contenders[0],handPot=pot;
@@ -587,8 +608,9 @@ function awardLastPlayer(){
 function showResultPrompt(){
  var alive=liveTournamentPlayers();
  var winText=lastResult.winners.join(" & ");
- var details=lastResult.byShow&&lastResult.score?lastResult.score.label:"Pemain lain Fold atau kombinasi tidak valid.";
- showPrompt("HASIL RONDE "+round,lastResult.byShow?"Showdown selesai":"Pot dimenangkan",winText+" menang dan menerima pot "+fmt(lastResult.amount)+". "+details,[
+ var details=lastResult.byShow&&lastResult.score?lastResult.score.label:(lastResult.noValid?"Tidak ada kombinasi valid; pot dibagi sesuai hasil simulasi.":"Pemain lain Fold atau kombinasi tidak valid.");
+ var resultMessage=lastResult.winners.length>1?(winText+" berbagi pot sebesar "+fmt(lastResult.amount)+". "+details):(winText+" menang dan menerima pot "+fmt(lastResult.amount)+". "+details);
+ showPrompt("HASIL RONDE "+round,lastResult.byShow?"Showdown selesai":"Pot dimenangkan",resultMessage,[
   {label:alive.length<=1?"Lihat pemenang turnamen":"Ronde berikutnya",click:function(){hidePrompt();if(alive.length<=1)endTournament(alive[0]||null);else startHand(false);}},
   {label:"Ulangi turnamen",kind:"secondary",click:function(){hidePrompt();round=1;makePlayers();startHand(true);}}
  ],"Chip Anda",fmt(userPlayer()?userPlayer().chips:0));
