@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dj-sapi-gu-show-bet-upright-tiles-2026-10-10-6';
+const CACHE_VERSION = 'dj-sapi-gu-lobby-settings-info-2026-10-10-7';
 const APP_SHELL = [
   './',
   './index.html',
