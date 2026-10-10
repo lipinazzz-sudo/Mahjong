@@ -173,7 +173,7 @@ button.hub-link{border:0;padding:0;background:transparent;cursor:pointer}
 .page-screen.active{display:flex}
 #screen-game{display:none}
 #screen-game.active{display:block}
-.landing-screen{position:relative;isolation:isolate;overflow:hidden;flex-direction:column;width:min(1300px,100%);min-height:calc(100svh - 16px);margin:auto;padding:clamp(14px,2.5vw,30px);border:1px solid rgba(215,180,109,.35);border-radius:25px;background:linear-gradient(145deg,rgba(6,12,10,.73),rgba(4,8,6,.91)),url("assets/backgrounds/bg-main.jpg") center/cover no-repeat;box-shadow:0 24px 75px #0008,inset 0 1px 0 #fff1}
+.landing-screen{position:relative;isolation:isolate;overflow:hidden;flex-direction:column;width:min(1300px,100%);min-height:calc(100svh - 16px);margin:auto;padding:clamp(14px,2.5vw,30px);border:1px solid rgba(215,180,109,.35);border-radius:25px;background:linear-gradient(145deg,rgba(6,12,10,.73),rgba(4,8,6,.91)),url("assets/sapi-gu/backgrounds/bg-main.svg") center/cover no-repeat;box-shadow:0 24px 75px #0008,inset 0 1px 0 #fff1}
 .landing-screen::before{content:"";position:absolute;z-index:-1;inset:0;background:radial-gradient(ellipse at 50% 37%,rgba(208,158,73,.13),transparent 42%),linear-gradient(90deg,rgba(2,6,5,.58),transparent 48%,rgba(2,6,5,.54));pointer-events:none}
 .lobby-topbar{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .lobby-profile{display:flex;align-items:center;gap:10px;min-width:0;max-width:240px;padding:7px 11px 7px 7px;border:1px solid rgba(230,190,111,.38);border-radius:14px;background:rgba(5,10,8,.76);color:#f9edcf;text-align:left;cursor:pointer}
@@ -204,14 +204,15 @@ button.hub-link{border:0;padding:0;background:transparent;cursor:pointer}
 .lobby-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#a8a18e;font-size:9px;letter-spacing:.08em}
 .lobby-footer button{border:0;background:transparent;color:#cbb987;font-size:10px;cursor:pointer}
 .page-panel{position:relative;width:min(760px,100%);margin:auto;padding:clamp(18px,4vw,38px);border:1px solid rgba(215,180,109,.38);border-radius:22px;background:linear-gradient(145deg,rgba(27,24,19,.96),rgba(6,9,7,.98));box-shadow:0 26px 78px #0008,inset 0 1px 0 #fff1}
+#screen-settings .page-panel{background-image:linear-gradient(145deg,rgba(27,24,19,.87),rgba(6,9,7,.92)),url("assets/sapi-gu/backgrounds/bg-settings.svg");background-position:center;background-size:cover;}
 .panel-header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px}
 .panel-heading{margin:0;color:#f5dfa5;font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(28px,4.4vw,43px);line-height:1}
 .panel-subheading{margin:7px 0 0;color:#b9b4a5;font-size:12px;line-height:1.6}
 .back-button{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 13px;border:1px solid rgba(220,187,115,.34);border-radius:11px;color:#e4d3a4;background:#111710;font-size:11px;font-weight:850;cursor:pointer;white-space:nowrap}
 .mode-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.mode-card-sg{position:relative;display:flex;min-height:205px;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:10px;padding:20px;overflow:hidden;border:1px solid #c8a45b77;border-radius:16px;text-align:left;background:linear-gradient(180deg,rgba(5,8,6,.08),rgba(5,8,6,.95)),url("assets/backgrounds/bg-ai-card.jpg") center/cover;color:#fff0c8;cursor:pointer;transition:transform .18s,border-color .18s}
+.mode-card-sg{position:relative;display:flex;min-height:205px;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:10px;padding:20px;overflow:hidden;border:1px solid #c8a45b77;border-radius:16px;text-align:left;background:linear-gradient(180deg,rgba(5,8,6,.08),rgba(5,8,6,.95)),url("assets/sapi-gu/backgrounds/bg-vs-bot.svg") center/cover;color:#fff0c8;cursor:pointer;transition:transform .18s,border-color .18s}
 .mode-card-sg:hover{transform:translateY(-3px);border-color:#ffe4a1}
-.mode-card-sg.multiplayer{background:linear-gradient(180deg,rgba(5,8,6,.05),rgba(5,8,6,.96)),url("assets/backgrounds/bg-multiplayer-card.jpg") center/cover}
+.mode-card-sg.multiplayer{background:linear-gradient(180deg,rgba(5,8,6,.05),rgba(5,8,6,.96)),url("assets/sapi-gu/backgrounds/bg-multiplayer.svg") center/cover}
 .mode-card-sg strong{font-family:"Bodoni MT",Didot,Georgia,serif;font-size:27px;line-height:1}
 .mode-card-sg span{font-size:11px;color:#d4c9ad;line-height:1.5}
 .mode-card-sg small{position:absolute;top:13px;right:13px;padding:6px 9px;border:1px solid #f0d79b55;border-radius:999px;background:#090d0bcc;color:#f1dba5;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
