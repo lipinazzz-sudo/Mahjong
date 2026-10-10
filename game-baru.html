@@ -1,299 +1,614 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#07100d">
-  <meta name="description" content="Prototype meja Sapi/Gu dengan pot virtual di tengah meja oval.">
-  <title>Sapi / Gu — DJ Game Hub</title>
-  <style>
-    :root{color-scheme:dark;--gold:#e9c77e;--gold-light:#ffedbd;--ink:#f8f0dd;--muted:#b8c9bd}
-    *{box-sizing:border-box}
-    html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink)}
-    body{min-height:100vh;min-height:100svh;padding:clamp(10px,2vw,22px);background:radial-gradient(ellipse at 50% 28%,#243c31 0%,#101d18 48%,#070b0a 100%)}
-    button,a{font:inherit}
-    .app{width:min(1440px,100%);margin:0 auto}
-    .topbar{height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
-    .brand{display:flex;align-items:center;gap:10px;min-width:0}
-    .brand-mark{display:grid;place-items:center;width:38px;height:38px;flex:0 0 38px;border:1px solid #a98445;border-radius:12px;background:linear-gradient(145deg,#352a17,#111510);color:var(--gold-light);font-size:18px;box-shadow:0 0 20px #e9c77e12}
-    .eyebrow{color:var(--gold);font-size:9px;font-weight:900;letter-spacing:.19em;text-transform:uppercase}
-    h1{font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(23px,3vw,31px);line-height:1;margin:3px 0 0;color:#f5dfab;font-weight:600}
-    .top-actions{display:flex;gap:8px;align-items:center}
-    .menu-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 13px;border:1px solid #d9b96e80;border-radius:12px;color:#ffedc6;background:linear-gradient(180deg,#312718,#151711);font-size:12px;font-weight:850;cursor:pointer}
-    .menu-button svg{width:17px;height:17px}
-    .table-shell{position:relative;width:100%;height:min(76svh,780px);min-height:450px;display:grid;place-items:center;overflow:hidden;border:1px solid #b78c4d70;border-radius:26px;background:linear-gradient(145deg,#151e18,#0a100d);box-shadow:0 22px 60px #0007,inset 0 1px 0 #fff1;padding:clamp(12px,2vw,24px)}
-    .table{position:relative;width:100%;height:100%;border-radius:50% / 45%;background:radial-gradient(ellipse at 50% 42%,#23684e 0%,#17513d 46%,#103b2d 74%,#0b2c22 100%);border:clamp(8px,1.15vw,14px) solid #5b3c21;box-shadow:inset 0 0 0 2px #d0a25a,inset 0 0 0 8px #291d12,inset 0 20px 55px #ffffff09,0 13px 26px #0007;isolation:isolate}
-    .table::before{content:"";position:absolute;inset:10px;border:1px solid #e5c78336;border-radius:inherit;pointer-events:none}
-    .table::after{content:"";position:absolute;inset:20px;border:1px solid #061b142b;border-radius:inherit;pointer-events:none}
-    .seat{position:absolute;z-index:2;display:flex;align-items:center;gap:8px;width:clamp(86px,17%,158px);min-height:57px;padding:7px 8px;border:1px solid #e7c77945;border-radius:13px;background:linear-gradient(145deg,rgba(11,22,17,.97),rgba(6,13,10,.97));box-shadow:0 8px 18px #0004}
-    .seat .avatar{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:50%;border:1px solid #e4c17680;background:linear-gradient(145deg,#6e5730,#272217);color:#fff0c8;font-size:11px;font-weight:900}
-    .seat-copy{min-width:0;flex:1}
-    .seat-name{font-size:11px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .seat-state{margin-top:3px;color:#afc7b8;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .seat-stack{color:var(--gold-light);font-size:10px;font-weight:850;margin-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
-    /* Four opponents occupy the far half of the table; the user always sits at the bottom. */
-    .opponent-1{left:3%;top:23%}
-    .opponent-2{left:27%;top:5%}
-    .opponent-3{right:27%;top:5%}
-    .opponent-4{right:3%;top:23%}
-    .seat.you{left:50%;bottom:3%;transform:translateX(-50%);border-color:#f3d38a;box-shadow:0 0 0 1px #f3d38a22,0 8px 18px #0005}
-    .seat.folded{opacity:.46;filter:saturate(.5)}
-    .seat.folded .seat-state{color:#e59d8c}
-    .pot-area{position:absolute;z-index:1;left:50%;top:48%;transform:translate(-50%,-50%);width:min(36%,310px);min-width:164px;text-align:center}
-    .pot-oval{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;height:112px;padding:12px 12px 20px;border:2px solid #d7b46d;border-radius:50% / 48%;background:radial-gradient(ellipse at 50% 25%,#18513c 0%,#0a2d22 73%,#071e17 100%);box-shadow:inset 0 0 0 4px #080f0b,inset 0 0 0 5px #c39c515c,0 8px 19px #0004}
-    .pot-label{font-size:9px;font-weight:900;letter-spacing:.2em;color:#d8c28f}
-    .pot-value{margin-top:3px;font-size:clamp(22px,2.8vw,30px);font-weight:900;letter-spacing:-.04em;color:#ffe7a2;font-variant-numeric:tabular-nums;text-shadow:0 2px 12px #0008}
-    .pot-sub{margin-top:2px;color:#a9c9b6;font-size:9px;white-space:nowrap}
-    .chips{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:3px;max-width:82%;height:15px;overflow:hidden}
-    .chip{width:14px;height:14px;flex:0 0 14px;border-radius:50%;border:1.5px dashed #fff8;box-shadow:0 2px 3px #0007;background:repeating-conic-gradient(#d8b66b 0 12deg,#8d642d 12deg 24deg)}
-    .chip:nth-child(3n+2){background:repeating-conic-gradient(#d8e0d6 0 12deg,#6d8577 12deg 24deg)}
-    .chip:nth-child(3n){background:repeating-conic-gradient(#b85b4f 0 12deg,#702f2b 12deg 24deg)}
-    .table-caption{position:absolute;left:50%;top:69%;transform:translateX(-50%);font-size:9px;letter-spacing:.14em;color:#b8d1bf;text-transform:uppercase;white-space:nowrap;pointer-events:none}
-    dialog{width:min(410px,calc(100vw - 28px));max-height:min(82svh,680px);overflow:auto;padding:0;border:1px solid #d4b16b80;border-radius:20px;color:var(--ink);background:linear-gradient(145deg,#17221b,#080e0b 80%);box-shadow:0 28px 90px #000b}
-    dialog::backdrop{background:rgba(0,0,0,.67);backdrop-filter:blur(4px)}
-    .dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 18px 13px;border-bottom:1px solid #ffffff13}
-    .dialog-head h2{margin:0;color:#f0d79b;font-size:15px}
-    .close-button{display:grid;place-items:center;width:32px;height:32px;border:1px solid #ffffff24;border-radius:10px;background:#0e1712;color:#e8e0cc;font-size:18px;cursor:pointer}
-    .dialog-body{padding:15px 18px 18px;display:grid;gap:15px}
-    .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .metric{padding:11px;border:1px solid #ffffff12;border-radius:12px;background:#ffffff05}
-    .metric span{display:block;color:#b8c9bd;font-size:10px}
-    .metric strong{display:block;margin-top:5px;color:#fff0c8;font-size:14px;font-variant-numeric:tabular-nums}
-    .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .action{min-height:43px;padding:8px 10px;border:1px solid #d9b96e;border-radius:11px;background:linear-gradient(180deg,#80602b,#48331a);color:#fff0c7;font-size:11px;font-weight:850;cursor:pointer;transition:transform .16s,filter .16s}
-    .action:hover{filter:brightness(1.12);transform:translateY(-1px)}
-    .action.secondary{background:#12241b;border-color:#426650;color:#d4e4d8}
-    .action:disabled{opacity:.4;cursor:not-allowed;transform:none}
-    .status{min-height:16px;color:#d8c18b;font-size:11px;line-height:1.5}
-    .log-section h3{margin:0 0 9px;color:#f0d79b;font-size:12px}
-    .log{display:grid;gap:8px;max-height:125px;overflow:auto}
-    .log-row{display:flex;justify-content:space-between;gap:10px;font-size:10px;color:#b9cbbf}
-    .log-row strong{color:#f4dca3;font-variant-numeric:tabular-nums}
-    .popup-note{margin:0;color:#a9bcb0;font-size:10px;line-height:1.6}
-    .dialog-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:12px;border-top:1px solid #ffffff13}
-    .hub-link{color:#ecd59e;text-decoration:none;font-size:11px;font-weight:800}
-    .hub-link:hover{text-decoration:underline}
-    @media(max-width:700px){
-      body{padding:9px}
-      .topbar{height:42px;margin-bottom:7px}
-      .brand-mark{width:33px;height:33px;flex-basis:33px;border-radius:10px;font-size:15px}
-      .eyebrow{font-size:8px;letter-spacing:.15em}
-      h1{font-size:24px}
-      .menu-button{width:39px;min-height:38px;padding:0;font-size:0;gap:0}
-      .menu-button svg{width:19px;height:19px}
-      .table-shell{height:auto;min-height:0;aspect-ratio:1.28/1;padding:7px;border-radius:19px}
-      .table{min-height:0;height:100%;border-width:7px}
-      .table::before{inset:5px}.table::after{inset:11px}
-      .seat{width:22%;min-height:0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 2px;border-radius:9px}
-      .seat .avatar{width:23px;height:23px;flex-basis:23px;font-size:9px}
-      .seat-name{max-width:100%;font-size:8px;text-align:center}
-      .seat-state{display:none}
-      .seat-stack{font-size:7px;margin-top:2px}
-      .opponent-1{left:1%;top:23%}
-      .opponent-2{left:26%;top:5%}
-      .opponent-3{right:26%;top:5%}
-      .opponent-4{right:1%;top:23%}
-      .seat.you{bottom:2%}
-      .seat.you .avatar{width:25px;height:25px;flex-basis:25px}
-      .seat.you .seat-name{font-size:9px}
-      .seat.you .seat-stack{font-size:8px}
-      .pot-area{width:43%;min-width:142px;top:48%}
-      .pot-oval{height:88px;padding:8px 7px 17px}
-      .pot-label{font-size:8px;letter-spacing:.14em}
-      .pot-value{font-size:23px}
-      .pot-sub{font-size:8px}
-      .chips{height:12px;bottom:4px;gap:2px}
-      .chip{width:11px;height:11px;flex-basis:11px;border-width:1px}
-      .table-caption{top:69%;font-size:7px;letter-spacing:.07em}
-      .dialog-body{padding:13px}
-      .dialog-head{padding:14px 13px 11px}
-    }
-    @media(max-width:370px){
-      .table-shell{aspect-ratio:1.16/1}
-      .pot-area{width:45%;min-width:132px}
-      .pot-oval{height:82px}
-      .pot-value{font-size:20px}
-      .seat-stack{font-size:6.5px}
-    }
-    @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07100d">
+<meta name="description" content="Prototype permainan Sapi/Gu dengan kartu domino, taruhan bertahap, dan pot virtual.">
+<title>Sapi / Gu — DJ Game Hub</title>
+<style>
+:root{color-scheme:dark;--gold:#e9c77e;--gold-light:#ffedbd;--ink:#f8f0dd;--muted:#b8c9bd;--felt:#17513d}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink)}
+body{min-height:100vh;min-height:100svh;padding:clamp(8px,1.6vw,18px);background:radial-gradient(ellipse at 50% 25%,#243c31 0%,#101d18 48%,#070b0a 100%)}
+button,a{font:inherit}
+.app{width:min(1480px,100%);margin:0 auto}
+.topbar{height:42px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 4px 7px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand-mark{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border:1px solid #a98445;border-radius:11px;background:linear-gradient(145deg,#352a17,#111510);color:var(--gold-light);font-size:16px}
+.eyebrow{color:var(--gold);font-size:9px;font-weight:900;letter-spacing:.19em;text-transform:uppercase}
+h1{font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(21px,2.7vw,29px);line-height:1;margin:3px 0 0;color:#f5dfab;font-weight:600}
+.hub-link{color:#d8c18b;text-decoration:none;font-size:10px;font-weight:800;letter-spacing:.06em;white-space:nowrap}
+.hub-link:hover{color:#fff0c8;text-decoration:underline}
+.table-shell{position:relative;width:100%;height:min(76svh,790px);min-height:455px;display:grid;place-items:center;overflow:hidden;border:1px solid #b78c4d70;border-radius:25px;background:linear-gradient(145deg,#151e18,#0a100d);box-shadow:0 22px 60px #0007,inset 0 1px 0 #fff1;padding:clamp(10px,1.7vw,22px)}
+.table{position:relative;width:100%;height:100%;border-radius:50% / 45%;background:radial-gradient(ellipse at 50% 42%,#23684e 0%,#17513d 46%,#103b2d 74%,#0b2c22 100%);border:clamp(8px,1.15vw,14px) solid #5b3c21;box-shadow:inset 0 0 0 2px #d0a25a,inset 0 0 0 8px #291d12,inset 0 20px 55px #ffffff09,0 13px 26px #0007;isolation:isolate}
+.table::before{content:"";position:absolute;inset:10px;border:1px solid #e5c78336;border-radius:inherit;pointer-events:none}
+.table::after{content:"";position:absolute;inset:20px;border:1px solid #061b142b;border-radius:inherit;pointer-events:none}
+.seat{position:absolute;z-index:3;display:flex;align-items:center;gap:7px;width:clamp(100px,15.5%,160px);min-height:55px;padding:7px 8px;border:1px solid #e7c77945;border-radius:12px;background:linear-gradient(145deg,rgba(11,22,17,.97),rgba(6,13,10,.97));box-shadow:0 8px 18px #0004;transition:border-color .18s,box-shadow .18s,opacity .18s}
+.seat .avatar{display:grid;place-items:center;flex:0 0 29px;width:29px;height:29px;border-radius:50%;border:1px solid #e4c17680;background:linear-gradient(145deg,#6e5730,#272217);color:#fff0c8;font-size:11px;font-weight:900}
+.seat-copy{min-width:0;flex:1}
+.seat-name{font-size:11px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seat-state{margin-top:3px;color:#afc7b8;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seat-stack{color:var(--gold-light);font-size:10px;font-weight:850;margin-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.seat.current{border-color:#ffe6a0;box-shadow:0 0 0 1px #ffe6a02a,0 0 20px #e9c77e24,0 8px 18px #0005}
+.seat.you{left:50%;bottom:2%;transform:translateX(-50%);width:clamp(120px,20%,190px);min-height:52px;border-color:#f3d38a}
+.seat.folded{opacity:.42;filter:saturate(.4)}
+.seat.folded .seat-state{color:#e59d8c}
+.seat.eliminated{opacity:.25;filter:grayscale(1)}
+.opponent-1{left:2%;top:24%}
+.opponent-2{left:27%;top:4%}
+.opponent-3{right:27%;top:4%}
+.opponent-4{right:2%;top:24%}
+.opponent-hand{position:absolute;z-index:2;display:flex;gap:2px;align-items:center;justify-content:center;min-height:29px;max-width:28%;overflow:hidden}
+.opponent-hand.opponent-1{left:4%;top:37%}
+.opponent-hand.opponent-2{left:29%;top:16%}
+.opponent-hand.opponent-3{right:29%;top:16%}
+.opponent-hand.opponent-4{right:4%;top:37%}
+.card-back{position:relative;width:22px;height:31px;flex:0 0 22px;border:1px solid #d7b56e;border-radius:4px;background:repeating-linear-gradient(135deg,#193b2d 0 4px,#0d261d 4px 8px);box-shadow:0 2px 4px #0005}
+.card-back::after{content:"✦";position:absolute;inset:0;display:grid;place-items:center;color:#e1c17a;font-size:11px}
+.pot-area{position:absolute;z-index:1;left:50%;top:46%;transform:translate(-50%,-50%);width:min(34%,310px);min-width:160px;text-align:center}
+.pot-oval{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;height:111px;padding:12px 12px 24px;border:2px solid #d7b46d;border-radius:50% / 48%;background:radial-gradient(ellipse at 50% 25%,#18513c 0%,#0a2d22 73%,#071e17 100%);box-shadow:inset 0 0 0 4px #080f0b,inset 0 0 0 5px #c39c515c,0 8px 19px #0004}
+.pot-label{font-size:9px;font-weight:900;letter-spacing:.2em;color:#d8c28f}
+.pot-value{margin-top:3px;font-size:clamp(21px,2.8vw,30px);font-weight:900;letter-spacing:-.04em;color:#ffe7a2;font-variant-numeric:tabular-nums;text-shadow:0 2px 12px #0008}
+.pot-sub{margin-top:2px;color:#a9c9b6;font-size:9px;white-space:nowrap}
+.chips{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:3px;max-width:82%;height:15px;overflow:hidden}
+.chip{width:14px;height:14px;flex:0 0 14px;border-radius:50%;border:1.5px dashed #fff8;box-shadow:0 2px 3px #0007;background:repeating-conic-gradient(#d8b66b 0 12deg,#8d642d 12deg 24deg)}
+.chip:nth-child(3n+2){background:repeating-conic-gradient(#d8e0d6 0 12deg,#6d8577 12deg 24deg)}
+.chip:nth-child(3n){background:repeating-conic-gradient(#b85b4f 0 12deg,#702f2b 12deg 24deg)}
+.table-caption{position:absolute;left:50%;top:66%;transform:translateX(-50%);font-size:9px;letter-spacing:.14em;color:#b8d1bf;text-transform:uppercase;white-space:nowrap;pointer-events:none}
+.table-phase{position:absolute;left:50%;top:56%;transform:translateX(-50%);max-width:75%;text-align:center;color:#d0e0d2;font-size:10px;letter-spacing:.08em;text-transform:uppercase;text-shadow:0 2px 7px #0009;white-space:nowrap}
+.hand-zone{position:absolute;left:50%;bottom:18%;transform:translateX(-50%);z-index:5;width:max-content;max-width:96%;display:flex;justify-content:center;align-items:flex-end;gap:clamp(2px,.5vw,7px)}
+.domino-card{display:block;position:relative;width:clamp(47px,5.8vw,72px);min-width:0;padding:3px;border:1px solid #c6a45d;border-radius:7px;background:linear-gradient(145deg,#fffaeb,#d9c9a5);box-shadow:0 6px 13px #0006;cursor:default;transition:transform .15s,border-color .15s,box-shadow .15s;touch-action:manipulation}
+.domino-card.selectable{cursor:pointer}
+.domino-card.selectable:hover{transform:translateY(-4px)}
+.domino-card.selected{transform:translateY(-9px);border:2px solid #ffe59a;box-shadow:0 0 0 2px #d9a94342,0 0 18px #f2ca6d42,0 8px 15px #0008}
+.domino-face{display:grid;grid-template-columns:1fr 1fr;aspect-ratio:1.7/1;background:linear-gradient(145deg,#fff9e7,#eee0c0);border:1px solid #ad9a75;border-radius:4px;overflow:hidden}
+.pip-half{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);align-items:center;justify-items:center;min-width:0;padding:3px}
+.pip-half+ .pip-half{border-left:1px solid #b7a681}
+.pip{width:clamp(2px,.38vw,4px);height:clamp(2px,.38vw,4px);border-radius:50%;background:#762d29;visibility:hidden}
+.pip.on{visibility:visible}
+.domino-card.special-tile .pip{background:#202c25}
+.card-number{display:block;margin-top:2px;text-align:center;font-size:7px;font-weight:900;letter-spacing:.02em;color:#8f7b57}
+.hand-help{position:absolute;left:50%;bottom:13.3%;transform:translateX(-50%);z-index:4;font-size:9px;color:#d6c89e;text-align:center;white-space:nowrap;text-shadow:0 1px 5px #000}
+.action-prompt{display:none;position:fixed;z-index:20;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(470px,calc(100vw - 22px));padding:14px 15px 13px;border:1px solid #d5b16b;border-radius:17px;background:linear-gradient(145deg,rgba(22,30,23,.985),rgba(6,12,9,.985));box-shadow:0 17px 55px #000b,inset 0 1px 0 #fff1}
+.action-prompt.visible{display:block;animation:prompt-in .16s ease-out}
+@keyframes prompt-in{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+.prompt-kicker{color:#d6b66f;font-size:9px;font-weight:900;letter-spacing:.17em;text-transform:uppercase}
+.prompt-title{margin:4px 0 4px;color:#fff0c8;font-size:15px;font-weight:850}
+.prompt-message{margin:0;color:#c3d2c6;font-size:11px;line-height:1.55}
+.prompt-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.prompt-button{flex:1 1 120px;min-height:39px;padding:8px 9px;border:1px solid #d9b96e;border-radius:10px;background:linear-gradient(180deg,#80602b,#48331a);color:#fff0c7;font-size:11px;font-weight:850;cursor:pointer;transition:filter .15s,transform .15s}
+.prompt-button:hover:not(:disabled){filter:brightness(1.13);transform:translateY(-1px)}
+.prompt-button.secondary{background:#12241b;border-color:#426650;color:#d4e4d8}
+.prompt-button.danger{background:#321d19;border-color:#875047;color:#f4c5b7}
+.prompt-button:disabled{opacity:.35;cursor:not-allowed;filter:grayscale(.3)}
+.prompt-foot{display:flex;justify-content:space-between;gap:12px;margin-top:9px;color:#899f8e;font-size:9px}
+.prompt-foot strong{color:#f1d59a;font-variant-numeric:tabular-nums}
+@media(max-width:760px){
+ body{padding:7px}
+ .topbar{height:36px;margin:0 2px 6px}
+ .brand-mark{width:30px;height:30px;flex-basis:30px;border-radius:9px;font-size:14px}
+ .eyebrow{font-size:7px;letter-spacing:.14em}
+ h1{font-size:22px}
+ .hub-link{font-size:9px}
+ .table-shell{height:auto;min-height:0;aspect-ratio:1.18/1;padding:6px;border-radius:18px}
+ .table{height:100%;min-height:0;border-width:7px}
+ .table::before{inset:5px}.table::after{inset:11px}
+ .seat{width:20%;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 2px;border-radius:9px}
+ .seat .avatar{width:22px;height:22px;flex-basis:22px;font-size:9px}
+ .seat-name{max-width:100%;font-size:8px;text-align:center}
+ .seat-state{display:none}
+ .seat-stack{font-size:7px;margin-top:2px}
+ .seat.you{width:25%;bottom:1%;min-height:0}
+ .seat.you .avatar{width:24px;height:24px;flex-basis:24px}
+ .seat.you .seat-name{font-size:9px}
+ .seat.you .seat-stack{font-size:7px}
+ .opponent-1{left:1%;top:23%}
+ .opponent-2{left:26%;top:4%}
+ .opponent-3{right:26%;top:4%}
+ .opponent-4{right:1%;top:23%}
+ .opponent-hand{gap:1px;max-width:27%}
+ .opponent-hand.opponent-1{left:2%;top:36%}
+ .opponent-hand.opponent-2{left:28%;top:15%}
+ .opponent-hand.opponent-3{right:28%;top:15%}
+ .opponent-hand.opponent-4{right:2%;top:36%}
+ .card-back{width:clamp(10px,3.8vw,17px);height:clamp(17px,5.8vw,25px);flex-basis:clamp(10px,3.8vw,17px);border-radius:3px}
+ .card-back::after{font-size:8px}
+ .pot-area{width:42%;min-width:130px;top:45%}
+ .pot-oval{height:clamp(77px,24vw,94px);padding:8px 7px 19px}
+ .pot-label{font-size:7px;letter-spacing:.14em}
+ .pot-value{font-size:clamp(18px,5.2vw,24px)}
+ .pot-sub{font-size:7px}
+ .chips{height:11px;bottom:4px;gap:2px}
+ .chip{width:10px;height:10px;flex-basis:10px;border-width:1px}
+ .table-phase{top:56%;font-size:7px;max-width:80%;letter-spacing:.04em}
+ .table-caption{top:65%;font-size:7px;letter-spacing:.06em}
+ .hand-zone{bottom:17%;max-width:98%;gap:2px}
+ .domino-card{width:clamp(38px,11.2vw,51px);padding:2px;border-radius:5px}
+ .pip-half{padding:2px}
+ .pip{width:clamp(2px,.65vw,3px);height:clamp(2px,.65vw,3px)}
+ .card-number{font-size:6px;margin-top:1px}
+ .hand-help{bottom:12.5%;font-size:7px}
+ .action-prompt{bottom:max(9px,env(safe-area-inset-bottom));padding:12px 12px 10px;border-radius:15px;max-width:470px}
+ .prompt-title{font-size:14px}
+ .prompt-message{font-size:10px}
+ .prompt-actions{gap:6px;margin-top:9px}
+ .prompt-button{min-height:37px;font-size:10px;padding:7px}
+ .prompt-foot{font-size:8px}
+}
+@media(max-width:370px){
+ .table-shell{aspect-ratio:1.08/1}
+ .seat-stack{font-size:6px}
+ .pot-area{width:45%;min-width:119px}
+ .pot-oval{height:75px}
+ .pot-value{font-size:18px}
+ .domino-card{width:37px}
+ .hand-zone{gap:1px}
+}
+@media(orientation:landscape) and (max-height:540px){
+ body{padding:4px}
+ .topbar{height:27px;margin-bottom:3px}
+ .brand-mark{width:25px;height:25px;flex-basis:25px}
+ h1{font-size:18px}
+ .table-shell{height:calc(100svh - 39px);min-height:0}
+ .action-prompt{bottom:5px;padding:8px 10px;width:min(450px,calc(100vw - 14px))}
+ .prompt-title{font-size:12px}.prompt-message{font-size:9px}.prompt-button{min-height:30px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
 </head>
 <body>
-  <main class="app">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">♟</div>
-        <div>
-          <div class="eyebrow">DJ Game Hub · Game 02</div>
-          <h1>Sapi / Gu</h1>
-        </div>
-      </div>
-      <div class="top-actions">
-        <button class="menu-button" id="openMenu" type="button" aria-haspopup="dialog" aria-controls="controlDialog">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-          Menu meja
-        </button>
-      </div>
-    </header>
+<main class="app">
+ <header class="topbar">
+  <div class="brand"><div class="brand-mark" aria-hidden="true">♟</div><div><div class="eyebrow">DJ Game Hub · Prototype</div><h1>Sapi / Gu</h1></div></div>
+  <a class="hub-link" href="./">← Game Hub</a>
+ </header>
+ <section class="table-shell" aria-label="Meja Sapi atau Gu">
+  <div class="table" id="gameTable">
+   <div class="seat opponent-1" data-player="B"><div class="avatar">B</div><div class="seat-copy"><div class="seat-name">Pemain B</div><div class="seat-state">Menunggu</div><div class="seat-stack">400.000</div></div></div>
+   <div class="seat opponent-2" data-player="C"><div class="avatar">C</div><div class="seat-copy"><div class="seat-name">Pemain C</div><div class="seat-state">Menunggu</div><div class="seat-stack">400.000</div></div></div>
+   <div class="seat opponent-3" data-player="D"><div class="avatar">D</div><div class="seat-copy"><div class="seat-name">Pemain D</div><div class="seat-state">Menunggu</div><div class="seat-stack">400.000</div></div></div>
+   <div class="seat opponent-4" data-player="E"><div class="avatar">E</div><div class="seat-copy"><div class="seat-name">Pemain E</div><div class="seat-state">Menunggu</div><div class="seat-stack">400.000</div></div></div>
+   <div class="opponent-hand opponent-1" data-hand="B" aria-label="Kartu tertutup pemain B"></div>
+   <div class="opponent-hand opponent-2" data-hand="C" aria-label="Kartu tertutup pemain C"></div>
+   <div class="opponent-hand opponent-3" data-hand="D" aria-label="Kartu tertutup pemain D"></div>
+   <div class="opponent-hand opponent-4" data-hand="E" aria-label="Kartu tertutup pemain E"></div>
+   <div class="pot-area" aria-label="Pot taruhan">
+    <div class="pot-oval"><div class="pot-label">TOTAL POT</div><div class="pot-value" id="potValue">0</div><div class="pot-sub" id="potSub">Menyiapkan meja</div><div class="chips" id="potChips"></div></div>
+   </div>
+   <div class="table-phase" id="tablePhase">Menyiapkan kartu</div>
+   <div class="table-caption" id="tableCaption">Meja Sapi / Gu</div>
+   <div class="hand-zone" id="playerHand" aria-label="Kartu Anda"></div>
+   <div class="hand-help" id="handHelp" aria-live="polite"></div>
+   <div class="seat you" data-player="A"><div class="avatar">A</div><div class="seat-copy"><div class="seat-name">Anda</div><div class="seat-state" id="youState">Pemain</div><div class="seat-stack" id="youStack">400.000</div></div></div>
+  </div>
+ </section>
+</main>
+<section class="action-prompt" id="actionPrompt" role="region" aria-live="polite" aria-label="Aksi permainan">
+ <div class="prompt-kicker" id="promptKicker">Giliran Anda</div>
+ <h2 class="prompt-title" id="promptTitle">Menyiapkan permainan</h2>
+ <p class="prompt-message" id="promptMessage"></p>
+ <div class="prompt-actions" id="promptActions"></div>
+ <div class="prompt-foot"><span id="promptFootLeft">Chip virtual</span><strong id="promptFootRight"></strong></div>
+</section>
+<script>
+(function(){
+"use strict";
+var STARTING_CHIPS=400000,START_MIN=5000;
+var players=[],deck=[],pot=0,round=1,minBet=START_MIN,maxBet=40000;
+var phase="idle",stageKey="",currentBet=0,lastActorIndex=-1,actingIndex=-1;
+var selectedIndexes=[],userChosenCombo=null,lastResult=null,handEnded=false,log=[];
+var $=function(id){return document.getElementById(id);};
+var fmt=function(n){return new Intl.NumberFormat("id-ID").format(Math.max(0,Math.floor(n)));};
+var liveHandPlayers=function(){return players.filter(function(p){return p.inHand&&!p.folded&&p.chips>=0;});};
+var liveTournamentPlayers=function(){return players.filter(function(p){return p.chips>0;});};
+var userPlayer=function(){return players.find(function(p){return p.human;});};
+var stageTitles={bet3:"Taruhan setelah 3 kartu",bet4:"Taruhan setelah kartu ke-4",bet5:"Taruhan sebelum Show"};
+var stageHints={bet3:"Ikut taruhan untuk menerima kartu ke-4. Jika tidak ikut, Anda Fold.",bet4:"Ikut taruhan untuk melanjutkan ke kartu ke-5. Jika tidak ikut, Anda Fold.",bet5:"Taruhan terakhir sebelum Show. Setelah ini Anda memilih sendiri 3 kartu."};
 
-    <section class="table-shell" aria-label="Meja Sapi atau Gu">
-      <div class="table" id="gameTable" aria-label="Meja permainan oval">
-        <div class="seat opponent-1" data-seat="0">
-          <div class="avatar">A</div><div class="seat-copy"><div class="seat-name">Pemain A</div><div class="seat-state">Menunggu taruhan</div><div class="seat-stack">400.000</div>
-        </div></div>
-        <div class="seat opponent-2" data-seat="1">
-          <div class="avatar">B</div><div class="seat-copy"><div class="seat-name">Pemain B</div><div class="seat-state">Menunggu taruhan</div><div class="seat-stack">400.000</div>
-        </div></div>
-        <div class="seat opponent-3" data-seat="2">
-          <div class="avatar">C</div><div class="seat-copy"><div class="seat-name">Pemain C</div><div class="seat-state">Menunggu taruhan</div><div class="seat-stack">400.000</div>
-        </div></div>
-        <div class="seat opponent-4" data-seat="3">
-          <div class="avatar">D</div><div class="seat-copy"><div class="seat-name">Pemain D</div><div class="seat-state">Menunggu taruhan</div><div class="seat-stack">400.000</div>
-        </div></div>
-        <div class="seat you" data-seat="4">
-          <div class="avatar">K</div><div class="seat-copy"><div class="seat-name">Anda</div><div class="seat-state">Pemain aktif</div><div class="seat-stack" id="playerStack">400.000</div>
-        </div></div>
-
-        <div class="pot-area" aria-label="Pot taruhan">
-          <div class="pot-oval">
-            <div class="pot-label">TOTAL POT</div>
-            <div class="pot-value" id="potValue">0</div>
-            <div class="pot-sub" id="potSub">Belum ada taruhan</div>
-            <div class="chips" id="potChips" aria-label="Chip virtual di dalam pot"></div>
-          </div>
-        </div>
-        <div class="table-caption">Meja Sapi / Gu</div>
-      </div>
-    </section>
-  </main>
-
-  <dialog id="controlDialog" aria-labelledby="menuTitle">
-    <div class="dialog-head">
-      <h2 id="menuTitle">Menu meja</h2>
-      <button class="close-button" id="closeMenu" type="button" aria-label="Tutup menu">×</button>
-    </div>
-    <div class="dialog-body">
-      <section class="metrics" aria-label="Status simulasi">
-        <div class="metric"><span>Ronde</span><strong id="roundValue">1</strong></div>
-        <div class="metric"><span>Chip Anda</span><strong id="balanceValue">400.000</strong></div>
-        <div class="metric"><span>Taruhan tahap ini</span><strong id="stageValue">0</strong></div>
-        <div class="metric"><span>Total masuk pot</span><strong id="totalValue">0</strong></div>
-      </section>
-      <section>
-        <div class="actions">
-          <button class="action" id="addBet" type="button">Tambah taruhan 5.000</button>
-          <button class="action secondary" id="nextRound" type="button">Ronde berikutnya</button>
-          <button class="action secondary" id="reset" type="button">Reset simulasi</button>
-          <button class="action secondary" id="closeMenuAlt" type="button">Kembali ke meja</button>
-        </div>
-        <div class="status" id="status" role="status" aria-live="polite">Prototype visual: gunakan tombol untuk menguji chip virtual di pot.</div>
-      </section>
-      <section class="log-section">
-        <h3>Riwayat pot</h3>
-        <div class="log" id="potLog"><div class="log-row"><span>Meja siap</span><strong>0</strong></div></div>
-      </section>
-      <p class="popup-note">Menu ini hanya untuk pengujian visual. Sistem kartu, taruhan multiplayer, Fold, Show, dan penentuan pemenang belum diaktifkan.</p>
-      <div class="dialog-footer"><a class="hub-link" href="./">← Kembali ke Game Hub</a><span class="eyebrow">Prototype 02</span></div>
-    </div>
-  </dialog>
-
-  <script>
-    (() => {
-      const STARTING_CHIPS = 400000;
-      const BET = 5000;
-      const MAX_CHIP_MARKS = 10;
-      let round = 1;
-      let pot = 0;
-      let balance = STARTING_CHIPS;
-      let stageTotal = 0;
-      let logEntries = [{ label: "Meja siap", amount: 0 }];
-
-      const $ = (id) => document.getElementById(id);
-      const fmt = (value) => new Intl.NumberFormat("id-ID").format(value);
-      const dialog = $("controlDialog");
-      const setStatus = (message) => { $("status").textContent = message; };
-
-      function renderChips() {
-        const container = $("potChips");
-        container.replaceChildren();
-        const count = Math.min(MAX_CHIP_MARKS, Math.floor(pot / BET));
-        for (let i = 0; i < count; i++) {
-          const chip = document.createElement("span");
-          chip.className = "chip";
-          chip.setAttribute("aria-hidden", "true");
-          container.appendChild(chip);
-        }
-        $("potValue").textContent = fmt(pot);
-        $("potSub").textContent = pot === 0 ? "Belum ada taruhan" : (count >= MAX_CHIP_MARKS ? "Chip terkumpul" : count + " chip virtual");
-        $("roundValue").textContent = round;
-        $("balanceValue").textContent = fmt(balance);
-        $("stageValue").textContent = fmt(stageTotal);
-        $("totalValue").textContent = fmt(pot);
-        $("playerStack").textContent = fmt(balance);
-        $("addBet").disabled = balance < BET;
-        $("addBet").textContent = balance < BET ? "Chip tidak mencukupi" : "Tambah taruhan " + fmt(BET);
-        $("potLog").replaceChildren();
-        logEntries.slice(-6).reverse().forEach((entry) => {
-          const row = document.createElement("div");
-          row.className = "log-row";
-          const label = document.createElement("span");
-          label.textContent = entry.label;
-          const amount = document.createElement("strong");
-          amount.textContent = fmt(entry.amount);
-          row.append(label, amount);
-          $("potLog").appendChild(row);
-        });
-      }
-
-      function openMenu() {
-        if (!dialog.open) dialog.showModal();
-      }
-      function closeMenu() {
-        if (dialog.open) dialog.close();
-      }
-      $("openMenu").addEventListener("click", openMenu);
-      $("closeMenu").addEventListener("click", closeMenu);
-      $("closeMenuAlt").addEventListener("click", closeMenu);
-      dialog.addEventListener("click", (event) => {
-        if (event.target === dialog) closeMenu();
-      });
-      document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && dialog.open) closeMenu();
-      });
-
-      $("addBet").addEventListener("click", () => {
-        if (balance < BET) {
-          setStatus("Chip Anda tidak cukup untuk taruhan 5.000.");
-          return;
-        }
-        balance -= BET;
-        pot += BET;
-        stageTotal += BET;
-        logEntries.push({ label: "Ronde " + round + " · taruhan masuk", amount: BET });
-        renderChips();
-        setStatus("5.000 chip ditambahkan ke pot. Pot sekarang " + fmt(pot) + ".");
-      });
-
-      $("nextRound").addEventListener("click", () => {
-        round += 1;
-        stageTotal = 0;
-        logEntries.push({ label: "Ronde " + round + " dimulai", amount: pot });
-        renderChips();
-        setStatus("Ronde " + round + " dimulai. Pot lama tetap tersimpan; taruhan tahap baru direset.");
-      });
-
-      $("reset").addEventListener("click", () => {
-        round = 1;
-        pot = 0;
-        balance = STARTING_CHIPS;
-        stageTotal = 0;
-        logEntries = [{ label: "Simulasi direset", amount: 0 }];
-        renderChips();
-        setStatus("Simulasi direset. Chip Anda kembali menjadi 400.000 dan pot kembali kosong.");
-      });
-
-      renderChips();
-    })();
-  </script>
+function createDeck(){
+ var d=[];
+ for(var a=0;a<=6;a++)for(var b=a;b<=6;b++)d.push({a:a,b:b,id:a+"-"+b});
+ for(var i=d.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),tmp=d[i];d[i]=d[j];d[j]=tmp;}
+ return d;
+}
+function scoreTile(t){return t.a===0&&t.b===0?10:t.a+t.b;}
+function tileRaw(t){return t.a+t.b;}
+function pipPositions(v){
+ var map={0:[],1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,3,6,2,5,8]};
+ return map[v]||[];
+}
+function buildHalf(v){
+ var half=document.createElement("span");half.className="pip-half";half.setAttribute("aria-hidden","true");
+ var positions=pipPositions(v);
+ for(var i=0;i<9;i++){var dot=document.createElement("span");dot.className="pip"+(positions.indexOf(i)>=0?" on":"");half.appendChild(dot);}
+ return half;
+}
+function buildCardButton(tile,index,selected,clickable){
+ var btn=document.createElement("button");btn.type="button";btn.className="domino-card"+(selected?" selected":"")+(clickable?" selectable":"")+(tile.a===tile.b?" special-tile":"");
+ btn.setAttribute("aria-label","Kartu domino "+tile.a+" dan "+tile.b+(selected?", dipilih":""));
+ btn.setAttribute("aria-pressed",selected?"true":"false");
+ if(!clickable)btn.tabIndex=-1;
+ var face=document.createElement("span");face.className="domino-face";face.append(buildHalf(tile.a),buildHalf(tile.b));btn.appendChild(face);
+ var label=document.createElement("span");label.className="card-number";label.textContent=tile.a+"|"+tile.b;btn.appendChild(label);
+ if(clickable)btn.addEventListener("click",function(){toggleSelected(index);});
+ else btn.disabled=true;
+ return btn;
+}
+function hasValidTriple(hand){
+ return validCombinations(hand).length>0;
+}
+function validCombinations(hand){
+ var out=[];
+ for(var i=0;i<hand.length;i++)for(var j=i+1;j<hand.length;j++)for(var k=j+1;k<hand.length;k++){
+  var sum=scoreTile(hand[i])+scoreTile(hand[j])+scoreTile(hand[k]);
+  if(sum===10||sum===20||sum===30)out.push({indexes:[i,j,k],sum:sum});
+ }
+ return out;
+}
+function pairScore(two){
+ if(!two||two.length!==2)return {rank:-1,total:0,special:false,label:"Tidak valid"};
+ var special=(two.some(function(t){return t.a===5&&t.b===5;})&&two.some(function(t){return t.a===0&&t.b===0;}));
+ var total=scoreTile(two[0])+scoreTile(two[1]),digit=total%10,rank=digit===0?10:digit;
+ if(special)return {rank:100,total:total,special:true,label:"KOMBINASI SPESIAL 5/5 + 0/0"};
+ var names={10:"0",9:"9",8:"8",7:"7",6:"6",5:"5",4:"4",3:"3",2:"2",1:"1"};
+ return {rank:rank,total:total,special:false,label:"Nilai "+names[rank]+" (total "+total+")"};
+}
+function compareScore(a,b){
+ if(a.rank!==b.rank)return a.rank>b.rank?1:-1;
+ if(a.total!==b.total)return a.total>b.total?1:-1;
+ return 0;
+}
+function bestBotCombo(hand){
+ var combos=validCombinations(hand),best=null;
+ combos.forEach(function(c){
+  var remain=hand.filter(function(t,index){return c.indexes.indexOf(index)<0;});
+  var score=pairScore(remain);
+  if(!best||compareScore(score,best.score)>0)best={indexes:c.indexes.slice(),sum:c.sum,pair:remain,score:score};
+ });
+ return best;
+}
+function makePlayers(){
+ players=[
+  {id:"A",name:"Anda",letter:"A",human:true,chips:STARTING_CHIPS,hand:[],inHand:true,folded:false,stageBet:0,actedAtBet:0,reveal:false,combo:null},
+  {id:"B",name:"Pemain B",letter:"B",human:false,chips:STARTING_CHIPS,hand:[],inHand:true,folded:false,stageBet:0,actedAtBet:0,reveal:false,combo:null},
+  {id:"C",name:"Pemain C",letter:"C",human:false,chips:STARTING_CHIPS,hand:[],inHand:true,folded:false,stageBet:0,actedAtBet:0,reveal:false,combo:null},
+  {id:"D",name:"Pemain D",letter:"D",human:false,chips:STARTING_CHIPS,hand:[],inHand:true,folded:false,stageBet:0,actedAtBet:0,reveal:false,combo:null},
+  {id:"E",name:"Pemain E",letter:"E",human:false,chips:STARTING_CHIPS,hand:[],inHand:true,folded:false,stageBet:0,actedAtBet:0,reveal:false,combo:null}
+ ];
+}
+function pushLog(text,amount){
+ log.unshift({text:text,amount:amount===undefined?null:amount});
+ if(log.length>8)log.length=8;
+}
+function renderPot(){
+ $("potValue").textContent=fmt(pot);
+ $("potSub").textContent=pot===0?(phase==="result"?"Pot sudah dibagikan":"Belum ada taruhan"):("Chip virtual terkumpul");
+ var host=$("potChips");host.replaceChildren();
+ var count=Math.min(12,Math.ceil(pot/Math.max(minBet,1)));
+ for(var i=0;i<count;i++){var c=document.createElement("span");c.className="chip";c.setAttribute("aria-hidden","true");host.appendChild(c);}
+}
+function renderSeats(){
+ document.querySelectorAll(".seat[data-player]").forEach(function(node){
+  var p=players.find(function(x){return x.id===node.dataset.player;});if(!p)return;
+  node.classList.toggle("folded",p.folded);
+  node.classList.toggle("eliminated",p.chips<=0);
+  node.classList.toggle("current",actingIndex>=0&&players[actingIndex]&&players[actingIndex].id===p.id&&phase!=="result");
+  var state=node.querySelector(".seat-state");
+  if(p.chips<=0)state.textContent="Kehabisan chip";
+  else if(p.folded)state.textContent="FOLD";
+  else if(p.human)state.textContent=phase==="show"?"Pilih 3 kartu":"Anda";
+  else if(p.inHand)state.textContent=phase==="show"&&p.combo?"Siap Show":"Bermain";
+  else state.textContent="Menunggu";
+  var stack=node.querySelector(".seat-stack");if(stack)stack.textContent=fmt(p.chips);
+ });
+ players.filter(function(p){return !p.human;}).forEach(function(p){
+  var host=document.querySelector('[data-hand="'+p.id+'"]');if(!host)return;host.replaceChildren();
+  if(p.chips<=0||p.folded&&phase!=="result")return;
+  var n=p.hand.length;
+  if(p.reveal&&phase==="result"){
+   p.hand.forEach(function(tile){var mini=document.createElement("span");mini.className="card-back";mini.style.background="#e7d9b8";mini.style.borderColor="#a98a51";mini.textContent="";mini.setAttribute("aria-label","Kartu terbuka");host.appendChild(mini);});
+  }else{
+   for(var i=0;i<n;i++){var back=document.createElement("span");back.className="card-back";back.setAttribute("aria-hidden","true");host.appendChild(back);}
+  }
+ });
+}
+function renderHand(){
+ var host=$("playerHand");host.replaceChildren();
+ var p=userPlayer();if(!p)return;
+ var selectable=phase==="show"&&!p.folded&&p.hand.length===5;
+ p.hand.forEach(function(tile,index){
+  var btn=buildCardButton(tile,index,selectedIndexes.indexOf(index)>=0,selectable);
+  host.appendChild(btn);
+ });
+ if(selectable){
+  var sum=selectedIndexes.reduce(function(s,index){return s+scoreTile(p.hand[index]);},0);
+  $("handHelp").textContent=selectedIndexes.length===0?"Pilih 3 kartu yang jumlah nilainya 10, 20, atau 30":("Pilihan: "+selectedIndexes.length+"/3 kartu · Total "+sum);
+ }else if(phase==="result"){
+  $("handHelp").textContent="";
+ }else{
+  $("handHelp").textContent=p.hand.length?(p.hand.length+" kartu Anda"):"";
+ }
+}
+function renderAll(){
+ renderPot();renderSeats();renderHand();
+ $("tablePhase").textContent=phaseLabel();
+ $("tableCaption").textContent="Ronde "+round+" · Minimum "+fmt(minBet)+" / Maksimum "+fmt(maxBet);
+ $("youStack").textContent=fmt(userPlayer()?userPlayer().chips:0);
+}
+function phaseLabel(){
+ if(phase==="bet3")return "Taruhan · 3 Kartu";
+ if(phase==="bet4")return "Taruhan · 4 Kartu";
+ if(phase==="bet5")return "Taruhan · 5 Kartu";
+ if(phase==="show")return "Showdown · Pilih 3 Kartu";
+ if(phase==="result")return "Hasil Ronde";
+ if(phase==="tournamentOver")return "Pemenang Turnamen";
+ return "Meja Sapi / Gu";
+}
+function hidePrompt(){$("actionPrompt").classList.remove("visible");}
+function showPrompt(kicker,title,message,buttons,footLeft,footRight){
+ $("promptKicker").textContent=kicker||"Giliran Anda";
+ $("promptTitle").textContent=title||"";
+ $("promptMessage").textContent=message||"";
+ var host=$("promptActions");host.replaceChildren();
+ buttons.forEach(function(b){
+  var btn=document.createElement("button");btn.type="button";btn.className="prompt-button"+(b.kind?" "+b.kind:"");btn.textContent=b.label;btn.disabled=!!b.disabled;
+  btn.addEventListener("click",b.click);host.appendChild(btn);
+ });
+ $("promptFootLeft").textContent=footLeft||"Chip virtual";
+ $("promptFootRight").textContent=footRight||"";
+ $("actionPrompt").classList.add("visible");
+}
+function amountText(v){return fmt(v)+" chip";}
+function promptBetting(p){
+ var need=currentBet-p.stageBet;
+ var canCall=p.chips>=need&&need>=0;
+ var nextRaise=Math.min(currentBet*2,maxBet);
+ var canRaise=nextRaise>currentBet&&(nextRaise-p.stageBet)<=p.chips;
+ var title=stageTitles[phase]||"Taruhan";
+ var message=(stageHints[phase]||"Ikut taruhan atau Fold.")+" Taruhan saat ini "+fmt(currentBet)+". Saldo Anda "+fmt(p.chips)+".";
+ var buttons=[
+  {label:(canCall?"Ikut / call "+fmt(need):"Chip tidak cukup"),disabled:!canCall,click:function(){humanAction("call");}},
+ ];
+ if(canRaise)buttons.push({label:"Raise ke "+fmt(nextRaise),click:function(){humanAction("raise");}});
+ buttons.push({label:"Fold",kind:"danger",click:function(){humanAction("fold");}});
+ showPrompt("RONDE "+round+" · GILIRAN ANDA",title,message,buttons,"Pot saat ini",fmt(pot));
+}
+function dealToActive(count){
+ for(var c=0;c<count;c++){
+  players.forEach(function(p){
+   if(p.inHand&&!p.folded&&p.chips>0&&deck.length)p.hand.push(deck.pop());
+  });
+ }
+}
+function startHand(initial){
+ var alive=liveTournamentPlayers();
+ if(alive.length<=1){endTournament(alive[0]||null);return;}
+ if(!initial)round++;
+ minBet=START_MIN*Math.pow(2,Math.floor((round-1)/10));
+ maxBet=minBet*8;
+ deck=createDeck();pot=0;selectedIndexes=[];userChosenCombo=null;lastResult=null;handEnded=false;
+ players.forEach(function(p){
+  p.hand=[];p.folded=false;p.inHand=p.chips>0;p.stageBet=0;p.actedAtBet=0;p.reveal=false;p.combo=null;
+ });
+ var eligible=players.filter(function(p){return p.chips>0;});
+ eligible.forEach(function(p){
+  var ante=Math.min(minBet,p.chips);
+  p.chips-=ante;pot+=ante;
+  if(p.chips===0){p.inHand=false;p.folded=true;}
+  pushLog(p.name+" · ante",ante);
+ });
+ dealToActive(3);
+ phase="bet3";stageKey="bet3";actingIndex=-1;lastActorIndex=-1;
+ renderAll();
+ if(liveHandPlayers().length<=1){awardLastPlayer();return;}
+ beginBettingStage("bet3");
+}
+function beginBettingStage(key){
+ phase=key;stageKey=key;currentBet=minBet;lastActorIndex=-1;actingIndex=-1;selectedIndexes=[];
+ players.forEach(function(p){p.stageBet=0;p.actedAtBet=0;});
+ renderAll();driveBetting();
+}
+function needsAction(p){
+ return p.inHand&&!p.folded&&p.chips>0&&(p.stageBet<currentBet||p.actedAtBet<currentBet);
+}
+function findNextActor(afterIndex){
+ for(var step=1;step<=players.length;step++){
+  var i=(afterIndex+step+players.length)%players.length;
+  if(needsAction(players[i]))return i;
+ }
+ return -1;
+}
+function activeCount(){return liveHandPlayers().length;}
+function driveBetting(){
+ var guard=0;
+ while(guard++<250){
+  if(activeCount()<=1){actingIndex=-1;awardLastPlayer();return;}
+  var next=findNextActor(lastActorIndex);
+  if(next<0){actingIndex=-1;finishBettingStage();return;}
+  actingIndex=next;var p=players[next];
+  if(p.human){
+   renderAll();promptBetting(p);return;
+  }
+  botAction(p);lastActorIndex=next;renderAll();
+ }
+ // Emergency guard: prevent a malformed or unexpected loop from locking the page.
+ actingIndex=-1;
+ showPrompt("SIMULASI","Putaran taruhan dihentikan","Sistem menghentikan perulangan untuk menjaga permainan tetap responsif.",[{label:"Lanjutkan",click:function(){hidePrompt();finishBettingStage();}}],"Pot",fmt(pot));
+}
+function payBet(p,target){
+ var needed=target-p.stageBet;
+ if(needed<0)needed=0;
+ if(p.chips<needed)return false;
+ p.chips-=needed;pot+=needed;p.stageBet=target;p.actedAtBet=currentBet;
+ if(needed>0)pushLog(p.name+" · taruhan",needed);
+ return true;
+}
+function botAction(p){
+ var due=currentBet-p.stageBet;
+ if(p.chips<due){p.folded=true;pushLog(p.name+" · Fold (chip tidak cukup)");return;}
+ var canRaise=Math.min(currentBet*2,maxBet)>currentBet;
+ var raiseTo=Math.min(currentBet*2,maxBet);
+ var potPressure=currentBet/minBet;
+ var valid=hasValidTriple(p.hand);
+ var foldChance=0.12+(potPressure>=4?0.12:0)+(phase==="bet5"&&!valid?0.2:0);
+ var raiseChance=canRaise?(0.27+(valid?0.08:0)-(potPressure>=4?0.12:0)):0;
+ var r=Math.random();
+ if(r<foldChance&&p.stageBet<currentBet){p.folded=true;pushLog(p.name+" · Fold");return;}
+ if(canRaise&&r<foldChance+raiseChance&&p.chips>=raiseTo-p.stageBet){
+  var amount=raiseTo-p.stageBet;
+  p.chips-=amount;pot+=amount;p.stageBet=raiseTo;currentBet=raiseTo;p.actedAtBet=currentBet;
+  pushLog(p.name+" · Raise ke "+fmt(raiseTo),amount);
+  return;
+ }
+ if(!payBet(p,currentBet)){p.folded=true;pushLog(p.name+" · Fold (chip tidak cukup)");return;}
+}
+function humanAction(action){
+ var p=userPlayer();if(!p||!needsAction(p)||actingIndex<0||players[actingIndex]!==p)return;
+ hidePrompt();
+ if(action==="fold"){
+  p.folded=true;pushLog("Anda · Fold");p.actedAtBet=currentBet;
+ }else if(action==="call"){
+  if(!payBet(p,currentBet)){showPrompt("AKSI TIDAK TERSEDIA","Chip tidak cukup","Saldo Anda tidak mencukupi untuk menyamai taruhan ini.",[{label:"Fold",kind:"danger",click:function(){humanAction("fold");}}],"Saldo",fmt(p.chips));return;}
+ }else if(action==="raise"){
+  var target=Math.min(currentBet*2,maxBet),needed=target-p.stageBet;
+  if(target<=currentBet||needed>p.chips){promptBetting(p);return;}
+  p.chips-=needed;pot+=needed;p.stageBet=target;currentBet=target;p.actedAtBet=currentBet;
+  pushLog("Anda · Raise ke "+fmt(target),needed);
+ }
+ lastActorIndex=players.indexOf(p);actingIndex=-1;renderAll();driveBetting();
+}
+function finishBettingStage(){
+ if(activeCount()<=1){awardLastPlayer();return;}
+ if(phase==="bet3"){
+  dealToActive(1);pushLog("Kartu ke-4 dibagikan");
+  beginBettingStage("bet4");return;
+ }
+ if(phase==="bet4"){
+  dealToActive(1);pushLog("Kartu ke-5 dibagikan");
+  beginBettingStage("bet5");return;
+ }
+ if(phase==="bet5"){enterShowdown();return;}
+}
+function enterShowdown(){
+ phase="show";actingIndex=-1;selectedIndexes=[];userChosenCombo=null;
+ players.forEach(function(p){
+  if(!p.inHand||p.folded)return;
+  if(p.hand.length!==5){p.folded=true;return;}
+  if(p.human){
+   if(!hasValidTriple(p.hand)){p.folded=true;pushLog("Anda · Fold otomatis (tidak ada kombinasi 10/20/30)");}
+  }else{
+   p.combo=bestBotCombo(p.hand);
+   if(!p.combo){p.folded=true;pushLog(p.name+" · Fold otomatis (kombinasi tidak valid)");}
+  }
+ });
+ renderAll();
+ if(activeCount()<=1){awardLastPlayer();return;}
+ var user=userPlayer();
+ if(!user||user.folded){resolveBotShowdown();return;}
+ var possibilities=validCombinations(user.hand);
+ showPrompt("RONDE "+round+" · SHOWDOWN","Pilih 3 kartu untuk Show","Pilih sendiri tepat 3 dari 5 kartu. Total nilai ketiganya harus tepat 10, 20, atau 30. Jika tidak ada kombinasi valid, sistem otomatis Fold.",[
+  {label:"Show kartu terpilih",click:function(){showSelectedCards();},disabled:true},
+  {label:"Fold",kind:"danger",click:function(){user.folded=true;pushLog("Anda · Fold saat Show");renderAll();hidePrompt();if(activeCount()<=1)awardLastPlayer();else resolveBotShowdown();}}
+ ],"Kombinasi valid ditemukan",String(possibilities.length));
+ updateShowPrompt();
+}
+function toggleSelected(index){
+ var p=userPlayer();if(phase!=="show"||!p||p.folded)return;
+ var found=selectedIndexes.indexOf(index);
+ if(found>=0)selectedIndexes.splice(found,1);
+ else if(selectedIndexes.length<3)selectedIndexes.push(index);
+ renderHand();updateShowPrompt();
+}
+function updateShowPrompt(){
+ var p=userPlayer();if(!p||p.folded||phase!=="show")return;
+ var selected=selectedIndexes.slice().sort(function(a,b){return a-b;});
+ var sum=selected.reduce(function(s,i){return s+scoreTile(p.hand[i]);},0);
+ var valid=selected.length===3&&(sum===10||sum===20||sum===30);
+ $("promptKicker").textContent="RONDE "+round+" · SHOWDOWN";
+ $("promptTitle").textContent="Pilih 3 kartu untuk Show";
+ $("promptMessage").textContent=selected.length<3?"Ketuk 3 kartu di tangan Anda. Hanya total 10, 20, atau 30 yang valid.":("Total pilihan: "+sum+". "+(valid?"Kombinasi valid; kartu lainnya menjadi penentu nilai akhir.":"Kombinasi belum valid. Pilih total 10, 20, atau 30."));
+ $("promptFootLeft").textContent="Pilihan "+selected.length+"/3 kartu";
+ $("promptFootRight").textContent="Total "+sum;
+ var buttons=$("promptActions").querySelectorAll("button");
+ buttons.forEach(function(btn){if(btn.textContent.indexOf("Show kartu terpilih")===0)btn.disabled=!valid;});
+}
+function showSelectedCards(){
+ var p=userPlayer();if(!p||phase!=="show"||p.folded)return;
+ if(selectedIndexes.length!==3)return;
+ var sum=selectedIndexes.reduce(function(s,i){return s+scoreTile(p.hand[i]);},0);
+ if(sum!==10&&sum!==20&&sum!==30){updateShowPrompt();return;}
+ var remain=p.hand.filter(function(tile,index){return selectedIndexes.indexOf(index)<0;});
+ p.combo={indexes:selectedIndexes.slice(),sum:sum,pair:remain,score:pairScore(remain)};
+ userChosenCombo=p.combo;hidePrompt();pushLog("Anda · Show valid, total "+sum);resolveShowdown();
+}
+function resolveBotShowdown(){
+ if(activeCount()<=1){awardLastPlayer();return;}
+ players.forEach(function(p){if(p.inHand&&!p.folded&&!p.human){p.combo=bestBotCombo(p.hand);if(!p.combo)p.folded=true;}});
+ renderAll();
+ if(activeCount()<=1){awardLastPlayer();return;}
+ resolveShowdown();
+}
+function resolveShowdown(){
+ var contenders=liveHandPlayers().filter(function(p){return p.combo&&p.combo.score;});
+ if(!contenders.length){awardLastPlayer();return;}
+ var best=contenders[0].combo.score,winners=[contenders[0]];
+ for(var i=1;i<contenders.length;i++){
+  var comparison=compareScore(contenders[i].combo.score,best);
+  if(comparison>0){best=contenders[i].combo.score;winners=[contenders[i]];}
+  else if(comparison===0)winners.push(contenders[i]);
+ }
+ players.forEach(function(p){if(p.inHand&&!p.folded)p.reveal=true;});
+ var handPot=pot;
+ var share=Math.floor(handPot/winners.length),remainder=handPot-share*winners.length;
+ winners.forEach(function(p,i){p.chips+=share+(i<remainder?1:0);});
+ lastResult={winners:winners.map(function(p){return p.name;}),amount:handPot,score:best,byShow:true};
+ handEnded=true;phase="result";actingIndex=-1;pot=handPot;
+ pushLog("Showdown selesai",handPot);
+ renderAll();showResultPrompt();
+}
+function awardLastPlayer(){
+ if(handEnded)return;
+ var contenders=liveHandPlayers();
+ if(contenders.length===0){
+  var alive=liveTournamentPlayers();
+  if(alive.length===1){endTournament(alive[0]);return;}
+  if(alive.length>1){resolveBotShowdown();return;}
+  endTournament(null);return;
+ }
+ var winner=contenders[0],handPot=pot;
+ winner.chips+=handPot;
+ players.forEach(function(p){if(p.folded)p.reveal=false;});
+ lastResult={winners:[winner.name],amount:handPot,score:null,byShow:false};
+ handEnded=true;phase="result";actingIndex=-1;
+ pushLog(winner.name+" menang tanpa Show",handPot);
+ renderAll();showResultPrompt();
+}
+function showResultPrompt(){
+ var alive=liveTournamentPlayers();
+ var winText=lastResult.winners.join(" & ");
+ var details=lastResult.byShow&&lastResult.score?lastResult.score.label:"Pemain lain Fold atau kombinasi tidak valid.";
+ showPrompt("HASIL RONDE "+round,lastResult.byShow?"Showdown selesai":"Pot dimenangkan",winText+" menang dan menerima pot "+fmt(lastResult.amount)+". "+details,[
+  {label:alive.length<=1?"Lihat pemenang turnamen":"Ronde berikutnya",click:function(){hidePrompt();if(alive.length<=1)endTournament(alive[0]||null);else startHand(false);}},
+  {label:"Ulangi turnamen",kind:"secondary",click:function(){hidePrompt();round=1;makePlayers();startHand(true);}}
+ ],"Chip Anda",fmt(userPlayer()?userPlayer().chips:0));
+}
+function endTournament(champion){
+ phase="tournamentOver";actingIndex=-1;hidePrompt();
+ if(champion)showPrompt("TURNAMEN SELESAI","Pemenang: "+champion.name,champion.name+" menjadi satu-satunya pemain yang masih memiliki chip. Saldo akhir: "+fmt(champion.chips)+".",[
+  {label:"Main lagi",click:function(){round=1;makePlayers();startHand(true);}}
+ ],"Total ronde",String(round));
+ else showPrompt("TURNAMEN SELESAI","Permainan selesai","Tidak ada pemain yang tersisa. Mulai ulang untuk mencoba lagi.",[
+  {label:"Main lagi",click:function(){round=1;makePlayers();startHand(true);}}
+ ],"Total ronde",String(round));
+ renderAll();
+}
+function renderInitial(){
+ renderAll();
+}
+makePlayers();
+startHand(true);
+})();
+</script>
 </body>
 </html>
