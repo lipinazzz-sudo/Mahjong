@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dj-sapi-gu-rule-text-final-stage-cleanup-2026-10-10-13';
+const CACHE_VERSION = 'dj-sapi-gu-compact-action-panel-visible-hand-2026-10-10-14';
 const APP_SHELL = [
   './',
   './index.html',

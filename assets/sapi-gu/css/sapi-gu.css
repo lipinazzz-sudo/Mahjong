@@ -55,7 +55,7 @@ button.hub-link{border:0;padding:0;background:transparent;cursor:pointer}
 .chip:nth-child(3n){background:repeating-conic-gradient(#b85b4f 0 12deg,#702f2b 12deg 24deg)}
 .table-caption{position:absolute;left:50%;top:66%;transform:translateX(-50%);font-size:9px;letter-spacing:.14em;color:#b8d1bf;text-transform:uppercase;white-space:nowrap;pointer-events:none}
 .table-phase{position:absolute;left:50%;top:56%;transform:translateX(-50%);max-width:75%;text-align:center;color:#d0e0d2;font-size:10px;letter-spacing:.08em;text-transform:uppercase;text-shadow:0 2px 7px #0009;white-space:nowrap}
-.hand-zone{position:absolute;left:50%;bottom:18%;transform:translateX(-50%);z-index:5;width:max-content;max-width:96%;display:flex;justify-content:center;align-items:flex-end;gap:clamp(2px,.5vw,7px)}
+.hand-zone{position:absolute;left:50%;bottom:23%;transform:translateX(-50%);z-index:5;width:max-content;max-width:96%;display:flex;justify-content:center;align-items:flex-end;gap:clamp(2px,.5vw,7px)}
 .domino-card{display:block;position:relative;width:clamp(35px,4vw,48px);min-width:0;padding:3px;border:1px solid #c6a45d;border-radius:7px;background:linear-gradient(145deg,#fffaeb,#d9c9a5);box-shadow:0 6px 13px #0006;cursor:default;transition:transform .15s,border-color .15s,box-shadow .15s;touch-action:manipulation}
 .domino-card.selectable{cursor:pointer}
 .domino-card.selectable:hover{transform:translateY(-4px)}
@@ -68,19 +68,19 @@ button.hub-link{border:0;padding:0;background:transparent;cursor:pointer}
 .domino-card.special-tile .pip{background:#202c25}
 .card-number{display:block;margin-top:2px;text-align:center;font-size:7px;font-weight:900;letter-spacing:.02em;color:#8f7b57}
 .hand-help{display:none}
-.action-prompt{display:none;position:fixed;z-index:20;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(470px,calc(100vw - 22px));padding:14px 15px 13px;border:1px solid #d5b16b;border-radius:17px;background:linear-gradient(145deg,rgba(22,30,23,.985),rgba(6,12,9,.985));box-shadow:0 17px 55px #000b,inset 0 1px 0 #fff1}
+.action-prompt{display:none;position:fixed;z-index:20;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(380px,calc(100vw - 24px));padding:10px 12px 9px;border:1px solid #d5b16b;border-radius:13px;background:linear-gradient(145deg,rgba(22,30,23,.985),rgba(6,12,9,.985));box-shadow:0 12px 32px #000b,inset 0 1px 0 #fff1}
 .action-prompt.visible{display:block;animation:prompt-in .16s ease-out}
 @keyframes prompt-in{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
 .prompt-kicker{color:#d6b66f;font-size:9px;font-weight:900;letter-spacing:.17em;text-transform:uppercase}
-.prompt-title{margin:4px 0 4px;color:#fff0c8;font-size:15px;font-weight:850}
-.prompt-message{margin:0;color:#c3d2c6;font-size:11px;line-height:1.55}
-.prompt-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
-.prompt-button{flex:1 1 120px;min-height:39px;padding:8px 9px;border:1px solid #d9b96e;border-radius:10px;background:linear-gradient(180deg,#80602b,#48331a);color:#fff0c7;font-size:11px;font-weight:850;cursor:pointer;transition:filter .15s,transform .15s}
+.prompt-title{margin:3px 0;color:#fff0c8;font-size:13px;font-weight:850}
+.prompt-message{margin:0;color:#c3d2c6;font-size:10px;line-height:1.4}
+.prompt-actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.prompt-button{flex:1 1 95px;min-height:32px;padding:6px 7px;border:1px solid #d9b96e;border-radius:8px;background:linear-gradient(180deg,#80602b,#48331a);color:#fff0c7;font-size:10px;font-weight:850;cursor:pointer;transition:filter .15s,transform .15s}
 .prompt-button:hover:not(:disabled){filter:brightness(1.13);transform:translateY(-1px)}
 .prompt-button.secondary{background:#12241b;border-color:#426650;color:#d4e4d8}
 .prompt-button.danger{background:#321d19;border-color:#875047;color:#f4c5b7}
 .prompt-button:disabled{opacity:.35;cursor:not-allowed;filter:grayscale(.3)}
-.prompt-foot{display:flex;justify-content:space-between;gap:12px;margin-top:9px;color:#899f8e;font-size:9px}
+.prompt-foot{display:flex;justify-content:space-between;gap:12px;margin-top:6px;color:#899f8e;font-size:8px}
 .prompt-foot strong{color:#f1d59a;font-variant-numeric:tabular-nums}
 @media(max-width:760px){
  body{padding:7px}
@@ -126,18 +126,18 @@ button.hub-link{border:0;padding:0;background:transparent;cursor:pointer}
  .chip{width:10px;height:10px;flex-basis:10px;border-width:1px}
  .table-phase{top:55%;font-size:7px;max-width:80%;letter-spacing:.04em}
  .table-caption{top:65%;font-size:7px;letter-spacing:.06em}
- .hand-zone{bottom:17%;max-width:98%;gap:2px}
+ .hand-zone{bottom:23%;max-width:98%;gap:2px}
  .domino-card{width:clamp(27px,7.1vw,35px);padding:2px;border-radius:5px}
  .domino-face{aspect-ratio:.62/1}
  .pip-half{padding:2px}
  .pip{width:clamp(2px,.55vw,3px);height:clamp(2px,.55vw,3px)}
  .card-number{font-size:6px;margin-top:1px}
  .hand-help{display:none}
- .action-prompt{bottom:max(9px,env(safe-area-inset-bottom));padding:12px 12px 10px;border-radius:15px;max-width:470px}
- .prompt-title{font-size:14px}
- .prompt-message{font-size:10px}
- .prompt-actions{gap:6px;margin-top:9px}
- .prompt-button{min-height:37px;font-size:10px;padding:7px}
+ .action-prompt{bottom:max(8px,env(safe-area-inset-bottom));padding:8px 9px 7px;border-radius:12px;width:min(380px,calc(100vw - 18px));max-width:380px}
+ .prompt-title{font-size:12px}
+ .prompt-message{font-size:9px;line-height:1.35}
+ .prompt-actions{gap:4px;margin-top:6px}
+ .prompt-button{min-height:29px;font-size:9px;padding:5px 6px;flex-basis:85px}
  .prompt-foot{font-size:8px}
 }
 @media(max-width:370px){
