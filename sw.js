@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dj-sapi-gu-lobby-settings-info-2026-10-10-7';
+const CACHE_VERSION = 'dj-sapi-gu-assets-own-lobby-flow-2026-10-10-8';
 const APP_SHELL = [
   './',
   './index.html',
@@ -41,6 +41,10 @@ const APP_SHELL = [
   './assets/css/18-history-mode-tabs.css?v=20261009-1',
   './assets/backgrounds/card-vs-ai.webp',
   './assets/backgrounds/card-multiplayer.webp',
+  './assets/sapi-gu/backgrounds/bg-main.svg',
+  './assets/sapi-gu/backgrounds/bg-settings.svg',
+  './assets/sapi-gu/backgrounds/bg-vs-bot.svg',
+  './assets/sapi-gu/backgrounds/bg-multiplayer.svg',
 ];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE_VERSION).then(cache => cache.addAll(APP_SHELL).catch(()=>{}))); self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE_VERSION).map(k=>caches.delete(k))))); self.clients.claim(); });
