@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dj-sapi-gu-playable-domino-prototype-2026-10-10-4';
+const CACHE_VERSION = 'dj-sapi-gu-show-betting-upright-domino-2026-10-10-5';
 const APP_SHELL = [
   './',
   './index.html',
