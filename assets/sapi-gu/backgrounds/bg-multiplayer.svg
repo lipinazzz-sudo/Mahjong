@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+<defs><linearGradient id="b" x2="1" y2="1"><stop stop-color="#2a2417"/><stop offset=".45" stop-color="#18251b"/><stop offset="1" stop-color="#060a08"/></linearGradient><radialGradient id="g"><stop stop-color="#d8b268" stop-opacity=".22"/><stop offset="1" stop-color="#d8b268" stop-opacity="0"/></radialGradient></defs>
+<rect width="800" height="500" fill="url(#b)"/><ellipse cx="400" cy="250" rx="450" ry="340" fill="url(#g)"/>
+<ellipse cx="400" cy="280" rx="310" ry="122" fill="#0c3527" stroke="#d2ae62" stroke-width="5"/><ellipse cx="400" cy="280" rx="289" ry="103" fill="none" stroke="#f5dc9a" stroke-opacity=".4" stroke-width="2"/>
+<g fill="#080d09" stroke="#d6b56d" stroke-width="3"><rect x="365" y="222" width="70" height="116" rx="11"/><circle cx="190" cy="270" r="34"/><circle cx="610" cy="270" r="34"/><circle cx="400" cy="105" r="34"/><circle cx="400" cy="424" r="34"/></g>
+<g fill="#f2d58e" font-family="sans-serif" font-weight="800" font-size="24" text-anchor="middle"><text x="400" y="278">5</text><text x="400" y="308" font-size="11" letter-spacing="3">PLAYERS</text><text x="190" y="278">B</text><text x="610" y="278">C</text><text x="400" y="113">A</text><text x="400" y="432">D</text></g>
+<g fill="#c4a054" fill-opacity=".72"><circle cx="275" cy="348" r="8"/><circle cx="294" cy="348" r="8"/><circle cx="313" cy="348" r="8"/><circle cx="332" cy="348" r="8"/><circle cx="468" cy="348" r="8"/><circle cx="487" cy="348" r="8"/><circle cx="506" cy="348" r="8"/><circle cx="525" cy="348" r="8"/></g>
+</svg>
