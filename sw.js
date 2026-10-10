@@ -1,7 +1,9 @@
-const CACHE_VERSION = 'mahjong-dj-river-dot-glow-2026-10-09-1';
+const CACHE_VERSION = 'dj-game-hub-mahjong-baseline-2026-10-10-1';
 const APP_SHELL = [
   './',
   './index.html',
+  './mahjong.html',
+  './game-baru.html',
   './manifest.webmanifest',
   './assets/backgrounds/bg-main.jpg',
   './assets/backgrounds/bg-lobby.jpg',

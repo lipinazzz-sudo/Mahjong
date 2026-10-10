@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08090d">
+  <meta name="description" content="Ruang terpisah untuk pengembangan game kedua di DJ Game Hub.">
+  <title>Game Baru — DJ Game Hub</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;min-height:100svh;display:grid;place-items:center;padding:22px;color:#f7edda;background:#08090d url("assets/backgrounds/bg-play.jpg") center/cover no-repeat fixed;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    body::before{content:"";position:fixed;inset:0;background:linear-gradient(130deg,rgba(4,5,8,.87),rgba(7,8,12,.75),rgba(4,5,8,.92));pointer-events:none}
+    .panel{position:relative;width:min(620px,100%);padding:clamp(26px,6vw,54px);text-align:center;border:1px solid rgba(237,198,117,.4);border-radius:24px;background:linear-gradient(145deg,rgba(27,24,20,.92),rgba(8,9,13,.96));box-shadow:0 25px 70px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,244,214,.10)}
+    .mark{display:grid;place-items:center;width:78px;height:78px;margin:0 auto 25px;border:1px solid rgba(255,223,153,.68);border-radius:24px;background:linear-gradient(145deg,#2c2419,#0b0c10);color:#f8d992;font-size:40px;box-shadow:0 0 34px rgba(227,178,78,.13)}
+    .eyebrow{color:#dfbc70;font-size:10px;font-weight:900;letter-spacing:.25em;text-transform:uppercase}
+    h1{margin:14px 0 12px;font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(35px,7vw,54px);line-height:1;color:#f4d99b}
+    p{max-width:460px;margin:0 auto;color:#c7c0b4;font-size:14px;line-height:1.8}
+    .note{margin-top:23px;padding:14px 16px;border:1px solid rgba(237,198,117,.17);border-radius:12px;background:rgba(0,0,0,.17);color:#d7c49b;font-size:12px;line-height:1.65}
+    .back{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:48px;margin-top:27px;padding:0 21px;border:1px solid rgba(255,221,145,.7);border-radius:12px;color:#ffedc6;background:linear-gradient(180deg,#6c4b20,#302113);font:800 12px inherit;letter-spacing:.07em;text-decoration:none;transition:filter .2s,transform .2s}
+    .back:hover{filter:brightness(1.15);transform:translateY(-2px)}
+    .back:focus-visible{outline:2px solid #ffe7a3;outline-offset:3px}
+  </style>
+</head>
+<body>
+  <main class="panel">
+    <div class="mark" aria-hidden="true">✦</div>
+    <div class="eyebrow">DJ Game Hub / Game 02</div>
+    <h1>Game Baru</h1>
+    <p>Area permainan kedua sudah dipisahkan dari Mahjong. Pengembangan berikutnya akan ditempatkan di halaman dan modul tersendiri agar kode, tampilan, serta data permainan tidak bercampur.</p>
+    <div class="note">Ruang ini merupakan kerangka awal, bukan game yang sudah dapat dimainkan. Jenis game dan mekanisme bermainnya akan diterapkan pada modul ini setelah ditentukan.</div>
+    <a class="back" href="./">← Kembali ke Game Hub</a>
+  </main>
+</body>
+</html>
