@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dj-sapi-gu-assets-own-lobby-flow-2026-10-10-8';
+const CACHE_VERSION = 'dj-sapi-gu-full-lobby-and-assets-2026-10-10-9';
 const APP_SHELL = [
   './',
   './index.html',
