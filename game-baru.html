@@ -20,6 +20,7 @@ button,a{font:inherit}
 h1{font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(21px,2.7vw,29px);line-height:1;margin:3px 0 0;color:#f5dfab;font-weight:600}
 .hub-link{color:#d8c18b;text-decoration:none;font-size:10px;font-weight:800;letter-spacing:.06em;white-space:nowrap}
 .hub-link:hover{color:#fff0c8;text-decoration:underline}
+button.hub-link{border:0;padding:0;background:transparent;cursor:pointer}
 .table-shell{position:relative;width:100%;height:min(76svh,790px);min-height:455px;display:grid;place-items:center;overflow:hidden;border:1px solid #b78c4d70;border-radius:25px;background:linear-gradient(145deg,#151e18,#0a100d);box-shadow:0 22px 60px #0007,inset 0 1px 0 #fff1;padding:clamp(10px,1.7vw,22px)}
 .table{position:relative;width:100%;height:100%;border-radius:50% / 45%;background:radial-gradient(ellipse at 50% 42%,#23684e 0%,#17513d 46%,#103b2d 74%,#0b2c22 100%);border:clamp(8px,1.15vw,14px) solid #5b3c21;box-shadow:inset 0 0 0 2px #d0a25a,inset 0 0 0 8px #291d12,inset 0 20px 55px #ffffff09,0 13px 26px #0007;isolation:isolate}
 .table::before{content:"";position:absolute;inset:10px;border:1px solid #e5c78336;border-radius:inherit;pointer-events:none}
@@ -443,6 +444,7 @@ h1{font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(21px,2.7vw,29px);
 var STARTING_CHIPS=400000,START_MIN=5000;
 var players=[],deck=[],pot=0,round=1,minBet=START_MIN,maxBet=40000;
 var phase="idle",stageKey="",currentBet=0,lastActorIndex=-1,actingIndex=-1;
+var settingsReturnTo="screen-main",gameStarted=false,tournamentSessionId=String(Date.now());
 var selectedIndexes=[],userChosenCombo=null,lastResult=null,handEnded=false,log=[];
 var $=function(id){return document.getElementById(id);};
 var fmt=function(n){return new Intl.NumberFormat("id-ID").format(Math.max(0,Math.floor(n)));};
@@ -529,6 +531,22 @@ function sgShowScreen(id){
  if(id!=="screen-game")hidePrompt();
  if(id==="screen-main")sgRenderHome();
  if(id==="screen-settings")sgRenderSettings();
+ if(id==="screen-game"&&gameStarted)sgRestorePrompt();
+}
+function sgRestorePrompt(){
+ var p=userPlayer();
+ if(!p)return;
+ if(["bet3","bet4","bet5","betShow"].indexOf(phase)>=0&&actingIndex>=0&&players[actingIndex]&&players[actingIndex].human){promptBetting(players[actingIndex]);return;}
+ if(phase==="show"&&!p.folded){
+  var count=validCombinations(p.hand).length;
+  showPrompt("RONDE "+round+" · SHOWDOWN","Pilih 3 kartu untuk Show","Pilih sendiri tepat 3 dari 5 kartu. Total nilai ketiganya harus tepat 10, 20, atau 30.",[
+   {label:"Show kartu terpilih",click:function(){showSelectedCards();},disabled:true},
+   {label:"Fold",kind:"danger",click:function(){p.folded=true;pushLog("Anda · Fold saat Show");renderAll();hidePrompt();if(activeCount()<=1)awardLastPlayer();else beginBettingStage("betShow");}}
+  ],"Kombinasi valid ditemukan",String(count));
+  updateShowPrompt();return;
+ }
+ if(phase==="result"&&lastResult){showResultPrompt();return;}
+ if(phase==="tournamentOver"){endTournament(liveTournamentPlayers()[0]||null);}
 }
 function sgOpenModal(id){
  var modal=$(id);if(modal){modal.classList.add("active");modal.dataset.open="1";}
@@ -540,7 +558,8 @@ function sgCloseModal(id){var m=$(id);if(m){m.classList.remove("active");delete 
 function sgOpenMessage(title,message){$("sgMessageTitle").textContent=title;$("sgMessageBody").textContent=message;sgOpenModal("sgMessageModal");}
 function sgRenderHome(){
  var p=sgReadProfile();$("sgProfileName").textContent=p.name;$("sgProfileAvatar").textContent=p.avatar;
- var rounds=JSON.parse(sgStorageGet("sg_history","[]"));$("sgStatRounds").textContent=rounds.length;
+ var rounds=[];try{rounds=JSON.parse(sgStorageGet("sg_history","[]"));if(!Array.isArray(rounds))rounds=[];}catch(e){}
+ $("sgStatRounds").textContent=rounds.length;
 }
 function sgRenderProfileForm(){
  var p=sgReadProfile();$("sgNameInput").value=p.name;$("sgAvatarCaption").textContent=p.avatar;
@@ -577,9 +596,9 @@ function sgLogHistory(){
  lastResult.logged=true;
 }
 function sgSaveTournamentWin(champion){
- if(!champion||!champion.human||sgStorageGet("sg_tournament_saved_round","")===String(round))return;
+ if(!champion||!champion.human||sgStorageGet("sg_tournament_saved_id","")===tournamentSessionId)return;
  var stats={};try{stats=JSON.parse(sgStorageGet("sg_stats","{}"))||{};}catch(e){}
- stats.tournaments=(stats.tournaments||0)+1;sgStorageSet("sg_stats",JSON.stringify(stats));sgStorageSet("sg_tournament_saved_round",String(round));
+ stats.tournaments=(stats.tournaments||0)+1;sgStorageSet("sg_stats",JSON.stringify(stats));sgStorageSet("sg_tournament_saved_id",tournamentSessionId);
 }
 function sgRenderPlayerIdentity(){
  var p=userPlayer();if(!p)return;
@@ -588,7 +607,8 @@ function sgRenderPlayerIdentity(){
  sgRenderHome();
 }
 function sgNewTournament(){
- round=1;makePlayers();phase="idle";selectedIndexes=[];log=[];sgShowScreen("screen-game");startHand(true);
+ tournamentSessionId=String(Date.now())+"-"+String(Math.random()).slice(2);
+ gameStarted=false;round=1;makePlayers();phase="idle";selectedIndexes=[];log=[];sgShowScreen("screen-game");gameStarted=true;startHand(true);
 }
 function sgReturnToLobby(){
  if(phase!=="idle"&&phase!=="result"&&phase!=="tournamentOver"){
@@ -606,15 +626,15 @@ function sgWireNavigation(){
  $("sgStatsOpen").addEventListener("click",function(){sgOpenModal("sgStatsModal");});
  $("sgInfoOpen").addEventListener("click",function(){sgOpenModal("sgInfoModal");});
  $("sgInfoOpenBottom").addEventListener("click",function(){sgOpenModal("sgInfoModal");});
- $("sgSettingsOpen").addEventListener("click",function(){sgShowScreen("screen-settings");});
+ $("sgSettingsOpen").addEventListener("click",function(){settingsReturnTo="screen-main";sgShowScreen("screen-settings");});
  $("sgPlayOpen").addEventListener("click",function(){sgShowScreen("screen-play");});
  $("sgPlayBack").addEventListener("click",function(){sgShowScreen("screen-main");});
- $("sgSettingsBack").addEventListener("click",function(){sgShowScreen("screen-main");});
+ $("sgSettingsBack").addEventListener("click",function(){sgShowScreen(settingsReturnTo||"screen-main");});
  $("sgSettingsInfo").addEventListener("click",function(){sgOpenModal("sgInfoModal");});
  $("sgVsBot").addEventListener("click",sgNewTournament);
  $("sgMultiplayer").addEventListener("click",function(){sgOpenMessage("Multiplayer belum tersedia","Prototype saat ini berisi permainan melawan empat bot. Mode multiplayer akan dikembangkan terpisah setelah alur kartu dan taruhan stabil.");});
  $("sgRefresh").addEventListener("click",function(){window.location.reload();});
- $("sgInGameSettings").addEventListener("click",function(){sgShowScreen("screen-settings");});
+ $("sgInGameSettings").addEventListener("click",function(){settingsReturnTo="screen-game";sgShowScreen("screen-settings");});
  $("sgLeaveGame").addEventListener("click",sgReturnToLobby);
  $("sgMusicVolume").addEventListener("input",function(){sgStorageSet("sg_music_volume",this.value);$("sgMusicValue").textContent=this.value+"%";});
  $("sgSfxVolume").addEventListener("input",function(){sgStorageSet("sg_sfx_volume",this.value);$("sgSfxValue").textContent=this.value+"%";});
@@ -832,8 +852,16 @@ function botAction(p){
  }
  if(!payBet(p,currentBet)){p.folded=true;pushLog(p.name+" · Fold (chip tidak cukup)");return;}
 }
-function humanAction(action){
+function humanAction(action,skipConfirmation){
  var p=userPlayer();if(!p||!needsAction(p)||actingIndex<0||players[actingIndex]!==p)return;
+ if(!skipConfirmation&&(action==="call"||action==="raise")&&sgReadSettings().confirm){
+  var target=action==="raise"?Math.min(currentBet*2,maxBet):currentBet;
+  var amount=Math.max(0,target-p.stageBet);
+  showPrompt("KONFIRMASI TARUHAN",action==="raise"?"Konfirmasi raise ke "+fmt(target):"Konfirmasi ikut taruhan","Anda akan menambahkan "+fmt(amount)+" chip ke pot. Saldo setelah aksi: "+fmt(p.chips-amount)+".",[
+   {label:"Konfirmasi",click:function(){humanAction(action,true);}},
+   {label:"Batal",kind:"secondary",click:function(){promptBetting(p);}}
+  ],"Pot saat ini",fmt(pot));return;
+ }
  hidePrompt();
  if(action==="fold"){
   p.folded=true;pushLog("Anda · Fold");p.actedAtBet=currentBet;
