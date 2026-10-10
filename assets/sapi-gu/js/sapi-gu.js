@@ -3,7 +3,7 @@
 "use strict";
 var STARTING_CHIPS=400000,START_MIN=5000;
 var players=[],deck=[],pot=0,round=1,minBet=START_MIN,maxBet=40000;
-var phase="idle",stageKey="",currentBet=0,lastActorIndex=-1,actingIndex=-1;
+var phase="idle",currentBet=0,lastActorIndex=-1,actingIndex=-1;
 var settingsReturnTo="screen-main",gameStarted=false,tournamentSessionId=String(Date.now());
 var selectedIndexes=[],userChosenCombo=null,lastResult=null,handEnded=false,log=[];
 var $=function(id){return document.getElementById(id);};
@@ -350,13 +350,13 @@ function startHand(initial){
 
  // All active players get four cards before the first betting decision.
  dealToActive(4);
- phase="buy5";stageKey="buy5";actingIndex=-1;lastActorIndex=-1;
+ phase="buy5";actingIndex=-1;lastActorIndex=-1;
  renderAll();
  if(liveHandPlayers().length<=1){awardLastPlayer();return;}
  beginBettingStage("buy5");
 }
 function beginBettingStage(key){
- phase=key;stageKey=key;currentBet=minBet;lastActorIndex=-1;actingIndex=-1;selectedIndexes=[];
+ phase=key;currentBet=minBet;lastActorIndex=-1;actingIndex=-1;selectedIndexes=[];
  players.forEach(function(p){p.stageBet=0;p.actedAtBet=0;});
  renderAll();driveBetting();
 }
