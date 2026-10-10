@@ -3,32 +3,292 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#08090d">
-  <meta name="description" content="Ruang terpisah untuk pengembangan game kedua di DJ Game Hub.">
-  <title>Game Baru — DJ Game Hub</title>
+  <meta name="theme-color" content="#07100d">
+  <meta name="description" content="Prototype meja Sapi/Gu dengan pot chip virtual di tengah meja oval.">
+  <title>Sapi / Gu — DJ Game Hub</title>
   <style>
+    :root{
+      color-scheme:dark;
+      --gold:#e9c77e;--gold-light:#ffedbd;--felt:#15533f;--felt-dark:#0a3026;
+      --ink:#f8f0dd;--muted:#b8c9bd;--panel:rgba(7,16,13,.88);
+    }
     *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;min-height:100svh;display:grid;place-items:center;padding:22px;color:#f7edda;background:#08090d url("assets/backgrounds/bg-play.jpg") center/cover no-repeat fixed;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    body::before{content:"";position:fixed;inset:0;background:linear-gradient(130deg,rgba(4,5,8,.87),rgba(7,8,12,.75),rgba(4,5,8,.92));pointer-events:none}
-    .panel{position:relative;width:min(620px,100%);padding:clamp(26px,6vw,54px);text-align:center;border:1px solid rgba(237,198,117,.4);border-radius:24px;background:linear-gradient(145deg,rgba(27,24,20,.92),rgba(8,9,13,.96));box-shadow:0 25px 70px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,244,214,.10)}
-    .mark{display:grid;place-items:center;width:78px;height:78px;margin:0 auto 25px;border:1px solid rgba(255,223,153,.68);border-radius:24px;background:linear-gradient(145deg,#2c2419,#0b0c10);color:#f8d992;font-size:40px;box-shadow:0 0 34px rgba(227,178,78,.13)}
-    .eyebrow{color:#dfbc70;font-size:10px;font-weight:900;letter-spacing:.25em;text-transform:uppercase}
-    h1{margin:14px 0 12px;font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(35px,7vw,54px);line-height:1;color:#f4d99b}
-    p{max-width:460px;margin:0 auto;color:#c7c0b4;font-size:14px;line-height:1.8}
-    .note{margin-top:23px;padding:14px 16px;border:1px solid rgba(237,198,117,.17);border-radius:12px;background:rgba(0,0,0,.17);color:#d7c49b;font-size:12px;line-height:1.65}
-    .back{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:48px;margin-top:27px;padding:0 21px;border:1px solid rgba(255,221,145,.7);border-radius:12px;color:#ffedc6;background:linear-gradient(180deg,#6c4b20,#302113);font-family:inherit;font-size:12px;font-weight:800;letter-spacing:.07em;text-decoration:none;transition:filter .2s,transform .2s}
-    .back:hover{filter:brightness(1.15);transform:translateY(-2px)}
-    .back:focus-visible{outline:2px solid #ffe7a3;outline-offset:3px}
+    html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink)}
+    body{
+      min-height:100vh;min-height:100svh;
+      background:radial-gradient(ellipse at 50% 30%,#243c31 0%,#101d18 48%,#070b0a 100%);
+      padding:clamp(12px,2.5vw,28px);
+    }
+    button{font:inherit}
+    .app{width:min(1240px,100%);margin:0 auto}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
+    .brand-mark{display:grid;place-items:center;width:43px;height:43px;flex:0 0 43px;border:1px solid #a98445;border-radius:14px;background:linear-gradient(145deg,#352a17,#111510);color:var(--gold-light);font-size:20px;box-shadow:0 0 22px #e9c77e12}
+    .eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:800}
+    h1{font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(24px,4vw,38px);line-height:1.05;margin:4px 0 0;color:#f5dfab;font-weight:600}
+    .top-actions{display:flex;gap:9px;align-items:center}
+    .pill,.back{display:inline-flex;align-items:center;justify-content:center;min-height:39px;padding:0 14px;border:1px solid #e9c77e55;border-radius:11px;color:#f5e6c1;text-decoration:none;background:#101a15;font-size:12px;font-weight:750;white-space:nowrap}
+    .pill{color:#c8d8ce;background:#12241b}
+    .layout{display:grid;grid-template-columns:minmax(0,1fr) 245px;gap:16px;align-items:stretch}
+    .table-shell{position:relative;min-width:0;min-height:650px;display:grid;place-items:center;overflow:hidden;border:1px solid #b78c4d70;border-radius:26px;background:linear-gradient(145deg,#151e18,#0a100d);box-shadow:0 22px 60px #0007,inset 0 1px 0 #fff1;padding:clamp(14px,3vw,34px)}
+    .table{
+      width:100%;height:100%;min-height:570px;max-height:730px;position:relative;
+      border-radius:50% / 43%;
+      background:
+        radial-gradient(ellipse at 50% 42%,#23684e 0%,#17513d 46%,#103b2d 74%,#0b2c22 100%);
+      border:clamp(8px,1.25vw,15px) solid #5b3c21;
+      box-shadow:inset 0 0 0 2px #d0a25a,inset 0 0 0 8px #291d12,inset 0 20px 55px #ffffff09,0 13px 26px #0007;
+      isolation:isolate;
+    }
+    .table::before{content:"";position:absolute;inset:10px;border:1px solid #e5c78336;border-radius:inherit;pointer-events:none}
+    .table::after{content:"";position:absolute;inset:20px;border:1px solid #061b142b;border-radius:inherit;pointer-events:none}
+    .seat{position:absolute;z-index:2;display:flex;align-items:center;gap:9px;width:clamp(135px,20%,190px);padding:9px 10px;border:1px solid #e7c77945;border-radius:14px;background:linear-gradient(145deg,rgba(11,22,17,.96),rgba(6,13,10,.96));box-shadow:0 8px 18px #0004}
+    .seat .avatar{display:grid;place-items:center;flex:0 0 35px;width:35px;height:35px;border-radius:50%;border:1px solid #e4c17680;background:linear-gradient(145deg,#6e5730,#272217);color:#fff0c8;font-size:13px;font-weight:900}
+    .seat-copy{min-width:0;flex:1}
+    .seat-name{font-size:12px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .seat-state{margin-top:3px;color:#afc7b8;font-size:10px}
+    .seat-stack{color:var(--gold-light);font-size:11px;font-weight:850;margin-top:4px;font-variant-numeric:tabular-nums}
+    .seat.top{top:-18px;left:50%;transform:translateX(-50%)}
+    .seat.left{left:-18px;top:36%;transform:translateY(-50%)}
+    .seat.right{right:-18px;top:36%;transform:translateY(-50%)}
+    .seat.bottom-left{bottom:3%;left:12%}
+    .seat.bottom-right{bottom:3%;right:12%}
+    .seat.you{border-color:#f3d38a;box-shadow:0 0 0 1px #f3d38a22,0 8px 18px #0005}
+    .seat.folded{opacity:.46;filter:saturate(.5)}
+    .seat.folded .seat-state{color:#e59d8c}
+    .pot-area{position:absolute;z-index:1;left:50%;top:48%;transform:translate(-50%,-50%);width:min(56%,430px);min-width:190px;text-align:center}
+    .pot-oval{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:clamp(116px,17vw,172px);padding:18px 14px;border:2px solid #d7b46d;border-radius:50% / 48%;background:radial-gradient(ellipse at 50% 25%,#18513c 0%,#0a2d22 73%,#071e17 100%);box-shadow:inset 0 0 0 5px #080f0b,inset 0 0 0 6px #c39c515c,0 12px 26px #0004}
+    .pot-label{font-size:10px;font-weight:900;letter-spacing:.23em;color:#d8c28f}
+    .pot-value{margin-top:5px;font-size:clamp(25px,4.2vw,42px);font-weight:900;letter-spacing:-.04em;color:#ffe7a2;font-variant-numeric:tabular-nums;text-shadow:0 2px 12px #0008}
+    .pot-sub{margin-top:3px;color:#a9c9b6;font-size:10px}
+    .chips{position:absolute;left:50%;top:0;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;gap:4px;max-width:90%;height:24px;overflow:hidden}
+    .chip{width:22px;height:22px;flex:0 0 22px;border-radius:50%;border:2px dashed #fff8;box-shadow:0 2px 3px #0007;background:repeating-conic-gradient(#d8b66b 0 12deg,#8d642d 12deg 24deg)}
+    .chip:nth-child(3n+2){background:repeating-conic-gradient(#d8e0d6 0 12deg,#6d8577 12deg 24deg)}
+    .chip:nth-child(3n){background:repeating-conic-gradient(#b85b4f 0 12deg,#702f2b 12deg 24deg)}
+    .table-caption{position:absolute;left:50%;top:69%;transform:translateX(-50%);font-size:10px;letter-spacing:.16em;color:#b8d1bf;text-transform:uppercase;white-space:nowrap}
+    .side-panel{display:flex;flex-direction:column;gap:13px}
+    .panel{padding:17px;border:1px solid #d4b16b42;border-radius:17px;background:var(--panel);box-shadow:0 14px 32px #0002}
+    .panel h2{margin:0 0 13px;color:#f0d79b;font-size:13px;letter-spacing:.04em}
+    .metric{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #ffffff12;font-size:11px;color:#b8c9bd}
+    .metric:last-child{border-bottom:0;padding-bottom:0}
+    .metric strong{font-size:12px;color:#fff0c8;font-variant-numeric:tabular-nums;text-align:right}
+    .actions{display:grid;gap:9px}
+    .action{min-height:43px;border:1px solid #d9b96e;border-radius:11px;background:linear-gradient(180deg,#80602b,#48331a);color:#fff0c7;font-size:12px;font-weight:850;cursor:pointer;transition:transform .16s,filter .16s}
+    .action:hover{filter:brightness(1.12);transform:translateY(-1px)}
+    .action:active{transform:translateY(1px)}
+    .action.secondary{background:#12241b;border-color:#426650;color:#d4e4d8}
+    .action:disabled{opacity:.4;cursor:not-allowed;transform:none}
+    .small-note{font-size:11px;line-height:1.65;color:#a9bcb0;margin:0}
+    .log{display:grid;gap:7px;max-height:145px;overflow:auto}
+    .log-row{display:flex;justify-content:space-between;gap:10px;font-size:10px;color:#b9cbbf}
+    .log-row strong{color:#f4dca3;font-variant-numeric:tabular-nums}
+    .status{min-height:16px;margin-top:10px;color:#d8c18b;font-size:10px;line-height:1.5}
+    .footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 3px 0;color:#81978a;font-size:10px}
+    @media(max-width:900px){
+      .layout{grid-template-columns:1fr}
+      .table-shell{min-height:570px;padding:20px}
+      .table{min-height:500px;max-height:610px}
+      .side-panel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+      .side-panel .panel:last-child{grid-column:1/-1}
+    }
+    @media(max-width:560px){
+      body{padding:12px}
+      .topbar{align-items:flex-start}
+      .brand-mark{width:37px;height:37px;flex-basis:37px;border-radius:12px}
+      .top-actions{flex-direction:column;align-items:stretch}
+      .pill,.back{min-height:34px;padding:0 10px;font-size:10px}
+      .table-shell{min-height:435px;padding:11px;border-radius:19px}
+      .table{min-height:405px;border-width:8px}
+      .table::before{inset:6px}.table::after{inset:13px}
+      .seat{width:clamp(108px,34%,145px);gap:6px;padding:7px 6px;border-radius:11px}
+      .seat .avatar{width:28px;height:28px;flex-basis:28px;font-size:10px}
+      .seat-name{font-size:10px}.seat-state{font-size:9px}.seat-stack{font-size:9px}
+      .seat.top{top:-10px}
+      .seat.left{left:-10px;top:35%}
+      .seat.right{right:-10px;top:35%}
+      .seat.bottom-left{bottom:2%;left:1%}
+      .seat.bottom-right{bottom:2%;right:1%}
+      .pot-area{width:62%;min-width:145px;top:48%}
+      .pot-oval{min-height:100px;padding:13px 8px}
+      .pot-label{font-size:8px}.pot-value{font-size:25px}.pot-sub{font-size:9px}
+      .chip{width:17px;height:17px;flex-basis:17px}
+      .chips{gap:2px;height:19px}
+      .table-caption{top:68%;font-size:8px;letter-spacing:.08em}
+      .side-panel{grid-template-columns:1fr}
+      .side-panel .panel:last-child{grid-column:auto}
+      .panel{padding:14px}
+    }
+    @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
   </style>
 </head>
 <body>
-  <main class="panel">
-    <div class="mark" aria-hidden="true">✦</div>
-    <div class="eyebrow">DJ Game Hub / Game 02</div>
-    <h1>Game Baru</h1>
-    <p>Area permainan kedua sudah dipisahkan dari Mahjong. Pengembangan berikutnya akan ditempatkan di halaman dan modul tersendiri agar kode, tampilan, serta data permainan tidak bercampur.</p>
-    <div class="note">Ruang ini merupakan kerangka awal, bukan game yang sudah dapat dimainkan. Jenis game dan mekanisme bermainnya akan diterapkan pada modul ini setelah ditentukan.</div>
-    <a class="back" href="./">← Kembali ke Game Hub</a>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">♟</div>
+        <div>
+          <div class="eyebrow">DJ Game Hub · Game 02</div>
+          <h1>Sapi / Gu</h1>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span class="pill">MODE TEST MEJA</span>
+        <a class="back" href="./">← Game Hub</a>
+      </div>
+    </header>
+
+    <section class="layout" aria-label="Prototype meja Sapi atau Gu">
+      <div class="table-shell">
+        <div class="table" id="gameTable" aria-label="Meja permainan oval">
+          <div class="seat top" data-seat="0">
+            <div class="avatar">A</div><div class="seat-copy"><div class="seat-name">Pemain A</div><div class="seat-state">Menunggu taruhan</div><div class="seat-stack">400.000 chip</div></div>
+          </div>
+          <div class="seat left" data-seat="1">
+            <div class="avatar">B</div><div class="seat-copy"><div class="seat-name">Pemain B</div><div class="seat-state">Menunggu taruhan</div><div class="seat-stack">400.000 chip</div></div>
+          </div>
+          <div class="seat right" data-seat="2">
+            <div class="avatar">C</div><div class="seat-copy"><div class="seat-name">Pemain C</div><div class="seat-state">Menunggu taruhan</div><div class="seat-stack">400.000 chip</div></div>
+          </div>
+          <div class="seat bottom-left" data-seat="3">
+            <div class="avatar">D</div><div class="seat-copy"><div class="seat-name">Pemain D</div><div class="seat-state">Menunggu taruhan</div><div class="seat-stack">400.000 chip</div></div>
+          </div>
+          <div class="seat bottom-right you" data-seat="4">
+            <div class="avatar">K</div><div class="seat-copy"><div class="seat-name">Anda</div><div class="seat-state">Pemain aktif</div><div class="seat-stack">400.000 chip</div></div>
+          </div>
+          <div class="pot-area">
+            <div class="chips" id="potChips" aria-label="Chip yang terkumpul di pot"></div>
+            <div class="pot-oval">
+              <div class="pot-label">TOTAL POT</div>
+              <div class="pot-value" id="potValue">0</div>
+              <div class="pot-sub" id="potSub">Belum ada taruhan</div>
+            </div>
+          </div>
+          <div class="table-caption">Sapi / Gu · Meja Taruhan</div>
+        </div>
+      </div>
+
+      <aside class="side-panel">
+        <section class="panel">
+          <h2>Status meja</h2>
+          <div class="metric"><span>Ronde</span><strong id="roundValue">1</strong></div>
+          <div class="metric"><span>Chip Anda</span><strong id="balanceValue">400.000</strong></div>
+          <div class="metric"><span>Taruhan tahap ini</span><strong id="stageValue">5.000</strong></div>
+          <div class="metric"><span>Total masuk pot</span><strong id="totalValue">0</strong></div>
+        </section>
+
+        <section class="panel">
+          <h2>Simulasi chip pot</h2>
+          <div class="actions">
+            <button class="action" id="addBet">Tambah taruhan 5.000</button>
+            <button class="action secondary" id="nextRound">Mulai ronde berikutnya</button>
+            <button class="action secondary" id="reset">Reset simulasi</button>
+          </div>
+          <div class="status" id="status" role="status" aria-live="polite">Prototype visual: tombol menambahkan chip virtual ke pot untuk menguji tampilan.</div>
+        </section>
+
+        <section class="panel">
+          <h2>Riwayat pot</h2>
+          <div class="log" id="potLog"><div class="log-row"><span>Meja siap</span><strong>0</strong></div></div>
+        </section>
+
+        <section class="panel">
+          <h2>Tahap prototype</h2>
+          <p class="small-note">Versi ini menguji bentuk meja oval, posisi 5 pemain, serta chip virtual yang terkumpul di oval tengah. Sistem kartu, giliran taruhan lengkap, Fold, Show, dan penentuan pemenang belum diaktifkan.</p>
+        </section>
+      </aside>
+    </section>
+    <footer class="footer"><span>Prototype awal · fokus tata letak meja dan pot</span><span>Mahjong tetap berada di halaman terpisah</span></footer>
   </main>
+
+  <script>
+    (() => {
+      const STARTING_CHIPS = 400000;
+      const BET = 5000;
+      const MAX_CHIP_MARKS = 28;
+      let round = 1;
+      let pot = 0;
+      let balance = STARTING_CHIPS;
+      let stageTotal = 0;
+      let logEntries = [{ label: "Meja siap", amount: 0 }];
+
+      const $ = (id) => document.getElementById(id);
+      const fmt = (value) => new Intl.NumberFormat("id-ID").format(value);
+      const setStatus = (message) => { $("status").textContent = message; };
+
+      function renderChips() {
+        const container = $("potChips");
+        container.replaceChildren();
+        const count = Math.min(MAX_CHIP_MARKS, Math.floor(pot / BET));
+        for (let i = 0; i < count; i++) {
+          const chip = document.createElement("span");
+          chip.className = "chip";
+          chip.setAttribute("aria-hidden", "true");
+          container.appendChild(chip);
+        }
+        if (pot > 0 && count === 0) {
+          const chip = document.createElement("span");
+          chip.className = "chip";
+          chip.setAttribute("aria-hidden", "true");
+          container.appendChild(chip);
+        }
+        $("potValue").textContent = fmt(pot);
+        $("potSub").textContent = pot === 0 ? "Belum ada taruhan" : count >= MAX_CHIP_MARKS ? "Chip terkumpul · tampilan ringkas" : count + " chip virtual terkumpul";
+        $("roundValue").textContent = round;
+        $("balanceValue").textContent = fmt(balance);
+        $("stageValue").textContent = fmt(BET);
+        $("totalValue").textContent = fmt(stageTotal);
+        $("addBet").disabled = balance < BET;
+        $("addBet").textContent = balance < BET ? "Chip tidak mencukupi" : "Tambah taruhan " + fmt(BET);
+        $("potLog").replaceChildren();
+        logEntries.slice(-6).reverse().forEach((entry) => {
+          const row = document.createElement("div");
+          row.className = "log-row";
+          const label = document.createElement("span");
+          label.textContent = entry.label;
+          const amount = document.createElement("strong");
+          amount.textContent = fmt(entry.amount);
+          row.append(label, amount);
+          $("potLog").appendChild(row);
+        });
+        document.querySelectorAll(".seat").forEach((seat) => {
+          const stack = seat.querySelector(".seat-stack");
+          if (seat.dataset.seat === "4") stack.textContent = fmt(balance) + " chip";
+        });
+      }
+
+      $("addBet").addEventListener("click", () => {
+        if (balance < BET) {
+          setStatus("Chip Anda tidak cukup untuk taruhan 5.000.");
+          return;
+        }
+        balance -= BET;
+        pot += BET;
+        stageTotal += BET;
+        logEntries.push({ label: "Ronde " + round + " · taruhan masuk", amount: BET });
+        renderChips();
+        setStatus("5.000 chip ditambahkan ke pot. Pot sekarang " + fmt(pot) + ".");
+      });
+
+      $("nextRound").addEventListener("click", () => {
+        round += 1;
+        stageTotal = 0;
+        logEntries.push({ label: "Ronde " + round + " dimulai", amount: pot });
+        renderChips();
+        setStatus("Ronde " + round + " dimulai. Pot lama tetap tersimpan; simulasi taruhan tahap baru direset.");
+      });
+
+      $("reset").addEventListener("click", () => {
+        round = 1;
+        pot = 0;
+        balance = STARTING_CHIPS;
+        stageTotal = 0;
+        logEntries = [{ label: "Simulasi direset", amount: 0 }];
+        renderChips();
+        setStatus("Simulasi direset. Chip Anda kembali menjadi 400.000 dan pot kembali kosong.");
+      });
+
+      renderChips();
+    })();
+  </script>
 </body>
 </html>
