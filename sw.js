@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dj-sapi-gu-full-lobby-and-assets-2026-10-10-9';
+const CACHE_VERSION = 'dj-sapi-gu-clean-screen-architecture-2026-10-10-10';
 const APP_SHELL = [
   './',
   './index.html',
@@ -45,6 +45,8 @@ const APP_SHELL = [
   './assets/sapi-gu/backgrounds/bg-settings.svg',
   './assets/sapi-gu/backgrounds/bg-vs-bot.svg',
   './assets/sapi-gu/backgrounds/bg-multiplayer.svg',
+  './assets/sapi-gu/css/sapi-gu.css',
+  './assets/sapi-gu/js/sapi-gu.js',
 ];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE_VERSION).then(cache => cache.addAll(APP_SHELL).catch(()=>{}))); self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE_VERSION).map(k=>caches.delete(k))))); self.clients.claim(); });
