@@ -319,11 +319,11 @@ function renderSeats(){
  });
  players.filter(function(p){return !p.human;}).forEach(function(p){
   var host=document.querySelector('[data-hand="'+p.id+'"]');if(!host)return;host.replaceChildren();
-  if(p.chips<=0||p.folded&&phase!=="result")return;
+  if(p.chips<=0||(p.folded&&phase!=="result"&&!(phase==="betShow"&&p.combo&&p.combo.indexes)))return;
   var n=p.hand.length;
   if(p.reveal&&phase==="result"){
    p.hand.forEach(function(tile){host.appendChild(buildMiniTile(tile));});
-  }else if(phase==="betShow"&&p.combo&&p.combo.indexes){
+  }else if((phase==="betShow"||phase==="result")&&p.combo&&p.combo.indexes){
    p.hand.forEach(function(tile,index){
     if(p.combo.indexes.indexOf(index)>=0)host.appendChild(buildMiniTile(tile));
     else{var back=document.createElement("span");back.className="card-back";back.setAttribute("aria-hidden","true");host.appendChild(back);}
@@ -363,6 +363,7 @@ function phaseLabel(){
  if(phase==="bet4")return "Taruhan · 4 Kartu";
  if(phase==="bet5")return "Taruhan · 5 Kartu";
  if(phase==="show")return "Showdown · Pilih 3 Kartu";
+ if(phase==="betShow")return "Taruhan Terakhir · Setelah Show";
  if(phase==="result")return "Hasil Ronde";
  if(phase==="tournamentOver")return "Pemenang Turnamen";
  return "Meja Sapi / Gu";
