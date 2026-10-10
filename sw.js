@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dj-game-hub-mahjong-baseline-2026-10-10-1';
+const CACHE_VERSION = 'dj-sapi-gu-table-layout-2026-10-10-2';
 const APP_SHELL = [
   './',
   './index.html',
