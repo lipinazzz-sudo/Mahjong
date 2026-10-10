@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dj-sapi-gu-clean-screen-architecture-2026-10-10-11';
+const CACHE_VERSION = 'dj-sapi-gu-four-cards-buy5-show-finalbet-2026-10-10-12';
 const APP_SHELL = [
   './',
   './index.html',

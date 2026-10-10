@@ -11,8 +11,8 @@ var fmt=function(n){return new Intl.NumberFormat("id-ID").format(Math.max(0,Math
 var liveHandPlayers=function(){return players.filter(function(p){return p.inHand&&!p.folded&&p.chips>=0;});};
 var liveTournamentPlayers=function(){return players.filter(function(p){return p.chips>0;});};
 var userPlayer=function(){return players.find(function(p){return p.human;});};
-var stageTitles={bet3:"Taruhan setelah 3 kartu",bet4:"Taruhan setelah kartu ke-4",bet5:"Taruhan sebelum Show",betShow:"Taruhan terakhir setelah Show"};
-var stageHints={bet3:"Beli kartu / ikut taruhan untuk menerima kartu ke-4. Jika tidak ikut, Anda Fold.",bet4:"Ikut taruhan untuk melanjutkan ke kartu ke-5. Jika tidak ikut, Anda Fold.",bet5:"Taruhan sebelum Show. Setelah tahap ini, Anda memilih sendiri 3 kartu.",betShow:"Tiga kartu pilihan sudah dibuka. Ini kesempatan terakhir untuk ikut atau menaikkan taruhan sebelum dua kartu penentu dibandingkan."};
+var stageTitles={buy5:"Taruhan untuk membeli kartu ke-5",betShow:"Taruhan terakhir setelah Show"};
+var stageHints={buy5:"Anda sudah menerima 4 kartu. Ikut atau naikkan taruhan untuk membeli kartu ke-5. Jika tidak ikut, Anda Fold.",betShow:"Tiga kartu pilihan sudah di-Show. Ini ronde taruhan terakhir sebelum nilai dua kartu sisanya dibandingkan."};
 
 function createDeck(){
  var d=[];
@@ -96,7 +96,7 @@ function sgShowScreen(id){
 function sgRestorePrompt(){
  var p=userPlayer();
  if(!p)return;
- if(["bet3","bet4","bet5","betShow"].indexOf(phase)>=0&&actingIndex>=0&&players[actingIndex]&&players[actingIndex].human){promptBetting(players[actingIndex]);return;}
+ if(["buy5","betShow"].indexOf(phase)>=0&&actingIndex>=0&&players[actingIndex]&&players[actingIndex].human){promptBetting(players[actingIndex]);return;}
  if(phase==="show"&&!p.folded){
   var count=validCombinations(p.hand).length;
   showPrompt("RONDE "+round+" · SHOWDOWN","Pilih 3 kartu untuk Show","Pilih sendiri tepat 3 dari 5 kartu. Total nilai ketiganya harus tepat 10, 20, atau 30.",[
@@ -284,9 +284,7 @@ function renderAll(){
  $("youStack").textContent=fmt(userPlayer()?userPlayer().chips:0);
 }
 function phaseLabel(){
- if(phase==="bet3")return "Taruhan · 3 Kartu";
- if(phase==="bet4")return "Taruhan · 4 Kartu";
- if(phase==="bet5")return "Taruhan · 5 Kartu";
+ if(phase==="buy5")return "Taruhan · Beli Kartu ke-5";
  if(phase==="show")return "Showdown · Pilih 3 Kartu";
  if(phase==="betShow")return "Taruhan Terakhir · Setelah Show";
  if(phase==="result")return "Hasil Ronde";
@@ -315,7 +313,7 @@ function promptBetting(p){
  var canRaise=nextRaise>currentBet&&(nextRaise-p.stageBet)<=p.chips;
  var title=stageTitles[phase]||"Taruhan";
  var message=(stageHints[phase]||"Ikut taruhan atau Fold.")+" Taruhan saat ini "+fmt(currentBet)+". Saldo Anda "+fmt(p.chips)+".";
- var callLabel=phase==="bet3"?"Beli / lanjut "+fmt(need):(phase==="bet4"?"Beli kartu ke-5 · "+fmt(need):(phase==="betShow"?"Ikut taruhan terakhir · "+fmt(need):"Ikut taruhan · "+fmt(need)));
+ var callLabel=phase==="buy5"?"Beli kartu ke-5 · "+fmt(need):(phase==="betShow"?"Ikut taruhan terakhir · "+fmt(need):"Ikut taruhan · "+fmt(need));
  var buttons=[
   {label:(canCall?callLabel:"Chip tidak cukup"),disabled:!canCall,click:function(){humanAction("call");}},
  ];
@@ -337,21 +335,25 @@ function startHand(initial){
  minBet=START_MIN*Math.pow(2,Math.floor((round-1)/10));
  maxBet=minBet*8;
  deck=createDeck();pot=0;selectedIndexes=[];userChosenCombo=null;lastResult=null;handEnded=false;
+
+ // Reset round state and collect the mandatory ante before cards are dealt.
  players.forEach(function(p){
   p.hand=[];p.folded=false;p.inHand=p.chips>0;p.stageBet=0;p.actedAtBet=0;p.reveal=false;p.combo=null;p.invalidShow=false;
  });
- var eligible=players.filter(function(p){return p.chips>0;});
- eligible.forEach(function(p){
+ players.forEach(function(p){
+  if(!p.inHand||p.chips<=0)return;
   var ante=Math.min(minBet,p.chips);
   p.chips-=ante;pot+=ante;
-  if(p.chips===0){p.inHand=false;p.folded=true;}
   pushLog(p.name+" · ante",ante);
+  if(p.chips===0){p.inHand=false;p.folded=true;}
  });
- dealToActive(3);
- phase="bet3";stageKey="bet3";actingIndex=-1;lastActorIndex=-1;
+
+ // All active players get four cards before the first betting decision.
+ dealToActive(4);
+ phase="buy5";stageKey="buy5";actingIndex=-1;lastActorIndex=-1;
  renderAll();
  if(liveHandPlayers().length<=1){awardLastPlayer();return;}
- beginBettingStage("bet3");
+ beginBettingStage("buy5");
 }
 function beginBettingStage(key){
  phase=key;stageKey=key;currentBet=minBet;lastActorIndex=-1;actingIndex=-1;selectedIndexes=[];
@@ -396,12 +398,13 @@ function payBet(p,target){
 function botAction(p){
  var due=currentBet-p.stageBet;
  if(p.chips<due){p.folded=true;pushLog(p.name+" · Fold (chip tidak cukup)");return;}
- var canRaise=Math.min(currentBet*2,maxBet)>currentBet;
  var raiseTo=Math.min(currentBet*2,maxBet);
+ var canRaise=raiseTo>currentBet;
  var potPressure=currentBet/minBet;
- var valid=hasValidTriple(p.hand);
- var foldChance=0.12+(potPressure>=4?0.12:0)+((phase==="bet5"||phase==="betShow")&&!valid?0.2:0);
- var raiseChance=canRaise?(0.27+(valid?0.08:0)-(potPressure>=4?0.12:0)):0;
+ // Buying the fifth card happens while all active players still hold four cards.
+ var valid=p.hand.length===5&&hasValidTriple(p.hand);
+ var foldChance=0.12+(potPressure>=4?0.12:0)+(phase==="betShow"&&!valid?0.2:0);
+ var raiseChance=canRaise?(0.27+(phase==="betShow"&&valid?0.08:0)-(potPressure>=4?0.12:0)):0;
  var r=Math.random();
  if(r<foldChance&&p.stageBet<currentBet){p.folded=true;pushLog(p.name+" · Fold");return;}
  if(canRaise&&r<foldChance+raiseChance&&p.chips>=raiseTo-p.stageBet){
@@ -437,15 +440,12 @@ function humanAction(action,skipConfirmation){
 }
 function finishBettingStage(){
  if(activeCount()<=1){awardLastPlayer();return;}
- if(phase==="bet3"){
-  dealToActive(1);pushLog("Kartu ke-4 dibagikan");
-  beginBettingStage("bet4");return;
+ if(phase==="buy5"){
+  dealToActive(1);
+  pushLog("Kartu ke-5 dibagikan kepada pemain aktif");
+  enterShowdown();
+  return;
  }
- if(phase==="bet4"){
-  dealToActive(1);pushLog("Kartu ke-5 dibagikan");
-  beginBettingStage("bet5");return;
- }
- if(phase==="bet5"){enterShowdown();return;}
  if(phase==="betShow"){resolveShowdown();return;}
 }
 function enterShowdown(){
