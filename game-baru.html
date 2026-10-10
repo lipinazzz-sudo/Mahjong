@@ -73,7 +73,7 @@ h1{font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(21px,2.7vw,29px);
 .pip.on{visibility:visible}
 .domino-card.special-tile .pip{background:#202c25}
 .card-number{display:block;margin-top:2px;text-align:center;font-size:7px;font-weight:900;letter-spacing:.02em;color:#8f7b57}
-.hand-help{position:absolute;left:50%;bottom:13.3%;transform:translateX(-50%);z-index:4;font-size:9px;color:#d6c89e;text-align:center;white-space:nowrap;text-shadow:0 1px 5px #000}
+.hand-help{display:none}
 .action-prompt{display:none;position:fixed;z-index:20;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(470px,calc(100vw - 22px));padding:14px 15px 13px;border:1px solid #d5b16b;border-radius:17px;background:linear-gradient(145deg,rgba(22,30,23,.985),rgba(6,12,9,.985));box-shadow:0 17px 55px #000b,inset 0 1px 0 #fff1}
 .action-prompt.visible{display:block;animation:prompt-in .16s ease-out}
 @keyframes prompt-in{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
@@ -95,7 +95,8 @@ h1{font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(21px,2.7vw,29px);
  .eyebrow{font-size:7px;letter-spacing:.14em}
  h1{font-size:22px}
  .hub-link{font-size:9px}
- .table-shell{height:auto;min-height:0;aspect-ratio:1.18/1;padding:6px;border-radius:18px}
+ .app{min-height:calc(100svh - 14px);display:flex;flex-direction:column}
+ .table-shell{height:auto;min-height:0;aspect-ratio:1.18/1;padding:6px;border-radius:18px;margin-top:auto;margin-bottom:auto}
  .table{height:100%;min-height:0;border-width:7px}
  .table::before{inset:5px}.table::after{inset:11px}
  .seat{width:20%;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 2px;border-radius:9px}
@@ -120,21 +121,21 @@ h1{font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(21px,2.7vw,29px);
  .card-back::after{font-size:8px}
  .opponent-reveal-card{width:clamp(12px,3.2vw,16px);flex-basis:clamp(12px,3.2vw,16px);padding:1px}
  .opponent-reveal-card .pip{width:2px;height:2px}
- .pot-area{width:42%;min-width:130px;top:45%}
+ .pot-area{width:42%;min-width:130px;top:40%}
  .pot-oval{height:clamp(77px,24vw,94px);padding:8px 7px 19px}
  .pot-label{font-size:7px;letter-spacing:.14em}
  .pot-value{font-size:clamp(18px,5.2vw,24px)}
  .pot-sub{font-size:7px}
  .chips{height:11px;bottom:4px;gap:2px}
  .chip{width:10px;height:10px;flex-basis:10px;border-width:1px}
- .table-phase{top:56%;font-size:7px;max-width:80%;letter-spacing:.04em}
+ .table-phase{top:55%;font-size:7px;max-width:80%;letter-spacing:.04em}
  .table-caption{top:65%;font-size:7px;letter-spacing:.06em}
  .hand-zone{bottom:17%;max-width:98%;gap:2px}
  .domino-card{width:clamp(38px,11.2vw,51px);padding:2px;border-radius:5px}
  .pip-half{padding:2px}
  .pip{width:clamp(2px,.65vw,3px);height:clamp(2px,.65vw,3px)}
  .card-number{font-size:6px;margin-top:1px}
- .hand-help{bottom:12.5%;font-size:7px}
+ .hand-help{display:none}
  .action-prompt{bottom:max(9px,env(safe-area-inset-bottom));padding:12px 12px 10px;border-radius:15px;max-width:470px}
  .prompt-title{font-size:14px}
  .prompt-message{font-size:10px}
@@ -373,8 +374,9 @@ function promptBetting(p){
  var canRaise=nextRaise>currentBet&&(nextRaise-p.stageBet)<=p.chips;
  var title=stageTitles[phase]||"Taruhan";
  var message=(stageHints[phase]||"Ikut taruhan atau Fold.")+" Taruhan saat ini "+fmt(currentBet)+". Saldo Anda "+fmt(p.chips)+".";
+ var callLabel=phase==="bet3"?"Beli / lanjut "+fmt(need):(phase==="bet4"?"Beli kartu ke-5 · "+fmt(need):"Ikut Show · "+fmt(need));
  var buttons=[
-  {label:(canCall?"Ikut / call "+fmt(need):"Chip tidak cukup"),disabled:!canCall,click:function(){humanAction("call");}},
+  {label:(canCall?callLabel:"Chip tidak cukup"),disabled:!canCall,click:function(){humanAction("call");}},
  ];
  if(canRaise)buttons.push({label:"Raise ke "+fmt(nextRaise),click:function(){humanAction("raise");}});
  buttons.push({label:"Fold",kind:"danger",click:function(){humanAction("fold");}});
