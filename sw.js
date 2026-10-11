@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dj-sapi-gu-compact-action-panel-visible-hand-2026-10-10-14';
+const CACHE_VERSION = 'dj-poker-texas-holdem-hub-bg-2026-10-11-1';
 const APP_SHELL = [
   './',
   './index.html',
