@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dj-poker-texas-holdem-hub-bg-2026-10-11-1';
+const CACHE_VERSION = 'dj-poker-texas-holdem-betting-fix-2026-10-11-2';
 const APP_SHELL = [
   './',
   './index.html',
