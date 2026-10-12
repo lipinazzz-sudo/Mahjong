@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dj-poker-9-player-200k-2k-blinds-2026-10-12-3';
+const CACHE_VERSION = 'dj-poker-seat-bounds-fold-hidden-timer-15s-bot-delay-2s-2026-10-12-4';
 const APP_SHELL = [
   './',
   './index.html',
