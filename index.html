@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#08090d">
-  <meta name="description" content="DJ Game Hub — pilih permainan Mahjong atau game baru.">
+  <meta name="description" content="DJ Game Hub — pilih Mahjong DJ atau DJ Poker.">
   <title>DJ Game Hub — Pilih Permainan</title>
   <style>
     :root{color-scheme:dark;--gold:#edc675;--gold-bright:#ffe7a3;--muted:#c4bba9;--line:rgba(237,198,117,.32);--panel:rgba(10,11,15,.84)}
@@ -31,7 +31,7 @@
     .game-card::before{content:"";position:absolute;z-index:-2;inset:0;background-size:cover;background-position:center;transition:transform .5s ease}
     .game-card::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,rgba(8,8,11,.20),rgba(7,7,10,.38) 35%,rgba(5,5,8,.97) 100%),linear-gradient(90deg,rgba(6,7,10,.66),rgba(6,7,10,.12))}
     .game-card--mahjong::before{background-image:url("assets/backgrounds/bg-main.jpg")}
-    .game-card--new::before{background-image:url("assets/backgrounds/bg-play.jpg")}
+    .game-card--new::before{background-image:url("assets/poker/poker-card-bg.svg")}
     .game-card:hover{transform:translateY(-4px);border-color:rgba(255,222,145,.82);box-shadow:0 28px 65px rgba(0,0,0,.46),0 0 28px rgba(224,172,65,.12),inset 0 1px 0 rgba(255,243,208,.14)}
     .game-card:hover::before{transform:scale(1.045)}
     .game-card:active{transform:translateY(-1px) scale(.995)}
@@ -93,17 +93,16 @@
           </div>
         </a>
 
-        <a class="game-card game-card--new" href="game-baru.html" aria-label="Buka Texas Hold’em Poker">
+        <a class="game-card game-card--new" href="game-baru.html" aria-label="Buka DJ Poker">
           <div class="card-top">
-            <span class="card-index">GAME 02 / TEXAS HOLD’EM</span>
+            <span class="card-index">GAME 02 / DJ POKER</span>
             <span class="card-tag">Cards · Strategy</span>
           </div>
-          <div class="card-art new-art" aria-hidden="true"></div>
           <div class="card-copy">
             <div class="card-kicker">Texas Hold’em Poker</div>
-            <h2>Texas Hold’em</h2>
-            <p>Dua kartu pribadi, lima kartu komunitas, ronde taruhan, dan showdown melawan bot.</p>
-            <div class="card-action"><span>Mainkan Poker</span><span class="arrow" aria-hidden="true">→</span></div>
+            <h2>DJ Poker</h2>
+            <p>Texas Hold’em melawan hingga delapan bot, dengan chip virtual dan ronde taruhan lengkap.</p>
+            <div class="card-action"><span>Mainkan DJ Poker</span><span class="arrow" aria-hidden="true">→</span></div>
           </div>
         </a>
       </section>

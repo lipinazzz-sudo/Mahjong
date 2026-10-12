@@ -1,9 +1,12 @@
-const CACHE_VERSION = 'dj-poker-texas-holdem-betting-fix-2026-10-11-2';
+const CACHE_VERSION = 'dj-poker-9-player-200k-2k-blinds-2026-10-12-3';
 const APP_SHELL = [
   './',
   './index.html',
   './mahjong.html',
   './game-baru.html',
+  './assets/poker/poker-card-bg.svg',
+  './assets/poker/poker.js',
+  './assets/poker/poker.css',
   './manifest.webmanifest',
   './assets/backgrounds/bg-main.jpg',
   './assets/backgrounds/bg-lobby.jpg',
@@ -41,12 +44,6 @@ const APP_SHELL = [
   './assets/css/18-history-mode-tabs.css?v=20261009-1',
   './assets/backgrounds/card-vs-ai.webp',
   './assets/backgrounds/card-multiplayer.webp',
-  './assets/sapi-gu/backgrounds/bg-main.svg',
-  './assets/sapi-gu/backgrounds/bg-settings.svg',
-  './assets/sapi-gu/backgrounds/bg-vs-bot.svg',
-  './assets/sapi-gu/backgrounds/bg-multiplayer.svg',
-  './assets/sapi-gu/css/sapi-gu.css',
-  './assets/sapi-gu/js/sapi-gu.js',
 ];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE_VERSION).then(cache => cache.addAll(APP_SHELL).catch(()=>{}))); self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE_VERSION).map(k=>caches.delete(k))))); self.clients.claim(); });
