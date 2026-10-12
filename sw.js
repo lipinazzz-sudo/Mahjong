@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dj-poker-seat-bounds-fold-hidden-timer-15s-bot-delay-2s-2026-10-12-4';
+const CACHE_VERSION = 'dj-poker-seat-bounds-fold-hidden-action-timer-bot-delay-2026-10-12-5';
 const APP_SHELL = [
   './',
   './index.html',
