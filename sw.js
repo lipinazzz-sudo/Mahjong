@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'dj-game-hub-mahjong-dj-shooting-2026-10-16-1';
+const CACHE_VERSION = 'dj-mahjong-compat-redirect-hub-2026-10-16-2';
 const APP_SHELL = [
   './',
   './index.html',
