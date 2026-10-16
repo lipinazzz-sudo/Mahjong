@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#08090d">
-  <meta name="description" content="DJ Game Hub — main Mahjong, Type Shooter, dan DJ Poker dari satu pintu publik tanpa login.">
+  <meta name="description" content="DJ Game Hub — main Mahjong DJ dan DJ-Shooting dari satu pintu publik tanpa login.">
   <title>DJ Game Hub — Pilih Permainan</title>
   <style>
     :root{color-scheme:dark;--gold:#edc675;--gold-bright:#ffe7a3;--muted:#c4bba9;--line:rgba(237,198,117,.32);--panel:rgba(10,11,15,.84)}
@@ -26,13 +26,12 @@
     .eyebrow::after{transform:scaleX(-1)}
     h1{max-width:850px;margin:18px auto 12px;font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(36px,6.3vw,70px);font-weight:750;line-height:.99;letter-spacing:-.045em;color:#f9e4b4;text-shadow:0 3px 24px rgba(0,0,0,.52)}
     .hero-copy{max-width:570px;margin:0 auto;color:#c9c2b4;font-size:clamp(13px,1.4vw,16px);line-height:1.7}
-    .game-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2.3vw,26px);width:100%;max-width:990px;margin:0 auto}
+    .game-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(14px,2.3vw,26px);width:100%;max-width:990px;margin:0 auto}
     .game-card{isolation:isolate;position:relative;display:flex;flex-direction:column;justify-content:space-between;min-height:clamp(305px,34vw,390px);padding:clamp(21px,3vw,34px);overflow:hidden;border:1px solid rgba(233,196,122,.38);border-radius:22px;text-decoration:none;background:#100f10;box-shadow:0 22px 55px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,243,208,.10);transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease,filter .2s ease}
     .game-card::before{content:"";position:absolute;z-index:-2;inset:0;background-size:cover;background-position:center;transition:transform .5s ease}
     .game-card::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,rgba(8,8,11,.20),rgba(7,7,10,.38) 35%,rgba(5,5,8,.97) 100%),linear-gradient(90deg,rgba(6,7,10,.66),rgba(6,7,10,.12))}
     .game-card--mahjong::before{background-image:url("assets/backgrounds/bg-main.jpg")}
     .game-card--shooter::before{background-image:url("https://lipinazzz-sudo.github.io/Type-Shooter/IMG_6628.jpeg")}
-    .game-card--new::before{background-image:url("assets/poker/poker-card-bg.svg")}
     .game-card:hover{transform:translateY(-4px);border-color:rgba(255,222,145,.82);box-shadow:0 28px 65px rgba(0,0,0,.46),0 0 28px rgba(224,172,65,.12),inset 0 1px 0 rgba(255,243,208,.14)}
     .game-card:hover::before{transform:scale(1.045)}
     .game-card:active{transform:translateY(-1px) scale(.995)}
@@ -45,9 +44,7 @@
     .tile:nth-child(1){transform:translateY(9px) rotate(-12deg);color:#226847}
     .tile:nth-child(2){transform:translateY(-5px);font-size:25px}
     .tile:nth-child(3){transform:translateY(9px) rotate(12deg);color:#ba302b}
-    .new-art{width:132px;height:132px;border:1px solid rgba(240,207,135,.72);border-radius:36px;transform:translate(-50%,-59%) rotate(-8deg);background:linear-gradient(145deg,rgba(29,27,26,.91),rgba(8,9,13,.94));box-shadow:inset 0 0 0 7px rgba(240,207,135,.055),0 0 50px rgba(224,176,77,.12)}
-    .new-art::before{content:"✦";display:grid;place-items:center;width:100%;height:100%;color:#f6d891;font-size:69px;text-shadow:0 0 25px rgba(244,197,101,.46);transform:rotate(8deg)}
-    .card-copy{margin-top:auto;position:relative;z-index:1}
+            .card-copy{margin-top:auto;position:relative;z-index:1}
     .card-kicker{margin-bottom:8px;color:#d7b66c;font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}
     .card-copy h2{margin:0;color:#fff0cf;font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(29px,3vw,38px);line-height:1.05;letter-spacing:-.025em}
     .card-copy p{min-height:43px;max-width:380px;margin:10px 0 18px;color:#d5cfc3;font-size:13px;line-height:1.65}
@@ -57,8 +54,7 @@
     .footer{margin-top:auto;padding-top:31px;display:flex;align-items:center;justify-content:center;gap:10px;color:rgba(203,194,174,.66);font-size:10px;letter-spacing:.08em;text-align:center}
     .footer-line{width:28px;height:1px;background:rgba(225,184,103,.4)}
     @media(min-width:1000px){.hero{padding-top:clamp(50px,7vh,75px);padding-bottom:35px}}
-    @media(max-width:850px) and (min-width:651px){.game-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.game-card--new{grid-column:1/-1;width:min(100%,480px);justify-self:center}}
-    @media(max-width:650px){.page{padding:17px 15px 17px}.brand-mark{width:42px;height:42px;border-radius:12px}.brand-name{font-size:10px;letter-spacing:.18em}.brand-sub{font-size:10px}.hub-status{font-size:8px;letter-spacing:.10em;gap:6px}.hero{padding:43px 0 24px}h1{max-width:440px;margin-top:15px;font-size:clamp(35px,10.5vw,51px)}.hero-copy{max-width:380px;font-size:13px}.game-grid{grid-template-columns:1fr;max-width:460px;gap:15px}.game-card{min-height:315px;padding:22px;border-radius:18px}.card-art{top:47%;transform:translate(-50%,-57%) scale(.92)}.new-art{transform:translate(-50%,-57%) rotate(-8deg) scale(.92)}.card-copy h2{font-size:32px}.card-copy p{min-height:0;margin-bottom:14px}.footer{padding-top:24px;font-size:9px}}
+    @media(max-width:650px){.page{padding:17px 15px 17px}.brand-mark{width:42px;height:42px;border-radius:12px}.brand-name{font-size:10px;letter-spacing:.18em}.brand-sub{font-size:10px}.hub-status{font-size:8px;letter-spacing:.10em;gap:6px}.hero{padding:43px 0 24px}h1{max-width:440px;margin-top:15px;font-size:clamp(35px,10.5vw,51px)}.hero-copy{max-width:380px;font-size:13px}.game-grid{grid-template-columns:1fr;max-width:460px;gap:15px}.game-card{min-height:315px;padding:22px;border-radius:18px}.card-art{top:47%;transform:translate(-50%,-57%) scale(.92)}.card-copy h2{font-size:32px}.card-copy p{min-height:0;margin-bottom:14px}.footer{padding-top:24px;font-size:9px}}
     @media(max-width:370px){.hub-status{display:none}.hero{padding-top:36px}.game-card{min-height:295px;padding:19px}.tile{width:43px;height:61px}.footer{letter-spacing:.02em}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
   </style>
@@ -78,7 +74,7 @@
       <section class="hero" aria-labelledby="hub-title">
         <div class="eyebrow">Choose your world</div>
         <h1 id="hub-title">Permainan dimulai dari sini.</h1>
-        <p class="hero-copy">Pilih permainan yang ingin dimainkan. Mahjong, Type Shooter, dan DJ Poker dapat dibuka dari satu pintu publik tanpa akun atau login.</p>
+        <p class="hero-copy">Pilih permainan yang ingin dimainkan. Mahjong DJ dan DJ-Shooting dapat dibuka dari satu pintu publik tanpa akun atau login.</p>
       </section>
 
       <section class="game-grid" aria-label="Pilihan permainan">
@@ -95,31 +91,19 @@
           </div>
         </a>
 
-        <a class="game-card game-card--shooter" href="https://lipinazzz-sudo.github.io/Type-Shooter/" aria-label="Mainkan Type Shooter">
+        <a class="game-card game-card--shooter" href="https://lipinazzz-sudo.github.io/Type-Shooter/" aria-label="Mainkan DJ-Shooting">
           <div class="card-top">
-            <span class="card-index">GAME 02 / TYPE SHOOTER</span>
+            <span class="card-index">GAME 02 / DJ-SHOOTING</span>
             <span class="card-tag">Arcade · Typing</span>
           </div>
           <div class="card-copy">
             <div class="card-kicker">Far And Beyond</div>
-            <h2>Type Shooter</h2>
+            <h2>DJ-Shooting</h2>
             <p>Game arcade berbasis mengetik. Hancurkan musuh dengan mengetik kata secara cepat dan akurat.</p>
-            <div class="card-action"><span>Mainkan Type Shooter</span><span class="arrow" aria-hidden="true">→</span></div>
+            <div class="card-action"><span>Mainkan DJ-Shooting</span><span class="arrow" aria-hidden="true">→</span></div>
           </div>
         </a>
 
-        <a class="game-card game-card--new" href="game-baru.html" aria-label="Buka DJ Poker">
-          <div class="card-top">
-            <span class="card-index">GAME 03 / DJ POKER</span>
-            <span class="card-tag">Cards · Strategy</span>
-          </div>
-          <div class="card-copy">
-            <div class="card-kicker">Texas Hold’em Poker</div>
-            <h2>DJ Poker</h2>
-            <p>Texas Hold’em melawan bot, dengan chip virtual dan ronde taruhan lengkap.</p>
-            <div class="card-action"><span>Mainkan DJ Poker</span><span class="arrow" aria-hidden="true">→</span></div>
-          </div>
-        </a>
       </section>
     </main>
 
