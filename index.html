@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#08090d">
-  <meta name="description" content="DJ Game Hub — pilih Mahjong DJ atau DJ Poker.">
+  <meta name="description" content="DJ Game Hub — main Mahjong, Type Shooter, dan DJ Poker dari satu pintu publik tanpa login.">
   <title>DJ Game Hub — Pilih Permainan</title>
   <style>
     :root{color-scheme:dark;--gold:#edc675;--gold-bright:#ffe7a3;--muted:#c4bba9;--line:rgba(237,198,117,.32);--panel:rgba(10,11,15,.84)}
@@ -26,11 +26,12 @@
     .eyebrow::after{transform:scaleX(-1)}
     h1{max-width:850px;margin:18px auto 12px;font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(36px,6.3vw,70px);font-weight:750;line-height:.99;letter-spacing:-.045em;color:#f9e4b4;text-shadow:0 3px 24px rgba(0,0,0,.52)}
     .hero-copy{max-width:570px;margin:0 auto;color:#c9c2b4;font-size:clamp(13px,1.4vw,16px);line-height:1.7}
-    .game-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(14px,2.3vw,26px);width:100%;max-width:990px;margin:0 auto}
+    .game-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2.3vw,26px);width:100%;max-width:990px;margin:0 auto}
     .game-card{isolation:isolate;position:relative;display:flex;flex-direction:column;justify-content:space-between;min-height:clamp(305px,34vw,390px);padding:clamp(21px,3vw,34px);overflow:hidden;border:1px solid rgba(233,196,122,.38);border-radius:22px;text-decoration:none;background:#100f10;box-shadow:0 22px 55px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,243,208,.10);transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease,filter .2s ease}
     .game-card::before{content:"";position:absolute;z-index:-2;inset:0;background-size:cover;background-position:center;transition:transform .5s ease}
     .game-card::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,rgba(8,8,11,.20),rgba(7,7,10,.38) 35%,rgba(5,5,8,.97) 100%),linear-gradient(90deg,rgba(6,7,10,.66),rgba(6,7,10,.12))}
     .game-card--mahjong::before{background-image:url("assets/backgrounds/bg-main.jpg")}
+    .game-card--shooter::before{background-image:url("https://lipinazzz-sudo.github.io/Type-Shooter/IMG_6628.jpeg")}
     .game-card--new::before{background-image:url("assets/poker/poker-card-bg.svg")}
     .game-card:hover{transform:translateY(-4px);border-color:rgba(255,222,145,.82);box-shadow:0 28px 65px rgba(0,0,0,.46),0 0 28px rgba(224,172,65,.12),inset 0 1px 0 rgba(255,243,208,.14)}
     .game-card:hover::before{transform:scale(1.045)}
@@ -76,7 +77,7 @@
       <section class="hero" aria-labelledby="hub-title">
         <div class="eyebrow">Choose your world</div>
         <h1 id="hub-title">Permainan dimulai dari sini.</h1>
-        <p class="hero-copy">Pilih permainan untuk masuk ke ruangnya masing-masing. Mahjong tetap berjalan seperti sebelumnya; game kedua dikembangkan secara terpisah.</p>
+        <p class="hero-copy">Pilih permainan yang ingin dimainkan. Mahjong, Type Shooter, dan DJ Poker dapat dibuka dari satu pintu publik tanpa akun atau login.</p>
       </section>
 
       <section class="game-grid" aria-label="Pilihan permainan">
@@ -85,7 +86,7 @@
             <span class="card-index">GAME 01 / MAHJONG</span>
             <span class="card-tag">Ready to play</span>
           </div>
-                    <div class="card-copy">
+          <div class="card-copy">
             <div class="card-kicker">Hong Kong Mahjong</div>
             <h2>Mahjong DJ</h2>
             <p>Masuk ke permainan Mahjong yang sudah ada, dengan mode VS AI dan multiplayer.</p>
@@ -93,15 +94,28 @@
           </div>
         </a>
 
+        <a class="game-card game-card--shooter" href="https://lipinazzz-sudo.github.io/Type-Shooter/" aria-label="Mainkan Type Shooter">
+          <div class="card-top">
+            <span class="card-index">GAME 02 / TYPE SHOOTER</span>
+            <span class="card-tag">Arcade · Typing</span>
+          </div>
+          <div class="card-copy">
+            <div class="card-kicker">Far And Beyond</div>
+            <h2>Type Shooter</h2>
+            <p>Game arcade berbasis mengetik. Hancurkan musuh dengan mengetik kata secara cepat dan akurat.</p>
+            <div class="card-action"><span>Mainkan Type Shooter</span><span class="arrow" aria-hidden="true">→</span></div>
+          </div>
+        </a>
+
         <a class="game-card game-card--new" href="game-baru.html" aria-label="Buka DJ Poker">
           <div class="card-top">
-            <span class="card-index">GAME 02 / DJ POKER</span>
+            <span class="card-index">GAME 03 / DJ POKER</span>
             <span class="card-tag">Cards · Strategy</span>
           </div>
           <div class="card-copy">
             <div class="card-kicker">Texas Hold’em Poker</div>
             <h2>DJ Poker</h2>
-            <p>Texas Hold’em melawan hingga delapan bot, dengan chip virtual dan ronde taruhan lengkap.</p>
+            <p>Texas Hold’em melawan bot, dengan chip virtual dan ronde taruhan lengkap.</p>
             <div class="card-action"><span>Mainkan DJ Poker</span><span class="arrow" aria-hidden="true">→</span></div>
           </div>
         </a>
