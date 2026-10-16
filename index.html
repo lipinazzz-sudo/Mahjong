@@ -1,122 +1,31 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#08090d">
-  <meta name="description" content="DJ Game Hub — main Mahjong DJ dan DJ-Shooting dari satu pintu publik tanpa login.">
-  <title>DJ Game Hub — Pilih Permainan</title>
-  <style>
-    :root{color-scheme:dark;--gold:#edc675;--gold-bright:#ffe7a3;--muted:#c4bba9;--line:rgba(237,198,117,.32);--panel:rgba(10,11,15,.84)}
-    *{box-sizing:border-box}
-    html{min-height:100%;background:#08090d}
-    body{margin:0;min-height:100vh;min-height:100svh;color:#f8f1e1;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 50% 15%,#24372e 0%,#111b19 38%,#080b10 76%,#050609 100%)}
-    body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 50% 28%,rgba(188,135,44,.15),transparent 42%),linear-gradient(100deg,rgba(3,5,9,.88),rgba(6,7,11,.72) 48%,rgba(3,5,9,.88)),linear-gradient(180deg,rgba(3,4,7,.32),rgba(3,4,7,.83))}
-    a{color:inherit}
-    .page{position:relative;z-index:1;min-height:100vh;min-height:100svh;width:min(1240px,100%);margin:0 auto;padding:clamp(20px,4vw,48px) clamp(16px,4vw,44px) 22px;display:flex;flex-direction:column}
-    .topbar{display:flex;align-items:center;gap:13px}
-    .brand-mark{width:48px;height:48px;display:grid;place-items:center;flex:none;border:1px solid rgba(255,221,152,.65);border-radius:14px;background:linear-gradient(145deg,rgba(45,35,22,.96),rgba(9,10,13,.98));box-shadow:0 0 24px rgba(232,179,79,.13),inset 0 1px 0 rgba(255,247,219,.15);font-family:Georgia,serif;font-size:19px;font-weight:900;letter-spacing:-.07em;color:var(--gold-bright)}
-    .brand-name{font-size:12px;font-weight:900;letter-spacing:.22em;text-transform:uppercase}
-    .brand-sub{margin-top:5px;color:#bdb4a4;font-size:11px;letter-spacing:.08em}
-    .hub-status{margin-left:auto;display:flex;align-items:center;gap:8px;color:#d2c4a5;font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
-    .status-dot{width:6px;height:6px;border-radius:50%;background:#dcb75f;box-shadow:0 0 10px rgba(235,190,93,.8)}
-    .hero{padding:clamp(42px,8vh,86px) 0 34px;text-align:center}
-    .eyebrow{display:inline-flex;align-items:center;gap:10px;color:var(--gold);font-size:10px;font-weight:900;letter-spacing:.28em;text-transform:uppercase}
-    .eyebrow::before,.eyebrow::after{content:"";width:24px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
-    .eyebrow::after{transform:scaleX(-1)}
-    h1{max-width:850px;margin:18px auto 12px;font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(36px,6.3vw,70px);font-weight:750;line-height:.99;letter-spacing:-.045em;color:#f9e4b4;text-shadow:0 3px 24px rgba(0,0,0,.52)}
-    .hero-copy{max-width:570px;margin:0 auto;color:#c9c2b4;font-size:clamp(13px,1.4vw,16px);line-height:1.7}
-    .game-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(14px,2.3vw,26px);width:100%;max-width:990px;margin:0 auto}
-    .game-card{isolation:isolate;position:relative;display:flex;flex-direction:column;justify-content:space-between;min-height:clamp(305px,34vw,390px);padding:clamp(21px,3vw,34px);overflow:hidden;border:1px solid rgba(233,196,122,.38);border-radius:22px;text-decoration:none;background:#100f10;box-shadow:0 22px 55px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,243,208,.10);transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease,filter .2s ease}
-    .game-card::before{content:"";position:absolute;z-index:-2;inset:0;background-size:cover;background-position:center;transition:transform .5s ease}
-    .game-card::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,rgba(8,8,11,.20),rgba(7,7,10,.38) 35%,rgba(5,5,8,.97) 100%),linear-gradient(90deg,rgba(6,7,10,.66),rgba(6,7,10,.12))}
-    .game-card--mahjong::before{background-image:url("assets/backgrounds/bg-main.jpg")}
-    .game-card--shooter::before{background-image:url("https://lipinazzz-sudo.github.io/Type-Shooter/IMG_6628.jpeg")}
-    .game-card:hover{transform:translateY(-4px);border-color:rgba(255,222,145,.82);box-shadow:0 28px 65px rgba(0,0,0,.46),0 0 28px rgba(224,172,65,.12),inset 0 1px 0 rgba(255,243,208,.14)}
-    .game-card:hover::before{transform:scale(1.045)}
-    .game-card:active{transform:translateY(-1px) scale(.995)}
-    .game-card:focus-visible{outline:2px solid var(--gold-bright);outline-offset:4px}
-    .card-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
-    .card-index{color:#f1d9a2;font-size:10px;font-weight:900;letter-spacing:.19em}
-    .card-tag{padding:7px 10px;border:1px solid rgba(255,222,158,.26);border-radius:999px;background:rgba(9,10,13,.48);color:#e4d1a6;font-size:9px;font-weight:850;letter-spacing:.12em;text-transform:uppercase}
-    .card-art{position:absolute;top:50%;left:50%;width:165px;height:118px;transform:translate(-50%,-59%);display:flex;align-items:center;justify-content:center;gap:8px;pointer-events:none;filter:drop-shadow(0 13px 13px rgba(0,0,0,.48))}
-    .tile{display:grid;place-items:center;width:48px;height:67px;border:1px solid rgba(255,223,150,.9);border-radius:7px;background:linear-gradient(145deg,#fff8e8,#dfcfad 70%,#b9a37b);color:#a52a29;text-shadow:0 1px 0 rgba(255,255,255,.7);font-family:"Noto Serif CJK SC",serif;font-size:29px;font-weight:900;box-shadow:inset 0 0 0 2px rgba(135,89,34,.12),0 7px 13px rgba(0,0,0,.35)}
-    .tile:nth-child(1){transform:translateY(9px) rotate(-12deg);color:#226847}
-    .tile:nth-child(2){transform:translateY(-5px);font-size:25px}
-    .tile:nth-child(3){transform:translateY(9px) rotate(12deg);color:#ba302b}
-            .card-copy{margin-top:auto;position:relative;z-index:1}
-    .card-kicker{margin-bottom:8px;color:#d7b66c;font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}
-    .card-copy h2{margin:0;color:#fff0cf;font-family:"Bodoni MT",Didot,Georgia,serif;font-size:clamp(29px,3vw,38px);line-height:1.05;letter-spacing:-.025em}
-    .card-copy p{min-height:43px;max-width:380px;margin:10px 0 18px;color:#d5cfc3;font-size:13px;line-height:1.65}
-    .card-action{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid rgba(235,203,146,.25);color:#f6dba0;font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
-    .arrow{display:grid;place-items:center;width:30px;height:30px;flex:none;border:1px solid rgba(242,209,143,.55);border-radius:50%;font-size:16px;transition:transform .2s ease,background .2s ease}
-    .game-card:hover .arrow{transform:translateX(3px);background:rgba(231,192,107,.12)}
-    .footer{margin-top:auto;padding-top:31px;display:flex;align-items:center;justify-content:center;gap:10px;color:rgba(203,194,174,.66);font-size:10px;letter-spacing:.08em;text-align:center}
-    .footer-line{width:28px;height:1px;background:rgba(225,184,103,.4)}
-    @media(min-width:1000px){.hero{padding-top:clamp(50px,7vh,75px);padding-bottom:35px}}
-    @media(max-width:650px){.page{padding:17px 15px 17px}.brand-mark{width:42px;height:42px;border-radius:12px}.brand-name{font-size:10px;letter-spacing:.18em}.brand-sub{font-size:10px}.hub-status{font-size:8px;letter-spacing:.10em;gap:6px}.hero{padding:43px 0 24px}h1{max-width:440px;margin-top:15px;font-size:clamp(35px,10.5vw,51px)}.hero-copy{max-width:380px;font-size:13px}.game-grid{grid-template-columns:1fr;max-width:460px;gap:15px}.game-card{min-height:315px;padding:22px;border-radius:18px}.card-art{top:47%;transform:translate(-50%,-57%) scale(.92)}.card-copy h2{font-size:32px}.card-copy p{min-height:0;margin-bottom:14px}.footer{padding-top:24px;font-size:9px}}
-    @media(max-width:370px){.hub-status{display:none}.hero{padding-top:36px}.game-card{min-height:295px;padding:19px}.tile{width:43px;height:61px}.footer{letter-spacing:.02em}}
-    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
-  </style>
-</head>
-<body>
-  <div class="page">
-    <header class="topbar">
-      <div class="brand-mark" aria-hidden="true">DJ</div>
-      <div>
-        <div class="brand-name">DJ Game Hub</div>
-        <div class="brand-sub">One entrance. Separate game worlds.</div>
-      </div>
-      <div class="hub-status"><span class="status-dot" aria-hidden="true"></span> Game Selection</div>
-    </header>
-
-    <main>
-      <section class="hero" aria-labelledby="hub-title">
-        <div class="eyebrow">Choose your world</div>
-        <h1 id="hub-title">Permainan dimulai dari sini.</h1>
-        <p class="hero-copy">Pilih permainan yang ingin dimainkan. Mahjong DJ dan DJ-Shooting dapat dibuka dari satu pintu publik tanpa akun atau login.</p>
-      </section>
-
-      <section class="game-grid" aria-label="Pilihan permainan">
-        <a class="game-card game-card--mahjong" href="mahjong.html" aria-label="Masuk ke Mahjong DJ">
-          <div class="card-top">
-            <span class="card-index">GAME 01 / MAHJONG</span>
-            <span class="card-tag">Ready to play</span>
-          </div>
-          <div class="card-copy">
-            <div class="card-kicker">Hong Kong Mahjong</div>
-            <h2>Mahjong DJ</h2>
-            <p>Masuk ke permainan Mahjong yang sudah ada, dengan mode VS AI dan multiplayer.</p>
-            <div class="card-action"><span>Masuk ke Mahjong</span><span class="arrow" aria-hidden="true">→</span></div>
-          </div>
-        </a>
-
-        <a class="game-card game-card--shooter" href="https://lipinazzz-sudo.github.io/Type-Shooter/" aria-label="Mainkan DJ-Shooting">
-          <div class="card-top">
-            <span class="card-index">GAME 02 / DJ-SHOOTING</span>
-            <span class="card-tag">Arcade · Typing</span>
-          </div>
-          <div class="card-copy">
-            <div class="card-kicker">Far And Beyond</div>
-            <h2>DJ-Shooting</h2>
-            <p>Game arcade berbasis mengetik. Hancurkan musuh dengan mengetik kata secara cepat dan akurat.</p>
-            <div class="card-action"><span>Mainkan DJ-Shooting</span><span class="arrow" aria-hidden="true">→</span></div>
-          </div>
-        </a>
-
-      </section>
-    </main>
-
-    <footer class="footer"><span class="footer-line" aria-hidden="true"></span><span>DJ GAME HUB</span><span class="footer-line" aria-hidden="true"></span></footer>
-  </div>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b10">
+  <meta name="robots" content="noindex">
+  <title>DJ Game Hub</title>
   <script>
-    // Keep old Mahjong room invites working after index.html becomes the game hub.
-    (function(){
+    (function () {
       var query = new URLSearchParams(window.location.search);
+
+      // Undangan multiplayer lama harus tetap menuju game, bukan halaman Hub.
       if (query.has("room")) {
-        window.location.replace("mahjong.html" + window.location.search + window.location.hash);
+        window.location.replace("./mahjong.html" + window.location.search + window.location.hash);
+        return;
       }
+
+      // Semua akses ke alamat Hub lama diarahkan ke repo Hub yang baru.
+      window.location.replace("https://lipinazzz-sudo.github.io/DJ-Game-Hub/");
     })();
   </script>
+</head>
+<body>
+  <p>Membuka DJ Game Hub…</p>
+  <noscript>
+    <p><a href="https://lipinazzz-sudo.github.io/DJ-Game-Hub/">Buka DJ Game Hub</a></p>
+    <p><a href="./mahjong.html">Buka Mahjong DJ</a></p>
+  </noscript>
 </body>
 </html>
