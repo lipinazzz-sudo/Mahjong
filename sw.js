@@ -1,12 +1,8 @@
-const CACHE_VERSION = 'dj-poker-seat-bounds-fold-hidden-action-timer-bot-delay-2026-10-12-5';
+const CACHE_VERSION = 'dj-game-hub-mahjong-dj-shooting-2026-10-16-1';
 const APP_SHELL = [
   './',
   './index.html',
   './mahjong.html',
-  './game-baru.html',
-  './assets/poker/poker-card-bg.svg',
-  './assets/poker/poker.js',
-  './assets/poker/poker.css',
   './manifest.webmanifest',
   './assets/backgrounds/bg-main.jpg',
   './assets/backgrounds/bg-lobby.jpg',
