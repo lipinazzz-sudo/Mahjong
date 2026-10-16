@@ -42,6 +42,24 @@
 <link rel="stylesheet" href="assets/css/16-lobby-artwork-and-toolbar-consistency.css?v=20261009-3">
 <link rel="stylesheet" href="assets/css/17-mode-card-artwork.css?v=20261009-6">
 <link rel="stylesheet" href="assets/css/18-history-mode-tabs.css?v=20261009-1">
+
+    <style id="dj-hub-return-style">
+      #screen-main .hub-home-btn{
+        width:min(100%,420px);
+        min-height:46px;
+        border:1px solid rgba(239,197,100,.48);
+        border-radius:13px;
+        background:linear-gradient(180deg,rgba(18,16,15,.93),rgba(4,4,5,.97));
+        color:#f4deb0;
+        font-size:clamp(12px,1.4vw,15px);
+        font-weight:800;
+        letter-spacing:.11em;
+        box-shadow:0 8px 20px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,241,205,.09);
+      }
+      #screen-main .hub-home-btn::before{content:"←";width:20px;margin-right:8px;color:#ffd27b;font-size:17px}
+      #screen-main .hub-home-btn:hover{filter:brightness(1.12);border-color:rgba(255,219,133,.78)}
+      @media(max-height:640px){#screen-main .hub-home-btn{min-height:38px;padding:8px 12px;font-size:12px}}
+    </style>
 </head>
 <body>
     <audio id="bg-music" loop preload="auto" aria-hidden="true"></audio>
@@ -75,6 +93,7 @@
                 </div>
                 <div class="menu-actions main-menu-actions">
                     <button class="btn btn-primary main-play-btn" onclick="nav('screen-play')">Play Game</button>
+                    <button class="btn btn-secondary hub-home-btn" type="button" onclick="window.location.assign('./')" aria-label="Kembali ke DJ Game Hub">Kembali ke DJ Game Hub</button>
                 </div>
             </div>
         </section>
